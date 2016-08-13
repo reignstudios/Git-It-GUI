@@ -1,0 +1,13 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="640" Design.Height="400" Background="LightGray">
+	<Grid>
+		<TextBlock Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">Merge / Diff tool</TextBlock>
+		<ListBox Margin="10,30,0,0" Width="256" HorizontalAlignment="Left" VerticalAlignment="Top" Background="White">
+			<ListBoxItem>Meld</ListBoxItem>
+			<ListBoxItem>kDiff3</ListBoxItem>
+			<ListBoxItem>P4Merge</ListBoxItem>
+			<ListBoxItem>DiffMerge</ListBoxItem>
+		</ListBox>
+
+		<Button Margin="0,10,10,0" HorizontalAlignment="Right" VerticalAlignment="Top">Go to Start-Page</Button>
+	</Grid>
+</UserControl>

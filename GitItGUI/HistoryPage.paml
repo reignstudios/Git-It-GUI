@@ -1,0 +1,6 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="640" Design.Height="400" Background="LightGray">
+	<Grid>
+		<TextBlock Height="32" Margin="0,0,0,70" HorizontalAlignment="Center" VerticalAlignment="Center">This will open 'Gitk' (built in Git-Gui tool)</TextBlock>
+		<Button FontSize="24" Width="256" Height="64" HorizontalAlignment="Center" VerticalAlignment="Center">Open History Tool</Button>
+	</Grid>
+</UserControl>
