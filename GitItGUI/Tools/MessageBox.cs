@@ -16,6 +16,11 @@ namespace GitItGUI
 
 	static class MessageBox
 	{
+		public static bool Show(string text)
+		{
+			return Show("Alert", text, MessageBoxTypes.Ok);
+		}
+
 		public static bool Show(string text, MessageBoxTypes type)
 		{
 			return Show("Alert", text, type);

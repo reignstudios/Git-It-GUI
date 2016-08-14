@@ -1,6 +1,6 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
 	Title="Git-It-GUI"
-	Icon="resm:GitItGUI.Icons.AppIcon.png?assembly=GitItGUI"
+	Icon="resm:GitItGUI.Icons.AppIcon.ico?assembly=GitItGUI"
 	Width="1280" Height="800">
 	
 </Window>
