@@ -10,12 +10,9 @@ namespace GitItGUI
 		public HistoryPage()
 		{
 			singleton = this;
-			this.InitializeComponent();
-		}
-
-		private void InitializeComponent()
-		{
 			AvaloniaXamlLoader.Load(this);
+
+
 		}
 	}
 }

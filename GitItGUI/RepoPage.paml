@@ -7,9 +7,9 @@
 
 		<Grid Grid.Column="0" Background="LightGray">
 			<TextBlock FontSize="24" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Remotes</TextBlock>
-			<ListBox Name="activeBranchListView" Margin="10,50,10,50" SelectionMode="Single" Background="White"/>
-			<Button HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75">Add</Button>
-			<Button HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75">Remove</Button>
+			<ListBox Name="remotesListView" Margin="10,50,10,50" SelectionMode="Single" Background="White"/>
+			<Button Name="addRemoteButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75">Add</Button>
+			<Button Name="removeRemoteButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75">Remove</Button>
 			<Line StartPoint="0,0" EndPoint="0,5000" Stroke="DarkGray" StrokeThickness="4" HorizontalAlignment="Right"/>
 		</Grid>
 
@@ -28,10 +28,10 @@
 					</Grid.ColumnDefinitions>
 
 					<Grid Grid.Column="0">
-						<TextBox Height="30" VerticalAlignment="Top" Margin="0,0,0,0">Sig Name</TextBox>
-						<TextBox Height="30" VerticalAlignment="Top" Margin="0,30,0,0">Sig Email</TextBox>
-						<TextBox Height="30" VerticalAlignment="Top" Margin="0,60,0,0">Username</TextBox>
-						<TextBox Height="30" VerticalAlignment="Top" Margin="0,90,0,0">Password</TextBox>
+						<TextBox Name="sigNameTextBox" Height="30" VerticalAlignment="Top" Margin="0,0,0,0">Sig Name</TextBox>
+						<TextBox Name="sigEmailTextBox" Height="30" VerticalAlignment="Top" Margin="0,30,0,0">Sig Email</TextBox>
+						<TextBox Name="usernameTextBox" Height="30" VerticalAlignment="Top" Margin="0,60,0,0">Username</TextBox>
+						<TextBox Name="passwordTextBox" Height="30" VerticalAlignment="Top" Margin="0,90,0,0">Password</TextBox>
 					</Grid>
 
 					<Grid Grid.Column="1">
@@ -43,8 +43,9 @@
 				</Grid>
 
 				<Grid Grid.Row="1">
-					<CheckBox Margin="0,0,0,65" HorizontalAlignment="Left" VerticalAlignment="Bottom">Git-LFS Support</CheckBox>
-					<CheckBox Margin="0,0,0,35" HorizontalAlignment="Left" VerticalAlignment="Bottom">Validate .gitignore file exists</CheckBox>
+					<CheckBox Name="gitlfsSupportCheckBox" Margin="0,0,0,65" HorizontalAlignment="Left" VerticalAlignment="Bottom">Git-LFS Support</CheckBox>
+					<CheckBox Name="validateGitignoreCheckbox" Margin="0,0,0,35" HorizontalAlignment="Left" VerticalAlignment="Bottom">Validate .gitignore file exists</CheckBox>
+					<!--Replace this button with ListBox with Add/Remove buttons -->
 					<Button Margin="0,0,0,0" Width="180" HorizontalAlignment="Left" VerticalAlignment="Bottom">Manage Git-LFS .ext types</Button>
 				</Grid>
 			</Grid>

@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -189,6 +189,9 @@
     <Compile Include="ChangesPage.paml.cs">
       <DependentUpon>ChangesPage.paml</DependentUpon>
     </Compile>
+    <Compile Include="CheckForUpdatesPage.paml.cs">
+      <DependentUpon>CheckForUpdatesPage.paml</DependentUpon>
+    </Compile>
     <Compile Include="Filters\GitLFS.cs" />
     <Compile Include="HistoryPage.paml.cs">
       <DependentUpon>HistoryPage.paml</DependentUpon>
@@ -231,6 +234,9 @@
     <EmbeddedResource Include="AppSettingsPage.paml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="CheckForUpdatesPage.paml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <EmbeddedResource Include="StartPage.paml">
       <SubType>Designer</SubType>
@@ -244,13 +250,13 @@
     <Content Include="AppIcon.ico" />
     <Content Include="VersionInfo.xml" />
     <EmbeddedResource Include="Icons\AppIcon.png" />
-    <Content Include="Icons\conflicted.png" />
-    <Content Include="Icons\deleted.png" />
-    <Content Include="Icons\modified.png" />
-    <Content Include="Icons\new.png" />
-    <Content Include="Icons\renamed.png" />
-    <Content Include="Icons\Thinking.png" />
-    <Content Include="Icons\typeChanged.png" />
+    <EmbeddedResource Include="Icons\conflicted.png" />
+    <EmbeddedResource Include="Icons\deleted.png" />
+    <EmbeddedResource Include="Icons\modified.png" />
+    <EmbeddedResource Include="Icons\new.png" />
+    <EmbeddedResource Include="Icons\renamed.png" />
+    <EmbeddedResource Include="Icons\Thinking.png" />
+    <EmbeddedResource Include="Icons\typeChanged.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

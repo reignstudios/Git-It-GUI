@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -41,9 +40,10 @@ namespace GitItGUI
 
 	static class Settings
 	{
+		public const string FolderName = "GitItGUI";
 		public const string GuiFilename = "Settings.xml";
-		public const string RepoFilename = ".gitgamegui";
-		public const string RepoUserFilename = ".gitgamegui-user";
+		public const string RepoFilename = ".gititgui";
+		public const string RepoUserFilename = ".gititgui-user";
 
 		public static T Load<T>(string filename) where T : new()
 		{

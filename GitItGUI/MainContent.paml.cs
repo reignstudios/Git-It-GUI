@@ -10,11 +10,7 @@ namespace GitItGUI
 		public MainContent()
 		{
 			singleton = this;
-			this.InitializeComponent();
-		}
-
-		private void InitializeComponent()
-		{
+			
 			// load pages
 			ChangesPage.singleton = new ChangesPage();
 			BranchesPage.singleton = new BranchesPage();

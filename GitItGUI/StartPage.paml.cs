@@ -11,11 +11,6 @@ namespace GitItGUI
 		public StartPage()
 		{
 			singleton = this;
-			this.InitializeComponent();
-		}
-
-		private void InitializeComponent()
-		{
 			AvaloniaXamlLoader.Load(this);
 
 			var historyStackPanel = this.Find<StackPanel>("historyStackPanel");

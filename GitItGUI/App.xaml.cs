@@ -14,8 +14,18 @@ namespace GitItGUI
 
 		public override void Initialize()
 		{
+			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+			
 			AvaloniaXamlLoader.Load(this);
 			base.Initialize();
+		}
+
+		private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			var ex = e.ExceptionObject as Exception;
+			string msg = "Unknown";
+			if (ex != null) msg = ex.Message;
+			MessageBox.Show("Critical Error: " + msg);
 		}
 
 		static void Main(string[] args)
@@ -29,19 +39,19 @@ namespace GitItGUI
 
 		public static void AttachDevTools(Window window)
 		{
-#if DEBUG
+			#if DEBUG
             DevTools.Attach(window);
-#endif
+			#endif
 		}
 
 		private static void InitializeLogging()
 		{
-#if DEBUG
+			#if DEBUG
             SerilogLogger.Initialize(new LoggerConfiguration()
                 .MinimumLevel.Warning()
                 .WriteTo.Trace(outputTemplate: "{Area}: {Message}")
                 .CreateLogger());
-#endif
+			#endif
 		}
 	}
 }

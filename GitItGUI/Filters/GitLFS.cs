@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
 
 namespace GitItGUI.Filters
 {
-	/*public class GitLFS : Filter
+	public class GitLFS : Filter
 	{
 		private Process process;
 		private FilterMode mode;
@@ -18,7 +17,7 @@ namespace GitItGUI.Filters
 
 		protected override void Clean(string path, string root, Stream input, Stream output)
 		{
-			if (!RepoUserControl.repoSettings.lfsSupport)
+			if (!RepoPage.repoSettings.lfsSupport)
 			{
 				base.Clean(path, root, input, output);
 				return;
@@ -38,7 +37,7 @@ namespace GitItGUI.Filters
 
 		protected override void Complete(string path, string root, Stream output)
 		{
-			if (!RepoUserControl.repoSettings.lfsSupport)
+			if (!RepoPage.repoSettings.lfsSupport)
 			{
 				base.Complete(path, root, output);
 				return;
@@ -82,7 +81,7 @@ namespace GitItGUI.Filters
 
 		protected override void Create(string path, string root, FilterMode mode)
 		{
-			if (!RepoUserControl.repoSettings.lfsSupport)
+			if (!RepoPage.repoSettings.lfsSupport)
 			{
 				base.Create(path, root, mode);
 				return;
@@ -95,7 +94,7 @@ namespace GitItGUI.Filters
 				process = new Process();
 				process.StartInfo.FileName = "git-lfs";
 				process.StartInfo.Arguments = mode == FilterMode.Clean ? "clean" : "smudge";
-				process.StartInfo.WorkingDirectory = RepoUserControl.repoPath;
+				process.StartInfo.WorkingDirectory = RepoPage.repoPath;
 				process.StartInfo.RedirectStandardInput = true;
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
@@ -117,7 +116,7 @@ namespace GitItGUI.Filters
 
 		protected override void Smudge(string path, string root, Stream input, Stream output)
 		{
-			if (!RepoUserControl.repoSettings.lfsSupport)
+			if (!RepoPage.repoSettings.lfsSupport)
 			{
 				base.Smudge(path, root, input, output);
 				return;
@@ -134,5 +133,5 @@ namespace GitItGUI.Filters
 				MessageBox.Show("LFS Smudge Error: " + e.Message);
 			}
 		}
-	}*/
+	}
 }
