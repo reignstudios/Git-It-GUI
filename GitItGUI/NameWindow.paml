@@ -1,0 +1,7 @@
+﻿<Window xmlns="https://github.com/avaloniaui" MinWidth="300" MinHeight="120">
+	<Grid>
+		<TextBox Name="nameTextBox" Height="28" Margin="10,0,12,0" TextWrapping="Wrap" Text="Some Name Text..." IsReadOnly="True"/>
+		<Button Name="okButton" Margin="-10,-10,10,10" Width="75" HorizontalAlignment="Right" VerticalAlignment="Bottom">Ok</Button>
+		<Button Name="cancleButton" Margin="10,-10,-10,10" Width="75" HorizontalAlignment="Left" VerticalAlignment="Bottom">Cancle</Button>
+	</Grid>
+</Window>

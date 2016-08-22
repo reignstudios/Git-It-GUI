@@ -11,10 +11,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitItGUI</RootNamespace>
     <AssemblyName>GitItGUI</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -192,12 +193,21 @@
     <Compile Include="CheckForUpdatesPage.paml.cs">
       <DependentUpon>CheckForUpdatesPage.paml</DependentUpon>
     </Compile>
+    <Compile Include="CommitWindow.paml.cs">
+      <DependentUpon>CommitWindow.paml</DependentUpon>
+    </Compile>
     <Compile Include="Filters\GitLFS.cs" />
     <Compile Include="HistoryPage.paml.cs">
       <DependentUpon>HistoryPage.paml</DependentUpon>
     </Compile>
     <Compile Include="MainContent.paml.cs">
       <DependentUpon>MainContent.paml</DependentUpon>
+    </Compile>
+    <Compile Include="MergeBinaryFileWindow.paml.cs">
+      <DependentUpon>MergeBinaryFileWindow.paml</DependentUpon>
+    </Compile>
+    <Compile Include="NameWindow.paml.cs">
+      <DependentUpon>NameWindow.paml</DependentUpon>
     </Compile>
     <Compile Include="RepoPage.paml.cs">
       <DependentUpon>RepoPage.paml</DependentUpon>
@@ -235,6 +245,16 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="CheckForUpdatesPage.paml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CommitWindow.paml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MergeBinaryFileWindow.paml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <EmbeddedResource Include="NameWindow.paml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />

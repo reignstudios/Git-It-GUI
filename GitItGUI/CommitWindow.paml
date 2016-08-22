@@ -1,0 +1,7 @@
+﻿<Window xmlns="https://github.com/avaloniaui" Height="200" Width="300" Title="Commit Message">
+	<Grid Background="LightGray">
+		<TextBox Name="messageTextBox" Margin="10,10,10,45" TextWrapping="Wrap" Text="" AcceptsReturn="True"/>
+		<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75"/>
+		<Button Name="okButton" Content="Commit" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75"/>
+	</Grid>
+</Window>

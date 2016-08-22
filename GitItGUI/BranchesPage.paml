@@ -8,15 +8,15 @@
 		<Grid Grid.Column="0" Background="LightGray">
 			<TextBlock FontSize="24" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Active Branch</TextBlock>
 			<ListBox Name="activeBranchListView" Margin="10,50,10,50" SelectionMode="Single" Background="White"/>
-			<Button HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75">Add</Button>
-			<Button HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75">Rename</Button>
+			<Button Name="addButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75">Add</Button>
+			<Button Name="renameButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75">Rename</Button>
 		</Grid>
 
 		<Grid Grid.Column="1" Background="LightGray">
 			<TextBlock FontSize="24" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Other Branch</TextBlock>
 			<ListBox Name="otherBranchListView" Margin="10,50,10,50" SelectionMode="Single" Background="White"/>
-			<Button HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75">Merge</Button>
-			<Button HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75">Delete</Button>
+			<Button Name="mergeButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75">Merge</Button>
+			<Button Name="deleteButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75">Delete</Button>
 		</Grid>
 	</Grid>
 </UserControl>
