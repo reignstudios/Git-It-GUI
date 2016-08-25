@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System;
-using System.Collections.Generic;
+using GitItGUI.Core;
 
 namespace GitItGUI
 {
@@ -19,8 +19,25 @@ namespace GitItGUI
 		public MainWindow()
 		{
 			singleton = this;
+
+			// load core
+			Debug.debugLogCallback += Debug_debugLogCallback;
+			Debug.debugLogWarningCallback += Debug_debugLogCallback;
+			Debug.debugLogErrorCallback += Debug_debugLogCallback;
+			if (!AppManager.Init())
+			{
+				Close();
+				return;
+			}
+
+			// load UI
 			LoadUI();
 			App.AttachDevTools(this);
+		}
+		
+		private void Debug_debugLogCallback(object value, bool alert)
+		{
+			if (alert) MessageBox.Show(value.ToString());
 		}
 
 		private void LoadUI()
@@ -55,7 +72,7 @@ namespace GitItGUI
 
 		private void MainWindow_Closed(object sender, EventArgs e)
 		{
-			// TODO: save settings and dispose
+			AppManager.Dispose();
 		}
 	}
 }

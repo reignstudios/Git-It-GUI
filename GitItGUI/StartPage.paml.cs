@@ -13,19 +13,19 @@ namespace GitItGUI
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
 
-			var historyStackPanel = this.Find<StackPanel>("historyStackPanel");
+			var recentStackPanel = this.Find<StackPanel>("recentStackPanel");
 			for (int i = 0; i != 5; ++i)
 			{
 				var button = new Button();
 				button.Content = "Repo Path...";
-				button.Click += historyButton_Click;
-				historyStackPanel.Children.Add(button);
+				button.Click += recentButton_Click;
+				recentStackPanel.Children.Add(button);
 			}
 		}
 
-		private void historyButton_Click(object sender, RoutedEventArgs e)
+		private void recentButton_Click(object sender, RoutedEventArgs e)
 		{
-			//MainWindow.LoadPage(PageTypes.MainContent);
+			MainWindow.LoadPage(PageTypes.MainContent);
 		}
 	}
 }
