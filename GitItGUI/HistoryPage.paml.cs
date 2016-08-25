@@ -13,30 +13,28 @@ namespace GitItGUI
 		{
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
-
-
 		}
 
-		private void openGitkButton_Click(object sender, RoutedEventArgs e)
-		{
-			// get gitk path
-			string programFilesx86, programFilesx64;
-			Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
+		//private void openGitkButton_Click(object sender, RoutedEventArgs e)
+		//{
+		//	// get gitk path
+		//	string programFilesx86, programFilesx64;
+		//	Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
 
-			// open gitk
-			var process = new Process();
-			process.StartInfo.FileName = programFilesx64 + "\\Git\\cmd\\gitk.exe";
-			process.StartInfo.WorkingDirectory = string.Format("{0}", RepoPage.repoPath);
-			process.StartInfo.Arguments = "";
-			process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
-			if (!process.Start())
-			{
-				MessageBox.Show("Failed to start Merge tool (is it installed?)");
-				return;
-			}
+		//	// open gitk
+		//	var process = new Process();
+		//	process.StartInfo.FileName = programFilesx64 + "\\Git\\cmd\\gitk.exe";
+		//	process.StartInfo.WorkingDirectory = string.Format("{0}", RepoPage.repoPath);
+		//	process.StartInfo.Arguments = "";
+		//	process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+		//	if (!process.Start())
+		//	{
+		//		MessageBox.Show("Failed to start Merge tool (is it installed?)");
+		//		return;
+		//	}
 
-			process.WaitForExit();
-			RepoPage.Refresh();
-		}
+		//	process.WaitForExit();
+		//	RepoPage.Refresh();
+		//}
 	}
 }

@@ -4,7 +4,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace GitItGUI
+namespace GitItGUI.Core
 {
 	namespace XML
 	{
@@ -24,7 +24,6 @@ namespace GitItGUI
 		[XmlRoot("RepoSettings")]
 		public class RepoSettings
 		{
-			[XmlAttribute("LFSSupport")] public bool lfsSupport = true;
 			[XmlAttribute("ValidateGitignore")] public bool validateGitignore = true;
 		}
 
@@ -37,13 +36,13 @@ namespace GitItGUI
 			[XmlAttribute("Password")] public string password = "password";
 		}
 	}
-
-	static class Settings
+	
+	public static class Settings
 	{
-		public const string FolderName = "GitItGUI";
-		public const string GuiFilename = "Settings.xml";
-		public const string RepoFilename = ".gititgui";
-		public const string RepoUserFilename = ".gititgui-user";
+		public const string appSettingsFolderName = "GitItGUI";
+		public const string appSettingsFilename = "GitItGUI_Settings.xml";
+		public const string repoSettingsFilename = ".gititgui";
+		public const string repoUserSettingsFilename = ".gititgui-user";
 
 		public static T Load<T>(string filename) where T : new()
 		{
@@ -59,7 +58,7 @@ namespace GitItGUI
 			}
 			catch (Exception e)
 			{
-				MessageBox.Show("Load Settings Error: " + e.Message);
+				Debug.LogError("Load Settings Error: " + e.Message, true);
 				return new T();
 			}
 		}
@@ -79,7 +78,7 @@ namespace GitItGUI
 			}
 			catch (Exception e)
 			{
-				MessageBox.Show("Save Settings Error: " + e.Message);
+				Debug.LogError("Save Settings Error: " + e.Message, true);
 				return false;
 			}
 

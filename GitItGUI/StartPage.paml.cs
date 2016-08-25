@@ -25,7 +25,7 @@ namespace GitItGUI
 
 		private void historyButton_Click(object sender, RoutedEventArgs e)
 		{
-			MainWindow.LoadPage(PageTypes.MainContent);
+			//MainWindow.LoadPage(PageTypes.MainContent);
 		}
 	}
 }

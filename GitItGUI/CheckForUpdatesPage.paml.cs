@@ -39,9 +39,11 @@ namespace GitItGUI
 		{
 			try
 			{
-				client = new WebClient();
-				client.DownloadStringCompleted += Client_DownloadStringCompleted;
-				client.DownloadStringAsync(new Uri(url));
+				//client = new WebClient();
+				//client.DownloadStringCompleted += Client_DownloadStringCompleted;
+				//client.DownloadStringAsync(new Uri(url));
+
+				MainWindow.LoadPage(PageTypes.Start);// TEMP: remove this
 			}
 			catch (Exception e)
 			{
@@ -118,7 +120,7 @@ namespace GitItGUI
 			return false;
 		}
 
-		private void Client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+		/*private void Client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
 		{
 			if (e.Error != null)
 			{
@@ -250,6 +252,6 @@ namespace GitItGUI
 
 			// load start page when done
 			MainWindow.LoadPage(PageTypes.Start);
-		}
+		}*/
 	}
 }

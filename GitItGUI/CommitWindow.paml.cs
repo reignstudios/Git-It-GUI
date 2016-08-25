@@ -39,7 +39,7 @@ namespace GitItGUI
 
 			try
 			{
-				RepoPage.repo.Commit(messageTextBox.Text, RepoPage.signature, RepoPage.signature);
+				//RepoPage.repo.Commit(messageTextBox.Text, RepoPage.signature, RepoPage.signature);
 			}
 			catch (Exception ex)
 			{

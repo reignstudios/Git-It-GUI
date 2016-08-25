@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace GitItGUI.Filters
+namespace GitItGUI.Core.Filters
 {
-	public class GitLFS : Filter
+	class GitLFS : Filter
 	{
 		private Process process;
 		private FilterMode mode;
@@ -17,7 +17,7 @@ namespace GitItGUI.Filters
 
 		protected override void Clean(string path, string root, Stream input, Stream output)
 		{
-			if (!RepoPage.repoSettings.lfsSupport)
+			if (!RepoManager.lfsEnabled)
 			{
 				base.Clean(path, root, input, output);
 				return;
@@ -31,13 +31,13 @@ namespace GitItGUI.Filters
 			}
 			catch (Exception e)
 			{
-				MessageBox.Show("LFS Clean Error: " + e.Message);
+				Debug.LogError("LFS Clean Error: " + e.Message, true);
 			}
 		}
 
 		protected override void Complete(string path, string root, Stream output)
 		{
-			if (!RepoPage.repoSettings.lfsSupport)
+			if (!RepoManager.lfsEnabled)
 			{
 				base.Complete(path, root, output);
 				return;
@@ -75,13 +75,13 @@ namespace GitItGUI.Filters
 			}
 			catch (Exception e)
 			{
-				MessageBox.Show("LFS Complete Error: " + e.Message);
+				Debug.LogError("LFS Complete Error: " + e.Message, true);
 			}
 		}
 
 		protected override void Create(string path, string root, FilterMode mode)
 		{
-			if (!RepoPage.repoSettings.lfsSupport)
+			if (!RepoManager.lfsEnabled)
 			{
 				base.Create(path, root, mode);
 				return;
@@ -94,7 +94,7 @@ namespace GitItGUI.Filters
 				process = new Process();
 				process.StartInfo.FileName = "git-lfs";
 				process.StartInfo.Arguments = mode == FilterMode.Clean ? "clean" : "smudge";
-				process.StartInfo.WorkingDirectory = RepoPage.repoPath;
+				process.StartInfo.WorkingDirectory = RepoManager.path;
 				process.StartInfo.RedirectStandardInput = true;
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
@@ -105,7 +105,7 @@ namespace GitItGUI.Filters
 			}
 			catch (Exception e)
 			{
-				MessageBox.Show("LFS Create Error: " + e.Message);
+				Debug.LogError("LFS Create Error: " + e.Message, true);
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace GitItGUI.Filters
 
 		protected override void Smudge(string path, string root, Stream input, Stream output)
 		{
-			if (!RepoPage.repoSettings.lfsSupport)
+			if (!RepoManager.lfsEnabled)
 			{
 				base.Smudge(path, root, input, output);
 				return;
@@ -130,7 +130,7 @@ namespace GitItGUI.Filters
 			}
 			catch (Exception e)
 			{
-				MessageBox.Show("LFS Smudge Error: " + e.Message);
+				Debug.LogError("LFS Smudge Error: " + e.Message, true);
 			}
 		}
 	}

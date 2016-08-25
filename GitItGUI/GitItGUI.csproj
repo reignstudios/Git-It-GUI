@@ -196,7 +196,6 @@
     <Compile Include="CommitWindow.paml.cs">
       <DependentUpon>CommitWindow.paml</DependentUpon>
     </Compile>
-    <Compile Include="Filters\GitLFS.cs" />
     <Compile Include="HistoryPage.paml.cs">
       <DependentUpon>HistoryPage.paml</DependentUpon>
     </Compile>
@@ -212,11 +211,9 @@
     <Compile Include="RepoPage.paml.cs">
       <DependentUpon>RepoPage.paml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Settings.cs" />
     <Compile Include="StartPage.paml.cs">
       <DependentUpon>StartPage.paml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Tools.cs" />
     <Compile Include="Tools\MessageBox.cs" />
     <EmbeddedResource Include="App.xaml" />
     <Compile Include="App.xaml.cs">
@@ -278,7 +275,12 @@
     <EmbeddedResource Include="Icons\Thinking.png" />
     <EmbeddedResource Include="Icons\typeChanged.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\GitItGUI.Core\GitItGUI.Core.csproj">
+      <Project>{0095000a-55af-4a89-8c5a-02e43caaf1f5}</Project>
+      <Name>GitItGUI.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

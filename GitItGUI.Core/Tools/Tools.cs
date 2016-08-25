@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace GitItGUI
+namespace GitItGUI.Core
 {
 	static class Tools
 	{
@@ -63,7 +63,7 @@ namespace GitItGUI
 			var process = new Process();
 			process.StartInfo.FileName = exe;
 			process.StartInfo.Arguments = arguments;
-			process.StartInfo.WorkingDirectory = RepoPage.repoPath;
+			process.StartInfo.WorkingDirectory = RepoManager.path;
 			process.StartInfo.RedirectStandardInput = input != null;
 			process.StartInfo.UseShellExecute = false;
 			process.StartInfo.CreateNoWindow = hideWindow;
@@ -82,7 +82,7 @@ namespace GitItGUI
 			var process = new Process();
 			process.StartInfo.FileName = exe;
 			process.StartInfo.Arguments = arguments;
-			process.StartInfo.WorkingDirectory = RepoPage.repoPath;
+			process.StartInfo.WorkingDirectory = RepoManager.path;
 			process.StartInfo.RedirectStandardInput = input != null;
 			process.StartInfo.RedirectStandardOutput = true;
 			process.StartInfo.UseShellExecute = false;
@@ -183,11 +183,11 @@ namespace GitItGUI
 		public static void SaveFileFromID(string filename, ObjectId id)
 		{
 			// get info
-			var blob = RepoPage.repo.Lookup<Blob>(id);
+			var blob = RepoManager.repo.Lookup<Blob>(id);
 
 			if (blob.Size < 1024 && IsGitLFSPtr(blob.GetContentText()))// check if lfs tracked file
 			{
-				if (!RepoPage.repoSettings.lfsSupport)
+				if (!RepoManager.lfsEnabled)
 				{
 					throw new Exception("Critical error: Git-LFS is not installed but repo contains git-lfs pointers!");
 				}
@@ -197,7 +197,7 @@ namespace GitItGUI
 				{
 					process.StartInfo.FileName = "git-lfs";
 					process.StartInfo.Arguments = "smudge";
-					process.StartInfo.WorkingDirectory = RepoPage.repoPath;
+					process.StartInfo.WorkingDirectory = RepoManager.path;
 					process.StartInfo.RedirectStandardInput = true;
 					process.StartInfo.RedirectStandardOutput = true;
 					process.StartInfo.RedirectStandardError = true;

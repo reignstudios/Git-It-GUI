@@ -11,8 +11,6 @@ namespace GitItGUI
 		{
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
-
-
 		}
 	}
 }
