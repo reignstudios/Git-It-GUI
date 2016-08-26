@@ -1,4 +1,22 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="1024" Design.Height="640">
+﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="1024" Design.Height="640" xmlns:self="clr-namespace:GitItGUI;assembly=GitItGUI">
+
+	<UserControl.DataTemplates>
+		<DataTemplate DataType="self:FileItem">
+			<StackPanel Orientation="Horizontal">
+				<Image Source="{Binding Icon}" Width="24" Height="24"/>
+				<TextBlock Text="{Binding Filename}" VerticalAlignment="Center">
+					<TextBlock.ContextMenu>
+						<ContextMenu>
+							<MenuItem Header="Open file"/>
+							<MenuItem Header="Open file location"/>
+							<MenuItem Header="Revert file"/>
+						</ContextMenu>
+					</TextBlock.ContextMenu>
+				</TextBlock>
+			</StackPanel>
+		</DataTemplate>
+	</UserControl.DataTemplates>
+
 	<Grid Background="LightGray">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="80*" />
@@ -23,7 +41,8 @@
 					<Button Name="stageAllButton" Content="Stage All" HorizontalAlignment="Left" Margin="10,10,-10,0" VerticalAlignment="Top" Width="75"/>
 					<Button Name="resolveSelectedButton" Content="Resolve Sel" HorizontalAlignment="Right" Margin="-90,10,90,0" VerticalAlignment="Top" Width="75"/>
 					<Button Name="resolveAllButton" Content="Resolve All" HorizontalAlignment="Right" Margin="-10,10,10,0" VerticalAlignment="Top" Width="75"/>
-					<ListBox Name="unstagedChangesListView" Margin="10,40,10,0" SelectionMode="Single" Background="White">
+					<ListBox Name="unstagedChangesListView" Margin="10,40,10,0" SelectionMode="Single" Background="White" ItemTemplate="{Binding FileItem}">
+						<!--
 						<ListBox.ContextMenu>
 							<ContextMenu>
 								<MenuItem Header="Open file"/>
@@ -31,6 +50,7 @@
 								<MenuItem Header="Revert file"/>
 							</ContextMenu>
 						</ListBox.ContextMenu>
+						-->
 					</ListBox>
 				</Grid>
 
