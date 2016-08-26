@@ -27,7 +27,7 @@ namespace GitItGUI.Core
 		private static CheckForUpdatesCallbackMethod checkForUpdatesCallback;
 		private static string checkForUpdatesURL, checkForUpdatesOutOfDateURL;
 
-		internal static XML.AppSettings settings;
+		public static XML.AppSettings settings;
 
 		private static WebClient client;
 		#if WINDOWS
