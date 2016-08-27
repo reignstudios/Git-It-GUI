@@ -1,7 +1,9 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
@@ -16,8 +18,8 @@ namespace GitItGUI
 {
 	public class FileItem
 	{
-		private Image icon;
-		public Image Icon {get {return icon;}}
+		private Bitmap icon;
+		public Bitmap Icon {get {return icon;}}
 
 		private string filename;
 		public string Filename {get {return filename;}}
@@ -29,14 +31,21 @@ namespace GitItGUI
 
 		public FileItem(string iconFilename, string filename)
 		{
-			icon = new Image();
-			icon.BeginInit();
-			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-			using (var stream = assembly.GetManifestResourceStream(iconFilename))
+			//icon = new Image();
+			//icon.BeginInit();
+			//var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			//using (var stream = assembly.GetManifestResourceStream(iconFilename))
+			//{
+			//	icon.Source = new Bitmap(stream);
+			//}
+			//icon.EndInit();
+
+			// TODO: create asset manager to load only the Bitmaps ONCE!
+			filename = "resm:" + "GitItGUI" + "." + "Icons.AppIcon.png";
+			using (var stream = AvaloniaLocator.Current.GetService<IAssetLoader>().Open(new Uri(filename)))
 			{
-				icon.Source = new Bitmap(stream);
+				icon = new Bitmap(stream);
 			}
-			icon.EndInit();
 			
 			this.filename = filename;
 		}
@@ -74,8 +83,8 @@ namespace GitItGUI
 			unstagedChangesListView.Items = unstagedChangesListViewItems;
 			stagedChangesListView.Items = stagedChangesListViewItems;
 
-			unstagedChangesListViewItems.Add(new FileItem("GitItGUI.Icons.AppIcon.png", "testing"));
-			unstagedChangesListViewItems.Add(new FileItem("GitItGUI.Icons.AppIcon.png", "testing2"));
+			unstagedChangesListViewItems.Add(new FileItem("resm:GitItGUI.Icons.AppIcon.png?assembly=GitItGUI", "testing"));
+			unstagedChangesListViewItems.Add(new FileItem("resm:GitItGUI.Icons.AppIcon.png?assembly=GitItGUI", "testing2"));
 		}
 	}
 }
