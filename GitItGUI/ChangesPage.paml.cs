@@ -29,24 +29,9 @@ namespace GitItGUI
 			filename = "ERROR";
 		}
 
-		public FileItem(string iconFilename, string filename)
+		public FileItem(Bitmap icon, string filename)
 		{
-			//icon = new Image();
-			//icon.BeginInit();
-			//var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-			//using (var stream = assembly.GetManifestResourceStream(iconFilename))
-			//{
-			//	icon.Source = new Bitmap(stream);
-			//}
-			//icon.EndInit();
-
-			// TODO: create asset manager to load only the Bitmaps ONCE!
-			filename = "resm:" + "GitItGUI" + "." + "Icons.AppIcon.png";
-			using (var stream = AvaloniaLocator.Current.GetService<IAssetLoader>().Open(new Uri(filename)))
-			{
-				icon = new Bitmap(stream);
-			}
-			
+			this.icon = icon;
 			this.filename = filename;
 		}
 	}
@@ -83,8 +68,8 @@ namespace GitItGUI
 			unstagedChangesListView.Items = unstagedChangesListViewItems;
 			stagedChangesListView.Items = stagedChangesListViewItems;
 
-			unstagedChangesListViewItems.Add(new FileItem("resm:GitItGUI.Icons.AppIcon.png?assembly=GitItGUI", "testing"));
-			unstagedChangesListViewItems.Add(new FileItem("resm:GitItGUI.Icons.AppIcon.png?assembly=GitItGUI", "testing2"));
+			unstagedChangesListViewItems.Add(new FileItem(ResourceManager.iconNew, "testing"));
+			unstagedChangesListViewItems.Add(new FileItem(ResourceManager.iconDeleted, "testing2"));
 		}
 	}
 }

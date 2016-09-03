@@ -20,6 +20,9 @@ namespace GitItGUI
 		{
 			singleton = this;
 
+			// load resources
+			ResourceManager.Init();
+
 			// load core
 			Debug.debugLogCallback += Debug_debugLogCallback;
 			Debug.debugLogWarningCallback += Debug_debugLogCallback;

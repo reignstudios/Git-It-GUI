@@ -215,6 +215,7 @@
       <DependentUpon>StartPage.paml</DependentUpon>
     </Compile>
     <Compile Include="Tools\MessageBox.cs" />
+    <Compile Include="Tools\ResourceManager.cs" />
     <EmbeddedResource Include="App.xaml" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
