@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+#if WINDOWS
 using Win = System.Windows.Forms;
+#endif
 
 namespace GitItGUI
 {
@@ -28,6 +31,7 @@ namespace GitItGUI
 
 		public static bool Show(string text, string title, MessageBoxTypes type)
 		{
+			#if WINDOWS
 			Win.DialogResult result = Win.DialogResult.None;
 			switch (type)
 			{
@@ -38,6 +42,7 @@ namespace GitItGUI
 
 			if (result == Win.DialogResult.OK || result == Win.DialogResult.Yes) return true;
 			return false;
+			#endif
 		}
 	}
 }

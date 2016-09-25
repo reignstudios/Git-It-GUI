@@ -216,13 +216,13 @@
     </Compile>
     <Compile Include="Tools\MessageBox.cs" />
     <Compile Include="Tools\ResourceManager.cs" />
-    <EmbeddedResource Include="App.xaml" />
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
+    <EmbeddedResource Include="App.paml" />
+    <Compile Include="App.paml.cs">
+      <DependentUpon>App.paml</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="MainWindow.xaml" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <EmbeddedResource Include="MainWindow.paml" />
+    <Compile Include="MainWindow.paml.cs">
+      <DependentUpon>MainWindow.paml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

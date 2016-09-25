@@ -63,7 +63,7 @@ namespace GitItGUI.Core
 			var process = new Process();
 			process.StartInfo.FileName = exe;
 			process.StartInfo.Arguments = arguments;
-			process.StartInfo.WorkingDirectory = RepoManager.path;
+			process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 			process.StartInfo.RedirectStandardInput = input != null;
 			process.StartInfo.UseShellExecute = false;
 			process.StartInfo.CreateNoWindow = hideWindow;
@@ -82,7 +82,7 @@ namespace GitItGUI.Core
 			var process = new Process();
 			process.StartInfo.FileName = exe;
 			process.StartInfo.Arguments = arguments;
-			process.StartInfo.WorkingDirectory = RepoManager.path;
+			process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 			process.StartInfo.RedirectStandardInput = input != null;
 			process.StartInfo.RedirectStandardOutput = true;
 			process.StartInfo.UseShellExecute = false;
@@ -197,7 +197,7 @@ namespace GitItGUI.Core
 				{
 					process.StartInfo.FileName = "git-lfs";
 					process.StartInfo.Arguments = "smudge";
-					process.StartInfo.WorkingDirectory = RepoManager.path;
+					process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 					process.StartInfo.RedirectStandardInput = true;
 					process.StartInfo.RedirectStandardOutput = true;
 					process.StartInfo.RedirectStandardError = true;

@@ -9,11 +9,15 @@ using System.Threading.Tasks;
 
 namespace GitItGUI.Core
 {
+	public delegate void RepoRefreshedCallbackMethod();
+
 	/// <summary>
 	/// Primary git manager
 	/// </summary>
 	public static class RepoManager
 	{
+		public static event RepoRefreshedCallbackMethod RepoRefreshedCallback;
+
 		/// <summary>
 		/// lib2git repo object
 		/// </summary>
@@ -22,7 +26,7 @@ namespace GitItGUI.Core
 		/// <summary>
 		/// Path to active repo
 		/// </summary>
-		public static string path {get; private set;}
+		public static string repoPath {get; private set;}
 
 		/// <summary>
 		/// True if this is a Git-LFS enabled repo
@@ -45,7 +49,7 @@ namespace GitItGUI.Core
 			try
 			{
 				// load repo
-				RepoManager.path = path;
+				RepoManager.repoPath = path;
 				repo = new Repository(path);
 
 				// check for git lfs
@@ -79,12 +83,19 @@ namespace GitItGUI.Core
 				return false;
 			}
 
+			ChangesManager.Refresh();
 			return true;
+		}
+
+		public static void Refresh()
+		{
+			OpenRepo(repoPath);
+			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 		}
 		
 		internal static void Dispose()
 		{
-			path = null;
+			repoPath = null;
 
 			if (repo != null)
 			{
@@ -95,7 +106,7 @@ namespace GitItGUI.Core
 
 		private static bool IsGitLFSRepo()
 		{
-			return Directory.Exists(path + "\\.git\\lfs") && File.Exists(path + "\\.gitattributes") && File.Exists(path + "\\.git\\hooks\\pre-push");
+			return Directory.Exists(repoPath + "\\.git\\lfs") && File.Exists(repoPath + "\\.gitattributes") && File.Exists(repoPath + "\\.git\\hooks\\pre-push");
 		}
 		
 		public static bool AddGitLFSSupport(bool addDefaultIgnoreExts)
@@ -110,10 +121,10 @@ namespace GitItGUI.Core
 			try
 			{
 				// init git lfs
-				if (!Directory.Exists(path + "\\.git\\lfs"))
+				if (!Directory.Exists(repoPath + "\\.git\\lfs"))
 				{
 					Tools.RunExe("git-lfs", "install", null);
-					if (!Directory.Exists(path + "\\.git\\lfs"))
+					if (!Directory.Exists(repoPath + "\\.git\\lfs"))
 					{
 						Debug.LogError("Git-LFS install failed! (Try manually)");
 						lfsEnabled = false;
@@ -122,9 +133,9 @@ namespace GitItGUI.Core
 				}
 
 				// add attr file if it doesn't exist
-				if (!File.Exists(path + "\\.gitattributes"))
+				if (!File.Exists(repoPath + "\\.gitattributes"))
 				{
-					using (var writer = File.CreateText(path + "\\.gitattributes"))
+					using (var writer = File.CreateText(repoPath + "\\.gitattributes"))
 					{
 						// this will be an empty file...
 					}
@@ -165,9 +176,9 @@ namespace GitItGUI.Core
 			try
 			{
 				// untrack lfs filters
-				if (File.Exists(path + "\\.gitattributes"))
+				if (File.Exists(repoPath + "\\.gitattributes"))
 				{
-					string data = File.ReadAllText(path + "\\.gitattributes");
+					string data = File.ReadAllText(repoPath + "\\.gitattributes");
 					var values = Regex.Matches(data, @"(\*\..*)? filter=lfs diff=lfs merge=lfs");
 					foreach (Match value in values)
 					{
@@ -178,8 +189,8 @@ namespace GitItGUI.Core
 
 				// remove lfs repo files
 				Tools.RunExe("git-lfs", "uninstall", null);
-				if (File.Exists(path + "\\.git\\hooks\\pre-push")) File.Delete(path + "\\.git\\hooks\\pre-push");
-				if (Directory.Exists(path + "\\.git\\lfs")) Directory.Delete(path + "\\.git\\lfs", true);
+				if (File.Exists(repoPath + "\\.git\\hooks\\pre-push")) File.Delete(repoPath + "\\.git\\hooks\\pre-push");
+				if (Directory.Exists(repoPath + "\\.git\\lfs")) Directory.Delete(repoPath + "\\.git\\lfs", true);
 					
 				// rebase repo
 				if (rebase)
