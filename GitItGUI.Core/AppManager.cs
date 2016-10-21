@@ -81,7 +81,6 @@ namespace GitItGUI.Core
 		public static void Dispose()
 		{
 			RepoManager.Dispose();
-			BranchManager.Dispose();
 		}
 
 		public static bool CheckForUpdates(string url, string outOfDateURL, CheckForUpdatesCallbackMethod checkForUpdatesCallback)

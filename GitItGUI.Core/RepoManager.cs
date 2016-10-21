@@ -83,7 +83,7 @@ namespace GitItGUI.Core
 				return false;
 			}
 
-			ChangesManager.Refresh();
+			//ChangesManager.Refresh();
 			return true;
 		}
 

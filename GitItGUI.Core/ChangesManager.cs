@@ -263,6 +263,8 @@ namespace GitItGUI.Core
 			{
 				Debug.LogError("Failed to refresh quick view: " + ex.Message, true);
 			}
+
+			return null;
 		}
 	}
 }
