@@ -82,14 +82,19 @@ namespace GitItGUI.Core
 				Dispose();
 				return false;
 			}
-
-			//ChangesManager.Refresh();
+			
+			RefreshAll();
 			return true;
 		}
 
 		public static void Refresh()
 		{
 			OpenRepo(repoPath);
+		}
+
+		private static void RefreshAll()
+		{
+			ChangesManager.Refresh();
 			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 		}
 		

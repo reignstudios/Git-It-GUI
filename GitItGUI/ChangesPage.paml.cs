@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using GitItGUI.Core;
 using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
@@ -68,8 +69,16 @@ namespace GitItGUI
 			unstagedChangesListView.Items = unstagedChangesListViewItems;
 			stagedChangesListView.Items = stagedChangesListViewItems;
 
-			unstagedChangesListViewItems.Add(new FileItem(ResourceManager.iconNew, "testing"));
-			unstagedChangesListViewItems.Add(new FileItem(ResourceManager.iconDeleted, "testing2"));
+			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
+		}
+
+		private void RepoManager_RepoRefreshedCallback()
+		{
+			unstagedChangesListViewItems.Clear();
+			foreach (var fileStatus in ChangesManager.GetFileStatuses())
+			{
+				unstagedChangesListViewItems.Add(new FileItem(ResourceManager.iconNew, "testing"));
+			}
 		}
 	}
 }

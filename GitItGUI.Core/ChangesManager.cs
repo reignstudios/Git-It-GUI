@@ -38,11 +38,13 @@ namespace GitItGUI.Core
 
 	public static class ChangesManager
 	{
-		public static FileState[] GetFileStatuses()
+		private static List<FileState> fileStates;
+
+		internal static void Refresh()
 		{
 			try
 			{
-				var fileStates = new List<FileState>();
+				fileStates = new List<FileState>();
 				bool changesFound = false;
 				var repoStatus = RepoManager.repo.RetrieveStatus();
 				foreach (var fileStatus in repoStatus)
@@ -157,13 +159,17 @@ namespace GitItGUI.Core
 				}
 
 				if (!changesFound) Debug.Log("No Changes, now do some stuff!");
-				return fileStates.ToArray();
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to update file status: " + e.Message, true);
-				return null;
+				fileStates = null;
 			}
+		}
+
+		public static FileState[] GetFileStatuses()
+		{
+			return fileStates.ToArray();
 		}
 
 		public static object GetQuickViewData(FileState fileState)

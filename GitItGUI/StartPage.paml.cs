@@ -79,6 +79,9 @@ namespace GitItGUI
 			var button = (Button)sender;
 			string path = (string)button.Content;
 
+			// load main repo page
+			MainWindow.LoadPage(PageTypes.MainContent);
+
 			// open repo
 			if (!RepoManager.OpenRepo(path))
 			{
@@ -94,9 +97,6 @@ namespace GitItGUI
 				path = path
 			};
 			AppManager.settings.repositories.Add(item);
-
-			// load main repo page
-			MainWindow.LoadPage(PageTypes.MainContent);
 		}
 	}
 }
