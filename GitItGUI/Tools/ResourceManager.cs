@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GitItGUI.Core;
 
 namespace GitItGUI
 {
@@ -37,6 +38,37 @@ namespace GitItGUI
 			iconModified = LoadBitmap("resm:GitItGUI.Icons.modified.png");
 			iconDeleted = LoadBitmap("resm:GitItGUI.Icons.deleted.png");
 			iconConflicted = LoadBitmap("resm:GitItGUI.Icons.conflicted.png");
+		}
+
+		public static Bitmap GetResource(FileStates state)
+		{
+			switch (state)
+			{
+				case FileStates.NewInIndex:
+				case FileStates.NewInWorkdir:
+					return iconNew;
+
+				case FileStates.DeletedFromIndex:
+				case FileStates.DeletedFromWorkdir:
+					return iconDeleted;
+
+				case FileStates.ModifiedInIndex:
+				case FileStates.ModifiedInWorkdir:
+					return iconModified;
+
+				case FileStates.RenamedInIndex:
+				case FileStates.RenamedInWorkdir:
+					return iconRenamed;
+
+				case FileStates.TypeChangeInIndex:
+				case FileStates.TypeChangeInWorkdir:
+					return iconTypeChanged;
+
+				case FileStates.Conflicted:
+					return iconConflicted;
+			}
+
+			throw new Exception("Unsuported state: " + state);
 		}
 	}
 }

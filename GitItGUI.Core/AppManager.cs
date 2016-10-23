@@ -11,6 +11,14 @@ using System.Xml;
 
 namespace GitItGUI.Core
 {
+	public enum MergeDiffTools
+	{
+		Meld,
+		kDiff3,
+		P4Merge,
+		DiffMerge
+	}
+
 	class VersionNumber
 	{
 		public int major, minor, patch, build;
@@ -28,6 +36,8 @@ namespace GitItGUI.Core
 		private static string checkForUpdatesURL, checkForUpdatesOutOfDateURL;
 
 		public static XML.AppSettings settings;
+		public static string mergeToolPath {get; private set;}
+		public static MergeDiffTools mergeDiffTool {get; private set;}
 
 		private static WebClient client;
 		#if WINDOWS
@@ -64,6 +74,9 @@ namespace GitItGUI.Core
 						".bin", ".data", ".raw", ".hex",// unknown binary types
 					});
 				}
+
+				// load
+				LoadMergeDiffTool();
 			}
 			catch (Exception e)
 			{
@@ -75,13 +88,47 @@ namespace GitItGUI.Core
 			return true;
 		}
 
+		public static void SetMergeDiffTool(MergeDiffTools tool)
+		{
+			mergeDiffTool = tool;
+			settings.mergeDiffTool = tool.ToString();
+			LoadMergeDiffTool();
+		}
+
+		private static void LoadMergeDiffTool()
+		{
+			string programFilesx86, programFilesx64;
+			Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
+			switch (settings.mergeDiffTool)
+			{
+				case "Meld":
+					mergeDiffTool = MergeDiffTools.Meld;
+					mergeToolPath = programFilesx86 + "\\Meld\\Meld.exe";
+					break;
+
+				case "kDiff3":
+					mergeDiffTool = MergeDiffTools.kDiff3;
+					mergeToolPath = programFilesx64 + "\\KDiff3\\kdiff3.exe";
+					break;
+
+				case "P4Merge":
+					mergeDiffTool = MergeDiffTools.P4Merge;
+					mergeToolPath = programFilesx64 + "\\Perforce\\p4merge.exe"; 
+					break;
+
+				case "DiffMerge":
+					mergeDiffTool = MergeDiffTools.DiffMerge;
+					mergeToolPath = programFilesx64 + "\\SourceGear\\Common\\\\DiffMerge\\sgdm.exe";
+					break;
+			}
+		}
+
 		/// <summary>
 		/// Disposes all manager objects (Call before app exit)
 		/// </summary>
 		public static void Dispose()
 		{
 			RepoManager.Dispose();
-			BranchManager.Dispose();
 		}
 
 		public static bool CheckForUpdates(string url, string outOfDateURL, CheckForUpdatesCallbackMethod checkForUpdatesCallback)

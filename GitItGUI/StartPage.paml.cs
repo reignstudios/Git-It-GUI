@@ -31,7 +31,7 @@ namespace GitItGUI
 			{
 				var button = new Button();
 				button.Content = repo.path;
-				button.Click += recentButton_Click;
+				button.Click += RecentButton_Click;
 				recentStackPanel.Children.Add(button);
 			}
 		}
@@ -74,7 +74,7 @@ namespace GitItGUI
 			MainWindow.LoadPage(PageTypes.MainContent);
 		}
 
-		private void recentButton_Click(object sender, RoutedEventArgs e)
+		private void RecentButton_Click(object sender, RoutedEventArgs e)
 		{
 			var button = (Button)sender;
 			string path = (string)button.Content;

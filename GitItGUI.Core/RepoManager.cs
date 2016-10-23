@@ -82,15 +82,20 @@ namespace GitItGUI.Core
 				Dispose();
 				return false;
 			}
-
-			ChangesManager.Refresh();
-			return true;
+			
+			return RefreshInternal();
 		}
 
-		public static void Refresh()
+		public static bool Refresh()
 		{
-			OpenRepo(repoPath);
+			return OpenRepo(repoPath);
+		}
+
+		private static bool RefreshInternal()
+		{
+			if (!ChangesManager.Refresh()) return false;
 			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
+			return true;
 		}
 		
 		internal static void Dispose()
@@ -209,5 +214,136 @@ namespace GitItGUI.Core
 
 			return true;
 		}
+
+		/*public static bool OpenDiffTool(FileState fileState)// TODO
+		{
+			try
+			{
+				// get selected item
+				var item = unstagedChangesListView.SelectedItem as FileItem;
+				if (item == null) item = stagedChangesListView.SelectedItem as FileItem;
+				var status = RepoUserControl.repo.RetrieveStatus(item.filename);
+				if ((status & FileStatus.ModifiedInIndex) == 0 && (status & FileStatus.ModifiedInWorkdir) == 0)
+				{
+					MessageBox.Show("This file is not modified");
+					return;
+				}
+
+				// get info and save orig file
+				string fullPath = string.Format("{0}\\{1}", RepoUserControl.repoPath, item.filename);
+				var changed = RepoUserControl.repo.Head.Tip[item.filename];
+				Tools.SaveFileFromID(string.Format("{0}\\{1}.orig", RepoUserControl.repoPath, item.filename), changed.Target.Id);
+
+				// open diff tool
+				using (var process = new Process())
+				{
+					process.StartInfo.FileName = RepoUserControl.mergeToolPath;
+					process.StartInfo.Arguments = string.Format("\"{0}.orig\" \"{0}\"", fullPath);
+					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+					if (!process.Start())
+					{
+						MessageBox.Show("Failed to start Diff tool (is it installed?)");
+
+						// delete temp files
+						if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
+						return;
+					}
+
+					process.WaitForExit();
+				}
+
+				// delete temp files
+				if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Failed to start Diff tool: " + ex.Message);
+			}
+		}*/
+
+		/*private void openFile_Click(object sender, RoutedEventArgs e)// TODO
+		{
+			// check for common mistakes
+			if (unstagedChangesListView.SelectedIndex < 0 && stagedChangesListView.SelectedIndex < 0)
+			{
+				MessageBox.Show("No file selected");
+				return;
+			}
+
+			try
+			{
+				var item = unstagedChangesListView.SelectedItem as FileItem;
+				if (item == null) item = stagedChangesListView.SelectedItem as FileItem;
+				Process.Start("explorer.exe", string.Format("{0}\\{1}", RepoUserControl.repoPath, item.filename));
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Failed to open folder location: " + ex.Message);
+			}
+		}
+
+		private void openFileLocation_Click(object sender, RoutedEventArgs e)
+		{
+			// check for common mistakes
+			if (unstagedChangesListView.SelectedIndex < 0 && stagedChangesListView.SelectedIndex < 0)
+			{
+				MessageBox.Show("No file selected");
+				return;
+			}
+
+			try
+			{
+				var item = unstagedChangesListView.SelectedItem as FileItem;
+				if (item == null) item = stagedChangesListView.SelectedItem as FileItem;
+				Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", RepoUserControl.repoPath, item.filename));
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Failed to open folder location: " + ex.Message);
+			}
+		}
+
+		private void revertFile_Click(object sender, RoutedEventArgs e)
+		{
+			// check for common mistakes
+			if (stagedChangesListView.SelectedIndex >= 0)
+			{
+				MessageBox.Show("Unstage file before reverting!");
+				return;
+			}
+
+			if (unstagedChangesListView.SelectedIndex < 0)
+			{
+				MessageBox.Show("No unstaged file selected");
+				return;
+			}
+
+			var item = unstagedChangesListView.SelectedItem as FileItem;
+			if (MessageBox.Show(string.Format("Are you sure you want to revert file '{0}'?", item.filename), "Revert?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+			{
+				return;
+			}
+
+			try
+			{
+				// get selected item
+				var status = RepoUserControl.repo.RetrieveStatus(item.filename);
+				if ((status & FileStatus.ModifiedInIndex) == 0 && (status & FileStatus.ModifiedInWorkdir) == 0 && (status & FileStatus.DeletedFromIndex) == 0 && (status & FileStatus.DeletedFromWorkdir) == 0)
+				{
+					MessageBox.Show("This file is not modified or deleted");
+					return;
+				}
+				
+				var options = new CheckoutOptions();
+				options.CheckoutModifiers = CheckoutModifiers.Force;
+				RepoUserControl.repo.CheckoutPaths(RepoUserControl.repo.Head.FriendlyName, new string[] {item.filename}, options);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Failed to open folder location: " + ex.Message);
+			}
+
+			RepoUserControl.Refresh();
+		}*/
 	}
 }

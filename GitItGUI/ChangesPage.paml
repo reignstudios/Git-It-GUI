@@ -2,9 +2,11 @@
 
 	<UserControl.DataTemplates>
 		<DataTemplate DataType="self:FileItem">
-			<StackPanel Orientation="Horizontal">
-				<Image Source="{Binding Icon}" Width="24" Height="24"/>
-				<TextBlock Text="{Binding Filename}" VerticalAlignment="Center">
+			<StackPanel Orientation="Horizontal" Margin="2,2">
+				<Button Command="{Binding ClickCommand}" Background="White">
+					<Image Source="{Binding Icon}" Width="24" Height="24"/>
+				</Button>
+				<TextBlock Text="{Binding Filename}" VerticalAlignment="Center" Margin="10,0,-10,0">
 					<TextBlock.ContextMenu>
 						<ContextMenu>
 							<MenuItem Header="Open file"/>

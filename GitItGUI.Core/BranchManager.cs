@@ -16,7 +16,12 @@ namespace GitItGUI.Core
 			activeBranch = repo.Head;
 		}
 
-		public static string GetRemote()
+		public static bool IsRemote()
+		{
+			return activeBranch.IsRemote && activeBranch.Remote != null && !string.IsNullOrEmpty(activeBranch.Remote.Url);
+		}
+
+		public static string GetRemoteURL()
 		{
 			if (!activeBranch.IsRemote) return "";
 			return activeBranch.Remote.Url;
@@ -119,9 +124,9 @@ namespace GitItGUI.Core
 				RepoManager.repo.Checkout(branch);
 				activeBranch = branch;
 			}
-			catch (Exception ex)
+			catch (Exception e)
 			{
-				Debug.LogError("Add new Branch Error: " + ex.Message, true);
+				Debug.LogError("Add new Branch Error: " + e.Message, true);
 				return false;
 			}
 			
@@ -141,9 +146,9 @@ namespace GitItGUI.Core
 					Tools.RunExe("git", string.Format("push origin --delete {0}", branchName), null);
 				}
 			}
-			catch (Exception ex)
+			catch (Exception e)
 			{
-				Debug.LogError("Delete new Branch Error: " + ex.Message, true);
+				Debug.LogError("Delete new Branch Error: " + e.Message, true);
 				return false;
 			}
 
@@ -162,9 +167,9 @@ namespace GitItGUI.Core
 					b.UpstreamBranch = branch.CanonicalName;
 				});
 			}
-			catch (Exception ex)
+			catch (Exception e)
 			{
-				Debug.LogError("Rename new Branch Error: " + ex.Message, true);
+				Debug.LogError("Rename new Branch Error: " + e.Message, true);
 				return false;
 			}
 
