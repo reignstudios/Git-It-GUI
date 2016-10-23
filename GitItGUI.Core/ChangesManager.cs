@@ -199,6 +199,11 @@ namespace GitItGUI.Core
 			}
 		}
 
+		public static FileState[] GetFileStatuses()
+		{
+			return fileStates.ToArray();
+		}
+
 		public static object GetQuickViewData(FileState fileState)
 		{
 			try
