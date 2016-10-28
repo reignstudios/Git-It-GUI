@@ -66,22 +66,23 @@ namespace GitItGUI
 		private Bitmap icon;
 		public Bitmap Icon {get {return icon;}}
 
-		private string filename;
-		public string Filename {get {return filename;}}
+		public FileState fileState;
 
-		private FileStates state;
-		public FileStates State {get {return state;}}
+		//private string filename;
+		public string Filename {get {return fileState.filename;}}
+
+		//private FileStates state;
+		public FileStates State {get {return fileState.state;}}
 
 		public FileItem()
 		{
-			filename = "ERROR";
+			fileState.filename = "ERROR";
 		}
 
-		public FileItem(Bitmap icon, string filename, FileStates state)
+		public FileItem(Bitmap icon, FileState fileState)
 		{
 			this.icon = icon;
-			this.filename = filename;
-			this.state = state;
+			this.fileState = fileState;
 		}
 
 		private ClickCommand clickCommand;
@@ -130,6 +131,7 @@ namespace GitItGUI
 		{
 			AvaloniaXamlLoader.Load(this);
 
+			diffTextBox = this.Find<TextBox>("diffTextBox");
 			unstagedChangesListView = this.Find<ListBox>("unstagedChangesListView");
 			stagedChangesListView = this.Find<ListBox>("stagedChangesListView");
 			stageAllButton = this.Find<Button>("stageAllButton");
@@ -218,7 +220,7 @@ namespace GitItGUI
 			stagedChangesListView.Items = null;
 			foreach (var fileState in ChangesManager.GetFileChanges())
 			{
-				var item = new FileItem(ResourceManager.GetResource(fileState.state), fileState.filename, fileState.state);
+				var item = new FileItem(ResourceManager.GetResource(fileState.state), fileState);
 				if (!fileState.IsStaged()) unstagedChangesListViewItems.Add(item);
 				else stagedChangesListViewItems.Add(item);
 			}
@@ -226,14 +228,41 @@ namespace GitItGUI
 			stagedChangesListView.Items = stagedChangesListViewItems;
 		}
 
+		private void UpdateDiffPanel(FileItem item)
+		{
+			var data = ChangesManager.GetQuickViewData(item.fileState);
+			if (data == null)
+			{
+				diffTextBox.Text = "<<< ERROR >>>";
+			}
+			else if (data.GetType() == typeof(string))
+			{
+				diffTextBox.Text = data.ToString();
+			}
+			else
+			{
+				diffTextBox.Text = "<<< Unsported Binary Format >>>";
+			}
+		}
+
 		private void UnstagedChangesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			
+			var item = unstagedChangesListView.SelectedItem as FileItem;
+			if (item != null)
+			{
+				UpdateDiffPanel(item);
+				stagedChangesListView.SelectedIndex = -1;
+			}
 		}
 
 		private void StagedChangesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			
+			var item = stagedChangesListView.SelectedItem as FileItem;
+			if (item != null)
+			{
+				UpdateDiffPanel(item);
+				unstagedChangesListView.SelectedIndex = -1;
+			}
 		}
 	}
 }
