@@ -28,12 +28,12 @@ namespace GitItGUI.Core
 
 	public class FileState
 	{
-		public string filePath;
+		public string filename;
 		public FileStates state;
 
-		public FileState(string filePath, FileStates state)
+		public FileState(string filename, FileStates state)
 		{
-			this.filePath = filePath;
+			this.filename = filename;
 			this.state = state;
 		}
 
@@ -209,7 +209,7 @@ namespace GitItGUI.Core
 			try
 			{
 				// check if file still exists
-				string fullPath = RepoManager.repoPath + "\\" + fileState.filePath;
+				string fullPath = RepoManager.repoPath + "\\" + fileState.filename;
 				if (!File.Exists(fullPath))
 				{
 					return "<< File Doesn't Exist >>";
@@ -236,7 +236,7 @@ namespace GitItGUI.Core
 				}
 
 				// check if binary file
-				var file = RepoManager.repo.Index[fileState.filePath];
+				var file = RepoManager.repo.Index[fileState.filename];
 				var blob = RepoManager.repo.Lookup<Blob>(file.Id);
 				if (blob.IsBinary || Tools.IsBinaryFileData(fullPath))
 				{
@@ -246,7 +246,7 @@ namespace GitItGUI.Core
 				// check for text types
 				if (fileState.state == FileStates.ModifiedInWorkdir)
 				{
-					var patch = RepoManager.repo.Diff.Compare<Patch>(new List<string>(){fileState.filePath});// use this for details about change
+					var patch = RepoManager.repo.Diff.Compare<Patch>(new List<string>(){fileState.filename});// use this for details about change
 
 					string content = patch.Content;
 
@@ -257,7 +257,7 @@ namespace GitItGUI.Core
 					bool search = true;
 					while (search)
 					{
-						patch = RepoManager.repo.Diff.Compare<Patch>(new List<string>() {fileState.filePath});
+						patch = RepoManager.repo.Diff.Compare<Patch>(new List<string>() {fileState.filename});
 						match = Regex.Match(content, @"(@@.*?(@@).*?\n)", RegexOptions.Singleline);
 						if (match.Success && match.Groups.Count == 3)
 						{
@@ -280,7 +280,7 @@ namespace GitItGUI.Core
 				}
 				else
 				{
-					Debug.LogError("Unsuported FileStatus: " + fileState.filePath, true);
+					Debug.LogError("Unsuported FileStatus: " + fileState.filename, true);
 					return null;
 				}
 			}
@@ -309,7 +309,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				RepoManager.repo.Stage(filePath);
+				RepoManager.repo.Unstage(filePath);
 				return true;
 			}
 			catch (Exception e)
@@ -454,23 +454,12 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static void ResolveConflicts()
-		{
-			// update ui before issue check
-			RepoManager.Refresh();
-
-			// check for merge issues and invoke resolve
-			//if (RepoManager.repo.Index.Conflicts.Count() != 0) singleton.resolveAllButton_Click(null, null);
-
-			// update ui after issue check
-			RepoManager.Refresh();
-		}
-
-		private static async Task<bool> ResolveChange(FileState item)
+		//private static async Task<bool> ResolveChange(FileState item)
+		public static bool ResolveConflict(string filename)
 		{
 			// get info
-			string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, item.filePath);
-			var conflict = RepoManager.repo.Index.Conflicts[item.filePath];
+			string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, filename);
+			var conflict = RepoManager.repo.Index.Conflicts[filename];
 			var ours = RepoManager.repo.Lookup<Blob>(conflict.Ours.Id);
 			var theirs = RepoManager.repo.Lookup<Blob>(conflict.Theirs.Id);
 
@@ -483,7 +472,7 @@ namespace GitItGUI.Core
 			{
 				// open merge tool
 				/*MainWindow.CanInteractWithUI(false);
-				var mergeBinaryFileWindow = new MergeBinaryFileWindow(item.filename);
+				var mergeBinaryFileWindow = new MergeBinaryFileWindow(filename);
 				mergeBinaryFileWindow.Owner = MainWindow.singleton;
 				mergeBinaryFileWindow.Show();
 				await mergeBinaryFileWindow.WaitForClose();
@@ -494,7 +483,7 @@ namespace GitItGUI.Core
 				if (mergeBinaryFileWindow.result == MergeBinaryResults.KeepMine) File.Copy(fullPath + ".ours", fullPath, true);
 				else if (mergeBinaryFileWindow.result == MergeBinaryResults.UserTheirs) File.Copy(fullPath + ".theirs", fullPath, true);
 
-				RepoUserControl.repo.Stage(item.filename);*/
+				RepoUserControl.repo.Stage(filename);*/
 
 				// delete temp files
 				if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
@@ -564,7 +553,7 @@ namespace GitItGUI.Core
 			{
 				wasModified = true;
 				File.Copy(fullPath + ".base", fullPath, true);
-				RepoManager.repo.Stage(item.filePath);
+				RepoManager.repo.Stage(filename);
 			}
 
 			// delete temp files
@@ -575,7 +564,7 @@ namespace GitItGUI.Core
 			// check if user accepts the current state of the merge
 			/*if (!wasModified && MessageBox.Show("No changes detected. Accept as merged?", "Accept Merge?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)// TODO
 			{
-				RepoManager.repo.Stage(item.filename);
+				RepoManager.repo.Stage(filename);
 				wasModified = true;
 			}*/
 

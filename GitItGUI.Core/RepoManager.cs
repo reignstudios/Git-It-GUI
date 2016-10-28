@@ -46,6 +46,8 @@ namespace GitItGUI.Core
 		/// <returns>True if succeeded</returns>
 		public static bool OpenRepo(string path)
 		{
+			bool refreshMode = path == repoPath;
+
 			try
 			{
 				// load repo
@@ -60,7 +62,7 @@ namespace GitItGUI.Core
 				userSettings = Settings.Load<XML.RepoUserSettings>(path + "\\" + Settings.repoUserSettingsFilename);
 
 				// check for .gitignore file
-				if (settings.validateGitignore)
+				if (!refreshMode && settings.validateGitignore)
 				{
 					if (!File.Exists(path + "\\.gitignore"))
 					{

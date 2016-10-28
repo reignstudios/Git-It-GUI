@@ -9,7 +9,6 @@ using LibGit2Sharp;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -21,7 +20,10 @@ namespace GitItGUI
 {
 	public class ClickCommand : ICommand
 	{
+		#pragma warning disable CS0067
 		public event EventHandler CanExecuteChanged;
+		#pragma warning restore CS0067
+
 		private FileItem sender;
 
 		public ClickCommand(FileItem sender)
@@ -36,7 +38,24 @@ namespace GitItGUI
 
 		public void Execute(object parameter)
 		{
-			ChangesManager.StageFile(sender.Filename);
+			switch (sender.State)
+			{
+				case FileStates.NewInWorkdir:
+				case FileStates.TypeChangeInWorkdir:
+				case FileStates.RenamedInWorkdir:
+				case FileStates.ModifiedInWorkdir:
+				case FileStates.DeletedFromWorkdir:
+					sender.Stage(true);
+					break;
+
+				case FileStates.NewInIndex:
+				case FileStates.TypeChangeInIndex:
+				case FileStates.RenamedInIndex:
+				case FileStates.ModifiedInIndex:
+				case FileStates.DeletedFromIndex:
+					sender.Unstage(true);
+					break;
+			}
 		}
 	}
 
@@ -50,15 +69,19 @@ namespace GitItGUI
 		private string filename;
 		public string Filename {get {return filename;}}
 
+		private FileStates state;
+		public FileStates State {get {return state;}}
+
 		public FileItem()
 		{
 			filename = "ERROR";
 		}
 
-		public FileItem(Bitmap icon, string filename)
+		public FileItem(Bitmap icon, string filename, FileStates state)
 		{
 			this.icon = icon;
 			this.filename = filename;
+			this.state = state;
 		}
 
 		private ClickCommand clickCommand;
@@ -69,6 +92,18 @@ namespace GitItGUI
 				clickCommand = new ClickCommand(this);
 				return clickCommand;
 			}
+		}
+
+		public void Stage(bool refresh)
+		{
+			ChangesManager.StageFile(Filename);
+			if (refresh) RepoManager.Refresh();
+		}
+
+		public void Unstage(bool refresh)
+		{
+			ChangesManager.UnstageFile(Filename);
+			if (refresh) RepoManager.Refresh();
 		}
 	}
 
@@ -97,6 +132,12 @@ namespace GitItGUI
 
 			unstagedChangesListView = this.Find<ListBox>("unstagedChangesListView");
 			stagedChangesListView = this.Find<ListBox>("stagedChangesListView");
+			stageAllButton = this.Find<Button>("stageAllButton");
+			unstageAllButton = this.Find<Button>("unstageAllButton");
+			refreshChangedButton = this.Find<Button>("refreshChangedButton");
+			revertAllButton = this.Find<Button>("revertAllButton");
+			resolveSelectedButton = this.Find<Button>("resolveSelectedButton");
+			resolveAllButton = this.Find<Button>("resolveAllButton");
 
 			// apply bindings
 			unstagedChangesListViewItems = new List<FileItem>();
@@ -106,50 +147,88 @@ namespace GitItGUI
 			
 			unstagedChangesListView.SelectionChanged += UnstagedChangesListView_SelectionChanged;
 			stagedChangesListView.SelectionChanged += StagedChangesListView_SelectionChanged;
+			stageAllButton.Click += StageAllButton_Click;
+			unstageAllButton.Click += UnstageAllButton_Click;
+			refreshChangedButton.Click += RefreshChangedButton_Click;
+			revertAllButton.Click += RevertAllButton_Click;
+			resolveSelectedButton.Click += ResolveSelectedButton_Click;
+			resolveAllButton.Click += ResolveAllButton_Click;
+
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
+		}
+
+		private void ResolveAllButton_Click(object sender, RoutedEventArgs e)
+		{
+			foreach (var item in unstagedChangesListViewItems)
+			{
+				ChangesManager.ResolveConflict(item.Filename);
+			}
+
+			RepoManager.Refresh();
+		}
+
+		private void ResolveSelectedButton_Click(object sender, RoutedEventArgs e)
+		{
+			var item = unstagedChangesListView.SelectedItem as FileItem;
+			if (item == null)
+			{
+				Debug.Log("File must be selected", true);
+				return;
+			}
+
+			ChangesManager.ResolveConflict(item.Filename);
+			RepoManager.Refresh();
+		}
+
+		private void RevertAllButton_Click(object sender, RoutedEventArgs e)
+		{
+			ChangesManager.RevertAll();
+		}
+
+		private void RefreshChangedButton_Click(object sender, RoutedEventArgs e)
+		{
+			RepoManager.Refresh();
+		}
+
+		private void StageAllButton_Click(object sender, RoutedEventArgs e)
+		{
+			foreach (var item in unstagedChangesListViewItems)
+			{
+				item.Stage(false);
+			}
+
+			RepoManager.Refresh();
+		}
+
+		private void UnstageAllButton_Click(object sender, RoutedEventArgs e)
+		{
+			foreach (var item in unstagedChangesListViewItems)
+			{
+				item.Unstage(false);
+			}
+
+			RepoManager.Refresh();
 		}
 
 		private void RepoManager_RepoRefreshedCallback()
 		{
 			unstagedChangesListViewItems.Clear();
 			stagedChangesListViewItems.Clear();
+			unstagedChangesListView.Items = null;
+			stagedChangesListView.Items = null;
 			foreach (var fileState in ChangesManager.GetFileChanges())
 			{
-				var item = new FileItem(ResourceManager.GetResource(fileState.state), fileState.filePath);
+				var item = new FileItem(ResourceManager.GetResource(fileState.state), fileState.filename, fileState.state);
 				if (!fileState.IsStaged()) unstagedChangesListViewItems.Add(item);
 				else stagedChangesListViewItems.Add(item);
 			}
 			unstagedChangesListView.Items = unstagedChangesListViewItems;
 			stagedChangesListView.Items = stagedChangesListViewItems;
-
-			//var i = unstagedChangesListView.ItemContainerGenerator.Containers.First().ContainerControl;
-			//foreach (var child in i.LogicalChildren.First().LogicalChildren)
-			//{
-			//	if (child.GetType() == typeof(Image))
-			//	{
-			//		var image = child as Image;
-			//		image.PointerReleased += Image_PointerReleased;
-			//	}
-			//}
 		}
 
 		private void UnstagedChangesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			//var i = unstagedChangesListView.ItemContainerGenerator.Containers.First().ContainerControl;
-			//foreach (var child in i.LogicalChildren.First().LogicalChildren)
-			//{
-			//	if (child.GetType() == typeof(Image))
-			//	{
-			//		var image = child as Image;
-			//		string value = image.Name;
-			//	}
-			//}
-			//var visualItems = unstagedChangesListView.F.FindControl<Image>("testImage");
-			//foreach (FileItem item in unstagedChangesListView.Items)
-			//{
-			//	//var l = new ListBoxItem();l.Content
-			//	var image = item.FindControl<Image>("testImage");
-			//}
+			
 		}
 
 		private void StagedChangesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
