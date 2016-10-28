@@ -65,12 +65,16 @@ namespace GitItGUI.Core
 				{
 					settings.defaultGitLFS_Exts.AddRange(new List<string>()
 					{
-						".psd", ".jpg", ".jpeg", ".png", ".bmp", ".tga",// image types
+						".jpg", ".jpeg", ".png", ".bmp", ".tga",// image types
+						".psd",// image binary types
+						".ai", ".svg", ".dwg",// vector binary types
+						".ae",// video binary types
 						".mpeg", ".mov", ".avi", ".mp4", ".wmv",// video types
 						".wav", ".mp3", ".ogg", ".wma", ".acc",// audio types
 						".zip", ".7z", ".rar", ".tar", ".gz",// compression types
-						".fbx", ".obj", ".3ds", ".blend", ".ma", ".mb", ".dae",// 3d formats
-						".pdf",// doc types
+						".fbx", ".obj", ".3ds", ".FBX", ".OBJ", ".3DS", ".blend", ".ma", ".mb", ".dae", ".daz", ".stl", ".wrl", ".spp", ".sbs", ".sppr", ".sbsar", ".ztl", ".zpr", ".obg",// 3d formats
+						".pdf", ".doc", ".docx",// doc types
+						".unity", ".unitypackage", ".uasset",// known binary types
 						".bin", ".data", ".raw", ".hex",// unknown binary types
 					});
 				}
