@@ -80,9 +80,9 @@
 
 			<TabItem Header="Advanced">
 				<Grid Background="White">
-					<Button Name="pullChangesButton2" FontSize="18" Content="Pull" Margin="0,10,0,10" HorizontalAlignment="Center" Width="256"/>
-					<Button Name="commitStagedButton2" FontSize="18" Content="Commit" Margin="10,10,0,10" HorizontalAlignment="Left" Width="256"/>
-					<Button Name="pushChangesButton" FontSize="18" Content="Push" Margin="0,10,10,10" HorizontalAlignment="Right" Width="256"/>
+					<Button Name="commitStagedButton_Advanced" FontSize="18" Content="Commit" Margin="10,10,0,10" HorizontalAlignment="Left" Width="256"/>
+					<Button Name="pullChangesButton_Advanced" FontSize="18" Content="Pull" Margin="0,10,0,10" HorizontalAlignment="Center" Width="256"/>
+					<Button Name="pushChangesButton_Advanced" FontSize="18" Content="Push" Margin="0,10,10,10" HorizontalAlignment="Right" Width="256"/>
 				</Grid>
 			</TabItem>
 		</TabControl>

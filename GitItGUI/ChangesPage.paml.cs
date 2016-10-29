@@ -97,14 +97,12 @@ namespace GitItGUI
 
 		public void Stage(bool refresh)
 		{
-			ChangesManager.StageFile(Filename);
-			if (refresh) RepoManager.Refresh();
+			ChangesManager.StageFile(fileState, refresh);
 		}
 
 		public void Unstage(bool refresh)
 		{
-			ChangesManager.UnstageFile(Filename);
-			if (refresh) RepoManager.Refresh();
+			ChangesManager.UnstageFile(fileState, refresh);
 		}
 	}
 
@@ -114,7 +112,7 @@ namespace GitItGUI
 
 		// ui objects
 		Button refreshChangedButton, revertAllButton, stageAllButton, unstageAllButton, resolveSelectedButton, resolveAllButton;
-		Button openDiffToolButton, commitStagedButton, syncChangesButton;
+		Button openDiffToolButton, commitStagedButton, syncChangesButton, commitStagedButton_Advanced, pullChangesButton_Advanced, pushChangesButton_Advanced;
 		ListBox unstagedChangesListView, stagedChangesListView;
 		ScrollViewer diffTextBoxScrollViewer;
 		TextBox diffTextBox;
@@ -140,6 +138,12 @@ namespace GitItGUI
 			revertAllButton = this.Find<Button>("revertAllButton");
 			resolveSelectedButton = this.Find<Button>("resolveSelectedButton");
 			resolveAllButton = this.Find<Button>("resolveAllButton");
+			openDiffToolButton = this.Find<Button>("openDiffToolButton");
+			commitStagedButton = this.Find<Button>("commitStagedButton");
+			syncChangesButton = this.Find<Button>("syncChangesButton");
+			commitStagedButton_Advanced = this.Find<Button>("commitStagedButton_Advanced");
+			pullChangesButton_Advanced = this.Find<Button>("pullChangesButton_Advanced");
+			pushChangesButton_Advanced = this.Find<Button>("pushChangesButton_Advanced");
 
 			// apply bindings
 			unstagedChangesListViewItems = new List<FileItem>();
@@ -155,18 +159,57 @@ namespace GitItGUI
 			revertAllButton.Click += RevertAllButton_Click;
 			resolveSelectedButton.Click += ResolveSelectedButton_Click;
 			resolveAllButton.Click += ResolveAllButton_Click;
+			openDiffToolButton.Click += OpenDiffToolButton_Click;
+			commitStagedButton.Click += CommitStagedButton_Click;
+			commitStagedButton_Advanced.Click += CommitStagedButton_Click;
+			syncChangesButton.Click += SyncChangesButton_Click;
+			pullChangesButton_Advanced.Click += PullChangesButton_Advanced_Click;
+			pushChangesButton_Advanced.Click += PushChangesButton_Advanced_Click;
 
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
+		}
+
+		private void PushChangesButton_Advanced_Click(object sender, RoutedEventArgs e)
+		{
+			
+		}
+
+		private void PullChangesButton_Advanced_Click(object sender, RoutedEventArgs e)
+		{
+			
+		}
+
+		private void SyncChangesButton_Click(object sender, RoutedEventArgs e)
+		{
+			
+		}
+
+		private void CommitStagedButton_Click(object sender, RoutedEventArgs e)
+		{
+			
+		}
+
+		private void OpenDiffToolButton_Click(object sender, RoutedEventArgs e)
+		{
+			var item = unstagedChangesListView.SelectedItem as FileItem;
+			if (item == null)
+			{
+				Debug.Log("Unstaged file must be selected", true);
+				return;
+			}
+
+			ChangesManager.OpenDiffTool(item.fileState);
 		}
 
 		private void ResolveAllButton_Click(object sender, RoutedEventArgs e)
 		{
 			foreach (var item in unstagedChangesListViewItems)
 			{
-				ChangesManager.ResolveConflict(item.Filename);
+				if (item.fileState.state == FileStates.Conflicted) ChangesManager.ResolveConflict(item.fileState, false);
 			}
 
 			RepoManager.Refresh();
+			MessageBox.Show("Resolve All Conflices done.");
 		}
 
 		private void ResolveSelectedButton_Click(object sender, RoutedEventArgs e)
@@ -174,17 +217,18 @@ namespace GitItGUI
 			var item = unstagedChangesListView.SelectedItem as FileItem;
 			if (item == null)
 			{
-				Debug.Log("File must be selected", true);
+				Debug.Log("Unstaged file must be selected", true);
 				return;
 			}
 
-			ChangesManager.ResolveConflict(item.Filename);
-			RepoManager.Refresh();
+			ChangesManager.ResolveConflict(item.fileState, true);
 		}
 
 		private void RevertAllButton_Click(object sender, RoutedEventArgs e)
 		{
+			if (!MessageBox.Show("Are you sure you want to revert all files?", MessageBoxTypes.OkCancel)) return;
 			ChangesManager.RevertAll();
+			MessageBox.Show("Revert All done.");
 		}
 
 		private void RefreshChangedButton_Click(object sender, RoutedEventArgs e)
@@ -204,7 +248,7 @@ namespace GitItGUI
 
 		private void UnstageAllButton_Click(object sender, RoutedEventArgs e)
 		{
-			foreach (var item in unstagedChangesListViewItems)
+			foreach (var item in stagedChangesListViewItems)
 			{
 				item.Unstage(false);
 			}

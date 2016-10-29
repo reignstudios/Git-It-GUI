@@ -39,6 +39,8 @@ namespace GitItGUI.Core
 		public static string mergeToolPath {get; private set;}
 		public static MergeDiffTools mergeDiffTool {get; private set;}
 
+		public static int MaxRepoHistoryCount = 20;
+
 		private static WebClient client;
 		#if WINDOWS
 		private const string platform = "Windows";
@@ -125,6 +127,54 @@ namespace GitItGUI.Core
 					mergeToolPath = programFilesx64 + "\\SourceGear\\Common\\\\DiffMerge\\sgdm.exe";
 					break;
 			}
+		}
+
+		internal static void AddActiveRepoToHistory()
+		{
+			// add if doesn't exist
+			var item = new XML.Repository()
+			{
+				path = RepoManager.repoPath
+			};
+
+			XML.Repository found = null;
+			int index = 0;
+			foreach (var repo in settings.repositories)
+			{
+				if (repo.path == item.path)
+				{
+					found = repo;
+					break;
+				}
+
+				++index;
+			}
+
+			if (found == null)
+			{
+				settings.repositories.Add(item);
+			}
+			else
+			{
+				var buff = settings.repositories[0];
+				settings.repositories[0] = found;
+				settings.repositories[index] = buff;
+			}
+
+			// trim
+			if (settings.repositories.Count > MaxRepoHistoryCount)
+			{
+				settings.repositories.RemoveAt(settings.repositories.Count - 1);
+			}
+		}
+
+		/// <summary>
+		/// Saves all app settings
+		/// </summary>
+		public static void SaveSettings()
+		{
+			string rootAppSettingsPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+			Settings.Save<XML.AppSettings>(rootAppSettingsPath + "\\" + Settings.appSettingsFolderName + "\\" + Settings.appSettingsFilename, settings);
 		}
 
 		/// <summary>

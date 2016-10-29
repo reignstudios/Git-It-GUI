@@ -36,14 +36,6 @@ namespace GitItGUI
 			}
 		}
 
-		private void TrimRepoList()
-		{
-			if (AppManager.settings.repositories.Count > 10)
-			{
-				AppManager.settings.repositories.RemoveAt(AppManager.settings.repositories.Count - 1);
-			}
-		}
-
 		private void CreateButton_Click(object sender, RoutedEventArgs e)
 		{
 			MessageBox.Show("TODO");
@@ -62,13 +54,6 @@ namespace GitItGUI
 				MessageBox.Show("Failed to open repo: " + path);
 				return;
 			}
-
-			// add repo to recent
-			var item = new Core.XML.Repository()
-			{
-				path = path
-			};
-			AppManager.settings.repositories.Add(item);
 
 			// load main repo page
 			MainWindow.LoadPage(PageTypes.MainContent);
@@ -90,13 +75,6 @@ namespace GitItGUI
 				recentStackPanel.Children.Remove(button);
 				return;
 			}
-
-			// add repo to recent
-			var item = new Core.XML.Repository()
-			{
-				path = path
-			};
-			AppManager.settings.repositories.Add(item);
 		}
 	}
 }

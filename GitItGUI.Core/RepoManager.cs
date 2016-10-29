@@ -46,12 +46,18 @@ namespace GitItGUI.Core
 		/// <returns>True if succeeded</returns>
 		public static bool OpenRepo(string path)
 		{
-			bool refreshMode = path == repoPath;
-
+			// unload repo
+			if (string.IsNullOrEmpty(path))
+			{
+				Dispose();
+				return true;
+			}
+			
 			try
 			{
 				// load repo
-				RepoManager.repoPath = path;
+				bool refreshMode = path == repoPath;
+				repoPath = path;
 				repo = new Repository(path);
 
 				// check for git lfs
@@ -77,6 +83,8 @@ namespace GitItGUI.Core
 					Username = userSettings.username,
 					Password = userSettings.password
 				};
+
+				AppManager.AddActiveRepoToHistory();
 			}
 			catch (Exception e)
 			{
@@ -98,6 +106,18 @@ namespace GitItGUI.Core
 			if (!ChangesManager.Refresh()) return false;
 			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 			return true;
+		}
+
+		/// <summary>
+		/// Saves open repo's settings
+		/// </summary>
+		public static void SaveSettings()
+		{
+			if (!string.IsNullOrEmpty(repoPath) && repo != null)
+			{
+				Settings.Save<XML.RepoSettings>(repoPath + "\\" + Settings.repoSettingsFilename, settings);
+				Settings.Save<XML.RepoUserSettings>(repoPath + "\\" + Settings.repoUserSettingsFilename, userSettings);
+			}
 		}
 		
 		internal static void Dispose()

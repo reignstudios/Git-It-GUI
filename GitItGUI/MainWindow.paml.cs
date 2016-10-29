@@ -36,8 +36,15 @@ namespace GitItGUI
 			// load UI
 			LoadUI();
 			App.AttachDevTools(this);
+
+			this.Activated += MainWindow_Activated;
 		}
-		
+
+		private void MainWindow_Activated(object sender, EventArgs e)
+		{
+			RepoManager.Refresh();
+		}
+
 		private void Debug_debugLogCallback(object value, bool alert)
 		{
 			if (alert) MessageBox.Show(value.ToString());
@@ -75,6 +82,8 @@ namespace GitItGUI
 
 		private void MainWindow_Closed(object sender, EventArgs e)
 		{
+			RepoManager.SaveSettings();
+			AppManager.SaveSettings();
 			AppManager.Dispose();
 		}
 	}

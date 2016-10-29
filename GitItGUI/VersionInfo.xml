@@ -2,13 +2,13 @@
 <VersionInfo>
 	<AppVersion>0.1.0.0</AppVersion>
 	<GitVersion>
-		<Windows>2.9.3</Windows>
+		<Windows>2.10.1</Windows>
 		<Mac>2.8.1</Mac>
 		<Linux>1.6.2</Linux>
 	</GitVersion>
 	<Git_LFS_Version>
-		<Windows>1.3.1</Windows>
-		<Mac>1.3.1</Mac>
-		<Linux>1.3.1</Linux>
+		<Windows>1.4.4</Windows>
+		<Mac>1.4.4</Mac>
+		<Linux>1.4.4</Linux>
 	</Git_LFS_Version>
 </VersionInfo>

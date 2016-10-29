@@ -291,11 +291,11 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public static bool StageFile(string filePath)
+		public static bool StageFile(FileState fileState, bool refresh)
 		{
 			try
 			{
-				RepoManager.repo.Stage(filePath);
+				RepoManager.repo.Stage(fileState.filename);
 				return true;
 			}
 			catch (Exception e)
@@ -303,13 +303,15 @@ namespace GitItGUI.Core
 				Debug.LogError("Failed to stage item: " + e.Message, true);
 				return false;
 			}
+
+			if (refresh) RepoManager.Refresh();
 		}
 
-		public static bool UnstageFile(string filePath)
+		public static bool UnstageFile(FileState fileState, bool refresh)
 		{
 			try
 			{
-				RepoManager.repo.Unstage(filePath);
+				RepoManager.repo.Unstage(fileState.filename);
 				return true;
 			}
 			catch (Exception e)
@@ -317,6 +319,8 @@ namespace GitItGUI.Core
 				Debug.LogError("Failed to unstage item: " + e.Message, true);
 				return false;
 			}
+
+			if (refresh) RepoManager.Refresh();
 		}
 
 		public static bool RevertAll()
@@ -455,11 +459,18 @@ namespace GitItGUI.Core
 		}
 
 		//private static async Task<bool> ResolveChange(FileState item)
-		public static bool ResolveConflict(string filename)
+		public static bool ResolveConflict(FileState fileState, bool refresh)
 		{
+			// make sure file needs to be resolved
+			if (fileState.state != FileStates.Conflicted)
+			{
+				Debug.LogError("File not in conflicted state: " + fileState.filename, true);
+				return false;
+			}
+
 			// get info
-			string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, filename);
-			var conflict = RepoManager.repo.Index.Conflicts[filename];
+			string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename);
+			var conflict = RepoManager.repo.Index.Conflicts[fileState.filename];
 			var ours = RepoManager.repo.Lookup<Blob>(conflict.Ours.Id);
 			var theirs = RepoManager.repo.Lookup<Blob>(conflict.Theirs.Id);
 
@@ -472,7 +483,7 @@ namespace GitItGUI.Core
 			{
 				// open merge tool
 				/*MainWindow.CanInteractWithUI(false);
-				var mergeBinaryFileWindow = new MergeBinaryFileWindow(filename);
+				var mergeBinaryFileWindow = new MergeBinaryFileWindow(fileState.filename);
 				mergeBinaryFileWindow.Owner = MainWindow.singleton;
 				mergeBinaryFileWindow.Show();
 				await mergeBinaryFileWindow.WaitForClose();
@@ -483,7 +494,7 @@ namespace GitItGUI.Core
 				if (mergeBinaryFileWindow.result == MergeBinaryResults.KeepMine) File.Copy(fullPath + ".ours", fullPath, true);
 				else if (mergeBinaryFileWindow.result == MergeBinaryResults.UserTheirs) File.Copy(fullPath + ".theirs", fullPath, true);
 
-				RepoUserControl.repo.Stage(filename);*/
+				RepoUserControl.repo.Stage(fileState.filename);*/
 
 				// delete temp files
 				if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
@@ -553,7 +564,7 @@ namespace GitItGUI.Core
 			{
 				wasModified = true;
 				File.Copy(fullPath + ".base", fullPath, true);
-				RepoManager.repo.Stage(filename);
+				RepoManager.repo.Stage(fileState.filename);
 			}
 
 			// delete temp files
@@ -564,12 +575,60 @@ namespace GitItGUI.Core
 			// check if user accepts the current state of the merge
 			/*if (!wasModified && MessageBox.Show("No changes detected. Accept as merged?", "Accept Merge?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)// TODO
 			{
-				RepoManager.repo.Stage(filename);
+				RepoManager.repo.Stage(fileState.filename);
 				wasModified = true;
 			}*/
 
 			// finish
+			if (refresh) RepoManager.Refresh();
 			return wasModified;
+		}
+
+		public static bool OpenDiffTool(FileState fileState)
+		{
+			string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename);
+
+			try
+			{
+				// get selected item
+				if (fileState.state != FileStates.ModifiedInIndex && fileState.state != FileStates.ModifiedInWorkdir)
+				{
+					Debug.LogError("This file is not modified", true);
+					return false;
+				}
+
+				// get info and save orig file
+				var changed = RepoManager.repo.Head.Tip[fileState.filename];
+				Tools.SaveFileFromID(string.Format("{0}\\{1}.orig", RepoManager.repoPath, fileState.filename), changed.Target.Id);
+
+				// open diff tool
+				using (var process = new Process())
+				{
+					process.StartInfo.FileName = AppManager.mergeToolPath;
+					process.StartInfo.Arguments = string.Format("\"{0}.orig\" \"{0}\"", fullPath);
+					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+					if (!process.Start())
+					{
+						Debug.LogError("Failed to start Diff tool (is it installed?)", true);
+
+						// delete temp files
+						if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
+						return false;
+					}
+
+					process.WaitForExit();
+				}
+
+				// delete temp files
+				if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
+			}
+			catch (Exception ex)
+			{
+				if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
+				Debug.LogError("Failed to start Diff tool: " + ex.Message, true);
+			}
+
+			return true;
 		}
 	}
 }
