@@ -186,7 +186,8 @@ namespace GitItGUI
 
 		private void CommitStagedButton_Click(object sender, RoutedEventArgs e)
 		{
-			
+			if (ChangesManager.changesStaged) MainWindow.LoadPage(PageTypes.Commit);
+			else MessageBox.Show("No changes staged!");
 		}
 
 		private void OpenDiffToolButton_Click(object sender, RoutedEventArgs e)

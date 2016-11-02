@@ -65,6 +65,8 @@ namespace GitItGUI.Core
 	public static class ChangesManager
 	{
 		private static List<FileState> fileStates;
+		public static bool changesExist {get; private set;}
+		public static bool changesStaged {get; private set;}
 
 		public static FileState[] GetFileChanges()
 		{
@@ -75,6 +77,8 @@ namespace GitItGUI.Core
 		{
 			try
 			{
+				changesExist = false;
+				changesStaged = false;
 				fileStates = new List<FileState>();
 				bool changesFound = false;
 				var repoStatus = RepoManager.repo.RetrieveStatus();
@@ -95,6 +99,7 @@ namespace GitItGUI.Core
 					{
 						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.ModifiedInIndex));
 						stateHandled = true;
+						changesStaged = true;
 					}
 
 					if ((state & FileStatus.NewInWorkdir) != 0)
@@ -107,6 +112,7 @@ namespace GitItGUI.Core
 					{
 						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.NewInIndex));
 						stateHandled = true;
+						changesStaged = true;
 					}
 
 					if ((state & FileStatus.DeletedFromWorkdir) != 0)
@@ -119,6 +125,7 @@ namespace GitItGUI.Core
 					{
 						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.DeletedFromIndex));
 						stateHandled = true;
+						changesStaged = true;
 					}
 
 					if ((state & FileStatus.RenamedInWorkdir) != 0)
@@ -131,6 +138,7 @@ namespace GitItGUI.Core
 					{
 						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.RenamedInIndex));
 						stateHandled = true;
+						changesStaged = true;
 					}
 
 					if ((state & FileStatus.TypeChangeInWorkdir) != 0)
@@ -143,6 +151,7 @@ namespace GitItGUI.Core
 					{
 						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.TypeChangeInIndex));
 						stateHandled = true;
+						changesStaged = true;
 					}
 
 					if ((state & FileStatus.Conflicted) != 0)
@@ -190,6 +199,7 @@ namespace GitItGUI.Core
 				}
 
 				if (!changesFound) Debug.Log("No Changes, now do some stuff!");
+				else changesExist = true;
 				return true;
 			}
 			catch (Exception e)

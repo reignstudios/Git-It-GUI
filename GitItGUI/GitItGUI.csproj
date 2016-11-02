@@ -193,8 +193,8 @@
     <Compile Include="CheckForUpdatesPage.paml.cs">
       <DependentUpon>CheckForUpdatesPage.paml</DependentUpon>
     </Compile>
-    <Compile Include="CommitWindow.paml.cs">
-      <DependentUpon>CommitWindow.paml</DependentUpon>
+    <Compile Include="CommitPage.paml.cs">
+      <DependentUpon>CommitPage.paml</DependentUpon>
     </Compile>
     <Compile Include="HistoryPage.paml.cs">
       <DependentUpon>HistoryPage.paml</DependentUpon>
@@ -245,9 +245,6 @@
     <EmbeddedResource Include="CheckForUpdatesPage.paml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="CommitWindow.paml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="MergeBinaryFileWindow.paml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -281,6 +278,11 @@
       <Project>{0095000a-55af-4a89-8c5a-02e43caaf1f5}</Project>
       <Name>GitItGUI.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CommitPage.paml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

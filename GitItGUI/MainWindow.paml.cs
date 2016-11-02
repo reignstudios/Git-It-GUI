@@ -9,7 +9,8 @@ namespace GitItGUI
 	{
 		CheckForUpdates,
 		Start,
-		MainContent
+		MainContent,
+		Commit
 	}
 	
 	public class MainWindow : Window
@@ -56,6 +57,7 @@ namespace GitItGUI
 			CheckForUpdatesPage.singleton = new CheckForUpdatesPage();
 			StartPage.singleton = new StartPage();
 			MainContent.singleton = new MainContent();
+			CommitPage.singleton = new CommitPage();
 
 			// load main page
 			AvaloniaXamlLoader.Load(this);
@@ -72,6 +74,7 @@ namespace GitItGUI
 				case PageTypes.CheckForUpdates: singleton.Content = CheckForUpdatesPage.singleton; break;
 				case PageTypes.Start: singleton.Content = StartPage.singleton; break;
 				case PageTypes.MainContent: singleton.Content = MainContent.singleton; break;
+				case PageTypes.Commit: singleton.Content = CommitPage.singleton; break;
 			}
 		}
 
