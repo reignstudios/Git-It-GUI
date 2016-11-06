@@ -21,6 +21,10 @@ namespace GitItGUI
 		{
 			singleton = this;
 
+			// load main page
+			AvaloniaXamlLoader.Load(this);
+			App.AttachDevTools(this);
+
 			// load resources
 			ResourceManager.Init();
 
@@ -34,16 +38,18 @@ namespace GitItGUI
 				return;
 			}
 
-			// load UI
-			LoadUI();
-			App.AttachDevTools(this);
+			// check for updates
+			LoadPage(PageTypes.CheckForUpdates);
+			CheckForUpdatesPage.singleton.Check("http://reign-studios-services.com/GitItGUI/VersionInfo.xml");
 
-			this.Activated += MainWindow_Activated;
+			// bind events
+			Closed += MainWindow_Closed;
+			Activated += MainWindow_Activated;
 		}
 
 		private void MainWindow_Activated(object sender, EventArgs e)
 		{
-			RepoManager.Refresh();
+			if (Content == MainContent.singleton) RepoManager.Refresh();
 		}
 
 		private void Debug_debugLogCallback(object value, bool alert)
@@ -51,30 +57,18 @@ namespace GitItGUI
 			if (alert) MessageBox.Show(value.ToString());
 		}
 
-		private void LoadUI()
-		{
-			// load pages
-			CheckForUpdatesPage.singleton = new CheckForUpdatesPage();
-			StartPage.singleton = new StartPage();
-			MainContent.singleton = new MainContent();
-			CommitPage.singleton = new CommitPage();
-
-			// load main page
-			AvaloniaXamlLoader.Load(this);
-			this.Closed += MainWindow_Closed;
-
-			LoadPage(PageTypes.CheckForUpdates);
-			CheckForUpdatesPage.singleton.Check("http://reign-studios-services.com/GitItGUI/VersionInfo.xml");
-		}
-
 		public static void LoadPage(PageTypes type)
 		{
+			CheckForUpdatesPage.singleton.IsVisible = false;
+			StartPage.singleton.IsVisible = false;
+			MainContent.singleton.IsVisible = false;
+			CommitPage.singleton.IsVisible = false;
 			switch (type)
 			{
-				case PageTypes.CheckForUpdates: singleton.Content = CheckForUpdatesPage.singleton; break;
-				case PageTypes.Start: singleton.Content = StartPage.singleton; break;
-				case PageTypes.MainContent: singleton.Content = MainContent.singleton; break;
-				case PageTypes.Commit: singleton.Content = CommitPage.singleton; break;
+				case PageTypes.CheckForUpdates: CheckForUpdatesPage.singleton.IsVisible = true; break;
+				case PageTypes.Start: StartPage.singleton.IsVisible = true; break;
+				case PageTypes.MainContent: MainContent.singleton.IsVisible = true; break;
+				case PageTypes.Commit: CommitPage.singleton.IsVisible = true; break;
 			}
 		}
 

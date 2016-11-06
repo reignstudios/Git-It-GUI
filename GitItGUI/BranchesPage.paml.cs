@@ -21,13 +21,9 @@ namespace GitItGUI
 		public BranchesPage()
 		{
 			singleton = this;
-			LoadUI();
-		}
-
-		private void LoadUI()
-		{
 			AvaloniaXamlLoader.Load(this);
 
+			// load ui items
 			activeBranchListView = this.Find<ListBox>("activeBranchListView");
 			otherBranchListView = this.Find<ListBox>("otherBranchListView");
 

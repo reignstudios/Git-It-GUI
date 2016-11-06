@@ -1,9 +1,26 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui" MinWidth="640" MinHeight="400">
+﻿<UserControl xmlns="https://github.com/avaloniaui" MinWidth="640" MinHeight="400"
+	xmlns:gititgui="clr-namespace:GitItGUI;assembly=GitItGUI">
+
 	<TabControl Margin="0,0,0,0">
-		<TabItem Name="changesPage" Header="Changes"/>
-		<TabItem Name="branchesPage" Header="Branches"/>
-		<TabItem Name="historyPage" Header="History"/>
-		<TabItem Name="repoPage" Header="Repository"/>
-		<TabItem Name="appSettingsPage" Header="App Settings"/>
+		<TabItem Name="changesPage" Header="Changes">
+			<gititgui:ChangesPage/>
+		</TabItem>
+
+		<TabItem Name="branchesPage" Header="Branches">
+			<gititgui:BranchesPage/>
+		</TabItem>
+
+		<TabItem Name="historyPage" Header="History">
+			<gititgui:HistoryPage/>
+		</TabItem>
+
+		<TabItem Name="repoPage" Header="Repository">
+			<gititgui:RepoPage/>
+		</TabItem>
+
+		<TabItem Name="appSettingsPage" Header="App Settings">
+			<gititgui:AppSettingsPage/>
+		</TabItem>
 	</TabControl>
+
 </UserControl>

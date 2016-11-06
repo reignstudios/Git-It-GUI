@@ -19,13 +19,16 @@ namespace GitItGUI
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
 
-			// load ui
+			// load ui items
 			recentStackPanel = this.Find<StackPanel>("recentStackPanel");
 			openButton = this.Find<Button>("openButton");
 			createButton = this.Find<Button>("createButton");
 			openButton.Click += OpenButton_Click;
 			createButton.Click += CreateButton_Click;
+		}
 
+		public void RefreshUI()
+		{
 			// fill resent
 			foreach (var repo in AppManager.settings.repositories)
 			{

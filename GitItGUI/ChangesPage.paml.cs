@@ -122,13 +122,9 @@ namespace GitItGUI
 		public ChangesPage()
 		{
 			singleton = this;
-			LoadUI();
-		}
-
-		private void LoadUI()
-		{
 			AvaloniaXamlLoader.Load(this);
 
+			// load ui items
 			diffTextBox = this.Find<TextBox>("diffTextBox");
 			unstagedChangesListView = this.Find<ListBox>("unstagedChangesListView");
 			stagedChangesListView = this.Find<ListBox>("stagedChangesListView");

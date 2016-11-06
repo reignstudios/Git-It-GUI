@@ -23,11 +23,6 @@ namespace GitItGUI
 		public RepoPage()
 		{
 			singleton = this;
-			LoadUI();
-		}
-
-		private void LoadUI()
-		{
 			AvaloniaXamlLoader.Load(this);
 
 			// remotes
