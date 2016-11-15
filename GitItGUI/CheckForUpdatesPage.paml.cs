@@ -5,7 +5,7 @@ using GitItGUI.Core;
 
 namespace GitItGUI
 {
-	public class CheckForUpdatesPage : UserControl
+	public class CheckForUpdatesPage : UserControl, NavigationPage
 	{
 		public static CheckForUpdatesPage singleton;
 		
@@ -22,6 +22,16 @@ namespace GitItGUI
 				StartPage.singleton.RefreshUI();
 				MainWindow.LoadPage(PageTypes.Start);
 			}
+		}
+
+		public void NavigatedFrom()
+		{
+			
+		}
+
+		public void NavigatedTo()
+		{
+			
 		}
 
 		private void checkForUpdatesCallback(bool succeeded)

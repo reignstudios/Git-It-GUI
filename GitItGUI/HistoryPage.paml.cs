@@ -2,6 +2,7 @@
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using System.Diagnostics;
+using System;
 
 namespace GitItGUI
 {

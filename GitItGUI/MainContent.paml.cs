@@ -1,9 +1,10 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace GitItGUI
 {
-	public class MainContent : UserControl
+	public class MainContent : UserControl, NavigationPage
 	{
 		public static MainContent singleton;
 
@@ -11,6 +12,16 @@ namespace GitItGUI
 		{
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
+		}
+
+		public void NavigatedFrom()
+		{
+			
+		}
+
+		public void NavigatedTo()
+		{
+			
 		}
 	}
 }

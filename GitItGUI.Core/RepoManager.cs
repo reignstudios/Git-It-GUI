@@ -36,8 +36,8 @@ namespace GitItGUI.Core
 		private static XML.RepoSettings settings;
 		private static XML.RepoUserSettings userSettings;
 
-		internal static Signature signature;
-		internal static UsernamePasswordCredentials credentials;
+		public static Signature signature {get; private set;}
+		public static UsernamePasswordCredentials credentials {get; private set;}
 
 		/// <summary>
 		/// Use to open an existing repo

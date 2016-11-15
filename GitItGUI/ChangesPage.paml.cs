@@ -110,6 +110,8 @@ namespace GitItGUI
 	{
 		public static ChangesPage singleton;
 
+		private bool isSyncMode, syncPullSucceeded, syncPushSucceeded;
+
 		// ui objects
 		Button refreshChangedButton, revertAllButton, stageAllButton, unstageAllButton, resolveSelectedButton, resolveAllButton;
 		Button openDiffToolButton, commitStagedButton, syncChangesButton, commitStagedButton_Advanced, pullChangesButton_Advanced, pushChangesButton_Advanced;

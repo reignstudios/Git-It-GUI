@@ -6,7 +6,7 @@ using GitItGUI.Core;
 
 namespace GitItGUI
 {
-	public class StartPage : UserControl
+	public class StartPage : UserControl, NavigationPage
 	{
 		public static StartPage singleton;
 
@@ -25,6 +25,16 @@ namespace GitItGUI
 			createButton = this.Find<Button>("createButton");
 			openButton.Click += OpenButton_Click;
 			createButton.Click += CreateButton_Click;
+		}
+
+		public void NavigatedTo()
+		{
+			
+		}
+
+		public void NavigatedFrom()
+		{
+			
 		}
 
 		public void RefreshUI()

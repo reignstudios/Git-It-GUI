@@ -68,6 +68,8 @@ namespace GitItGUI.Core
 		public static bool changesExist {get; private set;}
 		public static bool changesStaged {get; private set;}
 
+		private static bool isSyncMode, syncPushSuccess, syncPullSuccess;
+
 		public static FileState[] GetFileChanges()
 		{
 			return fileStates.ToArray();
@@ -349,7 +351,7 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool CommitStagedChanged(string commitMessage)
+		public static bool CommitStagedChanges(string commitMessage)
 		{
 			try
 			{
@@ -367,6 +369,8 @@ namespace GitItGUI.Core
 
 		public static bool Pull()
 		{
+			syncPullSuccess = false;
+
 			try
 			{
 				if (!BranchManager.IsRemote())
@@ -381,6 +385,8 @@ namespace GitItGUI.Core
 				options.FetchOptions.TagFetchMode = TagFetchMode.All;
 				RepoManager.repo.Network.Pull(RepoManager.signature, options);
 				//ResolveConflicts();// TODO
+
+				syncPullSuccess = true;
 			}
 			catch (Exception e)
 			{
@@ -394,6 +400,8 @@ namespace GitItGUI.Core
 
 		public static bool Push()
 		{
+			syncPushSuccess = false;
+
 			try
 			{
 				if (!BranchManager.IsRemote())
@@ -456,11 +464,31 @@ namespace GitItGUI.Core
 				};
 				RepoManager.repo.Network.Push(BranchManager.activeBranch, options);
 
-				if (!pushError) Debug.Log("Push Succeeded!");
+				if (!pushError)
+				{
+					syncPushSuccess = true;
+					Debug.Log("Push Succeeded!", !isSyncMode);
+				}
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to push: " + e.Message, true);
+				return false;
+			}
+
+			RepoManager.Refresh();
+			return true;
+		}
+
+		public static bool Sync()
+		{
+			isSyncMode = true;
+			bool pass = Pull();
+			if (pass) pass = Push();
+			
+			if (!pass)
+			{
+				Debug.LogError("Failed to Sync changes", true);
 				return false;
 			}
 
