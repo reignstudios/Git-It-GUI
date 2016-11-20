@@ -22,3 +22,5 @@
 - Auto check for external Git and Git-LFS updates.
 
 - gitk for history (maybe something built in later).
+
+Note: This is built using the nightly builds of Avalonia: https://github.com/AvaloniaUI/Avalonia/wiki/Using-nightly-build-feed
