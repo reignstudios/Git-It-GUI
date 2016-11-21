@@ -16,7 +16,7 @@ namespace GitItGUI
 		ListBox activeBranchListView, otherBranchListView;
 		Button addButton, renameButton, mergeButton, deleteButton;
 
-		List<string> activeBranchListViewItems, otherBranchListViewItems;
+		List<string> otherBranchListViewItems;
 
 		public BranchesPage()
 		{
@@ -24,13 +24,10 @@ namespace GitItGUI
 			AvaloniaXamlLoader.Load(this);
 
 			// load ui items
-			activeBranchListView = this.Find<ListBox>("activeBranchListView");
 			otherBranchListView = this.Find<ListBox>("otherBranchListView");
 
 			// apply bindings
-			activeBranchListViewItems = new List<string>();
 			otherBranchListViewItems = new List<string>();
-			activeBranchListView.Items = activeBranchListViewItems;
 			otherBranchListView.Items = otherBranchListViewItems;
 		}
 	}

@@ -7,26 +7,19 @@ using System.Threading.Tasks;
 
 namespace GitItGUI
 {
-	public enum MergeBinaryResults
+	public class MergeBinaryFilePage : UserControl
 	{
-		KeepMine,
-		UserTheirs,
-		Cancel
-	}
-
-	public class MergeBinaryFileWindow : Window
-	{
-		public MergeBinaryResults result = MergeBinaryResults.Cancel;
+		//public MergeBinaryResults result = MergeBinaryResults.Cancel;
 		private bool isClosed;
 
 		// ui objects
 		Button keepMineButton, useTheirsButton, cancelButton;
 		TextBox fileInConflictTextBox;
 
-		public MergeBinaryFileWindow(string fileInConflict)
+		public MergeBinaryFilePage(string fileInConflict)
 		{
 			AvaloniaXamlLoader.Load(this);
-			App.AttachDevTools(this);
+			//App.AttachDevTools(this);
 
 			fileInConflictTextBox.Text = fileInConflict;
 		}
@@ -51,20 +44,20 @@ namespace GitItGUI
 
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
-			result = MergeBinaryResults.Cancel;
-			Close();
+			//result = MergeBinaryResults.Cancel;
+			//Close();
 		}
 
 		private void keepMineButton_Click(object sender, RoutedEventArgs e)
 		{
-			result = MergeBinaryResults.KeepMine;
-			Close();
+			//result = MergeBinaryResults.KeepMine;
+			//Close();
 		}
 
 		private void useTheirsButton_Click(object sender, RoutedEventArgs e)
 		{
-			result = MergeBinaryResults.UserTheirs;
-			Close();
+			//result = MergeBinaryResults.UserTheirs;
+			//Close();
 		}
 	}
 }

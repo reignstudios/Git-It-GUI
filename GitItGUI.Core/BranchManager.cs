@@ -107,12 +107,12 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool AddNewBranch(string branchName, bool isRemote)
+		public static bool AddNewBranch(string branchName, bool addTracking)
 		{
 			try
 			{
 				var branch = RepoManager.repo.CreateBranch(branchName);
-				if (isRemote)
+				if (addTracking)
 				{
 					RepoManager.repo.Branches.Update(branch, b =>
 					{
@@ -134,17 +134,20 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool DeleteNonActiveBranch(string branchName)
+		public static bool DeleteNonActiveBranch(string branchName)//, bool deleteRemote)
 		{
 			try
 			{
 				RepoManager.repo.Branches.Remove(branchName);
-				var remoteBranch = RepoManager.repo.Branches["origin/" + branchName];
-				if (remoteBranch != null)
-				{
-					RepoManager.repo.Branches.Remove(remoteBranch);
-					Tools.RunExe("git", string.Format("push origin --delete {0}", branchName), null);
-				}
+				//if (deleteRemote)
+				//{
+				//	var remoteBranch = RepoManager.repo.Branches["origin/" + branchName];
+				//	if (remoteBranch != null)
+				//	{
+				//		RepoManager.repo.Branches.Remove(remoteBranch);
+				//		Tools.RunExe("git", string.Format("push origin --delete {0}", branchName), null);
+				//	}
+				//}
 			}
 			catch (Exception e)
 			{

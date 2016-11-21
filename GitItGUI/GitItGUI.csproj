@@ -213,8 +213,11 @@
     <Compile Include="MainContent.paml.cs">
       <DependentUpon>MainContent.paml</DependentUpon>
     </Compile>
-    <Compile Include="MergeBinaryFileWindow.paml.cs">
-      <DependentUpon>MergeBinaryFileWindow.paml</DependentUpon>
+    <Compile Include="MergeBinaryFilePage.xaml.cs">
+      <DependentUpon>MergeBinaryFilePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NamePage.xaml.cs">
+      <DependentUpon>NamePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="NameWindow.paml.cs">
       <DependentUpon>NameWindow.paml</DependentUpon>
@@ -257,9 +260,6 @@
     <EmbeddedResource Include="CheckForUpdatesPage.paml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="MergeBinaryFileWindow.paml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <None Include="app.config" />
     <EmbeddedResource Include="NameWindow.paml">
       <SubType>Designer</SubType>
@@ -293,6 +293,16 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CommitPage.paml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MergeBinaryFilePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NamePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
   </ItemGroup>
