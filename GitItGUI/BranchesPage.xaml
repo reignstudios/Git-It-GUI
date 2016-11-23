@@ -7,22 +7,22 @@
 
 		<Grid Grid.Column="0" Background="LightGray">
 			<TextBlock FontSize="24" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Active Branch</TextBlock>
-			<TextBox Height="32" Margin="10,50,10,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True"/>
-			<Button Name="addButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,85,-10,10" Width="75" ToolTip.Tip="Add new branch based off 'Active'?">Add</Button>
-			<Button Name="renameButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="90,85,-90,10" Width="75" ToolTip.Tip="Rename 'Active' branch?">Rename</Button>
+			<TextBox Height="32" Margin="10,50,10,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Current 'Active' branch name"/>
+			<Button Name="addBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,85,-10,10" Width="75" ToolTip.Tip="Add new branch based off 'Active'?">Add</Button>
+			<Button Name="renameBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="90,85,-90,10" Width="75" ToolTip.Tip="Rename 'Active' branch?">Rename</Button>
 
 			<TextBlock FontSize="18" Margin="0,150,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">--- Tracking ---</TextBlock>
-			<TextBox Height="32" Margin="10,180,10,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True"/>
-			<Button Name="addTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,215,-10,-215" Width="75" ToolTip.Tip="Add or Change tracking from 'Other' remote branch">*Add</Button>
-			<Button Name="removeTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="90,215,-90,-215" Width="75" ToolTip.Tip="Remove tracking">Remove</Button>
+			<TextBox Height="32" Margin="10,180,10,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Active branch tracking origin"/>
+			<Button Name="addTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,215,-10,-215" Width="75" ToolTip.Tip="Copy tracking origin from 'Other' remote branch to 'Active'">*Add</Button>
+			<Button Name="removeTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="90,215,-90,-215" Width="75" ToolTip.Tip="Remove tracking from 'Active' branch">Remove</Button>
 		</Grid>
 
 		<Grid Grid.Column="1" Background="LightGray">
 			<TextBlock FontSize="24" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Other Branch</TextBlock>
 			<ListBox Name="otherBranchListView" Margin="10,50,10,50" SelectionMode="Single" Background="White"/>
-			<Button Name="switchButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75" ToolTip.Tip="Switch to selected 'Other' branch?">Switch</Button>
-			<Button Name="mergeButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75" ToolTip.Tip="Merge selected 'Other' changes into 'Active'?">Merge</Button>
-			<Button Name="deleteButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="170,-10,-170,10" Width="75" ToolTip.Tip="Delete selected 'Other' branch?">Delete</Button>
+			<Button Name="switchBranchButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75" ToolTip.Tip="Switch to selected 'Other' branch?">Switch</Button>
+			<Button Name="mergeBranchButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75" ToolTip.Tip="Merge selected 'Other' changes into 'Active'?">Merge</Button>
+			<Button Name="deleteBranchButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="170,-10,-170,10" Width="75" ToolTip.Tip="Delete selected 'Other' branch?">Delete</Button>
 		</Grid>
 	</Grid>
 </UserControl>

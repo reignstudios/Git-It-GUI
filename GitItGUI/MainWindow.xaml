@@ -9,6 +9,7 @@
 		<gititgui:StartPage Name="startPage" IsVisible="False"/>
 		<gititgui:MainContent Name="mainContentPage" IsVisible="False"/>
 		<gititgui:CommitPage Name="commitPage" IsVisible="False"/>
+		<gititgui:CommitPage Name="namePage" IsVisible="False"/>
 	</Grid>
 
 </Window>

@@ -107,20 +107,11 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool AddNewBranch(string branchName, bool addTracking)
+		public static bool AddNewBranch(string branchName)
 		{
 			try
 			{
 				var branch = RepoManager.repo.CreateBranch(branchName);
-				if (addTracking)
-				{
-					RepoManager.repo.Branches.Update(branch, b =>
-					{
-						b.Remote = "origin";
-						b.UpstreamBranch = branch.CanonicalName;
-					});
-				}
-
 				RepoManager.repo.Checkout(branch);
 				activeBranch = branch;
 			}
@@ -130,6 +121,26 @@ namespace GitItGUI.Core
 				return false;
 			}
 			
+			RepoManager.Refresh();
+			return true;
+		}
+
+		public static bool AddTrackingToActiveBranch(string remote)
+		{
+			try
+			{
+				RepoManager.repo.Branches.Update(activeBranch, b =>
+				{
+					b.Remote = remote;// normally this will be: "origin"
+					b.UpstreamBranch = activeBranch.CanonicalName;
+				});
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Add tracking Error: " + e.Message, true);
+				return false;
+			}
+
 			RepoManager.Refresh();
 			return true;
 		}

@@ -10,7 +10,8 @@ namespace GitItGUI
 		CheckForUpdates,
 		Start,
 		MainContent,
-		Commit
+		Commit,
+		Name
 	}
 	
 	public class MainWindow : Window
@@ -63,6 +64,7 @@ namespace GitItGUI
 			else if (StartPage.singleton.IsVisible) return StartPage.singleton;
 			else if (MainContent.singleton.IsVisible) return MainContent.singleton;
 			else if (CommitPage.singleton.IsVisible) return CommitPage.singleton;
+			else if (NamePage.singleton.IsVisible) return NamePage.singleton;
 
 			return null;
 		}
@@ -73,6 +75,7 @@ namespace GitItGUI
 			StartPage.singleton.IsVisible = false;
 			MainContent.singleton.IsVisible = false;
 			CommitPage.singleton.IsVisible = false;
+			NamePage.singleton.IsVisible = false;
 			NavigationPage pageFrom = GetActivePage();
 			switch (type)
 			{
@@ -80,6 +83,7 @@ namespace GitItGUI
 				case PageTypes.Start: StartPage.singleton.IsVisible = true; break;
 				case PageTypes.MainContent: MainContent.singleton.IsVisible = true; break;
 				case PageTypes.Commit: CommitPage.singleton.IsVisible = true; break;
+				case PageTypes.Name: NamePage.singleton.IsVisible = true; break;
 				default: throw new Exception("Unsuported page type: " + type);
 			}
 
