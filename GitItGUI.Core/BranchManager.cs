@@ -7,9 +7,16 @@ using System.Threading.Tasks;
 
 namespace GitItGUI.Core
 {
+	public class BranchItem
+	{
+		public string name;
+		public bool isRemote;
+	}
+
 	public static class BranchManager
 	{
 		public static Branch activeBranch;
+		private static List<BranchItem> allBranches;
 
 		internal static void OpenRepo(Repository repo)
 		{
@@ -27,42 +34,25 @@ namespace GitItGUI.Core
 			return activeBranch.Remote.Url;
 		}
 
-		public static string[] GetBranches()
+		internal static bool Refresh()
 		{
-			try
+			if (allBranches == null) allBranches = new List<BranchItem>();
+			else allBranches.Clear();
+
+			var branches = RepoManager.repo.Branches;
+			foreach (var branch in branches)
 			{
-				var branchNames = new List<string>();
-				var branches = RepoManager.repo.Branches;
-				foreach (var branch in branches)
-				{
-					// make sure we don't show remotes that match locals
-					if (branch.IsRemote)
-					{
-						if (branch.FriendlyName == "origin/HEAD" || branch.FriendlyName == "origin/master") continue;
-
-						bool found = false;
-						foreach (var otherBranch in branches)
-						{
-							if (branch.FriendlyName == otherBranch.FriendlyName) continue;
-							if (branch.FriendlyName.Replace("origin/", "") == otherBranch.FriendlyName)
-							{
-								found = true;
-								break;
-							}
-						}
-
-						if (found) continue;
-						branchNames.Add(branch.FriendlyName);
-					}
-				}
-
-				return branchNames.ToArray();
+				var b = new BranchItem();
+				b.isRemote = branch.IsRemote;
+				b.name = branch.FriendlyName;
 			}
-			catch (Exception e)
-			{
-				Debug.LogError("BranchManager.GetBranches Failed: " + e.Message);
-				return null;
-			}
+
+			return true;
+		}
+
+		public static BranchItem[] GetBranches()
+		{
+			return allBranches.ToArray();
 		}
 
 		public static bool Checkout(string branchName)

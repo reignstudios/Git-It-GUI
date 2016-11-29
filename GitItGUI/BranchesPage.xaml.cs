@@ -67,6 +67,17 @@ namespace GitItGUI
 			{
 				BranchManager.RenameActiveBranch(NamePage.value);
 			}
+			else
+			{
+				var branches = BranchManager.GetBranches();
+				var items = new List<string>();
+				foreach (var branch in branches)
+				{
+					items.Add(branch.name);
+				}
+
+				otherBranchListView.Items = items;
+			}
 		}
 
 		private void AddBranchButton_Click(object sender, RoutedEventArgs e)
