@@ -103,6 +103,7 @@ namespace GitItGUI.Core
 
 		private static bool RefreshInternal()
 		{
+			if (!BranchManager.Refresh()) return false;
 			if (!ChangesManager.Refresh()) return false;
 			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 			return true;
