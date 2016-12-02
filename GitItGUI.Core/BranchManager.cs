@@ -9,6 +9,7 @@ namespace GitItGUI.Core
 {
 	public class BranchItem
 	{
+		public Branch branch;
 		public string name;
 		public bool isRemote;
 	}
@@ -30,7 +31,7 @@ namespace GitItGUI.Core
 
 		public static string GetRemoteURL()
 		{
-			if (!activeBranch.IsRemote) return "";
+			if (activeBranch.Remote == null) return "";
 			return activeBranch.Remote.Url;
 		}
 
@@ -43,16 +44,29 @@ namespace GitItGUI.Core
 			foreach (var branch in branches)
 			{
 				var b = new BranchItem();
+				b.branch = branch;
 				b.isRemote = branch.IsRemote;
 				b.name = branch.FriendlyName;
+				allBranches.Add(b);
 			}
 
 			return true;
 		}
 
-		public static BranchItem[] GetBranches()
+		public static BranchItem[] GetAllBranches()
 		{
 			return allBranches.ToArray();
+		}
+
+		public static BranchItem[] GetOtherBranches()
+		{
+			var otherBranches = new List<BranchItem>();
+			foreach (var branch in allBranches)
+			{
+				if (activeBranch != branch.branch) otherBranches.Add(branch);
+			}
+
+			return otherBranches.ToArray();
 		}
 
 		public static bool Checkout(string branchName)

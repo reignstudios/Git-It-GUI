@@ -52,11 +52,12 @@ namespace GitItGUI.Core
 				Dispose();
 				return true;
 			}
+
+			bool refreshMode = path == repoPath;
 			
 			try
 			{
 				// load repo
-				bool refreshMode = path == repoPath;
 				repoPath = path;
 				repo = new Repository(path);
 
@@ -85,6 +86,7 @@ namespace GitItGUI.Core
 				};
 
 				AppManager.AddActiveRepoToHistory();
+				BranchManager.OpenRepo(repo);
 			}
 			catch (Exception e)
 			{
@@ -93,7 +95,8 @@ namespace GitItGUI.Core
 				return false;
 			}
 			
-			return RefreshInternal();
+			if (refreshMode) return true;
+			else return RefreshInternal();
 		}
 
 		public static bool Refresh()

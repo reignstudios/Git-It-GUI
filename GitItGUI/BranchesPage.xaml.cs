@@ -22,6 +22,7 @@ namespace GitItGUI
 		private BranchModes mode = BranchModes.None;
 
 		// ui objects
+		TextBox activeBranchTextBox, trackingOriginTextBox;
 		ListBox otherBranchListView;
 		Button addBranchButton, renameBranchButton, addTrackingButton, removeTrackingButton, switchBranchButton, mergeBranchButton, deleteBranchButton;
 
@@ -33,6 +34,8 @@ namespace GitItGUI
 			AvaloniaXamlLoader.Load(this);
 
 			// load ui items
+			activeBranchTextBox = this.Find<TextBox>("activeBranchTextBox");
+			trackingOriginTextBox = this.Find<TextBox>("trackingOriginTextBox");
 			otherBranchListView = this.Find<ListBox>("otherBranchListView");
 			addBranchButton = this.Find<Button>("addBranchButton");
 			renameBranchButton = this.Find<Button>("renameBranchButton");
@@ -67,16 +70,19 @@ namespace GitItGUI
 			{
 				BranchManager.RenameActiveBranch(NamePage.value);
 			}
-			else
+			else// reload if not in special mode
 			{
-				var branches = BranchManager.GetBranches();
+				var branches = BranchManager.GetOtherBranches();
 				var items = new List<string>();
 				foreach (var branch in branches)
 				{
-					items.Add(branch.name);
+					if (branch.isRemote) items.Add(branch.name + " <Remote Branch>");
+					else items.Add(branch.name);
 				}
 
 				otherBranchListView.Items = items;
+				activeBranchTextBox.Text = BranchManager.activeBranch.FriendlyName;
+				trackingOriginTextBox.Text = BranchManager.GetRemoteURL();
 			}
 		}
 
