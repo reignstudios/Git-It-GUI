@@ -10,8 +10,8 @@ namespace GitItGUI.Core
 	public class BranchItem
 	{
 		public Branch branch;
-		public string name;
-		public bool isRemote;
+		public string name, trackedBranchName;
+		public bool isRemote, isTracking;
 	}
 
 	public static class BranchManager
@@ -35,6 +35,12 @@ namespace GitItGUI.Core
 			return activeBranch.Remote.Url;
 		}
 
+		public static string GetTrackingBranchName()
+		{
+			if (activeBranch.IsTracking || activeBranch.TrackedBranch == null) return "";
+			return activeBranch.TrackedBranch.FriendlyName;
+		}
+
 		internal static bool Refresh()
 		{
 			if (allBranches == null) allBranches = new List<BranchItem>();
@@ -46,7 +52,9 @@ namespace GitItGUI.Core
 				var b = new BranchItem();
 				b.branch = branch;
 				b.isRemote = branch.IsRemote;
+				b.isTracking = branch.IsTracking;
 				b.name = branch.FriendlyName;
+				if (branch.IsTracking) b.trackedBranchName = branch.TrackedBranch.FriendlyName;
 				allBranches.Add(b);
 			}
 

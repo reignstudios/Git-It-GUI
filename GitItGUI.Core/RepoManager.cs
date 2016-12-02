@@ -84,9 +84,9 @@ namespace GitItGUI.Core
 					Username = userSettings.username,
 					Password = userSettings.password
 				};
-
-				AppManager.AddActiveRepoToHistory();
+				
 				BranchManager.OpenRepo(repo);
+				AppManager.AddActiveRepoToHistory();
 			}
 			catch (Exception e)
 			{
@@ -95,8 +95,7 @@ namespace GitItGUI.Core
 				return false;
 			}
 			
-			if (refreshMode) return true;
-			else return RefreshInternal();
+			return RefreshInternal();
 		}
 
 		public static bool Refresh()

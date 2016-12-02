@@ -46,7 +46,12 @@ namespace GitItGUI.Core
 
 		public static T Load<T>(string filename) where T : new()
 		{
-			if (!File.Exists(filename)) return new T();
+			if (!File.Exists(filename))
+			{
+				var settings = new T();
+				Save<T>(filename, settings);
+				return settings;
+			}
 
 			try
 			{

@@ -13,7 +13,7 @@
 
 			<TextBlock FontSize="18" Margin="0,150,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">--- Tracking ---</TextBlock>
 			<TextBox Name="trackingOriginTextBox" Height="32" Margin="10,180,10,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Active branch tracking origin"/>
-			<Button Name="addTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,215,-10,-215" Width="75" ToolTip.Tip="Copy tracking origin from 'Other' remote branch to 'Active'">*Add</Button>
+			<Button Name="addTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,215,-10,-215" Width="75" ToolTip.Tip="Add tracking from 'Other' remote branch into 'Active'">*Add</Button>
 			<Button Name="removeTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="90,215,-90,-215" Width="75" ToolTip.Tip="Remove tracking from 'Active' branch">Remove</Button>
 		</Grid>
 

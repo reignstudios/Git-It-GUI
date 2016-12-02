@@ -153,6 +153,9 @@ namespace GitItGUI.Core
 			if (found == null)
 			{
 				settings.repositories.Add(item);
+				var buff = settings.repositories[0];
+				settings.repositories[0] = settings.repositories[settings.repositories.Count-1];
+				settings.repositories[settings.repositories.Count-1] = buff;
 			}
 			else
 			{

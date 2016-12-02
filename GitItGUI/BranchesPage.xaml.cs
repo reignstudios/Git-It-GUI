@@ -58,6 +58,23 @@ namespace GitItGUI
 
 			// bind events
 			MainContent.singleton.MainContentPageNavigatedTo += NavigatedTo;
+			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
+		}
+
+		private void RepoManager_RepoRefreshedCallback()
+		{
+			var branches = BranchManager.GetOtherBranches();
+			var items = new List<string>();
+			foreach (var branch in branches)
+			{
+				if (branch.isRemote) items.Add(branch.name + " <Remote Branch>");
+				else if (branch.isTracking) items.Add(branch.name + string.Format(" <Local Branch> [tracking remote: {0}]", branch.trackedBranchName));
+				else items.Add(branch.name + " <Local Branch>");
+			}
+
+			otherBranchListView.Items = items;
+			activeBranchTextBox.Text = BranchManager.activeBranch.FriendlyName;
+			trackingOriginTextBox.Text = BranchManager.GetRemoteURL();
 		}
 
 		private void NavigatedTo()
@@ -69,20 +86,6 @@ namespace GitItGUI
 			else if (mode == BranchModes.RenameBranch && NamePage.succeeded)
 			{
 				BranchManager.RenameActiveBranch(NamePage.value);
-			}
-			else// reload if not in special mode
-			{
-				var branches = BranchManager.GetOtherBranches();
-				var items = new List<string>();
-				foreach (var branch in branches)
-				{
-					if (branch.isRemote) items.Add(branch.name + " <Remote Branch>");
-					else items.Add(branch.name);
-				}
-
-				otherBranchListView.Items = items;
-				activeBranchTextBox.Text = BranchManager.activeBranch.FriendlyName;
-				trackingOriginTextBox.Text = BranchManager.GetRemoteURL();
 			}
 		}
 

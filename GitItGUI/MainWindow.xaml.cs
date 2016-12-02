@@ -50,7 +50,9 @@ namespace GitItGUI
 
 		private void MainWindow_Activated(object sender, EventArgs e)
 		{
+			#if !DEBUG
 			if (MainContent.singleton.IsVisible) RepoManager.Refresh();
+			#endif
 		}
 
 		private void Debug_debugLogCallback(object value, bool alert)
