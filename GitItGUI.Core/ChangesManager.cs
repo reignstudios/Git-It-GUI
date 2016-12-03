@@ -308,7 +308,6 @@ namespace GitItGUI.Core
 			try
 			{
 				RepoManager.repo.Stage(fileState.filename);
-				return true;
 			}
 			catch (Exception e)
 			{
@@ -317,6 +316,7 @@ namespace GitItGUI.Core
 			}
 
 			if (refresh) RepoManager.Refresh();
+			return true;
 		}
 
 		public static bool UnstageFile(FileState fileState, bool refresh)
@@ -324,7 +324,6 @@ namespace GitItGUI.Core
 			try
 			{
 				RepoManager.repo.Unstage(fileState.filename);
-				return true;
 			}
 			catch (Exception e)
 			{
@@ -333,6 +332,7 @@ namespace GitItGUI.Core
 			}
 
 			if (refresh) RepoManager.Refresh();
+			return true;
 		}
 
 		public static bool RevertAll()
