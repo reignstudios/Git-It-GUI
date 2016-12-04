@@ -14,12 +14,8 @@
 			<gititgui:HistoryPage/>
 		</TabItem>
 
-		<TabItem Name="repoPage" Header="Repository">
-			<gititgui:RepoPage/>
-		</TabItem>
-
-		<TabItem Name="appSettingsPage" Header="App Settings">
-			<gititgui:AppSettingsPage/>
+		<TabItem Name="settingsPage" Header="Settings">
+			<gititgui:SettingsPage/>
 		</TabItem>
 	</TabControl>
 

@@ -9,6 +9,7 @@ namespace GitItGUI
 	{
 		CheckForUpdates,
 		Start,
+		AppSettings,
 		MainContent,
 		Commit,
 		Name
@@ -64,6 +65,7 @@ namespace GitItGUI
 		{
 			if (CheckForUpdatesPage.singleton.IsVisible) return CheckForUpdatesPage.singleton;
 			else if (StartPage.singleton.IsVisible) return StartPage.singleton;
+			else if (AppSettingsPage.singleton.IsVisible) return AppSettingsPage.singleton;
 			else if (MainContent.singleton.IsVisible) return MainContent.singleton;
 			else if (CommitPage.singleton.IsVisible) return CommitPage.singleton;
 			else if (NamePage.singleton.IsVisible) return NamePage.singleton;
@@ -75,6 +77,7 @@ namespace GitItGUI
 		{
 			CheckForUpdatesPage.singleton.IsVisible = false;
 			StartPage.singleton.IsVisible = false;
+			AppSettingsPage.singleton.IsVisible = false;
 			MainContent.singleton.IsVisible = false;
 			CommitPage.singleton.IsVisible = false;
 			NamePage.singleton.IsVisible = false;
@@ -83,6 +86,7 @@ namespace GitItGUI
 			{
 				case PageTypes.CheckForUpdates: CheckForUpdatesPage.singleton.IsVisible = true; break;
 				case PageTypes.Start: StartPage.singleton.IsVisible = true; break;
+				case PageTypes.AppSettings: AppSettingsPage.singleton.IsVisible = true; break;
 				case PageTypes.MainContent: MainContent.singleton.IsVisible = true; break;
 				case PageTypes.Commit: CommitPage.singleton.IsVisible = true; break;
 				case PageTypes.Name: NamePage.singleton.IsVisible = true; break;

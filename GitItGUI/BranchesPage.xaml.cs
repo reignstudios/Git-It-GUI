@@ -22,7 +22,7 @@ namespace GitItGUI
 		private BranchModes mode = BranchModes.None;
 
 		// ui objects
-		TextBox activeBranchTextBox, trackingOriginTextBox;
+		TextBox activeBranchTextBox, trackingOriginTextBox, remoteURLTextBox;
 		ListBox otherBranchListView;
 		Button addBranchButton, renameBranchButton, addTrackingButton, removeTrackingButton, switchBranchButton, mergeBranchButton, deleteBranchButton;
 
@@ -36,6 +36,7 @@ namespace GitItGUI
 			// load ui items
 			activeBranchTextBox = this.Find<TextBox>("activeBranchTextBox");
 			trackingOriginTextBox = this.Find<TextBox>("trackingOriginTextBox");
+			remoteURLTextBox = this.Find<TextBox>("remoteURLTextBox");
 			otherBranchListView = this.Find<ListBox>("otherBranchListView");
 			addBranchButton = this.Find<Button>("addBranchButton");
 			renameBranchButton = this.Find<Button>("renameBranchButton");
@@ -74,7 +75,8 @@ namespace GitItGUI
 
 			otherBranchListView.Items = items;
 			activeBranchTextBox.Text = BranchManager.activeBranch.FriendlyName;
-			trackingOriginTextBox.Text = BranchManager.GetRemoteURL();
+			trackingOriginTextBox.Text = BranchManager.GetTrackedBranchName();
+			remoteURLTextBox.Text = BranchManager.GetRemoteURL();
 		}
 
 		private void NavigatedTo()

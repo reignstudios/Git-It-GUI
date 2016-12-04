@@ -35,7 +35,7 @@ namespace GitItGUI.Core
 			return activeBranch.Remote.Url;
 		}
 
-		public static string GetTrackingBranchName()
+		public static string GetTrackedBranchName()
 		{
 			if (activeBranch.IsTracking || activeBranch.TrackedBranch == null) return "";
 			return activeBranch.TrackedBranch.FriendlyName;

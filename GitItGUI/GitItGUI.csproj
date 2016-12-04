@@ -220,8 +220,8 @@
       <DependentUpon>NamePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="NavigationPage.cs" />
-    <Compile Include="RepoPage.xaml.cs">
-      <DependentUpon>RepoPage.xaml</DependentUpon>
+    <Compile Include="SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="StartPage.xaml.cs">
       <DependentUpon>StartPage.xaml</DependentUpon>
@@ -261,7 +261,7 @@
     <EmbeddedResource Include="StartPage.xaml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="RepoPage.xaml">
+    <EmbeddedResource Include="SettingsPage.xaml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
@@ -269,6 +269,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Icons\AppIcon.ico" />
     <Content Include="AppIcon.ico" />
+    <EmbeddedResource Include="Icons\Settings.png" />
     <Content Include="VersionInfo.xml" />
     <EmbeddedResource Include="Icons\AppIcon.png" />
     <EmbeddedResource Include="Icons\conflicted.png" />

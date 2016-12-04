@@ -12,7 +12,7 @@ namespace GitItGUI
 
 		// ui objects
 		StackPanel recentStackPanel;
-		Button openButton, createButton;
+		Button cloneButton, openButton, settingsButton;
 
 		public StartPage()
 		{
@@ -21,10 +21,17 @@ namespace GitItGUI
 
 			// load ui items
 			recentStackPanel = this.Find<StackPanel>("recentStackPanel");
+			cloneButton = this.Find<Button>("cloneButton");
 			openButton = this.Find<Button>("openButton");
-			createButton = this.Find<Button>("createButton");
-			openButton.Click += OpenButton_Click;
-			createButton.Click += CreateButton_Click;
+			settingsButton = this.Find<Button>("settingsButton");
+			cloneButton.Click += OpenButton_Click;
+			openButton.Click += CloneButton_Click;
+			settingsButton.Click += SettingsButton_Click;
+		}
+
+		private void SettingsButton_Click(object sender, RoutedEventArgs e)
+		{
+			MainWindow.LoadPage(PageTypes.AppSettings);
 		}
 
 		public void NavigatedTo()
@@ -49,7 +56,7 @@ namespace GitItGUI
 			}
 		}
 
-		private void CreateButton_Click(object sender, RoutedEventArgs e)
+		private void CloneButton_Click(object sender, RoutedEventArgs e)
 		{
 			MessageBox.Show("TODO");
 		}

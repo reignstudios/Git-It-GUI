@@ -10,25 +10,18 @@ using System.Text.RegularExpressions;
 
 namespace GitItGUI
 {
-	public class RepoPage : UserControl
+	public class SettingsPage : UserControl
 	{
-		public static RepoPage singleton;
+		public static SettingsPage singleton;
 
 		// UI objects
-		ListBox remotesListView;
-		Button addRemoteButton, removeRemoteButton;
 		TextBox sigNameTextBox, sigEmailTextBox, usernameTextBox, passwordTextBox;
 		CheckBox gitlfsSupportCheckBox, validateGitignoreCheckbox;
 
-		public RepoPage()
+		public SettingsPage()
 		{
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
-
-			// remotes
-			remotesListView = this.Find<ListBox>("remotesListView");
-			addRemoteButton = this.Find<Button>("addRemoteButton");
-			removeRemoteButton = this.Find<Button>("removeRemoteButton");
 
 			// user info
 			sigNameTextBox = this.Find<TextBox>("sigNameTextBox");
