@@ -22,9 +22,11 @@ namespace GitItGUI
 		private BranchModes mode = BranchModes.None;
 
 		// ui objects
+		TextBlock trackingLabel, trackedBranchLabel, remoteURLLabel;
 		TextBox activeBranchTextBox, trackingOriginTextBox, remoteURLTextBox;
 		ListBox otherBranchListView;
 		Button addBranchButton, renameBranchButton, addTrackingButton, removeTrackingButton, switchBranchButton, mergeBranchButton, deleteBranchButton;
+		CheckBox advancedModeCheckBox;
 
 		List<string> otherBranchListViewItems;
 
@@ -45,6 +47,10 @@ namespace GitItGUI
 			switchBranchButton = this.Find<Button>("switchBranchButton");
 			mergeBranchButton = this.Find<Button>("mergeBranchButton");
 			deleteBranchButton = this.Find<Button>("deleteBranchButton");
+			advancedModeCheckBox = this.Find<CheckBox>("advancedModeCheckBox");
+			trackingLabel = this.Find<TextBlock>("trackingLabel");
+			trackedBranchLabel = this.Find<TextBlock>("trackedBranchLabel");
+			remoteURLLabel = this.Find<TextBlock>("remoteURLLabel");
 
 			// apply bindings
 			otherBranchListViewItems = new List<string>();
@@ -56,21 +62,41 @@ namespace GitItGUI
 			switchBranchButton.Click += SwitchBranchButton_Click;
 			mergeBranchButton.Click += MergeBranchButton_Click;
 			deleteBranchButton.Click += DeleteBranchButton_Click;
+			advancedModeCheckBox.Click += AdvancedModeCheckBox_Click;
 
 			// bind events
 			MainContent.singleton.MainContentPageNavigatedTo += NavigatedTo;
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
 		}
 
+		private void AdvancedModeCheckBox_Click(object sender, RoutedEventArgs e)
+		{
+			RepoManager_RepoRefreshedCallback();
+		}
+
 		private void RepoManager_RepoRefreshedCallback()
 		{
+			bool isAdvancedMode = advancedModeCheckBox.IsChecked;
+
+			// show/hide advanced options
+			addBranchButton.IsVisible = isAdvancedMode;
+			renameBranchButton.IsVisible = isAdvancedMode;
+			trackingOriginTextBox.IsVisible = isAdvancedMode;
+			remoteURLTextBox.IsVisible = isAdvancedMode;
+			addTrackingButton.IsVisible = isAdvancedMode;
+			removeTrackingButton.IsVisible = isAdvancedMode;
+			trackingLabel.IsVisible = isAdvancedMode;
+			trackedBranchLabel.IsVisible = isAdvancedMode;
+			remoteURLLabel.IsVisible = isAdvancedMode;
+
+			// fill other branches list
 			var branches = BranchManager.GetOtherBranches();
 			var items = new List<string>();
 			foreach (var branch in branches)
 			{
-				if (branch.isRemote) items.Add(branch.name + " <Remote Branch>");
-				else if (branch.isTracking) items.Add(branch.name + string.Format(" <Local Branch> [tracking remote: {0}]", branch.trackedBranchName));
-				else items.Add(branch.name + " <Local Branch>");
+				if (branch.isRemote) items.Add(branch.name + (isAdvancedMode ? " <Remote Branch>" : ""));
+				else if (branch.isTracking) items.Add(branch.name + (isAdvancedMode ? string.Format(" <Local Branch> [tracking remote: {0}]", branch.trackedBranchName) : ""));
+				else items.Add(branch.name + (isAdvancedMode ? " <Local Branch>" : ""));
 			}
 
 			otherBranchListView.Items = items;

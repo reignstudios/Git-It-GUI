@@ -12,15 +12,15 @@
 			<Button Name="addBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,85,-100,10" Width="75" ToolTip.Tip="Add new branch based off 'Active'?">Add</Button>
 			<Button Name="renameBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,85,-180,10" Width="75" ToolTip.Tip="Rename 'Active' branch?">Rename</Button>
 
-			<TextBlock FontSize="18" Margin="0,150,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">--- Tracking ---</TextBlock>
-			<TextBlock Width="82" Height="32" Margin="10,180,10,-180" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Tracked Branch:</TextBlock>
+			<TextBlock Name="trackingLabel" FontSize="18" Margin="0,150,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">--- Tracking ---</TextBlock>
+			<TextBlock Name="trackedBranchLabel" Width="82" Height="32" Margin="10,180,10,-180" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Tracked Branch:</TextBlock>
 			<TextBox Name="trackingOriginTextBox" Height="32" Margin="100,180,0,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Active branch tracking origin"/>
-			<TextBlock Width="82" Height="32" Margin="10,215,10,-215" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Remote URL:</TextBlock>
+			<TextBlock Name="remoteURLLabel" Width="82" Height="32" Margin="10,215,10,-215" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Remote URL:</TextBlock>
 			<TextBox Name="remoteURLTextBox" Height="32" Margin="100,215,0,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Active branch tracking origin"/>
 			<Button Name="addTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,250,-100,-250" Width="75" ToolTip.Tip="Add tracking from 'Other' remote branch into 'Active'">*Add</Button>
 			<Button Name="removeTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,250,-180,-250" Width="75" ToolTip.Tip="Remove tracking from 'Active' branch">Remove</Button>
 
-			<CheckBox Name="advancedModeCheckBoxe" Margin="10" HorizontalContentAlignment="Left" VerticalAlignment="Bottom">Advanced Mode</CheckBox>
+			<CheckBox Name="advancedModeCheckBox" Margin="10" HorizontalContentAlignment="Left" VerticalAlignment="Bottom">Advanced Mode</CheckBox>
 		</Grid>
 
 		<Grid Grid.Column="1" Background="LightGray">
