@@ -1,6 +1,6 @@
 # Git-It-GUI (v0.1.0.0)
 
-![alt tag](http://reign-studios-services.com/GitItGUI/ScreenShots/ScreenShot.png)
+![alt tag](ScreenShots/ScreenShot.png?raw=true)
 
 
 - NOTE: This is just in the prototype faze.
