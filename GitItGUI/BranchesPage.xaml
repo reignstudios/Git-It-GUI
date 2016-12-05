@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="800" Design.Height="400" >
+﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="800" Design.Height="400" xmlns:self="clr-namespace:GitItGUI;assembly=GitItGUI">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="50*" />
@@ -17,7 +17,7 @@
 			<TextBox Name="trackingOriginTextBox" Height="32" Margin="100,180,0,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Active branch tracking origin"/>
 			<TextBlock Name="remoteURLLabel" Width="82" Height="32" Margin="10,215,10,-215" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Remote URL:</TextBlock>
 			<TextBox Name="remoteURLTextBox" Height="32" Margin="100,215,0,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Active branch tracking origin"/>
-			<Button Name="addTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,250,-100,-250" Width="75" ToolTip.Tip="Add tracking from 'Other' remote branch into 'Active'">*Add</Button>
+			<Button Name="addTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,250,-100,-250" Width="75" ToolTip.Tip="Copy tracking from 'Other' remote branch into 'Active'">*Add</Button>
 			<Button Name="removeTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,250,-180,-250" Width="75" ToolTip.Tip="Remove tracking from 'Active' branch">Remove</Button>
 
 			<CheckBox Name="advancedModeCheckBox" Margin="10" HorizontalContentAlignment="Left" VerticalAlignment="Bottom">Advanced Mode</CheckBox>

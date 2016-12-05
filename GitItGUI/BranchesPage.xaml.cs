@@ -94,9 +94,19 @@ namespace GitItGUI
 			var items = new List<string>();
 			foreach (var branch in branches)
 			{
-				if (branch.isRemote) items.Add(branch.name + (isAdvancedMode ? " <Remote Branch>" : ""));
-				else if (branch.isTracking) items.Add(branch.name + (isAdvancedMode ? string.Format(" <Local Branch> [tracking remote: {0}]", branch.trackedBranchName) : ""));
-				else items.Add(branch.name + (isAdvancedMode ? " <Local Branch>" : ""));
+				string detailedName = branch.name;
+				if (!isAdvancedMode)
+				{
+					if (!branch.isRemote) items.Add(detailedName);
+				}
+				else
+				{
+					if (branch.isRemote) detailedName += " <Remote Branch>";
+					else if (branch.isTracking) detailedName += string.Format(" <Local Branch> [tracking remote: {0}]", branch.trackedBranchName);
+					else detailedName += " <Local Branch>";
+					
+					items.Add(detailedName);
+				}
 			}
 
 			otherBranchListView.Items = items;
@@ -115,6 +125,8 @@ namespace GitItGUI
 			{
 				BranchManager.RenameActiveBranch(NamePage.value);
 			}
+
+			mode = BranchModes.None;
 		}
 
 		private void AddBranchButton_Click(object sender, RoutedEventArgs e)
@@ -137,27 +149,55 @@ namespace GitItGUI
 				return;
 			}
 
-			// TODO: check if selected branch is remote
+			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			if (!BranchManager.IsRemote(branch))
+			{
+				Debug.Log("Branch selected is not a 'Remote'", true);
+				return;
+			}
+
+			BranchManager.AddUpdateTracking(branch);
 		}
 
 		private void RemoveTrackingButton_Click(object sender, RoutedEventArgs e)
 		{
-			
+			BranchManager.RemoveTracking();
 		}
 
 		private void SwitchBranchButton_Click(object sender, RoutedEventArgs e)
 		{
-			
+			if (otherBranchListView.SelectedIndex == -1)
+			{
+				Debug.Log("Must select a 'Other' branch!", true);
+				return;
+			}
+
+			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			BranchManager.Checkout(branch);
 		}
 
 		private void MergeBranchButton_Click(object sender, RoutedEventArgs e)
 		{
-			
+			if (otherBranchListView.SelectedIndex == -1)
+			{
+				Debug.Log("Must select a 'Other' branch!", true);
+				return;
+			}
+
+			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			BranchManager.MergeBranchIntoActive(branch);
 		}
 
 		private void DeleteBranchButton_Click(object sender, RoutedEventArgs e)
 		{
-			
+			if (otherBranchListView.SelectedIndex == -1)
+			{
+				Debug.Log("Must select a 'Other' branch!", true);
+				return;
+			}
+
+			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			BranchManager.DeleteNonActiveBranch(branch);
 		}
 	}
 }
