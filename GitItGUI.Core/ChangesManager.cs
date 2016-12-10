@@ -384,9 +384,9 @@ namespace GitItGUI.Core
 				options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => RepoManager.credentials;
 				options.FetchOptions.TagFetchMode = TagFetchMode.All;
 				RepoManager.repo.Network.Pull(RepoManager.signature, options);
-				//ResolveConflicts();// TODO
-
-				syncPullSuccess = true;
+				bool conflicts = !ConflictsExist();
+				if (conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
+				syncPullSuccess = conflicts;
 			}
 			catch (Exception e)
 			{
@@ -394,7 +394,7 @@ namespace GitItGUI.Core
 				return false;
 			}
 
-			RepoManager.Refresh();
+			if (!isSyncMode) RepoManager.Refresh();
 			return true;
 		}
 
@@ -420,7 +420,7 @@ namespace GitItGUI.Core
 						using (var process = new Process())
 						{
 							process.StartInfo.FileName = "git-lfs";
-							process.StartInfo.Arguments = "pre-push origin";
+							process.StartInfo.Arguments = "pre-push " + BranchManager.activeBranch.Remote.Name;
 							process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 							process.StartInfo.CreateNoWindow = true;
 							process.StartInfo.UseShellExecute = false;
@@ -442,10 +442,10 @@ namespace GitItGUI.Core
 
 							string output = process.StandardOutput.ReadToEnd();
 							string outputErr = process.StandardError.ReadToEnd();
-							if (!string.IsNullOrEmpty(output)) Console.WriteLine("git-lfs pre-push results: " + output);
+							if (!string.IsNullOrEmpty(output)) Debug.Log("git-lfs pre-push results: " + output);
 							if (!string.IsNullOrEmpty(outputErr))
 							{
-								Console.WriteLine("git-lfs pre-push error results: " + outputErr);
+								Debug.LogError("git-lfs pre-push error results: " + outputErr);
 								return false;
 							}
 						}
@@ -463,7 +463,7 @@ namespace GitItGUI.Core
 					pushError = true;
 				};
 				RepoManager.repo.Network.Push(BranchManager.activeBranch, options);
-
+				
 				if (!pushError)
 				{
 					syncPushSuccess = true;
@@ -476,7 +476,7 @@ namespace GitItGUI.Core
 				return false;
 			}
 
-			RepoManager.Refresh();
+			if (!isSyncMode) RepoManager.Refresh();
 			return true;
 		}
 
@@ -496,126 +496,181 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		//private static async Task<bool> ResolveChange(FileState item)
-		public static bool ResolveConflict(FileState fileState, bool refresh)
+		public static bool ConflictsExist()
 		{
-			// make sure file needs to be resolved
-			if (fileState.state != FileStates.Conflicted)
+			foreach (var fileState in fileStates)
 			{
-				Debug.LogError("File not in conflicted state: " + fileState.filename, true);
-				return false;
+				if (fileState.state == FileStates.Conflicted) return true;
 			}
 
-			// get info
-			string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename);
-			var conflict = RepoManager.repo.Index.Conflicts[fileState.filename];
-			var ours = RepoManager.repo.Lookup<Blob>(conflict.Ours.Id);
-			var theirs = RepoManager.repo.Lookup<Blob>(conflict.Theirs.Id);
+			return false;
+		}
 
-			// save local temp files
-			Tools.SaveFileFromID(fullPath + ".ours", ours.Id);
-			Tools.SaveFileFromID(fullPath + ".theirs", theirs.Id);
-
-			// check if files are binary (if so open select binary file tool)
-			if (ours.IsBinary || theirs.IsBinary || Tools.IsBinaryFileData(fullPath + ".ours") || Tools.IsBinaryFileData(fullPath + ".theirs"))// TODO
+		public static bool ResolveAllConflicts(bool refresh)
+		{
+			foreach (var fileState in fileStates)
 			{
-				// open merge tool
-				/*MainWindow.CanInteractWithUI(false);
-				var mergeBinaryFileWindow = new MergeBinaryFileWindow(fileState.filename);
-				mergeBinaryFileWindow.Owner = MainWindow.singleton;
-				mergeBinaryFileWindow.Show();
-				await mergeBinaryFileWindow.WaitForClose();
-				MainWindow.CanInteractWithUI(true);
-				if (mergeBinaryFileWindow.result == MergeBinaryResults.Cancel) return false;
-
-				// copy selected
-				if (mergeBinaryFileWindow.result == MergeBinaryResults.KeepMine) File.Copy(fullPath + ".ours", fullPath, true);
-				else if (mergeBinaryFileWindow.result == MergeBinaryResults.UserTheirs) File.Copy(fullPath + ".theirs", fullPath, true);
-
-				RepoUserControl.repo.Stage(fileState.filename);*/
-
-				// delete temp files
-				if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
-				if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
-				if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
-
-				return true;
-			}
-			
-			// copy base and parse
-			File.Copy(fullPath, fullPath + ".base", true);
-			string baseFile = File.ReadAllText(fullPath);
-			var match = Regex.Match(baseFile, @"(<<<<<<<\s*\w*[\r\n]*).*(=======[\r\n]*).*(>>>>>>>\s*\w*[\r\n]*)", RegexOptions.Singleline);
-			if (match.Success && match.Groups.Count == 4)
-			{
-				baseFile = baseFile.Replace(match.Groups[1].Value, "").Replace(match.Groups[2].Value, "").Replace(match.Groups[3].Value, "");
-				File.WriteAllText(fullPath + ".base", baseFile);
-			}
-
-			// hash base file
-			byte[] baseHash = null;
-			using (var md5 = MD5.Create())
-			{
-				using (var stream = File.OpenRead(fullPath + ".base"))
+				if (fileState.state == FileStates.Conflicted && !ResolveConflict(fileState, false))
 				{
-					baseHash = md5.ComputeHash(stream);
+					Debug.LogError("Resolve conflict failed (aborting pending)", true);
+					return false;
 				}
 			}
 
-			// start external merge tool
-			using (var process = new Process())
+			if (refresh) RepoManager.Refresh();
+			return true;
+		}
+		
+		public static bool ResolveConflict(FileState fileState, bool refresh)
+		{
+			bool wasModified = false;
+
+			try
 			{
-				process.StartInfo.FileName = AppManager.mergeToolPath;
-				if (AppManager.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
-				else if (AppManager.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
-				else if (AppManager.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{0}.base\" \"{0}.ours\" \"{0}.theirs\" \"{0}.base\"", fullPath);
-				else if (AppManager.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
-				process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
-				if (!process.Start())
+				// make sure file needs to be resolved
+				if (fileState.state != FileStates.Conflicted)
 				{
-					Debug.LogError("Failed to start Merge tool (is it installed?)", true);
+					Debug.LogError("File not in conflicted state: " + fileState.filename, true);
+					return false;
+				}
+
+				// get info
+				string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename);
+				var conflict = RepoManager.repo.Index.Conflicts[fileState.filename];
+				var ours = RepoManager.repo.Lookup<Blob>(conflict.Ours.Id);
+				var theirs = RepoManager.repo.Lookup<Blob>(conflict.Theirs.Id);
+
+				// save local temp files
+				Tools.SaveFileFromID(fullPath + ".ours", ours.Id);
+				Tools.SaveFileFromID(fullPath + ".theirs", theirs.Id);
+
+				// check if files are binary (if so open select binary file tool)
+				if (ours.IsBinary || theirs.IsBinary || Tools.IsBinaryFileData(fullPath + ".ours") || Tools.IsBinaryFileData(fullPath + ".theirs"))
+				{
+					// open merge tool
+					using (var process = new Process())
+					{
+						process.StartInfo.RedirectStandardOutput = true;
+						process.StartInfo.FileName = "BinaryConflicPicker.exe";
+						process.StartInfo.Arguments = string.Format("-FileInConflic=\"{0}\"", fileState.filename);
+						process.StartInfo.UseShellExecute = false;
+						process.Start();
+						process.WaitForExit();
+
+						string result = process.StandardOutput.ReadToEnd();
+						var values = result.Split(':');
+						if (values.Length != 2)
+						{
+							Debug.LogWarning("Invalid merge app response: " + result, true);
+							return false;
+						}
+
+						if (values[0] == "ERROR")
+						{
+							Debug.LogWarning("Response error: " + values[1], true);
+							return false;
+						}
+						else if (values[0] == "SUCCEEDED")
+						{
+							switch (values[1])
+							{
+								case "Canceled": return false;
+								case "KeepMine": File.Copy(fullPath + ".ours", fullPath, true); break;
+								case "UseTheirs": File.Copy(fullPath + ".theirs", fullPath, true); break;
+								default: Debug.LogWarning("Response error: " + values[1], true); return false;
+							}
+
+							RepoManager.repo.Stage(fileState.filename);
+						}
+					}
 
 					// delete temp files
 					if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
 					if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
 					if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
 
-					return false;
+					return true;
 				}
-
-				process.WaitForExit();
-			}
-
-			// get new base hash
-			byte[] baseHashChange = null;
-			using (var md5 = MD5.Create())
-			{
-				using (var stream = File.OpenRead(fullPath + ".base"))
+			
+				// copy base and parse
+				File.Copy(fullPath, fullPath + ".base", true);
+				string baseFile = File.ReadAllText(fullPath);
+				var match = Regex.Match(baseFile, @"(<<<<<<<\s*\w*[\r\n]*).*(=======[\r\n]*).*(>>>>>>>\s*\w*[\r\n]*)", RegexOptions.Singleline);
+				if (match.Success && match.Groups.Count == 4)
 				{
-					baseHashChange = md5.ComputeHash(stream);
+					baseFile = baseFile.Replace(match.Groups[1].Value, "").Replace(match.Groups[2].Value, "").Replace(match.Groups[3].Value, "");
+					File.WriteAllText(fullPath + ".base", baseFile);
 				}
+
+				// hash base file
+				byte[] baseHash = null;
+				using (var md5 = MD5.Create())
+				{
+					using (var stream = File.OpenRead(fullPath + ".base"))
+					{
+						baseHash = md5.ComputeHash(stream);
+					}
+				}
+
+				// start external merge tool
+				using (var process = new Process())
+				{
+					process.StartInfo.FileName = AppManager.mergeToolPath;
+					if (AppManager.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
+					else if (AppManager.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
+					else if (AppManager.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{0}.base\" \"{0}.ours\" \"{0}.theirs\" \"{0}.base\"", fullPath);
+					else if (AppManager.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
+					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+					if (!process.Start())
+					{
+						Debug.LogError("Failed to start Merge tool (is it installed?)", true);
+
+						// delete temp files
+						if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
+						if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
+						if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
+
+						return false;
+					}
+
+					process.WaitForExit();
+				}
+
+				// get new base hash
+				byte[] baseHashChange = null;
+				using (var md5 = MD5.Create())
+				{
+					using (var stream = File.OpenRead(fullPath + ".base"))
+					{
+						baseHashChange = md5.ComputeHash(stream);
+					}
+				}
+
+				// check if file was modified
+				if (!baseHashChange.SequenceEqual(baseHash))
+				{
+					wasModified = true;
+					File.Copy(fullPath + ".base", fullPath, true);
+					RepoManager.repo.Stage(fileState.filename);
+				}
+
+				// delete temp files
+				if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
+				if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
+				if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
+
+				// check if user accepts the current state of the merge
+				/*if (!wasModified && MessageBox.Show("No changes detected. Accept as merged?", "Accept Merge?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)// TODO
+				{
+					RepoManager.repo.Stage(fileState.filename);
+					wasModified = true;
+				}*/
 			}
-
-			// check if file was modified
-			bool wasModified = false;
-			if (!baseHashChange.SequenceEqual(baseHash))
+			catch (Exception e)
 			{
-				wasModified = true;
-				File.Copy(fullPath + ".base", fullPath, true);
-				RepoManager.repo.Stage(fileState.filename);
+				Debug.LogError("Failed to resolve file: " + e.Message, true);
+				return false;
 			}
-
-			// delete temp files
-			if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
-			if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
-			if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
-
-			// check if user accepts the current state of the merge
-			/*if (!wasModified && MessageBox.Show("No changes detected. Accept as merged?", "Accept Merge?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)// TODO
-			{
-				RepoManager.repo.Stage(fileState.filename);
-				wasModified = true;
-			}*/
 
 			// finish
 			if (refresh) RepoManager.Refresh();

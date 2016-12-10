@@ -1,0 +1,8 @@
+﻿<Window xmlns="https://github.com/avaloniaui" Width="400" Height="150" MinWidth="400" MinHeight="150" MaxWidth="400" MaxHeight="150">
+	<Grid Name="grid" Background="LightGray">
+		<TextBox Name="fileInConflictTextBox" Height="28" Margin="10,0,12,0" TextWrapping="Wrap" Text="File in Question..." IsReadOnly="True"/>
+		<Button Name="keepMineButton" Content="Keep Mine" HorizontalAlignment="Left" Margin="10,0,-10,10" VerticalAlignment="Bottom" Width="75"/>
+		<Button Name="useTheirsButton" Content="Use Theirs" HorizontalAlignment="Right" Margin="-10,0,12,10" VerticalAlignment="Bottom" Width="75"/>
+		<Button Name="cancelButton" Content="Cancel" Margin="0,0,0,10" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="205"/>
+	</Grid>
+</Window>

@@ -99,6 +99,48 @@ namespace GitItGUI.Core
 			return process.StandardOutput.ReadToEnd();
 		}
 
+		//public static bool LaunchCoreApp(string exe, string arguments, out string type, out string value)
+		//{
+		//	type = null;
+		//	value = null;
+		//	var process = new Process();
+		//	process.StartInfo.FileName = exe;
+		//	process.StartInfo.Arguments = arguments;
+		//	process.StartInfo.WorkingDirectory = RepoManager.repoPath;
+		//	process.StartInfo.RedirectStandardOutput = true;
+		//	process.StartInfo.UseShellExecute = false;
+		//	process.Start();
+		//	process.WaitForExit();
+
+		//	var result = process.StandardOutput.ReadToEnd();
+		//	var values = result.Split(':');
+		//	if (values.Length != 2)
+		//	{
+		//		Debug.LogWarning("Invalid merge app response: " + result, true);
+		//		return false;
+		//	}
+
+		//	if (values[0] == "ERROR")
+		//	{
+		//		Debug.LogWarning("Response error: " + values[1], true);
+		//		return false;
+		//	}
+		//	else if (values[0] == "SUCCEEDED")
+		//	{
+		//		switch (values[1])
+		//		{
+		//			case "Canceled": return false;
+		//			case "KeepMine": File.Copy(fullPath + ".ours", fullPath, true); break;
+		//			case "UseTheirs": File.Copy(fullPath + ".theirs", fullPath, true); break;
+		//			default: Debug.LogWarning("Response error: " + values[1], true); return false;
+		//		}
+
+		//		RepoManager.repo.Stage(fileState.filename);
+		//	}
+
+		//	return true;
+		//}
+
 		public static bool IsSingleWord(string value)
 		{
 			foreach (char c in value)

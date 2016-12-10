@@ -1,6 +1,7 @@
 ﻿using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -370,5 +371,27 @@ namespace GitItGUI.Core
 
 			RepoUserControl.Refresh();
 		}*/
+
+		public static void OpenGitk()
+		{
+			// get gitk path
+			string programFilesx86, programFilesx64;
+			Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
+
+			// open gitk
+			var process = new Process();
+			process.StartInfo.FileName = programFilesx64 + "\\Git\\cmd\\gitk.exe";
+			process.StartInfo.WorkingDirectory = repoPath;
+			process.StartInfo.Arguments = "";
+			process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+			if (!process.Start())
+			{
+				Debug.LogError("Failed to start Merge tool (is it installed?)", true);
+				return;
+			}
+
+			process.WaitForExit();
+			Refresh();
+		}
 	}
 }

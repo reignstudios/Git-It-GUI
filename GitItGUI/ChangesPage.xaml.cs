@@ -169,17 +169,17 @@ namespace GitItGUI
 
 		private void PushChangesButton_Advanced_Click(object sender, RoutedEventArgs e)
 		{
-			
+			ChangesManager.Push();
 		}
 
 		private void PullChangesButton_Advanced_Click(object sender, RoutedEventArgs e)
 		{
-			
+			ChangesManager.Pull();
 		}
 
 		private void SyncChangesButton_Click(object sender, RoutedEventArgs e)
 		{
-			
+			ChangesManager.Sync();
 		}
 
 		private void CommitStagedButton_Click(object sender, RoutedEventArgs e)
