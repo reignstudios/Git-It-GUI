@@ -548,40 +548,23 @@ namespace GitItGUI.Core
 				if (ours.IsBinary || theirs.IsBinary || Tools.IsBinaryFileData(fullPath + ".ours") || Tools.IsBinaryFileData(fullPath + ".theirs"))
 				{
 					// open merge tool
-					using (var process = new Process())
+					string type, value;
+					if (Tools.LaunchCoreApp("BinaryConflicPicker.exe", string.Format("-FileInConflic=\"{0}\"", fileState.filename), out type, out value))
 					{
-						process.StartInfo.RedirectStandardOutput = true;
-						process.StartInfo.FileName = "BinaryConflicPicker.exe";
-						process.StartInfo.Arguments = string.Format("-FileInConflic=\"{0}\"", fileState.filename);
-						process.StartInfo.UseShellExecute = false;
-						process.Start();
-						process.WaitForExit();
-
-						string result = process.StandardOutput.ReadToEnd();
-						var values = result.Split(':');
-						if (values.Length != 2)
+						switch (value)
 						{
-							Debug.LogWarning("Invalid merge app response: " + result, true);
-							return false;
+							case "Canceled": return false;
+							case "KeepMine": File.Copy(fullPath + ".ours", fullPath, true); break;
+							case "UseTheirs": File.Copy(fullPath + ".theirs", fullPath, true); break;
+							default: Debug.LogWarning("Response error: " + value, true); return false;
 						}
 
-						if (values[0] == "ERROR")
-						{
-							Debug.LogWarning("Response error: " + values[1], true);
-							return false;
-						}
-						else if (values[0] == "SUCCEEDED")
-						{
-							switch (values[1])
-							{
-								case "Canceled": return false;
-								case "KeepMine": File.Copy(fullPath + ".ours", fullPath, true); break;
-								case "UseTheirs": File.Copy(fullPath + ".theirs", fullPath, true); break;
-								default: Debug.LogWarning("Response error: " + values[1], true); return false;
-							}
-
-							RepoManager.repo.Stage(fileState.filename);
-						}
+						RepoManager.repo.Stage(fileState.filename);
+					}
+					else
+					{
+						Debug.LogError("Failed to resolve file: " + fileState.filename, true);
+						return false;
 					}
 
 					// delete temp files
