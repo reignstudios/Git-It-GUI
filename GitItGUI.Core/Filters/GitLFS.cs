@@ -93,7 +93,7 @@ namespace GitItGUI.Core.Filters
 				// launch git-lfs
 				process = new Process();
 				process.StartInfo.FileName = "git-lfs";
-				process.StartInfo.Arguments = mode == FilterMode.Clean ? "clean" : "smudge";
+				process.StartInfo.Arguments = string.Format("{0} {1}", mode == FilterMode.Clean ? "clean" : "smudge", path);
 				process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 				process.StartInfo.RedirectStandardInput = true;
 				process.StartInfo.RedirectStandardOutput = true;
