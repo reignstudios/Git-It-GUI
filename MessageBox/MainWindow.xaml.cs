@@ -51,8 +51,22 @@ namespace MessageBox
 
 				switch (values[0])
 				{
+					case "-Title": Title = values[1]; break;
 					case "-Message": message.Text = values[1]; break;
-					case "-Type": cancelButton.IsVisible = values[1] == "OkCancel"; break;
+
+					case "-Type":
+						if (values[1] == "OkCancel")
+						{
+							cancelButton.IsVisible = true;
+						}
+						else if (values[1] == "YesNo")
+						{
+							cancelButton.IsVisible = true;
+							cancelButton.Content = "No";
+							okButton.Content = "Yes";
+						}
+						break;
+
 					default:
 						Console.Write(string.Format("ERROR:Invalid arg type ({0})", values[0]));
 						grid.IsVisible = false;

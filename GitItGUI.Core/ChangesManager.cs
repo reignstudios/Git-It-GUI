@@ -420,7 +420,7 @@ namespace GitItGUI.Core
 						using (var process = new Process())
 						{
 							process.StartInfo.FileName = "git-lfs";
-							process.StartInfo.Arguments = "pre-push " + BranchManager.activeBranch.Remote.Name;
+							process.StartInfo.Arguments = "pre-push " + BranchManager.activeBranch.Remote.Name;// do we need "BranchManager.activeBranch.Remote.Url" ?? (use "git-lfs pre-push --help" to check)
 							process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 							process.StartInfo.CreateNoWindow = true;
 							process.StartInfo.UseShellExecute = false;
@@ -643,11 +643,23 @@ namespace GitItGUI.Core
 				if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
 
 				// check if user accepts the current state of the merge
-				/*if (!wasModified && MessageBox.Show("No changes detected. Accept as merged?", "Accept Merge?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)// TODO
+				if (!wasModified)
 				{
-					RepoManager.repo.Stage(fileState.filename);
-					wasModified = true;
-				}*/
+					string type, value;
+					if (Tools.LaunchCoreApp("MessageBox.exe", "-Title=\"Accept Merge?\" -Message=\"No changes detected. Accept as merged\" -Type=\"YesNo\"", out type, out value))
+					{
+						switch (value)
+						{
+							case "Ok":
+								RepoManager.repo.Stage(fileState.filename);
+								wasModified = true;
+								break;
+
+							case "Cancel": break;
+							default: Debug.LogWarning("Response error: " + value, true); return false;
+						}
+					}
+				}
 			}
 			catch (Exception e)
 			{
