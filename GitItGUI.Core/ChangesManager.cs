@@ -351,6 +351,31 @@ namespace GitItGUI.Core
 			return true;
 		}
 
+		public static bool RevertFile(FileState fileState)
+		{
+			if (fileState.state == FileStates.ModifiedInIndex && fileState.state == FileStates.ModifiedInWorkdir &&
+				fileState.state == FileStates.DeletedFromIndex && fileState.state == FileStates.DeletedFromWorkdir)
+			{
+				Debug.LogError("This file is not modified or deleted", true);
+				return false;
+			}
+
+			try
+			{
+				var options = new CheckoutOptions();
+				options.CheckoutModifiers = CheckoutModifiers.Force;
+				RepoManager.repo.CheckoutPaths(RepoManager.repo.Head.FriendlyName, new string[] {fileState.filename}, options);
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to reset file: " + e.Message);
+				return false;
+			}
+
+			RepoManager.Refresh();
+			return true;
+		}
+
 		public static bool CommitStagedChanges(string commitMessage)
 		{
 			try

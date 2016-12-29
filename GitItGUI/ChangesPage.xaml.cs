@@ -59,6 +59,78 @@ namespace GitItGUI
 		}
 	}
 
+	public class OpenFile_ClickCommand : ICommand
+	{
+		#pragma warning disable CS0067
+		public event EventHandler CanExecuteChanged;
+		#pragma warning restore CS0067
+
+		private FileItem sender;
+
+		public OpenFile_ClickCommand(FileItem sender)
+		{
+			this.sender = sender;
+		}
+
+		public bool CanExecute(object parameter)
+		{
+			return true;
+		}
+
+		public void Execute(object parameter)
+		{
+			sender.OpenFile();
+		}
+	}
+
+	public class OpenFileLocation_ClickCommand : ICommand
+	{
+		#pragma warning disable CS0067
+		public event EventHandler CanExecuteChanged;
+		#pragma warning restore CS0067
+
+		private FileItem sender;
+
+		public OpenFileLocation_ClickCommand(FileItem sender)
+		{
+			this.sender = sender;
+		}
+
+		public bool CanExecute(object parameter)
+		{
+			return true;
+		}
+
+		public void Execute(object parameter)
+		{
+			sender.OpenFileLocation();
+		}
+	}
+
+	public class RevertFile_ClickCommand : ICommand
+	{
+		#pragma warning disable CS0067
+		public event EventHandler CanExecuteChanged;
+		#pragma warning restore CS0067
+
+		private FileItem sender;
+
+		public RevertFile_ClickCommand(FileItem sender)
+		{
+			this.sender = sender;
+		}
+
+		public bool CanExecute(object parameter)
+		{
+			return true;
+		}
+
+		public void Execute(object parameter)
+		{
+			sender.RevertFile();
+		}
+	}
+
 	public class FileItem
 	{
 		private ChangesPage page;
@@ -95,6 +167,36 @@ namespace GitItGUI
 			}
 		}
 
+		private OpenFile_ClickCommand openFileClickCommand;
+		public OpenFile_ClickCommand OpenFileClickCommand
+		{
+			get
+			{
+				openFileClickCommand = new OpenFile_ClickCommand(this);
+				return openFileClickCommand;
+			}
+		}
+
+		private OpenFileLocation_ClickCommand openFileLocationClickCommand;
+		public OpenFileLocation_ClickCommand OpenFileLocationClickCommand
+		{
+			get
+			{
+				openFileLocationClickCommand = new OpenFileLocation_ClickCommand(this);
+				return openFileLocationClickCommand;
+			}
+		}
+
+		private RevertFile_ClickCommand revertFileClickCommand;
+		public RevertFile_ClickCommand RevertFileClickCommand
+		{
+			get
+			{
+				revertFileClickCommand = new RevertFile_ClickCommand(this);
+				return revertFileClickCommand;
+			}
+		}
+
 		public void Stage(bool refresh)
 		{
 			ChangesManager.StageFile(fileState, refresh);
@@ -103,6 +205,35 @@ namespace GitItGUI
 		public void Unstage(bool refresh)
 		{
 			ChangesManager.UnstageFile(fileState, refresh);
+		}
+
+		public void OpenFile()
+		{
+			try
+			{
+				System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename));
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError("Failed to open file: " + ex.Message, true);
+			}
+		}
+
+		public void OpenFileLocation()
+		{
+			try
+			{
+				System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", RepoManager.repoPath, fileState.filename));
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError("Failed to open folder location: " + ex.Message, true);
+			}
+		}
+
+		public void RevertFile()
+		{
+			ChangesManager.RevertFile(fileState);
 		}
 	}
 

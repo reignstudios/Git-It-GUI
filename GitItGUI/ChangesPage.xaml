@@ -9,9 +9,9 @@
 				<TextBlock Text="{Binding Filename}" VerticalAlignment="Center" Margin="10,0,-10,0">
 					<TextBlock.ContextMenu>
 						<ContextMenu>
-							<MenuItem Header="Open file"/>
-							<MenuItem Header="Open file location"/>
-							<MenuItem Header="Revert file"/>
+							<MenuItem Header="Open file" Command="{Binding OpenFileClickCommand}"/>
+							<MenuItem Header="Open file location" Command="{Binding OpenFileLocationClickCommand}"/>
+							<MenuItem Header="Revert file" Command="{Binding RevertFileClickCommand}"/>
 						</ContextMenu>
 					</TextBlock.ContextMenu>
 				</TextBlock>
