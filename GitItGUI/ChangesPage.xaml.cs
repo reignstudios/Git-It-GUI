@@ -133,8 +133,6 @@ namespace GitItGUI
 
 	public class FileItem
 	{
-		private ChangesPage page;
-
 		private Bitmap icon;
 		public Bitmap Icon {get {return icon;}}
 
@@ -241,13 +239,10 @@ namespace GitItGUI
 	{
 		public static ChangesPage singleton;
 
-		private bool isSyncMode, syncPullSucceeded, syncPushSucceeded;
-
 		// ui objects
 		Button refreshChangedButton, revertAllButton, stageAllButton, unstageAllButton, resolveSelectedButton, resolveAllButton;
 		Button openDiffToolButton, commitStagedButton, syncChangesButton, commitStagedButton_Advanced, pullChangesButton_Advanced, pushChangesButton_Advanced;
 		ListBox unstagedChangesListView, stagedChangesListView;
-		ScrollViewer diffTextBoxScrollViewer;
 		TextBox diffTextBox;
 
 		List<FileItem> unstagedChangesListViewItems, stagedChangesListViewItems;

@@ -163,20 +163,11 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool DeleteNonActiveBranch(BranchState branch)//, bool deleteRemote)
+		public static bool DeleteNonActiveBranch(BranchState branch)
 		{
 			try
 			{
 				RepoManager.repo.Branches.Remove(branch.name);
-				//if (deleteRemote)
-				//{
-				//	var remoteBranch = RepoManager.repo.Branches["origin/" + branchName];
-				//	if (remoteBranch != null)
-				//	{
-				//		RepoManager.repo.Branches.Remove(remoteBranch);
-				//		Tools.RunExe("git", string.Format("push origin --delete {0}", branchName), null);
-				//	}
-				//}
 			}
 			catch (Exception e)
 			{
@@ -233,7 +224,7 @@ namespace GitItGUI.Core
 
 		public static bool RemoveTracking()
 		{
-			//if (!activeBranch.IsTracking) return true;
+			if (!activeBranch.IsTracking) return true;
 
 			try
 			{

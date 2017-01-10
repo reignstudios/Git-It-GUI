@@ -9,17 +9,9 @@ using GitItGUI.Core;
 
 namespace GitItGUI
 {
-	enum BranchModes
-	{
-		None,
-		AddingBranch,
-		RenameBranch
-	}
-
 	public class BranchesPage : UserControl
 	{
 		public static BranchesPage singleton;
-		private BranchModes mode = BranchModes.None;
 
 		// ui objects
 		TextBlock trackingLabel, trackedBranchLabel, remoteURLLabel;
@@ -117,27 +109,27 @@ namespace GitItGUI
 
 		private void NavigatedTo()
 		{
-			if (mode == BranchModes.AddingBranch && NamePage.succeeded)
-			{
-				BranchManager.AddNewBranch(NamePage.value);
-			}
-			else if (mode == BranchModes.RenameBranch && NamePage.succeeded)
-			{
-				BranchManager.RenameActiveBranch(NamePage.value);
-			}
+			//if (mode == BranchModes.AddingBranch && NamePage.succeeded)
+			//{
+			//	BranchManager.AddNewBranch(NamePage.value);
+			//}
+			//else if (mode == BranchModes.RenameBranch && NamePage.succeeded)
+			//{
+			//	BranchManager.RenameActiveBranch(NamePage.value);
+			//}
 
-			mode = BranchModes.None;
+			//mode = BranchModes.None;
 		}
 
 		private void AddBranchButton_Click(object sender, RoutedEventArgs e)
 		{
-			mode = BranchModes.AddingBranch;
+			//mode = BranchModes.AddingBranch;
 			MainWindow.LoadPage(PageTypes.Name);
 		}
 
 		private void RenameBranchButton_Click(object sender, RoutedEventArgs e)
 		{
-			mode = BranchModes.RenameBranch;
+			//mode = BranchModes.RenameBranch;
 			MainWindow.LoadPage(PageTypes.Name);
 		}
 

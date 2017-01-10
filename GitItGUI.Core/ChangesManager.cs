@@ -62,8 +62,27 @@ namespace GitItGUI.Core
 		}
 	}
 
+	public enum MergeBinaryFileResults
+	{
+		Cancel,
+		UseTheirs,
+		KeepMine
+	}
+
+	public enum MergeFileAcceptedResults
+	{
+		Yes,
+		No
+	}
+
 	public static class ChangesManager
 	{
+		public delegate bool AskUserToResolveBinaryFileCallbackMethod(out MergeBinaryFileResults result);
+		public static event AskUserToResolveBinaryFileCallbackMethod AskUserToResolveBinaryFileCallback;
+
+		public delegate bool AskUserIfTheyAcceptMergedFileCallbackMethod(out MergeFileAcceptedResults result);
+		public static event AskUserIfTheyAcceptMergedFileCallbackMethod AskUserIfTheyAcceptMergedFileCallback;
+
 		private static List<FileState> fileStates;
 		public static bool changesExist {get; private set;}
 		public static bool changesStaged {get; private set;}
@@ -569,18 +588,29 @@ namespace GitItGUI.Core
 				if (ours.IsBinary || theirs.IsBinary || Tools.IsBinaryFileData(fullPath + ".ours") || Tools.IsBinaryFileData(fullPath + ".theirs"))
 				{
 					// open merge tool
-					string type, value;
-					if (Tools.LaunchCoreApp("BinaryConflicPicker.exe", string.Format("-FileInConflic=\"{0}\"", fileState.filename), out type, out value))
-					{
-						switch (value)
-						{
-							case "Canceled": return false;
-							case "KeepMine": File.Copy(fullPath + ".ours", fullPath, true); break;
-							case "UseTheirs": File.Copy(fullPath + ".theirs", fullPath, true); break;
-							default: Debug.LogWarning("Response error: " + value, true); return false;
-						}
+					//string type, value;
+					//if (Tools.LaunchCoreApp("BinaryConflicPicker.exe", string.Format("-FileInConflic=\"{0}\"", fileState.filename), out type, out value))
+					//{
+					//	switch (value)
+					//	{
+					//		case "Canceled": return false;
+					//		case "KeepMine": File.Copy(fullPath + ".ours", fullPath, true); break;
+					//		case "UseTheirs": File.Copy(fullPath + ".theirs", fullPath, true); break;
+					//		default: Debug.LogWarning("Response error: " + value, true); return false;
+					//	}
 
-						Commands.Stage(RepoManager.repo, fileState.filename);
+					//	Commands.Stage(RepoManager.repo, fileState.filename);
+					//}
+					MergeBinaryFileResults result;
+					if (AskUserToResolveBinaryFileCallback != null && AskUserToResolveBinaryFileCallback(out result))
+					{
+						switch (result)
+						{
+							case MergeBinaryFileResults.Cancel: return false;
+							case MergeBinaryFileResults.KeepMine: File.Copy(fullPath + ".ours", fullPath, true); break;
+							case MergeBinaryFileResults.UseTheirs: File.Copy(fullPath + ".theirs", fullPath, true); break;
+							default: Debug.LogWarning("Unsuported Response: " + result, true); return false;
+						}
 					}
 					else
 					{
@@ -666,18 +696,34 @@ namespace GitItGUI.Core
 				// check if user accepts the current state of the merge
 				if (!wasModified)
 				{
-					string type, value;
-					if (Tools.LaunchCoreApp("MessageBox.exe", "-Title=\"Accept Merge?\" -Message=\"No changes detected. Accept as merged\" -Type=\"YesNo\"", out type, out value))
+					//string type, value;
+					//if (Tools.LaunchCoreApp("MessageBox.exe", "-Title=\"Accept Merge?\" -Message=\"No changes detected. Accept as merged\" -Type=\"YesNo\"", out type, out value))
+					//{
+					//	switch (value)
+					//	{
+					//		case "Ok":
+					//			Commands.Stage(RepoManager.repo, fileState.filename);
+					//			wasModified = true;
+					//			break;
+
+					//		case "Cancel": break;
+					//		default: Debug.LogWarning("Response error: " + value, true); return false;
+					//	}
+					//}
+					MergeFileAcceptedResults result;
+					if (AskUserIfTheyAcceptMergedFileCallback != null && AskUserIfTheyAcceptMergedFileCallback(out result))
 					{
-						switch (value)
+						switch (result)
 						{
-							case "Ok":
+							case MergeFileAcceptedResults.Yes:
 								Commands.Stage(RepoManager.repo, fileState.filename);
 								wasModified = true;
 								break;
 
-							case "Cancel": break;
-							default: Debug.LogWarning("Response error: " + value, true); return false;
+							case MergeFileAcceptedResults.No:
+								break;
+
+							default: Debug.LogWarning("Unsuported Response: " + result, true); return false;
 						}
 					}
 				}

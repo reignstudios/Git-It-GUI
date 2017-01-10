@@ -10,13 +10,12 @@ using System.Threading.Tasks;
 
 namespace GitItGUI.Core
 {
-	public delegate void RepoRefreshedCallbackMethod();
-
 	/// <summary>
 	/// Primary git manager
 	/// </summary>
 	public static class RepoManager
 	{
+		public delegate void RepoRefreshedCallbackMethod();
 		public static event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 
 		/// <summary>
