@@ -26,19 +26,19 @@ namespace GitItGUI.Core
 
 		public static bool IsRemote()
 		{
-			return activeBranch.IsRemote && activeBranch.Remote != null && !string.IsNullOrEmpty(activeBranch.Remote.Url);
+			return activeBranch.IsRemote;
 		}
 
 		public static bool IsRemote(BranchState branch)
 		{
 			var b = RepoManager.repo.Branches[branch.name];
-			return b.IsRemote && b.Remote != null && !string.IsNullOrEmpty(b.Remote.Url);
+			return b.IsRemote;
 		}
 
 		public static string GetRemoteURL()
 		{
-			if (activeBranch.Remote == null) return "";
-			return activeBranch.Remote.Url;
+			if (!activeBranch.IsTracking || activeBranch.TrackedBranch == null) return "";
+			return RepoManager.repo.Network.Remotes[activeBranch.TrackedBranch.RemoteName].Url;
 		}
 
 		public static string GetTrackedBranchName()
@@ -90,7 +90,7 @@ namespace GitItGUI.Core
 				var selectedBranch = RepoManager.repo.Branches[branch.name];
 				if (activeBranch != selectedBranch)
 				{
-					var newBranch = RepoManager.repo.Checkout(selectedBranch);
+					var newBranch = Commands.Checkout(RepoManager.repo, selectedBranch);
 					if (newBranch != selectedBranch)
 					{
 						Debug.LogError("Error checking out branch (do you have pending changes?)", true);
@@ -130,7 +130,7 @@ namespace GitItGUI.Core
 			try
 			{
 				var branch = RepoManager.repo.CreateBranch(branchName);
-				RepoManager.repo.Checkout(branch);
+				Commands.Checkout(RepoManager.repo, branch);
 				activeBranch = branch;
 			}
 			catch (Exception e)
@@ -216,7 +216,7 @@ namespace GitItGUI.Core
 				var srcBranch = RepoManager.repo.Branches[srcRemoteBranch.name];
 				RepoManager.repo.Branches.Update(activeBranch, b =>
 				{
-					b.Remote = srcBranch.Remote.Name;
+					b.Remote = RepoManager.repo.Network.Remotes[srcBranch.RemoteName].Name;
 					b.TrackedBranch = srcBranch.CanonicalName;
 					b.UpstreamBranch = srcBranch.UpstreamBranchCanonicalName;
 				});

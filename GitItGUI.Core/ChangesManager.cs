@@ -68,7 +68,7 @@ namespace GitItGUI.Core
 		public static bool changesExist {get; private set;}
 		public static bool changesStaged {get; private set;}
 
-		private static bool isSyncMode, syncPushSuccess, syncPullSuccess;
+		private static bool isSyncMode;
 
 		public static FileState[] GetFileChanges()
 		{
@@ -307,7 +307,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				RepoManager.repo.Stage(fileState.filename);
+				Commands.Stage(RepoManager.repo, fileState.filename);
 			}
 			catch (Exception e)
 			{
@@ -323,7 +323,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				RepoManager.repo.Unstage(fileState.filename);
+				Commands.Unstage(RepoManager.repo, fileState.filename);
 			}
 			catch (Exception e)
 			{
@@ -394,7 +394,7 @@ namespace GitItGUI.Core
 
 		public static bool Pull()
 		{
-			syncPullSuccess = false;
+			bool conflicts = false;
 
 			try
 			{
@@ -408,10 +408,9 @@ namespace GitItGUI.Core
 				options.FetchOptions = new FetchOptions();
 				options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => RepoManager.credentials;
 				options.FetchOptions.TagFetchMode = TagFetchMode.All;
-				RepoManager.repo.Network.Pull(RepoManager.signature, options);
-				bool conflicts = !ConflictsExist();
+				Commands.Pull(RepoManager.repo, RepoManager.signature, options);
+				conflicts = !ConflictsExist();
 				if (conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
-				syncPullSuccess = conflicts;
 			}
 			catch (Exception e)
 			{
@@ -420,13 +419,11 @@ namespace GitItGUI.Core
 			}
 
 			if (!isSyncMode) RepoManager.Refresh();
-			return true;
+			return conflicts;
 		}
 
 		public static bool Push()
 		{
-			syncPushSuccess = false;
-
 			try
 			{
 				if (!BranchManager.IsRemote())
@@ -445,7 +442,7 @@ namespace GitItGUI.Core
 						using (var process = new Process())
 						{
 							process.StartInfo.FileName = "git-lfs";
-							process.StartInfo.Arguments = "pre-push " + BranchManager.activeBranch.Remote.Name;// do we need "BranchManager.activeBranch.Remote.Url" ?? (use "git-lfs pre-push --help" to check)
+							process.StartInfo.Arguments = "pre-push " + RepoManager.repo.Network.Remotes[BranchManager.activeBranch.RemoteName].Name;// do we need "RepoManager.repo.Network.Remotes[BranchManager.activeBranch.RemoteName].Url" ?? (use "git-lfs pre-push --help" to check)
 							process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 							process.StartInfo.CreateNoWindow = true;
 							process.StartInfo.UseShellExecute = false;
@@ -491,7 +488,6 @@ namespace GitItGUI.Core
 				
 				if (!pushError)
 				{
-					syncPushSuccess = true;
 					Debug.Log("Push Succeeded!", !isSyncMode);
 				}
 			}
@@ -584,7 +580,7 @@ namespace GitItGUI.Core
 							default: Debug.LogWarning("Response error: " + value, true); return false;
 						}
 
-						RepoManager.repo.Stage(fileState.filename);
+						Commands.Stage(RepoManager.repo, fileState.filename);
 					}
 					else
 					{
@@ -659,7 +655,7 @@ namespace GitItGUI.Core
 				{
 					wasModified = true;
 					File.Copy(fullPath + ".base", fullPath, true);
-					RepoManager.repo.Stage(fileState.filename);
+					Commands.Stage(RepoManager.repo, fileState.filename);
 				}
 
 				// delete temp files
@@ -676,7 +672,7 @@ namespace GitItGUI.Core
 						switch (value)
 						{
 							case "Ok":
-								RepoManager.repo.Stage(fileState.filename);
+								Commands.Stage(RepoManager.repo, fileState.filename);
 								wasModified = true;
 								break;
 
