@@ -10,7 +10,6 @@
 		<gititgui:AppSettingsPage Name="appSettingPage" IsVisible="False"/>
 		<gititgui:MainContent Name="mainContentPage" IsVisible="False"/>
 		<gititgui:CommitPage Name="commitPage" IsVisible="False"/>
-		<gititgui:NamePage Name="namePage" IsVisible="False"/>
 	</Grid>
 
 </Window>
