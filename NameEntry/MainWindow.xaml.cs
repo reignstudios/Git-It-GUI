@@ -85,7 +85,7 @@ namespace NameEntry
 			Close();
 		}
 
-		private void MainWindow_Closed(object sender, System.EventArgs e)
+		private void MainWindow_Closed(object sender, EventArgs e)
 		{
 			if (writeCancleOnQuit) Console.Write("SUCCEEDED:Cancel:N/A");
 		}

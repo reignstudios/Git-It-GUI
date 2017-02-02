@@ -11,8 +11,7 @@ namespace GitItGUI
 		Start,
 		AppSettings,
 		MainContent,
-		Commit,
-		Name
+		Commit
 	}
 	
 	public class MainWindow : Window

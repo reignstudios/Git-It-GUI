@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GitItGUI.Core;
+using GitItGUI.Tools;
 
 namespace GitItGUI
 {
@@ -57,7 +58,6 @@ namespace GitItGUI
 			advancedModeCheckBox.Click += AdvancedModeCheckBox_Click;
 
 			// bind events
-			MainContent.singleton.MainContentPageNavigatedTo += NavigatedTo;
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
 		}
 
@@ -107,30 +107,16 @@ namespace GitItGUI
 			remoteURLTextBox.Text = BranchManager.GetRemoteURL();
 		}
 
-		private void NavigatedTo()
-		{
-			//if (mode == BranchModes.AddingBranch && NamePage.succeeded)
-			//{
-			//	BranchManager.AddNewBranch(NamePage.value);
-			//}
-			//else if (mode == BranchModes.RenameBranch && NamePage.succeeded)
-			//{
-			//	BranchManager.RenameActiveBranch(NamePage.value);
-			//}
-
-			//mode = BranchModes.None;
-		}
-
 		private void AddBranchButton_Click(object sender, RoutedEventArgs e)
 		{
-			//mode = BranchModes.AddingBranch;
-			MainWindow.LoadPage(PageTypes.Name);
+			string result;
+			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.AddNewBranch(result);
 		}
 
 		private void RenameBranchButton_Click(object sender, RoutedEventArgs e)
 		{
-			//mode = BranchModes.RenameBranch;
-			MainWindow.LoadPage(PageTypes.Name);
+			string result;
+			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.RenameActiveBranch(result);
 		}
 
 		private void AddTrackingButton_Click(object sender, RoutedEventArgs e)

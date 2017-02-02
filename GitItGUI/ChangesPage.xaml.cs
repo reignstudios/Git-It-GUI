@@ -137,11 +137,7 @@ namespace GitItGUI
 		public Bitmap Icon {get {return icon;}}
 
 		public FileState fileState;
-
-		//private string filename;
 		public string Filename {get {return fileState.filename;}}
-
-		//private FileStates state;
 		public FileStates State {get {return fileState.state;}}
 
 		public FileItem()
