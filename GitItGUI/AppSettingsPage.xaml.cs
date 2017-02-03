@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using GitItGUI.Core;
 
 namespace GitItGUI
 {
@@ -7,6 +8,7 @@ namespace GitItGUI
 	{
 		public static AppSettingsPage singleton;
 
+		private ListBox mergeDiffToolListBox;
 		private Button doneButton;
 
 		public AppSettingsPage()
@@ -14,7 +16,11 @@ namespace GitItGUI
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
 
+			// load ui items
+			mergeDiffToolListBox = this.Find<ListBox>("mergeDiffToolListBox");
 			doneButton = this.Find<Button>("doneButton");
+			
+			// apply bindings
 			doneButton.Click += DoneButton_Click;
 		}
 
@@ -25,12 +31,26 @@ namespace GitItGUI
 
 		public void NavigatedTo()
 		{
-			
+			switch (AppManager.mergeDiffTool)
+			{
+				case MergeDiffTools.Meld: mergeDiffToolListBox.SelectedIndex = 0; break;
+				case MergeDiffTools.kDiff3: mergeDiffToolListBox.SelectedIndex = 1; break;
+				case MergeDiffTools.P4Merge: mergeDiffToolListBox.SelectedIndex = 2; break;
+				case MergeDiffTools.DiffMerge: mergeDiffToolListBox.SelectedIndex = 3; break;
+				default: MessageBox.Show("Unsuported Merge/Diff tool type: " + AppManager.mergeDiffTool); break;
+			}
 		}
 
 		public void NavigatedFrom()
 		{
-			
+			switch (mergeDiffToolListBox.SelectedIndex)
+			{
+				case 0: AppManager.SetMergeDiffTool(MergeDiffTools.Meld); break;
+				case 1: AppManager.SetMergeDiffTool(MergeDiffTools.kDiff3); break;
+				case 2: AppManager.SetMergeDiffTool(MergeDiffTools.P4Merge); break;
+				case 3: AppManager.SetMergeDiffTool(MergeDiffTools.DiffMerge); break;
+				default: MessageBox.Show("Unsuported Merge/Diff tool index: " + mergeDiffToolListBox.SelectedIndex); break;
+			}
 		}
 	}
 }

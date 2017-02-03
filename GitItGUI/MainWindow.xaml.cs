@@ -73,12 +73,12 @@ namespace GitItGUI
 
 		public static void LoadPage(PageTypes type)
 		{
+			NavigationPage pageFrom = GetActivePage();
 			CheckForUpdatesPage.singleton.IsVisible = false;
 			StartPage.singleton.IsVisible = false;
 			AppSettingsPage.singleton.IsVisible = false;
 			MainContent.singleton.IsVisible = false;
 			CommitPage.singleton.IsVisible = false;
-			NavigationPage pageFrom = GetActivePage();
 			switch (type)
 			{
 				case PageTypes.CheckForUpdates: CheckForUpdatesPage.singleton.IsVisible = true; break;

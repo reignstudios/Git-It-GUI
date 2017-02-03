@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System;
+using System.Text.RegularExpressions;
 
 namespace NameEntry
 {
@@ -58,7 +59,7 @@ namespace NameEntry
 		private void OkButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
 		{
 			// check for errors
-			if (string.IsNullOrEmpty(nameTextBox.Text) || nameTextBox.Text.Length <= 3)
+			if (string.IsNullOrEmpty(nameTextBox.Text) || nameTextBox.Text.Length <= 3 || nameTextBox.Text.Contains(" ") || !Regex.IsMatch(nameTextBox.Text, @"^[a-zA-Z0-9]*$"))
 			{
 				Console.Write("ERROR:Invalid name entry");
 				writeCancleOnQuit = false;
