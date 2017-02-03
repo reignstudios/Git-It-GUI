@@ -143,26 +143,6 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool AddTrackingToActiveBranch(string remote)
-		{
-			try
-			{
-				RepoManager.repo.Branches.Update(activeBranch, b =>
-				{
-					b.Remote = remote;// normally this will be: "origin"
-					b.UpstreamBranch = activeBranch.CanonicalName;
-				});
-			}
-			catch (Exception e)
-			{
-				Debug.LogError("Add tracking Error: " + e.Message, true);
-				return false;
-			}
-
-			RepoManager.Refresh();
-			return true;
-		}
-
 		public static bool DeleteNonActiveBranch(BranchState branch)
 		{
 			try
@@ -186,7 +166,7 @@ namespace GitItGUI.Core
 				var branch = RepoManager.repo.Branches.Rename(activeBranch.FriendlyName, newBranchName);
 				RepoManager.repo.Branches.Update(branch, b =>
 				{
-					b.Remote = "origin";
+					b.Remote = activeBranch.RemoteName;
 					b.UpstreamBranch = branch.CanonicalName;
 				});
 			}
@@ -207,7 +187,7 @@ namespace GitItGUI.Core
 				var srcBranch = RepoManager.repo.Branches[srcRemoteBranch.name];
 				RepoManager.repo.Branches.Update(activeBranch, b =>
 				{
-					b.Remote = RepoManager.repo.Network.Remotes[srcBranch.RemoteName].Name;
+					b.Remote = srcBranch.RemoteName;
 					b.TrackedBranch = srcBranch.CanonicalName;
 					b.UpstreamBranch = srcBranch.UpstreamBranchCanonicalName;
 				});
