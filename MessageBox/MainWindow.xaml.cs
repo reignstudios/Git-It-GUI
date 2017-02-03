@@ -29,15 +29,6 @@ namespace MessageBox
 
 			// get args
 			var args = Environment.GetCommandLineArgs();
-
-			// check for errors
-			if (args.Length != 3)
-			{
-				Console.Write("ERROR:Invalid arg count: " + args.Length);
-				grid.IsVisible = false;
-				return;
-			}
-
 			for (int i = 1; i != args.Length; ++i)
 			{
 				var arg = args[i];
@@ -46,6 +37,7 @@ namespace MessageBox
 				{
 					Console.Write(string.Format("ERROR:Invalid arg ({0})", arg));
 					grid.IsVisible = false;
+					writeCancleOnQuit = false;
 					return;
 				}
 
@@ -55,7 +47,11 @@ namespace MessageBox
 					case "-Message": message.Text = values[1]; break;
 
 					case "-Type":
-						if (values[1] == "OkCancel")
+						if (values[1] == "Ok")
+						{
+							cancelButton.IsVisible = false;
+						}
+						else if (values[1] == "OkCancel")
 						{
 							cancelButton.IsVisible = true;
 						}

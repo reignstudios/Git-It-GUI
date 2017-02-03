@@ -5,7 +5,7 @@ namespace GitItGUI.Tools
 {
 	static class CoreApps
 	{
-		private static bool LaunchCoreApp(string exe, string arguments, out string type, out string value, out string valueMessage)
+		private static bool LaunchCoreApp(string exe, string arguments, out string type, out string value, out string valueMessage, bool alertEnabled)
 		{
 			type = null;
 			value = null;
@@ -23,7 +23,7 @@ namespace GitItGUI.Tools
 			var values = result.Split(':');
 			if (values.Length != 2 && values.Length != 3)
 			{
-				Debug.LogWarning("Invalid core app response: " + result, true);
+				Debug.LogWarning("Invalid core app response: " + result, alertEnabled);
 				return false;
 			}
 
@@ -32,7 +32,7 @@ namespace GitItGUI.Tools
 			if (values.Length == 3) valueMessage = values[2];
 			if (values[0] == "ERROR")
 			{
-				Debug.LogWarning("Response error: " + values[1], true);
+				Debug.LogWarning("Response error: " + values[1], alertEnabled);
 				return false;
 			}
 			else if (values[0] == "SUCCEEDED")
@@ -40,7 +40,7 @@ namespace GitItGUI.Tools
 				return true;
 			}
 
-			Debug.LogWarning("Unknown Error", true);
+			Debug.LogWarning("Unknown Error", alertEnabled);
 			return false;
 		}
 
@@ -49,19 +49,29 @@ namespace GitItGUI.Tools
 			string exe = Environment.CurrentDirectory + "\\NameEntry.exe";
 			string args = string.Format("-Caption=\"{0}\"", caption);
 			string type, value;
-			if (!LaunchCoreApp(exe, args, out type, out value, out result)) return false;
+			if (!LaunchCoreApp(exe, args, out type, out value, out result, true)) return false;
 			
 			return value == "Ok";
 		}
 
-		public static bool LaunchMessageBox(string title, string message, out string result)
+		public static bool LaunchMessageBox(string title, string message, MessageBoxTypes messageBoxType, out string result)
 		{
-			string exe = Environment.CurrentDirectory + "\\NameEntry.exe";
-			string args = string.Format("-Title=\"{0}\" -Message=\"{1}\"", title, message);
+			string exe = Environment.CurrentDirectory + "\\MessageBox.exe";
+			string args = string.Format("-Title=\"{0}\" -Message=\"{1}\" -Type={2}", title, message, "Ok");
 			string type, value;
-			if (!LaunchCoreApp(exe, args, out type, out value, out result)) return false;
+			if (!LaunchCoreApp(exe, args, out type, out value, out result, false)) return false;
 			
 			return value == "Ok";
+		}
+
+		public static bool LaunchBinaryConflicPicker(string fileInConflic, out string result)
+		{
+			string exe = Environment.CurrentDirectory + "\\BinaryConflicPicker.exe";
+			string args = string.Format("-FileInConflic=\"{0}\"", fileInConflic);
+			string type, value;
+			if (!LaunchCoreApp(exe, args, out type, out value, out result, false)) return false;
+			
+			return value != "Canceled";
 		}
 	}
 }

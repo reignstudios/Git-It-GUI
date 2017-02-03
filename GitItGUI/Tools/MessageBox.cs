@@ -19,20 +19,20 @@ namespace GitItGUI
 
 	static class MessageBox
 	{
-		public static bool Show(string text)
+		public static bool Show(string message)
 		{
-			return Show("Alert", text, MessageBoxTypes.Ok);
+			return Show(message, "Alert", MessageBoxTypes.Ok);
 		}
 
-		public static bool Show(string text, MessageBoxTypes type)
+		public static bool Show(string message, MessageBoxTypes type)
 		{
-			return Show("Alert", text, type);
+			return Show(message, "Alert", type);
 		}
 
 		public static bool Show(string message, string title, MessageBoxTypes type)
 		{
 			string result;
-			return Tools.CoreApps.LaunchMessageBox(title, message, out result);
+			return Tools.CoreApps.LaunchMessageBox(title, message, type, out result);
 
 			#if WINDOWS
 			//Win.DialogResult result = Win.DialogResult.None;

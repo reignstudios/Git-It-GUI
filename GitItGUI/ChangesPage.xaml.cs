@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using GitItGUI.Core;
+using GitItGUI.Tools;
 using LibGit2Sharp;
 using ReactiveUI;
 using System;
@@ -286,7 +287,34 @@ namespace GitItGUI
 			pullChangesButton_Advanced.Click += PullChangesButton_Advanced_Click;
 			pushChangesButton_Advanced.Click += PushChangesButton_Advanced_Click;
 
+			// bind event
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
+			ChangesManager.AskUserToResolveBinaryFileCallback += ChangesManager_AskUserToResolveBinaryFileCallback;
+			ChangesManager.AskUserIfTheyAcceptMergedFileCallback += ChangesManager_AskUserIfTheyAcceptMergedFileCallback;
+		}
+
+		private bool ChangesManager_AskUserToResolveBinaryFileCallback(FileState fileState, out MergeBinaryFileResults result)
+		{
+			string appResult;
+			if (!CoreApps.LaunchBinaryConflicPicker(fileState.filename, out appResult))
+			{
+				result = MergeBinaryFileResults.Error;
+				return false;
+			}
+
+			switch (appResult)
+			{
+				case "UseTheirs": result = MergeBinaryFileResults.UseTheirs; return true;
+				case "KeepMine": result = MergeBinaryFileResults.KeepMine; return true;
+				case "Canceled": result = MergeBinaryFileResults.Cancel; return true;
+				default: result = MergeBinaryFileResults.Error; return true;
+			}
+		}
+
+		private bool ChangesManager_AskUserIfTheyAcceptMergedFileCallback(FileState fileState, out MergeFileAcceptedResults result)
+		{
+			result = MessageBox.Show("Do you accept the file as merged?", MessageBoxTypes.YesNo) ? MergeFileAcceptedResults.Yes : MergeFileAcceptedResults.No;
+			return true;
 		}
 
 		private void PushChangesButton_Advanced_Click(object sender, RoutedEventArgs e)

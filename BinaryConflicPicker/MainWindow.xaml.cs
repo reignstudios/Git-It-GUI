@@ -9,6 +9,7 @@ namespace BinaryConflicPicker
 		private Grid grid;
 		private TextBox fileInConflictTextBox;
 		private Button keepMineButton, useTheirsButton, cancelButton;
+		private bool writeCancleOnQuit = true;
 
 		public MainWindow()
 		{
@@ -30,15 +31,6 @@ namespace BinaryConflicPicker
 
 			// get args
 			var args = Environment.GetCommandLineArgs();
-
-			// check for errors
-			if (args.Length != 2)
-			{
-				Console.Write("ERROR:Invalid arg count: " + args.Length);
-				grid.IsVisible = false;
-				return;
-			}
-
 			for (int i = 1; i != args.Length; ++i)
 			{
 				var arg = args[i];
@@ -47,6 +39,7 @@ namespace BinaryConflicPicker
 				{
 					Console.Write(string.Format("ERROR:Invalid arg ({0})", arg));
 					grid.IsVisible = false;
+					writeCancleOnQuit = false;
 					return;
 				}
 
@@ -63,7 +56,7 @@ namespace BinaryConflicPicker
 
 		private void MainWindow_Closed(object sender, EventArgs e)
 		{
-			if (grid.IsVisible) Console.Write("SUCCEEDED:Canceled");
+			if (writeCancleOnQuit) Console.Write("SUCCEEDED:Canceled");
 		}
 
 		private void CancelButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -74,11 +67,15 @@ namespace BinaryConflicPicker
 		private void UseTheirsButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
 		{
 			Console.Write("SUCCEEDED:UseTheirs");
+			writeCancleOnQuit = false;
+			Close();
 		}
 
 		private void KeepMineButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
 		{
 			Console.Write("SUCCEEDED:KeepMine");
+			writeCancleOnQuit = false;
+			Close();
 		}
 	}
 }

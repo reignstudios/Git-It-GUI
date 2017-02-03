@@ -64,6 +64,7 @@ namespace GitItGUI.Core
 
 	public enum MergeBinaryFileResults
 	{
+		Error,
 		Cancel,
 		UseTheirs,
 		KeepMine
@@ -77,10 +78,10 @@ namespace GitItGUI.Core
 
 	public static class ChangesManager
 	{
-		public delegate bool AskUserToResolveBinaryFileCallbackMethod(out MergeBinaryFileResults result);
+		public delegate bool AskUserToResolveBinaryFileCallbackMethod(FileState fileState, out MergeBinaryFileResults result);
 		public static event AskUserToResolveBinaryFileCallbackMethod AskUserToResolveBinaryFileCallback;
 
-		public delegate bool AskUserIfTheyAcceptMergedFileCallbackMethod(out MergeFileAcceptedResults result);
+		public delegate bool AskUserIfTheyAcceptMergedFileCallbackMethod(FileState fileState, out MergeFileAcceptedResults result);
 		public static event AskUserIfTheyAcceptMergedFileCallbackMethod AskUserIfTheyAcceptMergedFileCallback;
 
 		private static List<FileState> fileStates;
@@ -588,24 +589,12 @@ namespace GitItGUI.Core
 				if (ours.IsBinary || theirs.IsBinary || Tools.IsBinaryFileData(fullPath + ".ours") || Tools.IsBinaryFileData(fullPath + ".theirs"))
 				{
 					// open merge tool
-					//string type, value;
-					//if (Tools.LaunchCoreApp("BinaryConflicPicker.exe", string.Format("-FileInConflic=\"{0}\"", fileState.filename), out type, out value))
-					//{
-					//	switch (value)
-					//	{
-					//		case "Canceled": return false;
-					//		case "KeepMine": File.Copy(fullPath + ".ours", fullPath, true); break;
-					//		case "UseTheirs": File.Copy(fullPath + ".theirs", fullPath, true); break;
-					//		default: Debug.LogWarning("Response error: " + value, true); return false;
-					//	}
-
-					//	Commands.Stage(RepoManager.repo, fileState.filename);
-					//}
 					MergeBinaryFileResults result;
-					if (AskUserToResolveBinaryFileCallback != null && AskUserToResolveBinaryFileCallback(out result))
+					if (AskUserToResolveBinaryFileCallback != null && AskUserToResolveBinaryFileCallback(fileState, out result))
 					{
 						switch (result)
 						{
+							case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true); return false;
 							case MergeBinaryFileResults.Cancel: return false;
 							case MergeBinaryFileResults.KeepMine: File.Copy(fullPath + ".ours", fullPath, true); break;
 							case MergeBinaryFileResults.UseTheirs: File.Copy(fullPath + ".theirs", fullPath, true); break;
@@ -623,6 +612,8 @@ namespace GitItGUI.Core
 					if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
 					if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
 
+					// stage and finish
+					Commands.Stage(RepoManager.repo, fileState.filename);
 					return true;
 				}
 			
@@ -696,22 +687,8 @@ namespace GitItGUI.Core
 				// check if user accepts the current state of the merge
 				if (!wasModified)
 				{
-					//string type, value;
-					//if (Tools.LaunchCoreApp("MessageBox.exe", "-Title=\"Accept Merge?\" -Message=\"No changes detected. Accept as merged\" -Type=\"YesNo\"", out type, out value))
-					//{
-					//	switch (value)
-					//	{
-					//		case "Ok":
-					//			Commands.Stage(RepoManager.repo, fileState.filename);
-					//			wasModified = true;
-					//			break;
-
-					//		case "Cancel": break;
-					//		default: Debug.LogWarning("Response error: " + value, true); return false;
-					//	}
-					//}
 					MergeFileAcceptedResults result;
-					if (AskUserIfTheyAcceptMergedFileCallback != null && AskUserIfTheyAcceptMergedFileCallback(out result))
+					if (AskUserIfTheyAcceptMergedFileCallback != null && AskUserIfTheyAcceptMergedFileCallback(fileState, out result))
 					{
 						switch (result)
 						{
@@ -725,6 +702,11 @@ namespace GitItGUI.Core
 
 							default: Debug.LogWarning("Unsuported Response: " + result, true); return false;
 						}
+					}
+					else
+					{
+						Debug.LogError("Failed to ask user if file was resolved: " + fileState.filename, true);
+						return false;
 					}
 				}
 			}
