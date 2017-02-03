@@ -43,17 +43,7 @@
 					<Button Name="stageAllButton" Content="Stage All" HorizontalAlignment="Left" Margin="10,10,-10,0" VerticalAlignment="Top" Width="75"/>
 					<Button Name="resolveSelectedButton" Content="Resolve Sel" HorizontalAlignment="Right" Margin="-90,10,90,0" VerticalAlignment="Top" Width="75"/>
 					<Button Name="resolveAllButton" Content="Resolve All" HorizontalAlignment="Right" Margin="-10,10,10,0" VerticalAlignment="Top" Width="75"/>
-					<ListBox Name="unstagedChangesListView" Margin="10,40,10,0" SelectionMode="Single" Background="White" ItemTemplate="{Binding FileItem}">
-						<!--
-						<ListBox.ContextMenu>
-							<ContextMenu>
-								<MenuItem Header="Open file"/>
-								<MenuItem Header="Open file location"/>
-								<MenuItem Header="Revert file"/>
-							</ContextMenu>
-						</ListBox.ContextMenu>
-						-->
-					</ListBox>
+					<ListBox Name="unstagedChangesListView" Margin="10,40,10,0" SelectionMode="Single" Background="White" ItemTemplate="{Binding FileItem}"/>
 				</Grid>
 
 				<Grid Grid.Row="1">
