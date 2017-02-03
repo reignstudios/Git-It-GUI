@@ -32,12 +32,19 @@ namespace GitItGUI.Core
 		/// True if this is a Git-LFS enabled repo
 		/// </summary>
 		public static bool lfsEnabled {get; private set;}
+
+		public static bool validateGitignoreCheckbox {get; private set;}
+
+		public static string signatureName {get; private set;}
+		public static string signatureEmail {get; private set;}
+		public static string credentialUsername {get; private set;}
+		public static string credentialPassword {get; private set;}
 		
 		private static XML.RepoSettings settings;
 		private static XML.RepoUserSettings userSettings;
 
-		public static Signature signature {get; private set;}
-		public static UsernamePasswordCredentials credentials {get; private set;}
+		internal static Signature signature {get {return new Signature(userSettings.signatureName, userSettings.signatureEmail, DateTimeOffset.UtcNow);}}
+		internal static UsernamePasswordCredentials credentials {get; private set;}
 
 		/// <summary>
 		/// Use to open an existing repo
@@ -69,6 +76,7 @@ namespace GitItGUI.Core
 				userSettings = Settings.Load<XML.RepoUserSettings>(path + "\\" + Settings.repoUserSettingsFilename);
 
 				// check for .gitignore file
+				validateGitignoreCheckbox = settings.validateGitignore;
 				if (!refreshMode && settings.validateGitignore)
 				{
 					if (!File.Exists(path + "\\.gitignore"))
@@ -78,7 +86,10 @@ namespace GitItGUI.Core
 				}
 
 				// create user objects
-				signature = new Signature(userSettings.signatureName, userSettings.signatureEmail, DateTimeOffset.UtcNow);
+				signatureName = userSettings.signatureName;
+				signatureEmail = userSettings.signatureEmail;
+				credentialUsername = userSettings.username;
+				credentialPassword = userSettings.password;
 				credentials = new UsernamePasswordCredentials
 				{
 					Username = userSettings.username,
@@ -96,6 +107,11 @@ namespace GitItGUI.Core
 			}
 			
 			return RefreshInternal();
+		}
+
+		public static bool Close()
+		{
+			return OpenRepo(null);
 		}
 
 		public static bool Refresh()
@@ -136,7 +152,40 @@ namespace GitItGUI.Core
 
 		private static bool IsGitLFSRepo()
 		{
-			return Directory.Exists(repoPath + "\\.git\\lfs") && File.Exists(repoPath + "\\.gitattributes") && File.Exists(repoPath + "\\.git\\hooks\\pre-push");
+			if (Directory.Exists(repoPath + "\\.git\\lfs") && File.Exists(repoPath + "\\.gitattributes") && File.Exists(repoPath + "\\.git\\hooks\\pre-push"))
+			{
+				string data = File.ReadAllText(repoPath + "\\.git\\hooks\\pre-push");
+				return data.Contains("git-lfs");
+			}
+
+			return false;
+		}
+
+		public static void UpdateSignatureValues(string name, string email)
+		{
+			userSettings.signatureName = name;
+			userSettings.signatureEmail = email;
+			signatureName = name;
+			signatureEmail = email;
+		}
+
+		public static void UpdateCredentialValues(string username, string password)
+		{
+			userSettings.username = username;
+			userSettings.password = password;
+			credentialUsername = username;
+			credentialPassword = password;
+			credentials = new UsernamePasswordCredentials
+			{
+				Username = username,
+				Password = password
+			};
+		}
+
+		public static void UpdateValidateGitignore(bool validateGitignore)
+		{
+			validateGitignoreCheckbox = validateGitignore;
+			settings.validateGitignore = validateGitignore;
 		}
 		
 		public static bool AddGitLFSSupport(bool addDefaultIgnoreExts)
@@ -144,7 +193,7 @@ namespace GitItGUI.Core
 			// check if already init
 			if (lfsEnabled)
 			{
-				Debug.LogWarning("Git LFS already enabled on repo");
+				Debug.LogWarning("Git LFS already enabled on repo", true);
 				return false;
 			}
 
@@ -156,7 +205,7 @@ namespace GitItGUI.Core
 					Tools.RunExe("git-lfs", "install", null);
 					if (!Directory.Exists(repoPath + "\\.git\\lfs"))
 					{
-						Debug.LogError("Git-LFS install failed! (Try manually)");
+						Debug.LogError("Git-LFS install failed! (Try manually)", true);
 						lfsEnabled = false;
 						return false;
 					}
@@ -187,7 +236,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Add Git-LFS Error: " + e.Message);
+				Debug.LogError("Add Git-LFS Error: " + e.Message, true);
 				return false;
 			}
 			
@@ -199,7 +248,7 @@ namespace GitItGUI.Core
 			// check if not init
 			if (!lfsEnabled)
 			{
-				Debug.LogWarning("Git LFS is not enabled on repo");
+				Debug.LogWarning("Git LFS is not enabled on repo", true);
 				return false;
 			}
 
@@ -233,97 +282,12 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Remove Git-LFS Error: " + e.Message);
+				Debug.LogError("Remove Git-LFS Error: " + e.Message, true);
 				return false;
 			}
 
 			return true;
 		}
-
-		/*private void openFile_Click(object sender, RoutedEventArgs e)// TODO
-		{
-			// check for common mistakes
-			if (unstagedChangesListView.SelectedIndex < 0 && stagedChangesListView.SelectedIndex < 0)
-			{
-				MessageBox.Show("No file selected");
-				return;
-			}
-
-			try
-			{
-				var item = unstagedChangesListView.SelectedItem as FileItem;
-				if (item == null) item = stagedChangesListView.SelectedItem as FileItem;
-				Process.Start("explorer.exe", string.Format("{0}\\{1}", RepoUserControl.repoPath, item.filename));
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Failed to open folder location: " + ex.Message);
-			}
-		}
-
-		private void openFileLocation_Click(object sender, RoutedEventArgs e)
-		{
-			// check for common mistakes
-			if (unstagedChangesListView.SelectedIndex < 0 && stagedChangesListView.SelectedIndex < 0)
-			{
-				MessageBox.Show("No file selected");
-				return;
-			}
-
-			try
-			{
-				var item = unstagedChangesListView.SelectedItem as FileItem;
-				if (item == null) item = stagedChangesListView.SelectedItem as FileItem;
-				Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", RepoUserControl.repoPath, item.filename));
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Failed to open folder location: " + ex.Message);
-			}
-		}
-
-		private void revertFile_Click(object sender, RoutedEventArgs e)
-		{
-			// check for common mistakes
-			if (stagedChangesListView.SelectedIndex >= 0)
-			{
-				MessageBox.Show("Unstage file before reverting!");
-				return;
-			}
-
-			if (unstagedChangesListView.SelectedIndex < 0)
-			{
-				MessageBox.Show("No unstaged file selected");
-				return;
-			}
-
-			var item = unstagedChangesListView.SelectedItem as FileItem;
-			if (MessageBox.Show(string.Format("Are you sure you want to revert file '{0}'?", item.filename), "Revert?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
-			{
-				return;
-			}
-
-			try
-			{
-				// get selected item
-				var status = RepoUserControl.repo.RetrieveStatus(item.filename);
-				if ((status & FileStatus.ModifiedInIndex) == 0 && (status & FileStatus.ModifiedInWorkdir) == 0 && (status & FileStatus.DeletedFromIndex) == 0 && (status & FileStatus.DeletedFromWorkdir) == 0)
-				{
-					MessageBox.Show("This file is not modified or deleted");
-					return;
-				}
-				
-				var options = new CheckoutOptions();
-				options.CheckoutModifiers = CheckoutModifiers.Force;
-				RepoUserControl.repo.CheckoutPaths(RepoUserControl.repo.Head.FriendlyName, new string[] {item.filename}, options);
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Failed to open folder location: " + ex.Message);
-			}
-
-			RepoUserControl.Refresh();
-		}*/
 
 		public static void OpenGitk()
 		{
@@ -339,7 +303,7 @@ namespace GitItGUI.Core
 			process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 			if (!process.Start())
 			{
-				Debug.LogError("Failed to start Merge tool (is it installed?)", true);
+				Debug.LogError("Failed to start history tool (is it installed?)", true);
 				return;
 			}
 

@@ -407,6 +407,7 @@ namespace GitItGUI
 
 		private void RepoManager_RepoRefreshedCallback()
 		{
+			diffTextBox.Text = "";
 			unstagedChangesListViewItems.Clear();
 			stagedChangesListViewItems.Clear();
 			unstagedChangesListView.Items = null;

@@ -34,10 +34,11 @@ namespace GitItGUI.Core
 		public static bool gitlfsInstalled {get; private set;}
 		private static CheckForUpdatesCallbackMethod checkForUpdatesCallback;
 		private static string checkForUpdatesURL, checkForUpdatesOutOfDateURL;
+		internal static XML.AppSettings settings;
 
-		public static XML.AppSettings settings;
 		public static string mergeToolPath {get; private set;}
 		public static MergeDiffTools mergeDiffTool {get; private set;}
+		public static IReadOnlyList<XML.Repository> repositories {get{return settings.repositories;}}
 
 		public static int MaxRepoHistoryCount = 20;
 

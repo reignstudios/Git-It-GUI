@@ -19,7 +19,6 @@ namespace GitItGUI
 		{
 			if (!AppManager.CheckForUpdates("http://reign-studios-services.com/GitGameGUI/VersionInfo.xml", "http://reign-studios-services.com/GitGameGUI/index.html", checkForUpdatesCallback))
 			{
-				StartPage.singleton.RefreshUI();
 				MainWindow.LoadPage(PageTypes.Start);
 			}
 		}

@@ -24,8 +24,8 @@ namespace GitItGUI
 			cloneButton = this.Find<Button>("cloneButton");
 			openButton = this.Find<Button>("openButton");
 			settingsButton = this.Find<Button>("settingsButton");
-			cloneButton.Click += OpenButton_Click;
-			openButton.Click += CloneButton_Click;
+			cloneButton.Click += CloneButton_Click;
+			openButton.Click += OpenButton_Click;
 			settingsButton.Click += SettingsButton_Click;
 		}
 
@@ -36,7 +36,7 @@ namespace GitItGUI
 
 		public void NavigatedTo()
 		{
-			
+			RefreshUI();
 		}
 
 		public void NavigatedFrom()
@@ -46,8 +46,9 @@ namespace GitItGUI
 
 		public void RefreshUI()
 		{
-			// fill resent
-			foreach (var repo in AppManager.settings.repositories)
+			// fill repo list
+			recentStackPanel.Children.Clear();
+			foreach (var repo in AppManager.repositories)
 			{
 				var button = new Button();
 				button.Content = repo.path;

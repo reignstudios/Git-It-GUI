@@ -31,20 +31,20 @@ namespace GitItGUI
 
 		public static bool Show(string message, string title, MessageBoxTypes type)
 		{
+			#if WINDOWS
+			Win.DialogResult result = Win.DialogResult.None;
+			switch (type)
+			{
+				case MessageBoxTypes.Ok: result = Win.MessageBox.Show(message, title, Win.MessageBoxButtons.OK); break;
+				case MessageBoxTypes.OkCancel: result = Win.MessageBox.Show(message, title, Win.MessageBoxButtons.OKCancel); break;
+				case MessageBoxTypes.YesNo: result = Win.MessageBox.Show(message, title, Win.MessageBoxButtons.YesNo); break;
+			}
+
+			if (result == Win.DialogResult.OK || result == Win.DialogResult.Yes) return true;
+			return false;
+			#else
 			string result;
 			return Tools.CoreApps.LaunchMessageBox(title, message, type, out result);
-
-			#if WINDOWS
-			//Win.DialogResult result = Win.DialogResult.None;
-			//switch (type)
-			//{
-			//	case MessageBoxTypes.Ok: result = Win.MessageBox.Show(title, message, Win.MessageBoxButtons.OK); break;
-			//	case MessageBoxTypes.OkCancel: result = Win.MessageBox.Show(title, message, Win.MessageBoxButtons.OKCancel); break;
-			//	case MessageBoxTypes.YesNo: result = Win.MessageBox.Show(title, message, Win.MessageBoxButtons.YesNo); break;
-			//}
-
-			//if (result == Win.DialogResult.OK || result == Win.DialogResult.Yes) return true;
-			//return false;
 			#endif
 		}
 	}

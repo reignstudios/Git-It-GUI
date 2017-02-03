@@ -400,7 +400,8 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				RepoManager.repo.Commit(commitMessage, RepoManager.signature, RepoManager.signature);
+				var sig = RepoManager.signature;
+				RepoManager.repo.Commit(commitMessage, sig, sig);
 			}
 			catch (Exception e)
 			{
