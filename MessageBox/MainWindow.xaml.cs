@@ -31,7 +31,7 @@ namespace MessageBox
 			var args = Environment.GetCommandLineArgs();
 
 			// check for errors
-			if (args.Length != 2)
+			if (args.Length != 3)
 			{
 				Console.Write("ERROR:Invalid arg count: " + args.Length);
 				grid.IsVisible = false;
