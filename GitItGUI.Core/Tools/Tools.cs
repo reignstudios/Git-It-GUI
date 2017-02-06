@@ -95,7 +95,7 @@ namespace GitItGUI.Core
 				process.StandardInput.Close();
 			}
 			process.WaitForExit();
-
+			
 			return process.StandardOutput.ReadToEnd();
 		}
 
