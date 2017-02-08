@@ -419,9 +419,9 @@ namespace GitItGUI.Core
 
 			try
 			{
-				if (!BranchManager.IsRemote())
+				if (!BranchManager.IsTracking())
 				{
-					Debug.LogWarning("Branch is not remote!");
+					Debug.LogWarning("Branch is not tracking a remote!", true);
 					return false;
 				}
 
@@ -430,8 +430,9 @@ namespace GitItGUI.Core
 				options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => RepoManager.credentials;
 				options.FetchOptions.TagFetchMode = TagFetchMode.All;
 				Commands.Pull(RepoManager.repo, RepoManager.signature, options);
-				conflicts = !ConflictsExist();
+				conflicts = ConflictsExist();
 				if (conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
+				else Debug.Log("Pull Succeeded!", !isSyncMode);
 			}
 			catch (Exception e)
 			{
@@ -440,16 +441,16 @@ namespace GitItGUI.Core
 			}
 
 			if (!isSyncMode) RepoManager.Refresh();
-			return conflicts;
+			return !conflicts;
 		}
 
 		public static bool Push()
 		{
 			try
 			{
-				if (!BranchManager.IsRemote())
+				if (!BranchManager.IsTracking())
 				{
-					Debug.LogWarning("Branch is not remote!");
+					Debug.LogWarning("Branch is not tracking a remote!", true);
 					return false;
 				}
 				
@@ -527,13 +528,18 @@ namespace GitItGUI.Core
 			isSyncMode = true;
 			bool pass = Pull();
 			if (pass) pass = Push();
+			isSyncMode = false;
 			
 			if (!pass)
 			{
 				Debug.LogError("Failed to Sync changes", true);
 				return false;
 			}
-
+			else
+			{
+				Debug.Log("Sync succeeded!", true);
+			}
+			
 			RepoManager.Refresh();
 			return true;
 		}

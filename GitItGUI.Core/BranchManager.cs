@@ -10,7 +10,7 @@ namespace GitItGUI.Core
 	public class BranchState
 	{
 		public Branch branch;
-		public string name, trackedBranchName;
+		public string fullName, branchName, trackedBranchName;
 		public bool isRemote, isTracking;
 	}
 
@@ -38,8 +38,19 @@ namespace GitItGUI.Core
 
 		public static bool IsRemote(BranchState branch)
 		{
-			var b = RepoManager.repo.Branches[branch.name];
+			var b = RepoManager.repo.Branches[branch.fullName];
 			return b.IsRemote;
+		}
+
+		public static bool IsTracking()
+		{
+			return activeBranch.IsTracking;
+		}
+
+		public static bool IsTracking(BranchState branch)
+		{
+			var b = RepoManager.repo.Branches[branch.fullName];
+			return b.IsTracking;
 		}
 
 		public static string GetRemoteURL()
@@ -66,7 +77,8 @@ namespace GitItGUI.Core
 				b.branch = branch;
 				b.isRemote = branch.IsRemote;
 				b.isTracking = branch.IsTracking;
-				b.name = branch.FriendlyName;
+				b.fullName = branch.FriendlyName;
+				b.branchName = branch.FriendlyName.Replace(branch.RemoteName+"/", "");
 				if (branch.IsTracking) b.trackedBranchName = branch.TrackedBranch.FriendlyName;
 				allBranches.Add(b);
 			}
@@ -92,9 +104,14 @@ namespace GitItGUI.Core
 
 		public static bool Checkout(BranchState branch)
 		{
+			return Checkout(branch.fullName);
+		}
+
+		public static bool Checkout(string name)
+		{
 			try
 			{
-				var selectedBranch = RepoManager.repo.Branches[branch.name];
+				var selectedBranch = RepoManager.repo.Branches[name];
 				if (activeBranch != selectedBranch)
 				{
 					var newBranch = Commands.Checkout(RepoManager.repo, selectedBranch);
@@ -106,7 +123,7 @@ namespace GitItGUI.Core
 				}
 				else
 				{
-					Debug.LogError("Already on branch: " + branch.name, true);
+					Debug.LogError("Already on branch: " + name, true);
 					return false;
 				}
 			}
@@ -125,7 +142,7 @@ namespace GitItGUI.Core
 			MergeResults mergeResult;
 			try
 			{
-				var srcBround = RepoManager.repo.Branches[srcBranch.name];
+				var srcBround = RepoManager.repo.Branches[srcBranch.fullName];
 				var result = RepoManager.repo.Merge(srcBround, RepoManager.signature);
 				if (result.Status == MergeStatus.Conflicts) mergeResult = MergeResults.Conflicts;
 				else mergeResult = MergeResults.Succeeded;
@@ -162,7 +179,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				RepoManager.repo.Branches.Remove(branch.name);
+				RepoManager.repo.Branches.Remove(branch.fullName);
 			}
 			catch (Exception e)
 			{
@@ -197,9 +214,14 @@ namespace GitItGUI.Core
 
 		public static bool AddUpdateTracking(BranchState srcRemoteBranch)
 		{
+			return AddUpdateTracking(srcRemoteBranch.fullName);
+		}
+
+		public static bool AddUpdateTracking(string srcRemoteBranch)
+		{
 			try
 			{
-				var srcBranch = RepoManager.repo.Branches[srcRemoteBranch.name];
+				var srcBranch = RepoManager.repo.Branches[srcRemoteBranch];
 				RepoManager.repo.Branches.Update(activeBranch, b =>
 				{
 					b.Remote = srcBranch.RemoteName;
@@ -215,7 +237,7 @@ namespace GitItGUI.Core
 
 			RepoManager.Refresh();
 			return true;
-		} 
+		}
 
 		public static bool RemoveTracking()
 		{

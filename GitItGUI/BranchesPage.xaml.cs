@@ -86,7 +86,7 @@ namespace GitItGUI
 			var items = new List<string>();
 			foreach (var branch in branches)
 			{
-				string detailedName = branch.name;
+				string detailedName = branch.fullName;
 				if (!isAdvancedMode)
 				{
 					if (!branch.isRemote) items.Add(detailedName);
@@ -151,7 +151,16 @@ namespace GitItGUI
 			}
 
 			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
-			BranchManager.Checkout(branch);
+			if (!branch.isRemote) BranchManager.Checkout(branch);
+			else if (MessageBox.Show("Cannot checkout to remote branch.\nDo you want to create a local one that tracks this remote instead?", MessageBoxTypes.YesNo))//Debug.Log("Cannot checkout to remote branch.\nCreate a local one and copy tracking instead.", true);
+			{
+				string fullName = branch.branchName;
+				if (BranchManager.AddNewBranch(fullName))
+				{
+					BranchManager.Checkout(fullName);
+					BranchManager.AddUpdateTracking(branch.fullName);
+				}
+			}
 		}
 
 		private void MergeBranchButton_Click(object sender, RoutedEventArgs e)

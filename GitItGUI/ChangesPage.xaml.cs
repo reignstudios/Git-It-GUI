@@ -336,7 +336,6 @@ namespace GitItGUI
 		{
 			string result;
 			if (CoreApps.LaunchCommitEntry("", out result)) ChangesManager.CommitStagedChanges(result);
-			else MessageBox.Show("No changes staged!");
 		}
 
 		private void OpenDiffToolButton_Click(object sender, RoutedEventArgs e)

@@ -56,7 +56,7 @@ namespace CommitEntry
 		private void CommitButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
 		{
 			// check for errors
-			if (string.IsNullOrEmpty(messageTextBox.Text) || messageTextBox.Text.Length <= 3 || !Regex.IsMatch(messageTextBox.Text, @"^[a-zA-Z0-9 \n\r\!\?]*$"))
+			if (string.IsNullOrEmpty(messageTextBox.Text) || messageTextBox.Text.Length <= 3)
 			{
 				Console.Write("ERROR:Invalid message entry");
 				writeCancleOnQuit = false;
