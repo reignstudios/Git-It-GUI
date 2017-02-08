@@ -81,6 +81,7 @@ namespace GitItGUI.Tools
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, false)) return false;
 			
+			result = value;
 			return value != "Canceled";
 		}
 	}

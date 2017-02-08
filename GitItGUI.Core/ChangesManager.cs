@@ -621,6 +621,7 @@ namespace GitItGUI.Core
 
 					// stage and finish
 					Commands.Stage(RepoManager.repo, fileState.filename);
+					if (refresh) RepoManager.Refresh();
 					return true;
 				}
 			
