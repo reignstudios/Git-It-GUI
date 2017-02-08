@@ -46,7 +46,6 @@ namespace GitItGUI.Core
 				case FileStates.ModifiedInIndex:
 				case FileStates.RenamedInIndex:
 				case FileStates.TypeChangeInIndex:
-				case FileStates.Conflicted:
 					return true;
 
 				
@@ -55,6 +54,7 @@ namespace GitItGUI.Core
 				case FileStates.ModifiedInWorkdir:
 				case FileStates.RenamedInWorkdir:
 				case FileStates.TypeChangeInWorkdir:
+				case FileStates.Conflicted:
 					return false;
 			}
 
@@ -463,7 +463,7 @@ namespace GitItGUI.Core
 						using (var process = new Process())
 						{
 							process.StartInfo.FileName = "git-lfs";
-							process.StartInfo.Arguments = "pre-push " + RepoManager.repo.Network.Remotes[BranchManager.activeBranch.RemoteName].Name;// do we need "RepoManager.repo.Network.Remotes[BranchManager.activeBranch.RemoteName].Url" ?? (use "git-lfs pre-push --help" to check)
+							process.StartInfo.Arguments = "pre-push " + RepoManager.repo.Network.Remotes[BranchManager.activeBranch.RemoteName].Name;
 							process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 							process.StartInfo.CreateNoWindow = true;
 							process.StartInfo.UseShellExecute = false;
@@ -548,7 +548,7 @@ namespace GitItGUI.Core
 			return false;
 		}
 
-		public static bool ResolveAllConflicts(bool refresh)
+		public static bool ResolveAllConflicts(bool refresh = true)
 		{
 			foreach (var fileState in fileStates)
 			{

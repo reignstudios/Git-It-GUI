@@ -54,6 +54,16 @@ namespace GitItGUI.Tools
 			return value == "Ok";
 		}
 
+		public static bool LaunchCommitEntry(string message, out string result)
+		{
+			string exe = Environment.CurrentDirectory + "\\CommitEntry.exe";
+			string args = string.Format("-Message=\"{0}\"", message);
+			string type, value;
+			if (!LaunchCoreApp(exe, args, out type, out value, out result, true)) return false;
+			
+			return value == "Ok";
+		}
+
 		public static bool LaunchMessageBox(string title, string message, MessageBoxTypes messageBoxType, out string result)
 		{
 			string exe = Environment.CurrentDirectory + "\\MessageBox.exe";

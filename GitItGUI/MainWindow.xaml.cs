@@ -10,8 +10,7 @@ namespace GitItGUI
 		CheckForUpdates,
 		Start,
 		AppSettings,
-		MainContent,
-		Commit
+		MainContent
 	}
 	
 	public class MainWindow : Window
@@ -66,7 +65,6 @@ namespace GitItGUI
 			else if (StartPage.singleton.IsVisible) return StartPage.singleton;
 			else if (AppSettingsPage.singleton.IsVisible) return AppSettingsPage.singleton;
 			else if (MainContent.singleton.IsVisible) return MainContent.singleton;
-			else if (CommitPage.singleton.IsVisible) return CommitPage.singleton;
 
 			return null;
 		}
@@ -78,14 +76,12 @@ namespace GitItGUI
 			StartPage.singleton.IsVisible = false;
 			AppSettingsPage.singleton.IsVisible = false;
 			MainContent.singleton.IsVisible = false;
-			CommitPage.singleton.IsVisible = false;
 			switch (type)
 			{
 				case PageTypes.CheckForUpdates: CheckForUpdatesPage.singleton.IsVisible = true; break;
 				case PageTypes.Start: StartPage.singleton.IsVisible = true; break;
 				case PageTypes.AppSettings: AppSettingsPage.singleton.IsVisible = true; break;
 				case PageTypes.MainContent: MainContent.singleton.IsVisible = true; break;
-				case PageTypes.Commit: CommitPage.singleton.IsVisible = true; break;
 				default: throw new Exception("Unsuported page type: " + type);
 			}
 

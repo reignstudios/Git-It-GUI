@@ -14,6 +14,13 @@ namespace GitItGUI.Core
 		public bool isRemote, isTracking;
 	}
 
+	public enum MergeResults
+	{
+		Succeeded,
+		Conflicts,
+		Error
+	}
+
 	public static class BranchManager
 	{
 		public static Branch activeBranch;
@@ -91,11 +98,16 @@ namespace GitItGUI.Core
 				if (activeBranch != selectedBranch)
 				{
 					var newBranch = Commands.Checkout(RepoManager.repo, selectedBranch);
-					if (newBranch != selectedBranch)
+					if (newBranch.FriendlyName != selectedBranch.FriendlyName)
 					{
 						Debug.LogError("Error checking out branch (do you have pending changes?)", true);
 						return false;
 					}
+				}
+				else
+				{
+					Debug.LogError("Already on branch: " + branch.name, true);
+					return false;
 				}
 			}
 			catch (Exception e)
@@ -108,21 +120,24 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool MergeBranchIntoActive(BranchState srcBranch)
+		public static MergeResults MergeBranchIntoActive(BranchState srcBranch)
 		{
+			MergeResults mergeResult;
 			try
 			{
 				var srcBround = RepoManager.repo.Branches[srcBranch.name];
-				RepoManager.repo.Merge(srcBround, RepoManager.signature);
+				var result = RepoManager.repo.Merge(srcBround, RepoManager.signature);
+				if (result.Status == MergeStatus.Conflicts) mergeResult = MergeResults.Conflicts;
+				else mergeResult = MergeResults.Succeeded;
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("BranchManager.Merge Failed: " + e.Message, true);
-				return false;
+				return MergeResults.Error;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return mergeResult;
 		}
 
 		public static bool AddNewBranch(string branchName)

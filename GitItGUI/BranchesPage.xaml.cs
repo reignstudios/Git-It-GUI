@@ -163,7 +163,21 @@ namespace GitItGUI
 			}
 
 			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
-			BranchManager.MergeBranchIntoActive(branch);
+			if (branch.branch.FriendlyName == BranchManager.activeBranch.FriendlyName)
+			{
+				Debug.LogError("You must select a non active branch", true);
+				return;
+			}
+
+			var result = BranchManager.MergeBranchIntoActive(branch);
+			if (result == MergeResults.Succeeded)
+			{
+				MessageBox.Show("Merge Succedded!");
+			}
+			else if (result == MergeResults.Conflicts && MessageBox.Show("Conflicts detected! Resolve now?", MessageBoxTypes.YesNo))
+			{
+				ChangesManager.ResolveAllConflicts();
+			}
 		}
 
 		private void DeleteBranchButton_Click(object sender, RoutedEventArgs e)
@@ -175,6 +189,12 @@ namespace GitItGUI
 			}
 
 			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			if (branch.branch.FriendlyName == BranchManager.activeBranch.FriendlyName)
+			{
+				Debug.LogError("You must select a non active branch", true);
+				return;
+			}
+
 			BranchManager.DeleteNonActiveBranch(branch);
 		}
 	}

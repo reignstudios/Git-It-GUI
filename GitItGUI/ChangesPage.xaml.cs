@@ -334,7 +334,8 @@ namespace GitItGUI
 
 		private void CommitStagedButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (ChangesManager.changesStaged) MainWindow.LoadPage(PageTypes.Commit);
+			string result;
+			if (CoreApps.LaunchCommitEntry("", out result)) ChangesManager.CommitStagedChanges(result);
 			else MessageBox.Show("No changes staged!");
 		}
 
@@ -352,13 +353,7 @@ namespace GitItGUI
 
 		private void ResolveAllButton_Click(object sender, RoutedEventArgs e)
 		{
-			foreach (var item in unstagedChangesListViewItems)
-			{
-				if (item.fileState.state == FileStates.Conflicted) ChangesManager.ResolveConflict(item.fileState, false);
-			}
-
-			RepoManager.Refresh();
-			MessageBox.Show("Resolve All Conflices done.");
+			if (ChangesManager.ResolveAllConflicts()) MessageBox.Show("Resolve All Conflices done.");
 		}
 
 		private void ResolveSelectedButton_Click(object sender, RoutedEventArgs e)

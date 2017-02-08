@@ -42,6 +42,7 @@ namespace GitItGUI.Core
 		
 		private static XML.RepoSettings settings;
 		private static XML.RepoUserSettings userSettings;
+		private static FilterRegistration lfsFilterRegistration;
 
 		internal static Signature signature {get {return new Signature(userSettings.signatureName, userSettings.signatureEmail, DateTimeOffset.UtcNow);}}
 		internal static UsernamePasswordCredentials credentials {get; private set;}
@@ -127,6 +128,54 @@ namespace GitItGUI.Core
 			return true;
 		}
 
+		public static bool Clone(string url, string destination, string username, string password, out string repoPath)
+		{
+			try
+			{
+				// get repo name
+				var match = Regex.Match(url, @"(.*)/(.*\.git)");
+				repoPath = null;
+				if (match.Groups.Count == 3 && !string.IsNullOrEmpty(match.Groups[2].Value))
+				{
+					repoPath = match.Groups[2].Value.Replace(".git", "");
+					repoPath = Path.Combine(destination, repoPath);
+				}
+				else
+				{
+					Debug.LogError("Failed to parse url for repo name: " + url, true);
+					return false;
+				}
+
+				// valid folder is free
+				if (Directory.Exists(repoPath))
+				{
+					Debug.LogError("Folder already exists: " + repoPath, true);
+					return false;
+				}
+
+				// create folder
+				Directory.CreateDirectory(repoPath);
+
+				// clone
+				var options = new CloneOptions();
+				options.IsBare = false;
+				options.CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
+				{
+					Username = username,
+					Password = password
+				};
+
+				string result = Repository.Clone(url, repoPath, options);
+				return result == (repoPath + "\\.git\\");
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Clone error: " + e.Message, true);
+				repoPath = null;
+				return false;
+			}
+		}
+
 		/// <summary>
 		/// Saves open repo's settings
 		/// </summary>
@@ -148,17 +197,6 @@ namespace GitItGUI.Core
 				repo.Dispose();
 				repo = null;
 			}
-		}
-
-		private static bool IsGitLFSRepo()
-		{
-			if (Directory.Exists(repoPath + "\\.git\\lfs") && File.Exists(repoPath + "\\.gitattributes") && File.Exists(repoPath + "\\.git\\hooks\\pre-push"))
-			{
-				string data = File.ReadAllText(repoPath + "\\.git\\hooks\\pre-push");
-				return data.Contains("git-lfs");
-			}
-
-			return false;
 		}
 
 		public static void UpdateSignatureValues(string name, string email)
@@ -186,6 +224,46 @@ namespace GitItGUI.Core
 		{
 			validateGitignoreCheckbox = validateGitignore;
 			settings.validateGitignore = validateGitignore;
+		}
+
+		private static bool IsGitLFSRepo()
+		{
+			if (Directory.Exists(repoPath + "\\.git\\lfs") && File.Exists(repoPath + "\\.gitattributes") && File.Exists(repoPath + "\\.git\\hooks\\pre-push"))
+			{
+				string data = File.ReadAllText(repoPath + "\\.git\\hooks\\pre-push");
+				bool isValid = data.Contains("git-lfs");
+				if (isValid)
+				{
+					EnableGitLFSFilter();
+					return true;
+				}
+				else
+				{
+					DisableGitLFSFilter();
+				}
+			}
+
+			return false;
+		}
+
+		private static void EnableGitLFSFilter()
+		{
+			// check if filter already active
+			if (lfsFilterRegistration != null || GlobalSettings.GetRegisteredFilters().Contains(lfsFilterRegistration)) return;
+
+			// create lfs filter
+            var filteredFiles = new List<FilterAttributeEntry>()
+            {
+                new FilterAttributeEntry("lfs")
+            };
+            var filter = new Filters.GitLFS("lfs", filteredFiles);
+            lfsFilterRegistration = GlobalSettings.RegisterFilter(filter);
+		}
+
+		private static void DisableGitLFSFilter()
+		{
+           GlobalSettings.DeregisterFilter(lfsFilterRegistration);
+		   lfsFilterRegistration = null;
 		}
 		
 		public static bool AddGitLFSSupport(bool addDefaultIgnoreExts)
@@ -237,9 +315,11 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Add Git-LFS Error: " + e.Message, true);
+				Environment.Exit(0);// quit for safety as application should restart
 				return false;
 			}
 			
+			EnableGitLFSFilter();
 			return true;
 		}
 
@@ -283,9 +363,11 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Remove Git-LFS Error: " + e.Message, true);
+				Environment.Exit(0);// quit for safety as application should restart
 				return false;
 			}
 
+			DisableGitLFSFilter();
 			return true;
 		}
 

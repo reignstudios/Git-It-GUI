@@ -1,5 +1,5 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="640" Design.Height="400" >
-	<Grid>
+	<Grid Name="grid">
 		<TextBlock FontSize="32" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Git-It-GUI</TextBlock>
 		<TextBlock FontSize="16" Margin="0,60,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Select a project from history or create/open another one</TextBlock>
 		<Button Name="settingsButton" Margin="0,10,10,-10" Width="32" Height="32" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent">

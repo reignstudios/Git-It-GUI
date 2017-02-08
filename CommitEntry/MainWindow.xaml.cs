@@ -3,14 +3,13 @@ using Avalonia.Markup.Xaml;
 using System;
 using System.Text.RegularExpressions;
 
-namespace NameEntry
+namespace CommitEntry
 {
 	public class MainWindow : Window
 	{
 		private Grid grid;
-		private TextBlock captionTextBlock;
-		private TextBox nameTextBox;
-		private Button okButton, cancelButton;
+		private Button cancelButton, commitButton;
+		private TextBox messageTextBox;
 		bool writeCancleOnQuit = true;
 
 		public MainWindow()
@@ -19,16 +18,14 @@ namespace NameEntry
 			App.AttachDevTools(this);
 			Closed += MainWindow_Closed;
 
-			// load ui
-			grid = this.Find<Grid>("grid");
-			captionTextBlock = this.Find<TextBlock>("captionTextBlock");
-			nameTextBox = this.Find<TextBox>("nameTextBox");
-			okButton = this.Find<Button>("okButton");
+			// load ui items
 			cancelButton = this.Find<Button>("cancelButton");
+			commitButton = this.Find<Button>("commitButton");
+			messageTextBox = this.Find<TextBox>("messageTextBox");
 
-			// bind ui
-			okButton.Click += OkButton_Click;
+			// apply bindings
 			cancelButton.Click += CancelButton_Click;
+			commitButton.Click += CommitButton_Click;
 
 			// get args
 			var args = Environment.GetCommandLineArgs();
@@ -46,7 +43,7 @@ namespace NameEntry
 
 				switch (values[0])
 				{
-					case "-Caption": captionTextBlock.Text = values[1]; break;
+					case "-Message": messageTextBox.Text = values[1]; break;
 
 					default:
 						Console.Write(string.Format("ERROR:Invalid arg type ({0})", values[0]));
@@ -56,19 +53,19 @@ namespace NameEntry
 			}
 		}
 
-		private void OkButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+		private void CommitButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
 		{
 			// check for errors
-			if (string.IsNullOrEmpty(nameTextBox.Text) || nameTextBox.Text.Length < 3 || nameTextBox.Text.Contains(" ") || !Regex.IsMatch(nameTextBox.Text, @"^[a-zA-Z0-9]*$"))
+			if (string.IsNullOrEmpty(messageTextBox.Text) || messageTextBox.Text.Length <= 3 || !Regex.IsMatch(messageTextBox.Text, @"^[a-zA-Z0-9 \n\r\!\?]*$"))
 			{
-				Console.Write("ERROR:Invalid name entry");
+				Console.Write("ERROR:Invalid message entry");
 				writeCancleOnQuit = false;
 				Close();
 				return;
 			}
 
 			// finish normally
-			Console.Write("SUCCEEDED:Ok:" + nameTextBox.Text);
+			Console.Write("SUCCEEDED:Ok:" + messageTextBox.Text);
 			writeCancleOnQuit = false;
 			Close();
 		}
