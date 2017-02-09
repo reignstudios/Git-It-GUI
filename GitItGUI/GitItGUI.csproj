@@ -215,6 +215,9 @@
       <DependentUpon>MainContent.xaml</DependentUpon>
     </Compile>
     <Compile Include="NavigationPage.cs" />
+    <Compile Include="ProcessingPage.xaml.cs">
+      <DependentUpon>ProcessingPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
@@ -281,6 +284,11 @@
       <Project>{0095000a-55af-4a89-8c5a-02e43caaf1f5}</Project>
       <Name>GitItGUI.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ProcessingPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

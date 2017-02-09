@@ -1,6 +1,6 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
 	xmlns:gititgui="clr-namespace:GitItGUI;assembly=GitItGUI"
-	Title="Git-It-GUI"
+	Title="Git-It-GUI v0.1.0.0"
 	Icon="resm:GitItGUI.Icons.AppIcon.ico?assembly=GitItGUI"
 	Width="1280" Height="800">
 
@@ -9,6 +9,7 @@
 		<gititgui:StartPage Name="startPage" IsVisible="False"/>
 		<gititgui:AppSettingsPage Name="appSettingPage" IsVisible="False"/>
 		<gititgui:MainContent Name="mainContentPage" IsVisible="False"/>
+		<gititgui:ProcessingPage Name="processingPage" IsVisible="False"/>
 	</Grid>
 
 </Window>

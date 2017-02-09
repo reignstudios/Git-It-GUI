@@ -343,7 +343,8 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				Commands.Unstage(RepoManager.repo, fileState.filename);
+				//Commands.Unstage(RepoManager.repo, fileState.filename);// libgit2sharp has some bug on this method
+				Tools.RunExe("git", string.Format("reset \"{0}\"", fileState.filename), null);// use this hack for now
 			}
 			catch (Exception e)
 			{
@@ -436,7 +437,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError(string.Format("Failed to pull: {0}\n\nIf this is from a merge conflict.\nYou either need to stage and commit conflicting files\nor delete conflicting files.", e.Message, true));
+				Debug.LogError("Failed to pull: " + e.Message, true);
 				return false;
 			}
 
@@ -489,7 +490,7 @@ namespace GitItGUI.Core
 							if (!string.IsNullOrEmpty(output)) Debug.Log("git-lfs pre-push results: " + output);
 							if (!string.IsNullOrEmpty(outputErr))
 							{
-								Debug.LogError("git-lfs pre-push error results: " + outputErr);
+								Debug.LogError("git-lfs pre-push error results: " + outputErr, true);
 								return false;
 							}
 						}
@@ -503,7 +504,7 @@ namespace GitItGUI.Core
 				bool pushError = false;
 				options.OnPushStatusError = delegate(PushStatusError ex)
 				{
-					Debug.LogError("Failed to push (do you have valid permisions?): " + ex.Message);
+					Debug.LogError("Failed to push (do you have valid permisions?): " + ex.Message, true);
 					pushError = true;
 				};
 				RepoManager.repo.Network.Push(BranchManager.activeBranch, options);

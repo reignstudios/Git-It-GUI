@@ -319,17 +319,20 @@ namespace GitItGUI
 
 		private void PushChangesButton_Advanced_Click(object sender, RoutedEventArgs e)
 		{
-			ChangesManager.Push();
+			ProcessingPage.singleton.mode = ProcessingPageModes.Push;
+			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
 		private void PullChangesButton_Advanced_Click(object sender, RoutedEventArgs e)
 		{
-			ChangesManager.Pull();
+			ProcessingPage.singleton.mode = ProcessingPageModes.Pull;
+			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
 		private void SyncChangesButton_Click(object sender, RoutedEventArgs e)
 		{
-			ChangesManager.Sync();
+			ProcessingPage.singleton.mode = ProcessingPageModes.Sync;
+			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
 		private void CommitStagedButton_Click(object sender, RoutedEventArgs e)
