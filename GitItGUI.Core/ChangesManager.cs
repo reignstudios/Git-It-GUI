@@ -462,6 +462,7 @@ namespace GitItGUI.Core
 				{
 					options.OnNegotiationCompletedBeforePush = delegate(IEnumerable<PushUpdate> updates)
 					{
+						string outputErr = "", output = "";
 						using (var process = new Process())
 						{
 							process.StartInfo.FileName = "git-lfs";
@@ -472,7 +473,20 @@ namespace GitItGUI.Core
 							process.StartInfo.RedirectStandardInput = true;
 							process.StartInfo.RedirectStandardOutput = true;
 							process.StartInfo.RedirectStandardError = true;
+
+							process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
+							{
+								if (e.Data != null) output += e.Data + Environment.NewLine;
+							};
+
+							process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
+							{
+								if (e.Data != null) outputErr += e.Data + Environment.NewLine;
+							};
+
 							process.Start();
+							process.BeginOutputReadLine();
+							process.BeginErrorReadLine();
 				
 							foreach (var update in updates)
 							{
@@ -484,9 +498,7 @@ namespace GitItGUI.Core
 							process.StandardInput.Flush();
 							process.StandardInput.Close();
 							process.WaitForExit();
-
-							string output = process.StandardOutput.ReadToEnd();
-							string outputErr = process.StandardError.ReadToEnd();
+							
 							if (!string.IsNullOrEmpty(output)) Debug.Log("git-lfs pre-push results: " + output);
 							if (!string.IsNullOrEmpty(outputErr))
 							{

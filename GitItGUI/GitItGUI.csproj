@@ -208,6 +208,9 @@
     <Compile Include="CheckForUpdatesPage.xaml.cs">
       <DependentUpon>CheckForUpdatesPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ClonePage.xaml.cs">
+      <DependentUpon>ClonePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="HistoryPage.xaml.cs">
       <DependentUpon>HistoryPage.xaml</DependentUpon>
     </Compile>
@@ -287,6 +290,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProcessingPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ClonePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
   </ItemGroup>

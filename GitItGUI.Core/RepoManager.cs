@@ -164,9 +164,51 @@ namespace GitItGUI.Core
 					Username = username,
 					Password = password
 				};
-
+				
 				string result = Repository.Clone(url, repoPath, options);
-				return result == (repoPath + "\\.git\\");
+				if (result == (repoPath + "\\.git\\"))
+				{
+					string attributes = Path.Combine(repoPath, ".gitattributes");
+					if (File.Exists(attributes))
+					{
+						string lines = File.ReadAllText(attributes);
+						if (lines.Contains("filter=lfs diff=lfs merge=lfs"))
+						{
+							const string errorStringHelper = "\n(please manually run these commands in order\ngit-lfs [install, fetch, checkout])";
+							RepoManager.repoPath = repoPath;
+
+							string errors;
+							Tools.RunExeOutputErrors("git-lfs", "install", null, out errors);
+							if (!string.IsNullOrEmpty(errors))
+							{
+								Debug.LogError("Failed to init git-lfs on repo" + errorStringHelper, true);
+								return false;
+							}
+
+							Tools.RunExeOutputErrors("git-lfs", "fetch", null, out errors);
+							if (!string.IsNullOrEmpty(errors))
+							{
+								Debug.LogError("Failed to fetch git-lfs files" + errorStringHelper, true);
+								return false;
+							}
+
+							Tools.RunExeOutputErrors("git-lfs", "checkout", null, out errors);
+							if (!string.IsNullOrEmpty(errors))
+							{
+								Debug.LogError("Failed to checkout git-lfs files" + errorStringHelper, true);
+								return false;
+							}
+
+							EnableGitLFSFilter();
+						}
+					}
+
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
 			catch (Exception e)
 			{
@@ -378,18 +420,21 @@ namespace GitItGUI.Core
 			Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
 
 			// open gitk
-			var process = new Process();
-			process.StartInfo.FileName = programFilesx64 + "\\Git\\cmd\\gitk.exe";
-			process.StartInfo.WorkingDirectory = repoPath;
-			process.StartInfo.Arguments = "";
-			process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
-			if (!process.Start())
+			using (var process = new Process())
 			{
-				Debug.LogError("Failed to start history tool (is it installed?)", true);
-				return;
+				process.StartInfo.FileName = programFilesx64 + "\\Git\\cmd\\gitk.exe";
+				process.StartInfo.WorkingDirectory = repoPath;
+				process.StartInfo.Arguments = "";
+				process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+				if (!process.Start())
+				{
+					Debug.LogError("Failed to start history tool (is it installed?)", true);
+					return;
+				}
+
+				process.WaitForExit();
 			}
 
-			process.WaitForExit();
 			Refresh();
 		}
 	}

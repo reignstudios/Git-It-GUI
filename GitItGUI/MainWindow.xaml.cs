@@ -11,7 +11,8 @@ namespace GitItGUI
 		Start,
 		AppSettings,
 		MainContent,
-		Processing
+		Processing,
+		Clone
 	}
 	
 	public class MainWindow : Window
@@ -25,6 +26,7 @@ namespace GitItGUI
 			// load main page
 			AvaloniaXamlLoader.Load(this);
 			App.AttachDevTools(this);
+			Title = "Git-It-GUI v" + VersionInfo.version;
 
 			// load resources
 			ResourceManager.Init();
@@ -67,6 +69,7 @@ namespace GitItGUI
 			else if (AppSettingsPage.singleton.IsVisible) return AppSettingsPage.singleton;
 			else if (MainContent.singleton.IsVisible) return MainContent.singleton;
 			else if (ProcessingPage.singleton.IsVisible) return ProcessingPage.singleton;
+			else if (ClonePage.singleton.IsVisible) return ClonePage.singleton;
 
 			return null;
 		}
@@ -79,6 +82,7 @@ namespace GitItGUI
 			AppSettingsPage.singleton.IsVisible = false;
 			MainContent.singleton.IsVisible = false;
 			ProcessingPage.singleton.IsVisible = false;
+			ClonePage.singleton.IsVisible = false;
 			switch (type)
 			{
 				case PageTypes.CheckForUpdates: CheckForUpdatesPage.singleton.IsVisible = true; break;
@@ -86,6 +90,7 @@ namespace GitItGUI
 				case PageTypes.AppSettings: AppSettingsPage.singleton.IsVisible = true; break;
 				case PageTypes.MainContent: MainContent.singleton.IsVisible = true; break;
 				case PageTypes.Processing: ProcessingPage.singleton.IsVisible = true; break;
+				case PageTypes.Clone: ClonePage.singleton.IsVisible = true; break;
 				default: throw new Exception("Unsuported page type: " + type);
 			}
 

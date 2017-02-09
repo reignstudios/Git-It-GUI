@@ -68,7 +68,7 @@ namespace GitItGUI.Core
 				{
 					settings.defaultGitLFS_Exts.AddRange(new List<string>()
 					{
-						".jpg", ".jpeg", ".png", ".bmp", ".tga",// image types
+						".jpg", ".jpeg", ".png", ".bmp", ".tga", ".tif",// image types
 						".psd",// image binary types
 						".ai", ".svg", ".dwg",// vector binary types
 						".ae",// video binary types

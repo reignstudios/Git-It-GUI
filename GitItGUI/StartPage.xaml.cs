@@ -59,12 +59,26 @@ namespace GitItGUI
 			}
 		}
 
-		private void OpenRepo(string path)
+		private void CloneButton_Click(object sender, RoutedEventArgs e)
 		{
+			MainWindow.LoadPage(PageTypes.Clone);
+		}
+
+		private async void OpenButton_Click(object sender, RoutedEventArgs e)
+		{
+			// select path
+			grid.IsVisible = false;
+			var dlg = new OpenFolderDialog();
+			var path = await dlg.ShowAsync();
+			if (string.IsNullOrEmpty(path))
+			{
+				grid.IsVisible = true;
+				return;
+			}
+
 			// open repo
 			if (!RepoManager.OpenRepo(path))
 			{
-				// remove bad repo from list
 				MessageBox.Show("Failed to open repo: " + path);
 				grid.IsVisible = true;
 				return;
@@ -73,46 +87,6 @@ namespace GitItGUI
 			// load main repo page
 			grid.IsVisible = true;
 			MainWindow.LoadPage(PageTypes.MainContent);
-		}
-
-		private async void CloneButton_Click(object sender, RoutedEventArgs e)
-		{
-			// get url, username and password
-			// TODO: create core app for this
-			return;
-
-			// get destination
-			grid.IsVisible = false;
-			var dlg = new OpenFolderDialog();
-			var path = await dlg.ShowAsync();
-			if (string.IsNullOrEmpty(path))
-			{
-				grid.IsVisible = true;
-				return;
-			}
-			
-			if (!RepoManager.Clone("", path, "", "", out path))
-			{
-				MessageBox.Show("Failed to clone repo: " + path);
-				grid.IsVisible = true;
-				return;
-			}
-
-			OpenRepo(path);
-		}
-
-		private async void OpenButton_Click(object sender, RoutedEventArgs e)
-		{
-			grid.IsVisible = false;
-			var dlg = new OpenFolderDialog();
-			var path = await dlg.ShowAsync();
-			if (string.IsNullOrEmpty(path))
-			{
-				grid.IsVisible = true;
-				return;
-			}
-
-			OpenRepo(path);
 		}
 
 		private void RecentButton_Click(object sender, RoutedEventArgs e)

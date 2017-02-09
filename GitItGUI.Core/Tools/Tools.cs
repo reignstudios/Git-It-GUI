@@ -8,6 +8,12 @@ namespace GitItGUI.Core
 {
 	static class Tools
 	{
+		#if DEBUG
+		public static bool forceHideWindowOff = false;
+		#else
+		public static bool forceHideWindowOff = false;
+		#endif
+
 		public static void GetProgramFilesPath(out string programFilesx86, out string programFilesx64)
 		{
 			if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432"))) programFilesx86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
@@ -60,43 +66,99 @@ namespace GitItGUI.Core
 
 		public static void RunExe(string exe, string arguments, string input, bool hideWindow = true)
 		{
-			var process = new Process();
-			process.StartInfo.FileName = exe;
-			process.StartInfo.Arguments = arguments;
-			process.StartInfo.WorkingDirectory = RepoManager.repoPath;
-			process.StartInfo.RedirectStandardInput = input != null;
-			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.CreateNoWindow = hideWindow;
-			process.Start();
-			if (input != null)
+			using (var process = new Process())
 			{
-				process.StandardInput.WriteLine(input);
-				process.StandardInput.Flush();
-				process.StandardInput.Close();
+				process.StartInfo.FileName = exe;
+				process.StartInfo.Arguments = arguments;
+				process.StartInfo.WorkingDirectory = RepoManager.repoPath;
+				process.StartInfo.RedirectStandardInput = input != null;
+				process.StartInfo.UseShellExecute = false;
+				process.StartInfo.CreateNoWindow = forceHideWindowOff ? false : hideWindow;
+				process.Start();
+				if (input != null)
+				{
+					process.StandardInput.WriteLine(input);
+					process.StandardInput.Flush();
+					process.StandardInput.Close();
+				}
+				process.WaitForExit();
 			}
-			process.WaitForExit();
 		}
 
 		public static string RunExeOutput(string exe, string arguments, string input, bool hideWindow = true)
 		{
-			var process = new Process();
-			process.StartInfo.FileName = exe;
-			process.StartInfo.Arguments = arguments;
-			process.StartInfo.WorkingDirectory = RepoManager.repoPath;
-			process.StartInfo.RedirectStandardInput = input != null;
-			process.StartInfo.RedirectStandardOutput = true;
-			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.CreateNoWindow = hideWindow;
-			process.Start();
-			if (input != null)
+			string output = "";
+			using (var process = new Process())
 			{
-				process.StandardInput.WriteLine(input);
-				process.StandardInput.Flush();
-				process.StandardInput.Close();
+				process.StartInfo.FileName = exe;
+				process.StartInfo.Arguments = arguments;
+				process.StartInfo.WorkingDirectory = RepoManager.repoPath;
+				process.StartInfo.RedirectStandardInput = input != null;
+				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.UseShellExecute = false;
+				process.StartInfo.CreateNoWindow = forceHideWindowOff ? false : hideWindow;
+
+				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
+				{
+					if (e.Data != null) output += e.Data + Environment.NewLine;
+				};
+
+				process.Start();
+				process.BeginOutputReadLine();
+
+				if (input != null)
+				{
+					process.StandardInput.WriteLine(input);
+					process.StandardInput.Flush();
+					process.StandardInput.Close();
+				}
+
+				process.WaitForExit();
 			}
-			process.WaitForExit();
-			
-			return process.StandardOutput.ReadToEnd();
+
+			return output;
+		}
+
+		public static string RunExeOutputErrors(string exe, string arguments, string input, out string errors, bool hideWindow = true)
+		{
+			string outputErr = "", output = "";
+			using (var process = new Process())
+			{
+				process.StartInfo.FileName = exe;
+				process.StartInfo.Arguments = arguments;
+				process.StartInfo.WorkingDirectory = RepoManager.repoPath;
+				process.StartInfo.RedirectStandardInput = input != null;
+				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.RedirectStandardError = true;
+				process.StartInfo.UseShellExecute = false;
+				process.StartInfo.CreateNoWindow = forceHideWindowOff ? false : hideWindow;
+
+				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
+				{
+					if (e.Data != null) output += e.Data + Environment.NewLine;
+				};
+
+				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
+				{
+					if (e.Data != null) outputErr += e.Data + Environment.NewLine;
+				};
+
+				process.Start();
+				process.BeginOutputReadLine();
+				process.BeginErrorReadLine();
+
+				if (input != null)
+				{
+					process.StandardInput.WriteLine(input);
+					process.StandardInput.Flush();
+					process.StandardInput.Close();
+				}
+
+				process.WaitForExit();
+				errors = outputErr;
+			}
+
+			return output;
 		}
 
 		public static bool IsSingleWord(string value)
