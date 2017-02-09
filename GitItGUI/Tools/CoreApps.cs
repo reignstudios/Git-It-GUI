@@ -10,34 +10,36 @@ namespace GitItGUI.Tools
 			type = null;
 			value = null;
 			valueMessage = null;
-			var process = new System.Diagnostics.Process();
-			process.StartInfo.FileName = exe;
-			process.StartInfo.Arguments = arguments;
-			process.StartInfo.WorkingDirectory = RepoManager.repoPath;
-			process.StartInfo.RedirectStandardOutput = true;
-			process.StartInfo.UseShellExecute = false;
-			process.Start();
-			process.WaitForExit();
+			using (var process = new System.Diagnostics.Process())
+			{
+				process.StartInfo.FileName = exe;
+				process.StartInfo.Arguments = arguments;
+				process.StartInfo.WorkingDirectory = RepoManager.repoPath;
+				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.UseShellExecute = false;
+				process.Start();
+				process.WaitForExit();
 
-			var result = process.StandardOutput.ReadToEnd();
-			var values = result.Split(':');
-			if (values.Length != 2 && values.Length != 3)
-			{
-				Debug.LogWarning("Invalid core app response: " + result, alertEnabled);
-				return false;
-			}
+				var result = process.StandardOutput.ReadToEnd();
+				var values = result.Split(':');
+				if (values.Length != 2 && values.Length != 3)
+				{
+					Debug.LogWarning("Invalid core app response: " + result, alertEnabled);
+					return false;
+				}
 
-			type = values[0];
-			value = values[1];
-			if (values.Length == 3) valueMessage = values[2];
-			if (values[0] == "ERROR")
-			{
-				Debug.LogWarning("Response error: " + values[1], alertEnabled);
-				return false;
-			}
-			else if (values[0] == "SUCCEEDED")
-			{
-				return true;
+				type = values[0];
+				value = values[1];
+				if (values.Length == 3) valueMessage = values[2];
+				if (values[0] == "ERROR")
+				{
+					Debug.LogWarning("Response error: " + values[1], alertEnabled);
+					return false;
+				}
+				else if (values[0] == "SUCCEEDED")
+				{
+					return true;
+				}
 			}
 
 			Debug.LogWarning("Unknown Error", alertEnabled);
