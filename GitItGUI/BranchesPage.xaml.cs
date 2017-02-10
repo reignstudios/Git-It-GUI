@@ -82,7 +82,7 @@ namespace GitItGUI
 			remoteURLLabel.IsVisible = isAdvancedMode;
 
 			// fill other branches list
-			var branches = BranchManager.GetOtherBranches();
+			var branches = BranchManager.GetOtherBranches(isAdvancedMode);
 			var items = new List<string>();
 			foreach (var branch in branches)
 			{
@@ -127,7 +127,7 @@ namespace GitItGUI
 				return;
 			}
 
-			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
 			if (!BranchManager.IsRemote(branch))
 			{
 				Debug.Log("Branch selected is not a 'Remote'", true);
@@ -150,7 +150,7 @@ namespace GitItGUI
 				return;
 			}
 
-			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
 			if (!branch.isRemote) BranchManager.Checkout(branch);
 			else if (MessageBox.Show("Cannot checkout to remote branch.\nDo you want to create a local one that tracks this remote instead?", MessageBoxTypes.YesNo))//Debug.Log("Cannot checkout to remote branch.\nCreate a local one and copy tracking instead.", true);
 			{
@@ -171,7 +171,7 @@ namespace GitItGUI
 				return;
 			}
 
-			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
 			if (branch.branch.FriendlyName == BranchManager.activeBranch.FriendlyName)
 			{
 				Debug.LogError("You must select a non active branch", true);
@@ -197,7 +197,7 @@ namespace GitItGUI
 				return;
 			}
 
-			var branch = BranchManager.GetOtherBranches()[otherBranchListView.SelectedIndex];
+			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
 			if (branch.branch.FriendlyName == BranchManager.activeBranch.FriendlyName)
 			{
 				Debug.LogError("You must select a non active branch", true);

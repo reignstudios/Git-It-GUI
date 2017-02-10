@@ -91,12 +91,22 @@ namespace GitItGUI.Core
 			return allBranches.ToArray();
 		}
 
-		public static BranchState[] GetOtherBranches()
+		public static BranchState[] GetOtherBranches(bool getRemotes)
 		{
 			var otherBranches = new List<BranchState>();
 			foreach (var branch in allBranches)
 			{
-				if (activeBranch != branch.branch) otherBranches.Add(branch);
+				if (activeBranch.FriendlyName != branch.branch.FriendlyName)
+				{
+					if (getRemotes)
+					{
+						otherBranches.Add(branch);
+					}
+					else
+					{
+						if (!branch.isRemote) otherBranches.Add(branch);
+					}
+				}
 			}
 
 			return otherBranches.ToArray();
@@ -112,7 +122,7 @@ namespace GitItGUI.Core
 			try
 			{
 				var selectedBranch = RepoManager.repo.Branches[name];
-				if (activeBranch != selectedBranch)
+				if (activeBranch.FriendlyName != selectedBranch.FriendlyName)
 				{
 					var newBranch = Commands.Checkout(RepoManager.repo, selectedBranch);
 					if (newBranch.FriendlyName != selectedBranch.FriendlyName)
