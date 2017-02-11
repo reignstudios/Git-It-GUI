@@ -1,8 +1,10 @@
 ﻿using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GitItGUI.Core
@@ -121,6 +123,19 @@ namespace GitItGUI.Core
 		{
 			try
 			{
+				// check for git settings file not in repo history
+				string settingsPath = RepoManager.repoPath + "\\" + Settings.repoSettingsFilename;
+				if (File.Exists(settingsPath))
+				{
+					var repoStatus = RepoManager.repo.RetrieveStatus(Settings.repoSettingsFilename);
+					if ((repoStatus | FileStatus.NewInWorkdir) != 0)
+					{
+						File.Delete(settingsPath);
+						while (File.Exists(settingsPath)) Thread.Sleep(250);
+					}
+				}
+
+				// checkout
 				var selectedBranch = RepoManager.repo.Branches[name];
 				if (activeBranch.FriendlyName != selectedBranch.FriendlyName)
 				{

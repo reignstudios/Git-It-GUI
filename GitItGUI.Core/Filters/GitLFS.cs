@@ -48,29 +48,21 @@ namespace GitItGUI.Core.Filters
 				// finalize stdin and wait for git-lfs to finish
 				process.StandardInput.Flush();
 				process.StandardInput.Close();
-				if (mode == FilterMode.Clean)
+				bool dataWriten = false;
+				while (!process.WaitForExit(100) || !dataWriten)
 				{
-					process.WaitForExit();
-
-					// write git-lfs pointer for 'clean' to git or file data for 'smudge' to working copy
 					process.StandardOutput.BaseStream.CopyTo(output);
 					process.StandardOutput.BaseStream.Flush();
-					process.StandardOutput.Close();
-					output.Flush();
-					output.Close();
-				}
-				else if (mode == FilterMode.Smudge)
-				{
-					// write git-lfs pointer for 'clean' to git or file data for 'smudge' to working copy
-					process.StandardOutput.BaseStream.CopyTo(output);
-					process.StandardOutput.BaseStream.Flush();
-					process.StandardOutput.Close();
-					output.Flush();
-					output.Close();
-
-					process.WaitForExit();
+					dataWriten = true;
 				}
 
+				// write git-lfs pointer for 'clean' to git or file data for 'smudge' to working copy
+				process.StandardOutput.Close();
+				output.Flush();
+				output.Close();
+
+				// finish
+				process.WaitForExit();
 				process.Dispose();
 			}
 			catch (Exception e)
@@ -100,13 +92,19 @@ namespace GitItGUI.Core.Filters
 				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.CreateNoWindow = true;
 				process.StartInfo.UseShellExecute = false;
-
+				process.ErrorDataReceived += Process_ErrorDataReceived;
 				process.Start();
+
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("LFS Create Error: " + e.Message, true);
 			}
+		}
+
+		private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+		{
+			if (!string.IsNullOrEmpty(e.Data)) Debug.LogError(string.Format("LFS {0} Error: {1}", mode, e.Data), true);
 		}
 
 		protected override void Initialize()
