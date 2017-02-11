@@ -194,7 +194,14 @@ namespace GitItGUI
 
 		public void Stage(bool refresh)
 		{
-			ChangesManager.StageFile(fileState, refresh);
+			if (fileState.state == FileStates.Conflicted)
+			{
+				if (MessageBox.Show("File in conflicted state.\nAre you sure you want to stage un-resolved file?", MessageBoxTypes.YesNo)) ChangesManager.StageFile(fileState, refresh);
+			}
+			else
+			{
+				ChangesManager.StageFile(fileState, refresh);
+			}
 		}
 
 		public void Unstage(bool refresh)

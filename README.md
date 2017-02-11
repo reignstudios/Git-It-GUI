@@ -1,4 +1,4 @@
-# Git-It-GUI (v0.1.3.0)
+# Git-It-GUI (v0.1.3.1)
 
 ![alt tag](ScreenShots/ScreenShot.png?raw=true)
 
@@ -11,7 +11,7 @@
 
 - Per project settings saved in .gititgui file.
 
-- Per project user settings saved in .gitgamegui-user file (don't track [add to .gitignore!]).
+- Per project user settings saved in .gititgui-user file (don't track this, add to .gitignore!).
 
 - Doesn't allow non resolved files to be staged without warning.
 
