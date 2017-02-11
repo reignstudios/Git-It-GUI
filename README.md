@@ -3,8 +3,6 @@
 ![alt tag](ScreenShots/ScreenShot.png?raw=true)
 
 
-- NOTE: This is just in the prototype faze.
-
 - Based on libgit2sharp and writen in C# / AvaloniaUI.
 
 - Auto check for .gitignore file.
