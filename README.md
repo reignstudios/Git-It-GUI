@@ -1,6 +1,6 @@
 # Git-It-GUI
 
-![alt tag](ScreenShots/ScreenShot.png?raw=true)
+![alt tag](ScreenShots/Changes.png?raw=true)
 
 
 - Based on libgit2sharp and writen in C# / AvaloniaUI.
