@@ -9,6 +9,7 @@ namespace GitItGUI
 		public static AppSettingsPage singleton;
 
 		private ListBox mergeDiffToolListBox;
+		private CheckBox autoRefreshChanges;
 		private Button doneButton;
 
 		public AppSettingsPage()
@@ -18,8 +19,9 @@ namespace GitItGUI
 
 			// load ui items
 			mergeDiffToolListBox = this.Find<ListBox>("mergeDiffToolListBox");
+			autoRefreshChanges = this.Find<CheckBox>("autoRefreshChanges");
 			doneButton = this.Find<Button>("doneButton");
-			
+
 			// apply bindings
 			doneButton.Click += DoneButton_Click;
 		}
@@ -39,6 +41,8 @@ namespace GitItGUI
 				case MergeDiffTools.DiffMerge: mergeDiffToolListBox.SelectedIndex = 3; break;
 				default: MessageBox.Show("Unsuported Merge/Diff tool type: " + AppManager.mergeDiffTool); break;
 			}
+
+			autoRefreshChanges.IsChecked = AppManager.autoRefreshChanges;
 		}
 
 		public void NavigatedFrom()
@@ -51,6 +55,8 @@ namespace GitItGUI
 				case 3: AppManager.SetMergeDiffTool(MergeDiffTools.DiffMerge); break;
 				default: MessageBox.Show("Unsuported Merge/Diff tool index: " + mergeDiffToolListBox.SelectedIndex); break;
 			}
+
+			AppManager.autoRefreshChanges = autoRefreshChanges.IsChecked;
 		}
 	}
 }

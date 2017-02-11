@@ -38,6 +38,7 @@ namespace GitItGUI.Core
 
 		public static string mergeToolPath {get; private set;}
 		public static MergeDiffTools mergeDiffTool {get; private set;}
+		public static bool autoRefreshChanges;
 		public static IReadOnlyList<XML.Repository> repositories {get{return settings.repositories;}}
 
 		public static int MaxRepoHistoryCount = 20;
@@ -84,6 +85,7 @@ namespace GitItGUI.Core
 
 				// load
 				LoadMergeDiffTool();
+				autoRefreshChanges = settings.autoRefreshChanges;
 			}
 			catch (Exception e)
 			{
@@ -177,6 +179,7 @@ namespace GitItGUI.Core
 		/// </summary>
 		public static void SaveSettings()
 		{
+			settings.autoRefreshChanges = autoRefreshChanges;
 			string rootAppSettingsPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 			Settings.Save<XML.AppSettings>(rootAppSettingsPath + "\\" + Settings.appSettingsFolderName + "\\" + Settings.appSettingsFilename, settings);
 		}
@@ -359,7 +362,7 @@ namespace GitItGUI.Core
 							canCheckAppVersion = false;
 							if (!IsValidVersion(VersionInfo.version, xmlReader.ReadInnerXml()))
 							{
-								Debug.LogError("Your 'Git-Game-GUI' version is out of date.", true);
+								Debug.LogError("Your 'Git-It-GUI' version is out of date.", true);
 								using (var process = Process.Start(checkForUpdatesOutOfDateURL))
 								{
 									process.WaitForExit();

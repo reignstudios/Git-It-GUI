@@ -17,7 +17,7 @@ namespace GitItGUI
 
 		public void Check(string url)
 		{
-			if (!AppManager.CheckForUpdates("http://reign-studios-services.com/GitGameGUI/VersionInfo.xml", "http://reign-studios-services.com/GitGameGUI/index.html", checkForUpdatesCallback))
+			if (!AppManager.CheckForUpdates("http://reign-studios-services.com/GitItGUI/VersionInfo.xml", "https://github.com/reignstudios/Git-It-GUI/releases", checkForUpdatesCallback))
 			{
 				MainWindow.LoadPage(PageTypes.Start);
 			}

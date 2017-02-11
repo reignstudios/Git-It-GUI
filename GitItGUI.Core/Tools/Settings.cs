@@ -17,6 +17,7 @@ namespace GitItGUI.Core
 		public class AppSettings
 		{
 			[XmlAttribute("MergeDiffTool")] public string mergeDiffTool = "P4Merge";
+			[XmlAttribute("AutoRefreshChanges")] public bool autoRefreshChanges = true;
 			[XmlElement("Repository")] public List<Repository> repositories = new List<Repository>();
 			[XmlElement("DefaultGitLFS-Ext")] public List<string> defaultGitLFS_Exts = new List<string>();
 		}
