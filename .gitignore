@@ -245,3 +245,7 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+# Installer
+Installer/Setup Files/
+Installer/Git-It-GUI_Installer-cache/

@@ -1,4 +1,4 @@
-# Git-It-GUI (v0.1.3.1)
+# Git-It-GUI
 
 ![alt tag](ScreenShots/ScreenShot.png?raw=true)
 

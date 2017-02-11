@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="13.5" version="13.5" Modules="simple" RootPath="." Language="en" Id="{C7F5B7C6-44E5-4AFF-8FCE-81E9836F6364}">
+  <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
+    <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;MsiThemeComponent;BackgroundImagesComponent;UpdaterComponent;SerValComponent;DigCertStoreComponent;MsiInstExSeqComponent;DictionaryComponent;MsiAppSearchComponent;MsiAssemblyComponent;MsiClassComponent;MsiOdbcDataSrcComponent;MsiServInstComponent;MsiOrgComponent;MsiExtComponent;CPLAppletComponent;ActSyncAppComponent;PreReqComponent;WebApplicationsComponent;MsiJavaComponent;MsiDriverPackagesComponent;UserAccountsComponent;ScheduledTasksComponent;SqlConnectionComponent;AutorunComponent;FirewallExceptionComponent;GameUxComponent;MsiDirectEditorComponent;SharePointSlnComponent;SilverlightSlnComponent;MultipleInstancesComponent;SccmComponent;ActSyncAppComponent"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="AI_PROPPATH_PERBUILD_LibGit2Sharp.dll.config" Value="..\bin\LibGit2Sharp.dll.config"/>
+    <ROW Property="AI_PROPPATH_PERBUILD_git2a5cf255.dll" Value="..\bin\lib\win32\x64\git2-a5cf255.dll"/>
+    <ROW Property="AI_PROPPATH_PERBUILD_git2a5cf255.pdb" Value="..\bin\lib\win32\x64\git2-a5cf255.pdb"/>
+    <ROW Property="AI_PROPPATH_PERBUILD_libSkiaSharp.dll" Value="..\bin\libSkiaSharp.dll"/>
+    <ROW Property="AI_PROPPATH_PERBUILD_libgit2a5cf255.dylib" Value="..\bin\lib\osx\libgit2-a5cf255.dylib"/>
+    <ROW Property="AI_PROPPATH_PERBUILD_libgit2a5cf255.so" Value="..\bin\lib\linux\x86_64\libgit2-a5cf255.so"/>
+    <ROW Property="ALLUSERS" Value="1"/>
+    <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
+    <ROW Property="ARPHELPLINK" Value="https://github.com/reignstudios/Git-It-GUI/issues"/>
+    <ROW Property="ARPURLINFOABOUT" Value="https://github.com/reignstudios/Git-It-GUI"/>
+    <ROW Property="ARPURLUPDATEINFO" Value="https://github.com/reignstudios/Git-It-GUI/releases"/>
+    <ROW Property="CTRLS" Value="2"/>
+    <ROW Property="Manufacturer" Value="Reign-Studios"/>
+    <ROW Property="ProductCode" Value="1033:{42766E62-79F9-4E1B-8E10-B2A3EB3BA874} " Type="16"/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="Git-It-GUI"/>
+    <ROW Property="ProductVersion" Value="0.1.4" Type="32"/>
+    <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
+    <ROW Property="UpgradeCode" Value="{FD4A5E78-F668-42CE-90BC-D1DDAA792189}"/>
+    <ROW Property="WindowsType9X" MultiBuildValue="x86_Release:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsType9XDisplay" MultiBuildValue="x86_Release:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40" MultiBuildValue="x86_Release:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40Display" MultiBuildValue="x86_Release:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50" MultiBuildValue="x86_Release:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50Display" MultiBuildValue="x86_Release:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5X" MultiBuildValue="x86_Release:Windows XP/2003 RTM, Windows XP/2003 SP1, Windows XP SP2 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="x86_Release:Windows XP/2003 RTM, Windows XP/2003 SP1, Windows XP SP2 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT64" MultiBuildValue="x86_Release:Windows XP x64 Service Pack 2, Windows Server 2003 x64 Service Pack 2" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT64Display" MultiBuildValue="x86_Release:Windows XP x64 Service Pack 2, Windows Server 2003 x64 Service Pack 2" ValueLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
+    <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="lib_Dir" Directory_Parent="APPDIR" DefaultDir="lib"/>
+    <ROW Directory="linux_Dir" Directory_Parent="lib_Dir" DefaultDir="linux"/>
+    <ROW Directory="osx_Dir" Directory_Parent="lib_Dir" DefaultDir="osx"/>
+    <ROW Directory="win32_Dir" Directory_Parent="lib_Dir" DefaultDir="win32"/>
+    <ROW Directory="x64_Dir" Directory_Parent="win32_Dir" DefaultDir="x64"/>
+    <ROW Directory="x86_64_Dir" Directory_Parent="linux_Dir" DefaultDir="x86_64"/>
+    <ROW Directory="x86_Dir" Directory_Parent="win32_Dir" DefaultDir="x86"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="Avalonia.Animation.dll" ComponentId="{7FA1A3F0-5545-4141-86AC-971BE49BAFF1}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Animation.dll"/>
+    <ROW Component="Avalonia.Base.dll" ComponentId="{D63BB441-D29D-4DD1-A475-3A7C85E704A4}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Base.dll"/>
+    <ROW Component="Avalonia.Cairo.dll" ComponentId="{B34F107F-1A3F-4D9B-967D-493217E54BC1}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Cairo.dll"/>
+    <ROW Component="Avalonia.Controls.dll" ComponentId="{6AB0CEC9-64AA-4288-B0E7-57BBAE813982}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Controls.dll"/>
+    <ROW Component="Avalonia.DesignerSupport.dll" ComponentId="{FA80676E-89F0-412F-8BB3-C2D4CCFA1D90}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.DesignerSupport.dll"/>
+    <ROW Component="Avalonia.Diagnostics.dll" ComponentId="{1FE5F857-6F0C-4D61-8DE7-9FEDCAC6FE10}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Diagnostics.dll"/>
+    <ROW Component="Avalonia.Direct2D1.dll" ComponentId="{3A00210F-3DCE-4880-A462-31448868C5A3}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Direct2D1.dll"/>
+    <ROW Component="Avalonia.DotNetFrameworkRuntime.dll" ComponentId="{FE55474C-8BA9-4845-B3AA-8BDFB772AE12}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.DotNetFrameworkRuntime.dll"/>
+    <ROW Component="Avalonia.Gtk.dll" ComponentId="{EE59FECA-0B40-4F0C-8872-93AF2576C847}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Gtk.dll"/>
+    <ROW Component="Avalonia.Input.dll" ComponentId="{DEB3F0F8-4154-4A5A-9A5A-E55E421022C6}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Input.dll"/>
+    <ROW Component="Avalonia.Interactivity.dll" ComponentId="{1429D1B4-E224-43F4-A7AD-95D0153B1E5F}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Interactivity.dll"/>
+    <ROW Component="Avalonia.Layout.dll" ComponentId="{0FBF12AE-5334-4BAB-B027-2BAF7A3B250B}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Layout.dll"/>
+    <ROW Component="Avalonia.Logging.Serilog.dll" ComponentId="{C4607DE3-AF81-4C15-8330-3043E1584310}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Logging.Serilog.dll"/>
+    <ROW Component="Avalonia.Markup.Xaml.dll" ComponentId="{1D78B419-8B1F-4BC7-B553-0852EE8AF4BD}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Markup.Xaml.dll"/>
+    <ROW Component="Avalonia.Markup.dll" ComponentId="{EB769151-2868-4A12-8121-9B52354E2A66}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Markup.dll"/>
+    <ROW Component="Avalonia.ReactiveUI.dll" ComponentId="{3E03FF58-0CFB-4CCE-B5FB-1AD04ABA27AE}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.ReactiveUI.dll"/>
+    <ROW Component="Avalonia.Skia.Desktop.dll" ComponentId="{6600EA0F-84D4-45AB-AC28-DE3534584D0A}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Skia.Desktop.dll"/>
+    <ROW Component="Avalonia.Styling.dll" ComponentId="{4D2C7EC7-0716-417D-B2C0-714321C24472}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Styling.dll"/>
+    <ROW Component="Avalonia.Themes.Default.dll" ComponentId="{235A4B51-2987-4CA6-B76A-1419F0A0FEE7}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Themes.Default.dll"/>
+    <ROW Component="Avalonia.Visuals.dll" ComponentId="{5E45EC2A-03D5-414E-80B5-1001285E9707}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Visuals.dll"/>
+    <ROW Component="Avalonia.Win32.dll" ComponentId="{AB786C42-95EF-4F08-BD01-C6854EF2636E}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Win32.dll"/>
+    <ROW Component="BinaryConflicPicker.exe" ComponentId="{AF6CD568-DF4D-4CCA-966E-5D31111D36CE}" Directory_="APPDIR" Attributes="0" KeyPath="BinaryConflicPicker.exe"/>
+    <ROW Component="CommitEntry.exe" ComponentId="{CB6C8A20-9C58-4A58-B688-D4A11E97A71B}" Directory_="APPDIR" Attributes="0" KeyPath="CommitEntry.exe"/>
+    <ROW Component="GitCommander.dll" ComponentId="{9987B526-A2AF-4A57-9486-74EF3C9D2139}" Directory_="APPDIR" Attributes="0" KeyPath="GitCommander.dll"/>
+    <ROW Component="GitItGUI.Core.dll" ComponentId="{169E0A70-2302-4C34-9D8D-79430E06775E}" Directory_="APPDIR" Attributes="0" KeyPath="GitItGUI.Core.dll"/>
+    <ROW Component="GitItGUI.exe" ComponentId="{CDA82C62-58F1-4E88-B7BF-2A687391D47E}" Directory_="APPDIR" Attributes="0" KeyPath="GitItGUI.exe"/>
+    <ROW Component="GitItGUI.exe.config" ComponentId="{0048A718-DC1D-4C7C-ADA0-494CBEB2F955}" Directory_="APPDIR" Attributes="0" KeyPath="GitItGUI.exe.config" Type="0"/>
+    <ROW Component="LibGit2Sharp.dll" ComponentId="{DF1B21E2-FE6F-4485-B48E-730946CD88C0}" Directory_="APPDIR" Attributes="0" KeyPath="LibGit2Sharp.dll"/>
+    <ROW Component="MessageBox.exe" ComponentId="{1BB0BFAD-8C64-4B93-BBEB-D525DD4474D9}" Directory_="APPDIR" Attributes="0" KeyPath="MessageBox.exe"/>
+    <ROW Component="Microsoft.CSharp.dll" ComponentId="{48C68701-62E3-4410-9EC1-935A6E754B1B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CSharp.dll"/>
+    <ROW Component="NameEntry.exe" ComponentId="{219377B4-42C6-4F29-9718-452E2D17C798}" Directory_="APPDIR" Attributes="0" KeyPath="NameEntry.exe"/>
+    <ROW Component="ProductInformation" ComponentId="{5578F502-08C2-4B0E-B8FE-8318417169C2}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
+    <ROW Component="SHORTCUTDIR" ComponentId="{4D58BD27-3184-4206-8B1B-A0B220B0AFC9}" Directory_="SHORTCUTDIR" Attributes="0"/>
+    <ROW Component="Serilog.FullNetFx.dll" ComponentId="{BC8CE937-F4C4-4DCF-8EBF-FF2ABA404887}" Directory_="APPDIR" Attributes="0" KeyPath="Serilog.FullNetFx.dll"/>
+    <ROW Component="Serilog.dll" ComponentId="{EF42AA2E-2ECE-4CA7-8EE0-FBEC5E42ADA6}" Directory_="APPDIR" Attributes="0" KeyPath="Serilog.dll"/>
+    <ROW Component="SharpDX.DXGI.dll" ComponentId="{586CEF7F-E906-4F42-B988-1D686658DA32}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.DXGI.dll"/>
+    <ROW Component="SharpDX.Direct2D1.dll" ComponentId="{865C5287-4E1C-4A8F-98BA-009C85812004}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct2D1.dll"/>
+    <ROW Component="SharpDX.Direct3D11.dll" ComponentId="{2D20E8D1-2A07-4B71-882A-87A2550160E0}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct3D11.dll"/>
+    <ROW Component="SharpDX.dll" ComponentId="{F06650ED-84CD-4F7D-B7A9-411E9E1D0971}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.dll"/>
+    <ROW Component="SkiaSharp.dll" ComponentId="{724ABA24-D12A-4596-81F3-A48153B5A206}" Directory_="APPDIR" Attributes="0" KeyPath="SkiaSharp.dll"/>
+    <ROW Component="Splat.dll" ComponentId="{8ED0CD77-E1D0-4699-B328-A6E1C256E86A}" Directory_="APPDIR" Attributes="0" KeyPath="Splat.dll"/>
+    <ROW Component="Sprache.dll" ComponentId="{A3800223-16FB-4293-933C-BEA6144686B7}" Directory_="APPDIR" Attributes="0" KeyPath="Sprache.dll"/>
+    <ROW Component="System.Core.dll" ComponentId="{30BE0DF2-4411-469D-A505-982BF191AE34}" Directory_="APPDIR" Attributes="0" KeyPath="System.Core.dll"/>
+    <ROW Component="System.Data.DataSetExtensions.dll" ComponentId="{3D596844-B064-4272-987F-F45A1747AD38}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.DataSetExtensions.dll"/>
+    <ROW Component="System.Data.dll" ComponentId="{E33D8420-195E-4673-B563-4A868B586D9B}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.dll"/>
+    <ROW Component="System.Net.Http.dll" ComponentId="{D2F61AFF-16F2-4E75-889A-CDBBC069B6B2}" Directory_="APPDIR" Attributes="0" KeyPath="System.Net.Http.dll"/>
+    <ROW Component="System.Reactive.Core.dll" ComponentId="{E1F37964-FB84-4C16-8493-68BCD6448C05}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Core.dll"/>
+    <ROW Component="System.Reactive.Interfaces.dll" ComponentId="{102AF2CE-66CC-4DDF-AAC7-EBB1E44B14BC}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Interfaces.dll"/>
+    <ROW Component="System.Reactive.Linq.dll" ComponentId="{D72C08A6-3DE6-4890-986D-2F7EE9BD7BB3}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Linq.dll"/>
+    <ROW Component="System.Reactive.PlatformServices.dll" ComponentId="{D3531E09-3E89-4849-9AC0-CA465A146422}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.PlatformServices.dll"/>
+    <ROW Component="System.Reactive.Windows.Threading.dll" ComponentId="{7324F1E4-D71F-41A7-B743-BFBECAA0C0AE}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Windows.Threading.dll"/>
+    <ROW Component="System.Windows.Forms.dll" ComponentId="{7D49CCFB-88C7-491F-981A-4C0B899C3B94}" Directory_="APPDIR" Attributes="0" KeyPath="System.Windows.Forms.dll"/>
+    <ROW Component="System.Xml.Linq.dll" ComponentId="{45B1671C-5FFA-4267-BFF3-FDE02CFD2409}" Directory_="APPDIR" Attributes="0" KeyPath="System.Xml.Linq.dll"/>
+    <ROW Component="System.Xml.dll" ComponentId="{4BF067CC-CD57-4922-9E55-A69EAF88C2C0}" Directory_="APPDIR" Attributes="0" KeyPath="System.Xml.dll"/>
+    <ROW Component="System.dll" ComponentId="{FFA4A688-CC86-48CC-9104-74ED3A2B76D7}" Directory_="APPDIR" Attributes="0" KeyPath="System.dll"/>
+    <ROW Component="WindowsBase.dll" ComponentId="{9E0DF496-F191-4FC3-A8BF-AA4E56F94BED}" Directory_="APPDIR" Attributes="0" KeyPath="WindowsBase.dll"/>
+    <ROW Component="git2a5cf255.dll" ComponentId="{75E5355A-6ACF-4474-95B4-AB415BD72268}" Directory_="x64_Dir" Attributes="256" KeyPath="git2a5cf255.dll_1"/>
+    <ROW Component="git2a5cf255.dll_1" ComponentId="{BEEE9C4A-6BB6-47CC-BC95-02898C06046E}" Directory_="x86_Dir" Attributes="0" KeyPath="git2a5cf255.dll_2"/>
+    <ROW Component="git2a5cf255.pdb" ComponentId="{67223BF8-5064-4C7F-B36F-8ADCC9D62711}" Directory_="APPDIR" Attributes="0" KeyPath="git2a5cf255.dll"/>
+    <ROW Component="libSkiaSharp.dll" ComponentId="{B60B9061-4D33-4147-B01E-7CC2CB3D5029}" Directory_="APPDIR" Attributes="0" KeyPath="libSkiaSharp.dll"/>
+    <ROW Component="libgit2a5cf255.dylib" ComponentId="{AB3A9F6E-FE6D-4B94-B3C0-7449700873F5}" Directory_="osx_Dir" Attributes="0" KeyPath="libgit2a5cf255.dylib_1" Type="0"/>
+    <ROW Component="libgit2a5cf255.so" ComponentId="{177D794A-0D5F-4F54-8084-9EC91E289E13}" Directory_="x86_64_Dir" Attributes="0" KeyPath="libgit2a5cf255.so_1" Type="0"/>
+    <ROW Component="mscorlib.dll" ComponentId="{930834BA-E99C-4100-A4DA-F150952E4AEA}" Directory_="APPDIR" Attributes="0" KeyPath="mscorlib.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Avalonia.Animation.dll Avalonia.Base.dll Avalonia.Cairo.dll Avalonia.Controls.dll Avalonia.DesignerSupport.dll Avalonia.Diagnostics.dll Avalonia.Direct2D1.dll Avalonia.DotNetFrameworkRuntime.dll Avalonia.Gtk.dll Avalonia.Input.dll Avalonia.Interactivity.dll Avalonia.Layout.dll Avalonia.Logging.Serilog.dll Avalonia.Markup.Xaml.dll Avalonia.Markup.dll Avalonia.ReactiveUI.dll Avalonia.Skia.Desktop.dll Avalonia.Styling.dll Avalonia.Themes.Default.dll Avalonia.Visuals.dll Avalonia.Win32.dll BinaryConflicPicker.exe CommitEntry.exe GitCommander.dll GitItGUI.Core.dll GitItGUI.exe GitItGUI.exe.config LibGit2Sharp.dll MessageBox.exe Microsoft.CSharp.dll NameEntry.exe ProductInformation SHORTCUTDIR Serilog.FullNetFx.dll Serilog.dll SharpDX.DXGI.dll SharpDX.Direct2D1.dll SharpDX.Direct3D11.dll SharpDX.dll SkiaSharp.dll Splat.dll Sprache.dll System.Core.dll System.Data.DataSetExtensions.dll System.Data.dll System.Net.Http.dll System.Reactive.Core.dll System.Reactive.Interfaces.dll System.Reactive.Linq.dll System.Reactive.PlatformServices.dll System.Reactive.Windows.Threading.dll System.Windows.Forms.dll System.Xml.Linq.dll System.Xml.dll System.dll WindowsBase.dll git2a5cf255.dll git2a5cf255.dll_1 git2a5cf255.pdb libSkiaSharp.dll libgit2a5cf255.dylib libgit2a5cf255.so mscorlib.dll"/>
+    <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="Avalonia.Animation.dll" Component_="Avalonia.Animation.dll" FileName="AVALON~3.DLL|Avalonia.Animation.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Animation.dll" SelfReg="false" NextFile="Avalonia.Base.dll"/>
+    <ROW File="Avalonia.Base.dll" Component_="Avalonia.Base.dll" FileName="AVALON~4.DLL|Avalonia.Base.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Base.dll" SelfReg="false" NextFile="SkiaSharp.dll"/>
+    <ROW File="Avalonia.Cairo.dll" Component_="Avalonia.Cairo.dll" FileName="AVALON~6.DLL|Avalonia.Cairo.dll" Attributes="0" SourcePath="..\packages\Avalonia.Cairo.0.4.1-build2634-alpha\lib\net45\Avalonia.Cairo.dll" SelfReg="false" NextFile="System.Reactive.Windows.Threading.dll"/>
+    <ROW File="Avalonia.Controls.dll" Component_="Avalonia.Controls.dll" FileName="AVALON~8.DLL|Avalonia.Controls.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Controls.dll" SelfReg="false" NextFile="Avalonia.DesignerSupport.dll"/>
+    <ROW File="Avalonia.DesignerSupport.dll" Component_="Avalonia.DesignerSupport.dll" FileName="AVALON~9.DLL|Avalonia.DesignerSupport.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.DesignerSupport.dll" SelfReg="false" NextFile="System.Net.Http.dll"/>
+    <ROW File="Avalonia.Diagnostics.dll" Component_="Avalonia.Diagnostics.dll" FileName="AVALO~10.DLL|Avalonia.Diagnostics.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Diagnostics.dll" SelfReg="false" NextFile="Avalonia.Markup.Xaml.dll"/>
+    <ROW File="Avalonia.Direct2D1.dll" Component_="Avalonia.Direct2D1.dll" FileName="AVALO~12.DLL|Avalonia.Direct2D1.dll" Attributes="0" SourcePath="..\packages\Avalonia.Direct2D1.0.4.1-build2634-alpha\lib\net45\Avalonia.Direct2D1.dll" SelfReg="false" NextFile="Sprache.dll"/>
+    <ROW File="Avalonia.DotNetFrameworkRuntime.dll" Component_="Avalonia.DotNetFrameworkRuntime.dll" FileName="AVALO~13.DLL|Avalonia.DotNetFrameworkRuntime.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.DotNetFrameworkRuntime.dll" SelfReg="false" NextFile="Avalonia.Gtk.dll"/>
+    <ROW File="Avalonia.Gtk.dll" Component_="Avalonia.Gtk.dll" FileName="AVALO~14.DLL|Avalonia.Gtk.dll" Attributes="0" SourcePath="..\packages\Avalonia.Gtk.0.4.1-build2634-alpha\lib\net45\Avalonia.Gtk.dll" SelfReg="false" NextFile="MessageBox.exe"/>
+    <ROW File="Avalonia.Input.dll" Component_="Avalonia.Input.dll" FileName="AVALON~5.DLL|Avalonia.Input.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Input.dll" SelfReg="false" NextFile="Avalonia.Cairo.dll"/>
+    <ROW File="Avalonia.Interactivity.dll" Component_="Avalonia.Interactivity.dll" FileName="AVALO~15.DLL|Avalonia.Interactivity.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Interactivity.dll" SelfReg="false" NextFile="Avalonia.Layout.dll"/>
+    <ROW File="Avalonia.Layout.dll" Component_="Avalonia.Layout.dll" FileName="AVALO~16.DLL|Avalonia.Layout.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Layout.dll" SelfReg="false" NextFile="Avalonia.Markup.dll"/>
+    <ROW File="Avalonia.Logging.Serilog.dll" Component_="Avalonia.Logging.Serilog.dll" FileName="AVALON~7.DLL|Avalonia.Logging.Serilog.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Logging.Serilog.dll" SelfReg="false" NextFile="SharpDX.DXGI.dll"/>
+    <ROW File="Avalonia.Markup.Xaml.dll" Component_="Avalonia.Markup.Xaml.dll" FileName="AVALO~11.DLL|Avalonia.Markup.Xaml.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Markup.Xaml.dll" SelfReg="false" NextFile="Avalonia.Direct2D1.dll"/>
+    <ROW File="Avalonia.Markup.dll" Component_="Avalonia.Markup.dll" FileName="AVALO~17.DLL|Avalonia.Markup.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Markup.dll" SelfReg="false" NextFile="System.Windows.Forms.dll"/>
+    <ROW File="Avalonia.ReactiveUI.dll" Component_="Avalonia.ReactiveUI.dll" FileName="AVALO~18.DLL|Avalonia.ReactiveUI.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.ReactiveUI.dll" SelfReg="false" NextFile="Avalonia.Skia.Desktop.dll"/>
+    <ROW File="Avalonia.Skia.Desktop.dll" Component_="Avalonia.Skia.Desktop.dll" FileName="AVALO~19.DLL|Avalonia.Skia.Desktop.dll" Attributes="0" SourcePath="..\packages\Avalonia.Skia.Desktop.0.4.1-build2634-alpha\lib\net45\Avalonia.Skia.Desktop.dll" SelfReg="false" NextFile="CommitEntry.exe"/>
+    <ROW File="Avalonia.Styling.dll" Component_="Avalonia.Styling.dll" FileName="AVALO~20.DLL|Avalonia.Styling.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Styling.dll" SelfReg="false" NextFile="System.Xml.Linq.dll"/>
+    <ROW File="Avalonia.Themes.Default.dll" Component_="Avalonia.Themes.Default.dll" FileName="AVALON~2.DLL|Avalonia.Themes.Default.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Themes.Default.dll" SelfReg="false" NextFile="git2a5cf255.pdb"/>
+    <ROW File="Avalonia.Visuals.dll" Component_="Avalonia.Visuals.dll" FileName="AVALON~1.DLL|Avalonia.Visuals.dll" Attributes="0" SourcePath="..\packages\Avalonia.0.4.1-build2634-alpha\lib\net45\Avalonia.Visuals.dll" SelfReg="false" NextFile="Avalonia.Themes.Default.dll"/>
+    <ROW File="Avalonia.Win32.dll" Component_="Avalonia.Win32.dll" FileName="AVALO~21.DLL|Avalonia.Win32.dll" Attributes="0" SourcePath="..\packages\Avalonia.Win32.0.4.1-build2634-alpha\lib\net45\Avalonia.Win32.dll" SelfReg="false" NextFile="Splat.dll"/>
+    <ROW File="BinaryConflicPicker.exe" Component_="BinaryConflicPicker.exe" FileName="BINARY~1.EXE|BinaryConflicPicker.exe" Attributes="0" SourcePath="..\bin\BinaryConflicPicker.exe" SelfReg="false" NextFile="BinaryConflicPicker.exe.config" DigSign="true"/>
+    <ROW File="BinaryConflicPicker.exe.config" Component_="GitItGUI.exe.config" FileName="BINARY~1.CON|BinaryConflicPicker.exe.config" Attributes="0" SourcePath="..\bin\BinaryConflicPicker.exe.config" SelfReg="false" NextFile="NameEntry.exe"/>
+    <ROW File="CommitEntry.exe" Component_="CommitEntry.exe" FileName="COMMIT~1.EXE|CommitEntry.exe" Attributes="0" SourcePath="..\bin\CommitEntry.exe" SelfReg="false" NextFile="Avalonia.Styling.dll" DigSign="true"/>
+    <ROW File="GitCommander.dll" Component_="GitCommander.dll" FileName="GITCOM~1.DLL|GitCommander.dll" Attributes="0" SourcePath="..\bin\GitCommander.dll" SelfReg="false" NextFile="libgit2a5cf255.so_1"/>
+    <ROW File="GitItGUI.Core.dll" Component_="GitItGUI.Core.dll" FileName="GITITG~1.DLL|GitItGUI.Core.dll" Attributes="0" SourcePath="..\bin\GitItGUI.Core.dll" SelfReg="false" NextFile="BinaryConflicPicker.exe"/>
+    <ROW File="GitItGUI.exe" Component_="GitItGUI.exe" FileName="GitItGUI.exe" Attributes="0" SourcePath="..\bin\GitItGUI.exe" SelfReg="false" NextFile="Avalonia.Visuals.dll" DigSign="true"/>
+    <ROW File="GitItGUI.exe.config" Component_="GitItGUI.exe.config" FileName="GITITG~1.CON|GitItGUI.exe.config" Attributes="0" SourcePath="..\bin\GitItGUI.exe.config" SelfReg="false" NextFile="System.Reactive.Interfaces.dll"/>
+    <ROW File="LibGit2Sharp.dll" Component_="LibGit2Sharp.dll" FileName="LIBGIT~1.DLL|LibGit2Sharp.dll" Attributes="0" SourcePath="..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll" SelfReg="false" NextFile="Microsoft.CSharp.dll"/>
+    <ROW File="LibGit2Sharp.dll.config" Component_="GitItGUI.exe.config" FileName="LIBGIT~1.CON|LibGit2Sharp.dll.config" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_LibGit2Sharp.dll.config&gt;" SelfReg="false" NextFile="Avalonia.Animation.dll"/>
+    <ROW File="MessageBox.exe" Component_="MessageBox.exe" FileName="MESSAG~1.EXE|MessageBox.exe" Attributes="0" SourcePath="..\bin\MessageBox.exe" SelfReg="false" NextFile="Avalonia.Interactivity.dll" DigSign="true"/>
+    <ROW File="Microsoft.CSharp.dll" Component_="Microsoft.CSharp.dll" FileName="MICROS~1.DLL|Microsoft.CSharp.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\Microsoft.CSharp.dll" SelfReg="false" NextFile="mscorlib.dll"/>
+    <ROW File="NameEntry.exe" Component_="NameEntry.exe" FileName="NAMEEN~1.EXE|NameEntry.exe" Attributes="0" SourcePath="..\bin\NameEntry.exe" SelfReg="false" NextFile="GitCommander.dll" DigSign="true"/>
+    <ROW File="Serilog.FullNetFx.dll" Component_="Serilog.FullNetFx.dll" FileName="SERILO~1.DLL|Serilog.FullNetFx.dll" Attributes="0" SourcePath="..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll" SelfReg="false" NextFile="Avalonia.Diagnostics.dll"/>
+    <ROW File="Serilog.dll" Component_="Serilog.dll" FileName="Serilog.dll" Attributes="0" SourcePath="..\packages\Serilog.1.5.14\lib\net45\Serilog.dll" SelfReg="false" NextFile="Avalonia.Input.dll"/>
+    <ROW File="SharpDX.DXGI.dll" Component_="SharpDX.DXGI.dll" FileName="SHARPD~2.DLL|SharpDX.DXGI.dll" Attributes="0" SourcePath="..\packages\SharpDX.DXGI.3.1.1\lib\net45\SharpDX.DXGI.dll" SelfReg="false" NextFile="Avalonia.Controls.dll"/>
+    <ROW File="SharpDX.Direct2D1.dll" Component_="SharpDX.Direct2D1.dll" FileName="SHARPD~3.DLL|SharpDX.Direct2D1.dll" Attributes="0" SourcePath="..\packages\SharpDX.Direct2D1.3.1.1\lib\net45\SharpDX.Direct2D1.dll" SelfReg="false" NextFile="System.Data.dll"/>
+    <ROW File="SharpDX.Direct3D11.dll" Component_="SharpDX.Direct3D11.dll" FileName="SHARPD~1.DLL|SharpDX.Direct3D11.dll" Attributes="0" SourcePath="..\packages\SharpDX.Direct3D11.3.1.1\lib\net45\SharpDX.Direct3D11.dll" SelfReg="false" NextFile="libgit2a5cf255.dylib"/>
+    <ROW File="SharpDX.dll" Component_="SharpDX.dll" FileName="SharpDX.dll" Attributes="0" SourcePath="..\packages\SharpDX.3.1.1\lib\net45\SharpDX.dll" SelfReg="false" NextFile="SharpDX.Direct2D1.dll"/>
+    <ROW File="SkiaSharp.dll" Component_="SkiaSharp.dll" FileName="SKIASH~1.DLL|SkiaSharp.dll" Attributes="0" SourcePath="..\packages\SkiaSharp.1.56.1-beta\lib\net45\SkiaSharp.dll" SelfReg="false" NextFile="Serilog.dll"/>
+    <ROW File="Splat.dll" Component_="Splat.dll" FileName="Splat.dll" Attributes="0" SourcePath="..\packages\Splat.1.6.2\lib\Net45\Splat.dll" SelfReg="false" NextFile="LibGit2Sharp.dll"/>
+    <ROW File="Sprache.dll" Component_="Sprache.dll" FileName="Sprache.dll" Attributes="0" SourcePath="..\packages\Sprache.2.1.0\lib\net40\Sprache.dll" SelfReg="false" NextFile="Avalonia.DotNetFrameworkRuntime.dll"/>
+    <ROW File="System.Core.dll" Component_="System.Core.dll" FileName="SYSTEM~3.DLL|System.Core.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.Core.dll" SelfReg="false" NextFile="LibGit2Sharp.dll.config"/>
+    <ROW File="System.Data.DataSetExtensions.dll" Component_="System.Data.DataSetExtensions.dll" FileName="SYSTEM~2.DLL|System.Data.DataSetExtensions.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.Data.DataSetExtensions.dll" SelfReg="false" NextFile="git2a5cf255.dll"/>
+    <ROW File="System.Data.dll" Component_="System.Data.dll" FileName="SYSTEM~8.DLL|System.Data.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.Data.dll" SelfReg="false" NextFile="System.dll"/>
+    <ROW File="System.Net.Http.dll" Component_="System.Net.Http.dll" FileName="SYSTEM~5.DLL|System.Net.Http.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.Net.Http.dll" SelfReg="false" NextFile="Serilog.FullNetFx.dll"/>
+    <ROW File="System.Reactive.Core.dll" Component_="System.Reactive.Core.dll" FileName="SYSTE~10.DLL|System.Reactive.Core.dll" Attributes="0" SourcePath="..\packages\System.Reactive.Core.3.0.0\lib\net46\System.Reactive.Core.dll" SelfReg="false" NextFile="System.Reactive.Linq.dll"/>
+    <ROW File="System.Reactive.Interfaces.dll" Component_="System.Reactive.Interfaces.dll" FileName="SYSTEM~1.DLL|System.Reactive.Interfaces.dll" Attributes="0" SourcePath="..\packages\System.Reactive.Interfaces.3.0.0\lib\net45\System.Reactive.Interfaces.dll" SelfReg="false" NextFile="SharpDX.Direct3D11.dll"/>
+    <ROW File="System.Reactive.Linq.dll" Component_="System.Reactive.Linq.dll" FileName="SYSTE~11.DLL|System.Reactive.Linq.dll" Attributes="0" SourcePath="..\packages\System.Reactive.Linq.3.0.0\lib\net46\System.Reactive.Linq.dll" SelfReg="false" NextFile="System.Xml.dll"/>
+    <ROW File="System.Reactive.PlatformServices.dll" Component_="System.Reactive.PlatformServices.dll" FileName="SYSTEM~9.DLL|System.Reactive.PlatformServices.dll" Attributes="0" SourcePath="..\packages\System.Reactive.PlatformServices.3.0.0\lib\net46\System.Reactive.PlatformServices.dll" SelfReg="false" NextFile="System.Reactive.Core.dll"/>
+    <ROW File="System.Reactive.Windows.Threading.dll" Component_="System.Reactive.Windows.Threading.dll" FileName="SYSTEM~4.DLL|System.Reactive.Windows.Threading.dll" Attributes="0" SourcePath="..\packages\System.Reactive.Windows.Threading.3.0.0\lib\net45\System.Reactive.Windows.Threading.dll" SelfReg="false" NextFile="Avalonia.Logging.Serilog.dll"/>
+    <ROW File="System.Windows.Forms.dll" Component_="System.Windows.Forms.dll" FileName="SYSTEM~6.DLL|System.Windows.Forms.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.Windows.Forms.dll" SelfReg="false" NextFile="Avalonia.ReactiveUI.dll"/>
+    <ROW File="System.Xml.Linq.dll" Component_="System.Xml.Linq.dll" FileName="SYSTEM~7.DLL|System.Xml.Linq.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.Xml.Linq.dll" SelfReg="false" NextFile="Avalonia.Win32.dll"/>
+    <ROW File="System.Xml.dll" Component_="System.Xml.dll" FileName="SYSTE~12.DLL|System.Xml.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.Xml.dll" SelfReg="false" NextFile="GitItGUI.Core.dll"/>
+    <ROW File="System.dll" Component_="System.dll" FileName="System.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.dll" SelfReg="false" NextFile="System.Reactive.PlatformServices.dll"/>
+    <ROW File="WindowsBase.dll" Component_="WindowsBase.dll" FileName="WINDOW~1.DLL|WindowsBase.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\WindowsBase.dll" SelfReg="false" NextFile="libgit2a5cf255.so"/>
+    <ROW File="git2a5cf255.dll" Component_="git2a5cf255.pdb" FileName="GIT2-A~1.DLL|git2-a5cf255.dll" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_git2a5cf255.dll&gt;" SelfReg="false" NextFile="WindowsBase.dll"/>
+    <ROW File="git2a5cf255.dll_1" Component_="git2a5cf255.dll" FileName="GIT2-A~1.DLL|git2-a5cf255.dll" Attributes="0" SourcePath="..\bin\lib\win32\x64\git2-a5cf255.dll" SelfReg="false" NextFile="git2a5cf255.pdb_1"/>
+    <ROW File="git2a5cf255.dll_2" Component_="git2a5cf255.dll_1" FileName="GIT2-A~1.DLL|git2-a5cf255.dll" Attributes="0" SourcePath="..\bin\lib\win32\x86\git2-a5cf255.dll" SelfReg="false" NextFile="git2a5cf255.pdb_2"/>
+    <ROW File="git2a5cf255.pdb" Component_="git2a5cf255.pdb" FileName="GIT2-A~1.PDB|git2-a5cf255.pdb" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_git2a5cf255.pdb&gt;" SelfReg="false" NextFile="GitItGUI.exe.config"/>
+    <ROW File="git2a5cf255.pdb_1" Component_="git2a5cf255.dll" FileName="GIT2-A~1.PDB|git2-a5cf255.pdb" Attributes="0" SourcePath="..\bin\lib\win32\x64\git2-a5cf255.pdb" SelfReg="false" NextFile="git2a5cf255.dll_2"/>
+    <ROW File="git2a5cf255.pdb_2" Component_="git2a5cf255.dll_1" FileName="GIT2-A~1.PDB|git2-a5cf255.pdb" Attributes="0" SourcePath="..\bin\lib\win32\x86\git2-a5cf255.pdb" SelfReg="false"/>
+    <ROW File="libSkiaSharp.dll" Component_="libSkiaSharp.dll" FileName="LIBSKI~1.DLL|libSkiaSharp.dll" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_libSkiaSharp.dll&gt;" SelfReg="false" NextFile="System.Data.DataSetExtensions.dll"/>
+    <ROW File="libgit2a5cf255.dylib" Component_="GitItGUI.exe.config" FileName="LIBGIT~1.DYL|libgit2-a5cf255.dylib" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_libgit2a5cf255.dylib&gt;" SelfReg="false" NextFile="libSkiaSharp.dll"/>
+    <ROW File="libgit2a5cf255.dylib_1" Component_="libgit2a5cf255.dylib" FileName="LIBGIT~1.DYL|libgit2-a5cf255.dylib" Attributes="0" SourcePath="..\bin\lib\osx\libgit2-a5cf255.dylib" SelfReg="false" NextFile="git2a5cf255.dll_1"/>
+    <ROW File="libgit2a5cf255.so" Component_="GitItGUI.exe.config" FileName="LIBGIT~1.SO|libgit2-a5cf255.so" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_libgit2a5cf255.so&gt;" SelfReg="false" NextFile="System.Core.dll"/>
+    <ROW File="libgit2a5cf255.so_1" Component_="libgit2a5cf255.so" FileName="LIBGIT~1.SO|libgit2-a5cf255.so" Attributes="0" SourcePath="..\bin\lib\linux\x86_64\libgit2-a5cf255.so" SelfReg="false" NextFile="libgit2a5cf255.dylib_1"/>
+    <ROW File="mscorlib.dll" Component_="mscorlib.dll" FileName="mscorlib.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\mscorlib.dll" SelfReg="false" NextFile="SharpDX.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.AppPathsComponent">
+    <ROW Name="AI_APPPATH_PERBUILD_LibGit2Sharp.dll.config" Path="[|AI_PROPPATH_PERBUILD_LibGit2Sharp.dll.config]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_git2a5cf255.dll" Path="[|AI_PROPPATH_PERBUILD_git2a5cf255.dll]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_git2a5cf255.pdb" Path="[|AI_PROPPATH_PERBUILD_git2a5cf255.pdb]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_libSkiaSharp.dll" Path="[|AI_PROPPATH_PERBUILD_libSkiaSharp.dll]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_libgit2a5cf255.dylib" Path="[|AI_PROPPATH_PERBUILD_libgit2a5cf255.dylib]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_libgit2a5cf255.so" Path="[|AI_PROPPATH_PERBUILD_libgit2a5cf255.so]" Type="2" Content="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="x86_Release" BuildName="x86_Release" BuildOrder="1" BuildType="0" PackageFolder="Setup Files" Languages="en" InstallationType="4" UseLargeSchema="true"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
+    <ROW Fragment="FolderDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\FolderDlg.aip"/>
+    <ROW Fragment="MaintenanceTypeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceTypeDlg.aip"/>
+    <ROW Fragment="MaintenanceWelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceWelcomeDlg.aip"/>
+    <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
+    <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
+    <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
+    <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
+    <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRemoveDlg.aip"/>
+    <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRepairDlg.aip"/>
+    <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_MAINT" Ordering="198"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="202"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="ChangeButton" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="501"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RemoveButton" Event="NewDialog" Argument="VerifyRemoveDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RepairButton" Event="NewDialog" Argument="VerifyRepairDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="1"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Repair" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="399" Options="1"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Remove" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="299" Options="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="201"/>
+    <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_PATCH" Ordering="199"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="203"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="SHORTCUTDIR" Component_="SHORTCUTDIR" ManualDelete="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
+    <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
+    <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
+    <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_LaunchApp" Type="1" Source="aicustact.dll" Target="[#GitItGUI.exe]"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
+    <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1501"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="53"/>
+    <ROW Action="AI_DpiContentScale" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
+    <ROW Condition="( Version9X OR ( NOT VersionNT64 ) OR ( VersionNT64 AND ((VersionNT64 &lt;&gt; 502) OR (ServicePackLevel &lt;&gt; 2) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 502) OR (ServicePackLevel &lt;&gt; 2) OR (MsiNTProductType = 1)) ) )" Description="[ProductName] cannot be installed on the following Windows versions: [WindowsTypeNT64Display]." DescriptionLocId="AI.LaunchCondition.NoSpecificNT64" IsPredefined="true" Builds="x86_Release"/>
+    <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="x86_Release"/>
+    <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="x86_Release"/>
+    <ROW Condition="(VersionNT64 OR ((VersionNT &lt;&gt; 501) OR (ServicePackLevel = 3))) AND ((VersionNT &lt;&gt; 502) OR (ServicePackLevel = 2))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="x86_Release"/>
+    <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="x86_Release"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
+    <ROW Shortcut="GitItGUI.exe" Directory_="SHORTCUTDIR" Name="GitItGUI.exe" Component_="GitItGUI.exe" Target="[#GitItGUI.exe]" Description="GitItGUI.exe" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="GitItGUI.exe_1" Directory_="DesktopFolder" Name="GitItGUI.exe" Component_="GitItGUI.exe" Target="[#GitItGUI.exe]" Description="GitItGUI.exe" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
+    <ATTRIBUTE name="UsedTheme" value="classic"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+  </COMPONENT>
+</DOCUMENT>
