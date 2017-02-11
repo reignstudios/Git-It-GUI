@@ -3,7 +3,7 @@
 ![alt tag](ScreenShots/Changes.png?raw=true)
 
 
-- Based on libgit2sharp and writen in C# / AvaloniaUI.
+- Based on libgit2sharp and writen in C# / AvaloniaUI (should support macOS and Linux in the future).
 
 - Auto check for .gitignore file.
 
