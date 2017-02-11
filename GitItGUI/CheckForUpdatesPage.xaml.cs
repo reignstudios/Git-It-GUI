@@ -33,8 +33,14 @@ namespace GitItGUI
 			
 		}
 
-		private void checkForUpdatesCallback(bool succeeded)
+		private void checkForUpdatesCallback(bool succeeded, bool invalidFeatures)
 		{
+			if (invalidFeatures)
+			{
+				Environment.Exit(0);
+				return;
+			}
+
 			StartPage.singleton.RefreshUI();
 			MainWindow.LoadPage(PageTypes.Start);
 		}
