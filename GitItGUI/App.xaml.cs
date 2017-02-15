@@ -33,6 +33,7 @@ namespace GitItGUI
 			InitializeLogging();
 			AppBuilder.Configure<App>()
 				.UseWin32()
+				//.UseSkia()
 				.UseDirect2D1()
 				.Start<MainWindow>();
 		}
