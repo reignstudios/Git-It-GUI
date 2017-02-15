@@ -473,7 +473,7 @@ namespace GitItGUI.Core
 			try
 			{
 				string errors;
-				string result = Tools.RunExeOutputErrors("git", "gc", null, out errors, false);
+				string result = Tools.RunExeOutputErrors("git", "gc", null, out errors);
 				if (!string.IsNullOrEmpty(result)) Debug.Log("git gc result: " + result);
 				if (!string.IsNullOrEmpty(errors)) Debug.LogError("git gc errors: " + errors, true);
 			}
