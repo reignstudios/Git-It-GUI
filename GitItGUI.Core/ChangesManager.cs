@@ -426,6 +426,9 @@ namespace GitItGUI.Core
 					return false;
 				}
 
+				// check for git settings file not in repo history
+				RepoManager.DeleteRepoSettingsIfUnCommit();
+
 				var options = new PullOptions();
 				options.FetchOptions = new FetchOptions();
 				options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => RepoManager.credentials;
@@ -454,10 +457,9 @@ namespace GitItGUI.Core
 					Debug.LogWarning("Branch is not tracking a remote!", true);
 					return false;
 				}
-				
-				var options = new PushOptions();
 
 				// pre push git lfs file data
+				var options = new PushOptions();
 				if (RepoManager.lfsEnabled)
 				{
 					options.OnNegotiationCompletedBeforePush = delegate(IEnumerable<PushUpdate> updates)

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GitItGUI.Core
@@ -126,6 +127,21 @@ namespace GitItGUI.Core
 			if (!ChangesManager.Refresh()) return false;
 			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 			return true;
+		}
+
+		internal static void DeleteRepoSettingsIfUnCommit()
+		{
+			// check for git settings file not in repo history
+			string settingsPath = repoPath + "\\" + Settings.repoSettingsFilename;
+			if (File.Exists(settingsPath))
+			{
+				var repoStatus = repo.RetrieveStatus(Settings.repoSettingsFilename);
+				if ((repoStatus & FileStatus.NewInWorkdir) != 0)
+				{
+					File.Delete(settingsPath);
+					while (File.Exists(settingsPath)) Thread.Sleep(250);
+				}
+			}
 		}
 
 		public static bool Clone(string url, string destination, string username, string password, out string repoPath)
