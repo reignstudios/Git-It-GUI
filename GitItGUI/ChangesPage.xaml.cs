@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using GitItGUI.Core;
 using GitItGUI.Tools;
 using LibGit2Sharp;
@@ -132,6 +133,54 @@ namespace GitItGUI
 		}
 	}
 
+	public class DeleteFile_ClickCommand : ICommand
+	{
+		#pragma warning disable CS0067
+		public event EventHandler CanExecuteChanged;
+		#pragma warning restore CS0067
+
+		private FileItem sender;
+
+		public DeleteFile_ClickCommand(FileItem sender)
+		{
+			this.sender = sender;
+		}
+
+		public bool CanExecute(object parameter)
+		{
+			return true;
+		}
+
+		public void Execute(object parameter)
+		{
+			sender.DeleteFile();
+		}
+	}
+
+	public class DeleteUntrackedFiles_ClickCommand : ICommand
+	{
+		#pragma warning disable CS0067
+		public event EventHandler CanExecuteChanged;
+		#pragma warning restore CS0067
+
+		private FileItem sender;
+
+		public DeleteUntrackedFiles_ClickCommand(FileItem sender)
+		{
+			this.sender = sender;
+		}
+
+		public bool CanExecute(object parameter)
+		{
+			return true;
+		}
+
+		public void Execute(object parameter)
+		{
+			sender.DeleteUntrackedFiles();
+		}
+	}
+
 	public class FileItem
 	{
 		private Bitmap icon;
@@ -192,6 +241,26 @@ namespace GitItGUI
 			}
 		}
 
+		private DeleteFile_ClickCommand deleteFileClickCommand;
+		public DeleteFile_ClickCommand DeleteFileClickCommand
+		{
+			get
+			{
+				deleteFileClickCommand = new DeleteFile_ClickCommand(this);
+				return deleteFileClickCommand;
+			}
+		}
+
+		private DeleteUntrackedFiles_ClickCommand deleteUntrackedFilesClickCommand;
+		public DeleteUntrackedFiles_ClickCommand DeleteUntrackedFilesClickCommand
+		{
+			get
+			{
+				deleteUntrackedFilesClickCommand = new DeleteUntrackedFiles_ClickCommand(this);
+				return deleteUntrackedFilesClickCommand;
+			}
+		}
+
 		public void Stage(bool refresh)
 		{
 			if (fileState.state == FileStates.Conflicted)
@@ -235,7 +304,20 @@ namespace GitItGUI
 
 		public void RevertFile()
 		{
+			if (!MessageBox.Show("Are you sure you want to revert this file?", MessageBoxTypes.YesNo)) return;
 			ChangesManager.RevertFile(fileState);
+		}
+
+		public void DeleteFile()
+		{
+			if (!MessageBox.Show("Are you sure you want to delete this file?", MessageBoxTypes.YesNo)) return;
+			ChangesManager.DeleteUntrackedUnstagedFile(fileState, true);
+		}
+
+		public void DeleteUntrackedFiles()
+		{
+			if (!MessageBox.Show("Are you sure you want to delete all untracked/unstaged files?", MessageBoxTypes.YesNo)) return;
+			ChangesManager.DeleteUntrackedUnstagedFiles(true);
 		}
 	}
 
@@ -245,7 +327,7 @@ namespace GitItGUI
 
 		// ui objects
 		Button refreshChangedButton, revertAllButton, stageAllButton, unstageAllButton, resolveSelectedButton, resolveAllButton;
-		Button openDiffToolButton, commitStagedButton, syncChangesButton, commitStagedButton_Advanced, pullChangesButton_Advanced, pushChangesButton_Advanced;
+		Button openDiffToolButton, syncChangesButton, commitStagedButton_Advanced, pullChangesButton_Advanced, pushChangesButton_Advanced;
 		ListBox unstagedChangesListView, stagedChangesListView;
 		TextBox diffTextBox;
 
@@ -267,7 +349,6 @@ namespace GitItGUI
 			resolveSelectedButton = this.Find<Button>("resolveSelectedButton");
 			resolveAllButton = this.Find<Button>("resolveAllButton");
 			openDiffToolButton = this.Find<Button>("openDiffToolButton");
-			commitStagedButton = this.Find<Button>("commitStagedButton");
 			syncChangesButton = this.Find<Button>("syncChangesButton");
 			commitStagedButton_Advanced = this.Find<Button>("commitStagedButton_Advanced");
 			pullChangesButton_Advanced = this.Find<Button>("pullChangesButton_Advanced");
@@ -288,7 +369,6 @@ namespace GitItGUI
 			resolveSelectedButton.Click += ResolveSelectedButton_Click;
 			resolveAllButton.Click += ResolveAllButton_Click;
 			openDiffToolButton.Click += OpenDiffToolButton_Click;
-			commitStagedButton.Click += CommitStagedButton_Click;
 			commitStagedButton_Advanced.Click += CommitStagedButton_Click;
 			syncChangesButton.Click += SyncChangesButton_Click;
 			pullChangesButton_Advanced.Click += PullChangesButton_Advanced_Click;
@@ -314,6 +394,7 @@ namespace GitItGUI
 				case "UseTheirs": result = MergeBinaryFileResults.UseTheirs; return true;
 				case "KeepMine": result = MergeBinaryFileResults.KeepMine; return true;
 				case "Canceled": result = MergeBinaryFileResults.Cancel; return true;
+				case "RunMergeTool": result = MergeBinaryFileResults.RunMergeTool; return true;
 				default: result = MergeBinaryFileResults.Error; return true;
 			}
 		}
@@ -338,14 +419,40 @@ namespace GitItGUI
 
 		private void SyncChangesButton_Click(object sender, RoutedEventArgs e)
 		{
+			// check if files need to be staged
+			if (ChangesManager.FilesAreUnstaged())
+			{
+				MessageBox.Show("You must stage all files first!");
+				return;
+			}
+
+			// check if files need to be commit
+			if (ChangesManager.FilesAreStaged())
+			{
+				if (!CommitChanges()) return;
+			}
+
+			// sync changes
 			ProcessingPage.singleton.mode = ProcessingPageModes.Sync;
 			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
 		private void CommitStagedButton_Click(object sender, RoutedEventArgs e)
 		{
+			CommitChanges();
+		}
+
+		private bool CommitChanges()
+		{
+			if (!ChangesManager.FilesAreStaged())
+			{
+				MessageBox.Show("No files have been staged to commit");
+				return false;
+			}
+
 			string result;
-			if (CoreApps.LaunchCommitEntry("", out result)) ChangesManager.CommitStagedChanges(result);
+			if (CoreApps.LaunchCommitEntry("", out result)) return ChangesManager.CommitStagedChanges(result);
+			else return false;
 		}
 
 		private void OpenDiffToolButton_Click(object sender, RoutedEventArgs e)
@@ -410,6 +517,21 @@ namespace GitItGUI
 		}
 
 		private void RepoManager_RepoRefreshedCallback()
+		{
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				RepoManager_RepoRefreshedCallback_UIThread();
+			}
+			else
+			{
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					RepoManager_RepoRefreshedCallback_UIThread();
+				});
+			}
+		}
+
+		private void RepoManager_RepoRefreshedCallback_UIThread()
 		{
 			diffTextBox.Text = "";
 			unstagedChangesListViewItems.Clear();

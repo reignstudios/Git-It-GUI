@@ -12,8 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitItGUI", "GitItGUI\GitItG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitItGUI.Core", "GitItGUI.Core\GitItGUI.Core.csproj", "{0095000A-55AF-4A89-8C5A-02E43CAAF1F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinaryConflicPicker", "BinaryConflicPicker\BinaryConflicPicker.csproj", "{B0A50262-1677-453D-96F7-9169A622BE5A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageBox", "MessageBox\MessageBox.csproj", "{2D84AC5D-E1F7-40BD-A2CA-59F3C8C050FC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NameEntry", "NameEntry\NameEntry.csproj", "{D1B04444-C700-4C07-A9A8-052AFB74030F}"
@@ -21,6 +19,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitCommander", "GitCommander\GitCommander.csproj", "{B27247A7-FB34-41C9-BA20-22C758460D6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommitEntry", "CommitEntry\CommitEntry.csproj", "{A00578DB-F074-4338-A7EB-047FE2BB93D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MergeConflicPicker", "MergeConflicPicker\MergeConflicPicker.csproj", "{B0A50262-1677-453D-96F7-9169A622BE5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +36,6 @@ Global
 		{0095000A-55AF-4A89-8C5A-02E43CAAF1F5}.Debug|x86.Build.0 = Debug|x86
 		{0095000A-55AF-4A89-8C5A-02E43CAAF1F5}.Release|x86.ActiveCfg = Release|x86
 		{0095000A-55AF-4A89-8C5A-02E43CAAF1F5}.Release|x86.Build.0 = Release|x86
-		{B0A50262-1677-453D-96F7-9169A622BE5A}.Debug|x86.ActiveCfg = Debug|x86
-		{B0A50262-1677-453D-96F7-9169A622BE5A}.Debug|x86.Build.0 = Debug|x86
-		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|x86.ActiveCfg = Release|x86
-		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|x86.Build.0 = Release|x86
 		{2D84AC5D-E1F7-40BD-A2CA-59F3C8C050FC}.Debug|x86.ActiveCfg = Debug|x86
 		{2D84AC5D-E1F7-40BD-A2CA-59F3C8C050FC}.Debug|x86.Build.0 = Debug|x86
 		{2D84AC5D-E1F7-40BD-A2CA-59F3C8C050FC}.Release|x86.ActiveCfg = Release|x86
@@ -56,6 +52,10 @@ Global
 		{A00578DB-F074-4338-A7EB-047FE2BB93D6}.Debug|x86.Build.0 = Debug|x86
 		{A00578DB-F074-4338-A7EB-047FE2BB93D6}.Release|x86.ActiveCfg = Release|x86
 		{A00578DB-F074-4338-A7EB-047FE2BB93D6}.Release|x86.Build.0 = Release|x86
+		{B0A50262-1677-453D-96F7-9169A622BE5A}.Debug|x86.ActiveCfg = Debug|x86
+		{B0A50262-1677-453D-96F7-9169A622BE5A}.Debug|x86.Build.0 = Debug|x86
+		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|x86.ActiveCfg = Release|x86
+		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

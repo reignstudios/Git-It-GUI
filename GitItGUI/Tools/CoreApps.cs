@@ -78,7 +78,7 @@ namespace GitItGUI.Tools
 
 		public static bool LaunchBinaryConflicPicker(string fileInConflic, out string result)
 		{
-			string exe = Environment.CurrentDirectory + "\\BinaryConflicPicker.exe";
+			string exe = Environment.CurrentDirectory + "\\MergeConflicPicker.exe";
 			string args = string.Format("-FileInConflic=\"{0}\"", fileInConflic);
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, false)) return false;

@@ -1,7 +1,7 @@
 ﻿<Window xmlns="https://github.com/avaloniaui" MinWidth="500" MinHeight="150" MaxWidth="500" MaxHeight="150" Width="500" Height="150">
 	<Grid Name="grid">
 		<TextBlock Name="captionTextBlock" Height="28" Margin="0,10,0,-10" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24">Caption...</TextBlock>
-		<TextBox Name="nameTextBox" Height="28" Margin="10,0,12,0" TextWrapping="Wrap" Text="Some Name Text..."/>
+		<TextBox Name="nameTextBox" Height="28" Margin="10,0,12,0" TextWrapping="Wrap" Text=""/>
 		<Button Name="okButton" Margin="-10,-10,10,10" Width="75" HorizontalAlignment="Right" VerticalAlignment="Bottom">Ok</Button>
 		<Button Name="cancelButton" Margin="10,-10,-10,10" Width="75" HorizontalAlignment="Left" VerticalAlignment="Bottom">Cancel</Button>
 	</Grid>

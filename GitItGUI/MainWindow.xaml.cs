@@ -2,6 +2,7 @@
 using Avalonia.Markup.Xaml;
 using System;
 using GitItGUI.Core;
+using Avalonia.Threading;
 
 namespace GitItGUI
 {
@@ -59,7 +60,17 @@ namespace GitItGUI
 
 		private void Debug_debugLogCallback(object value, bool alert)
 		{
-			if (alert) MessageBox.Show(value.ToString());
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				if (alert) MessageBox.Show(value.ToString());
+			}
+			else
+			{
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					if (alert) MessageBox.Show(value.ToString());
+				});
+			}
 		}
 
 		private static NavigationPage GetActivePage()
@@ -75,6 +86,21 @@ namespace GitItGUI
 		}
 
 		public static void LoadPage(PageTypes type)
+		{
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				LoadPage_UIThread(type);
+			}
+			else
+			{
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					LoadPage_UIThread(type);
+				});
+			}
+		}
+
+		private static void LoadPage_UIThread(PageTypes type)
 		{
 			NavigationPage pageFrom = GetActivePage();
 			CheckForUpdatesPage.singleton.IsVisible = false;
@@ -97,11 +123,6 @@ namespace GitItGUI
 			if (pageFrom != null) pageFrom.NavigatedFrom();
 			NavigationPage pageTo = GetActivePage();
 			pageTo.NavigatedTo();
-		}
-
-		public static void CanInteractWithUI(bool enabled)
-		{
-			//singleton.tabControl.IsEnabled = enabled;
 		}
 
 		private void MainWindow_Closed(object sender, EventArgs e)

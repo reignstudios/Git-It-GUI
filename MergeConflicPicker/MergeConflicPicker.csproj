@@ -8,8 +8,8 @@
     <ProjectGuid>{B0A50262-1677-453D-96F7-9169A622BE5A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BinaryConflicPicker</RootNamespace>
-    <AssemblyName>BinaryConflicPicker</AssemblyName>
+    <RootNamespace>MergeConflicPicker</RootNamespace>
+    <AssemblyName>MergeConflicPicker</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>

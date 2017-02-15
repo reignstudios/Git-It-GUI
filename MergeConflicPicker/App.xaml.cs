@@ -7,7 +7,7 @@ using Avalonia.Themes.Default;
 using Avalonia.Markup.Xaml;
 using Serilog;
 
-namespace BinaryConflicPicker
+namespace MergeConflicPicker
 {
 	class App : Application
 	{
