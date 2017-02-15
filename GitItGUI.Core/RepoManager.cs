@@ -472,7 +472,10 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				Tools.RunExe("git", "gc", null, false);
+				string errors;
+				string result = Tools.RunExeOutputErrors("git", "gc", null, out errors, false);
+				if (!string.IsNullOrEmpty(result)) Debug.Log("git gc result: " + result);
+				if (!string.IsNullOrEmpty(errors)) Debug.LogError("git gc errors: " + errors, true);
 			}
 			catch (Exception e)
 			{
