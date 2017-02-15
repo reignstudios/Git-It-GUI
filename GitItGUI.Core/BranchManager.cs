@@ -158,6 +158,10 @@ namespace GitItGUI.Core
 			MergeResults mergeResult;
 			try
 			{
+				// check for git settings file not in repo history
+				RepoManager.DeleteRepoSettingsIfUnCommit();
+
+				// merge
 				var srcBround = RepoManager.repo.Branches[srcBranch.fullName];
 				var result = RepoManager.repo.Merge(srcBround, RepoManager.signature);
 				if (result.Status == MergeStatus.Conflicts) mergeResult = MergeResults.Conflicts;
