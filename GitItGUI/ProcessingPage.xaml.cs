@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using GitItGUI.Core;
 using System.Threading.Tasks;
+using System.Threading;
+using Avalonia.Threading;
 
 namespace GitItGUI
 {
@@ -23,6 +25,9 @@ namespace GitItGUI
 		public string clonePath, cloneURL, cloneUsername, clonePassword;
 		public bool cloneSucceeded;
 
+		private int askToOptamizeSync;
+		private Thread thread;
+
 		public ProcessingPage()
 		{
 			singleton = this;
@@ -36,11 +41,24 @@ namespace GitItGUI
 
 		public async void NavigatedTo()
 		{
-			await Task.Delay(1000);
+			await Task.Delay(500);
+			thread = new Thread(Process);
+			thread.Start();
+		}
 
+		private void Process()
+		{
 			if (mode == ProcessingPageModes.Pull) ChangesManager.Pull();
 			else if (mode == ProcessingPageModes.Push) ChangesManager.Push();
-			else if (mode == ProcessingPageModes.Sync) ChangesManager.Sync();
+			else if (mode == ProcessingPageModes.Sync)
+			{
+				if (ChangesManager.Sync())
+				{
+					if (askToOptamizeSync == 0 && MessageBox.Show("Would you like to run git optimizers?", MessageBoxTypes.YesNo)) RepoManager.Optimize();
+					++askToOptamizeSync;
+					if (askToOptamizeSync == 10) askToOptamizeSync = 0;
+				}
+			}
 			else if (mode == ProcessingPageModes.Clone)
 			{
 				// clone repo
@@ -64,10 +82,6 @@ namespace GitItGUI
 				RepoManager.UpdateCredentialValues(cloneUsername, clonePassword);
 				RepoManager.SaveSettings();
 				RepoManager.Refresh();
-
-				// load main repo page
-				MainWindow.LoadPage(PageTypes.MainContent);
-				return;
 			}
 
 			MainWindow.LoadPage(PageTypes.MainContent);

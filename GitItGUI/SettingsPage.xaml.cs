@@ -56,6 +56,7 @@ namespace GitItGUI
 
 		private void CloseRepoButton_Click(object sender, RoutedEventArgs e)
 		{
+			applyChangesButton.IsVisible = false;
 			RepoManager.Close();
 			MainWindow.LoadPage(PageTypes.Start);
 		}

@@ -67,7 +67,8 @@ namespace GitItGUI.Core
 		Error,
 		Cancel,
 		UseTheirs,
-		KeepMine
+		KeepMine,
+		RunMergeTool
 	}
 
 	public enum MergeFileAcceptedResults
@@ -236,6 +237,34 @@ namespace GitItGUI.Core
 			return fileStates.ToArray();
 		}
 
+		public static bool FilesAreStaged()
+		{
+			foreach (var state in fileStates)
+			{
+				if (state.state == FileStates.DeletedFromIndex || state.state == FileStates.ModifiedInIndex ||
+					state.state == FileStates.NewInIndex || state.state == FileStates.RenamedInIndex || state.state == FileStates.TypeChangeInIndex)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public static bool FilesAreUnstaged()
+		{
+			foreach (var state in fileStates)
+			{
+				if (state.state == FileStates.DeletedFromWorkdir || state.state == FileStates.ModifiedInWorkdir ||
+					state.state == FileStates.NewInWorkdir|| state.state == FileStates.RenamedInWorkdir || state.state == FileStates.TypeChangeInWorkdir)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		public static object GetQuickViewData(FileState fileState)
 		{
 			try
@@ -321,6 +350,45 @@ namespace GitItGUI.Core
 				Debug.LogError("Failed to refresh quick view: " + e.Message, true);
 				return null;
 			}
+		}
+
+		public static bool DeleteUntrackedUnstagedFile(FileState fileState, bool refresh)
+		{
+			try
+			{
+				if (fileState.state != FileStates.NewInWorkdir) return false;
+				string filePath = RepoManager.repoPath + "\\" + fileState.filename;
+				if (File.Exists(filePath)) File.Delete(filePath);
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to delete item: " + e.Message, true);
+				return false;
+			}
+
+			if (refresh) RepoManager.Refresh();
+			return true;
+		}
+
+		public static bool DeleteUntrackedUnstagedFiles(bool refresh)
+		{
+			try
+			{
+				foreach (var fileState in fileStates)
+				{
+					if (fileState.state != FileStates.NewInWorkdir) continue;
+					string filePath = RepoManager.repoPath + "\\" + fileState.filename;
+					if (File.Exists(filePath)) File.Delete(filePath);
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to delete item: " + e.Message, true);
+				return false;
+			}
+
+			if (refresh) RepoManager.Refresh();
+			return true;
 		}
 
 		public static bool StageFile(FileState fileState, bool refresh)
@@ -609,16 +677,16 @@ namespace GitItGUI.Core
 				if (ours.IsBinary || theirs.IsBinary || Tools.IsBinaryFileData(fullPath + ".ours") || Tools.IsBinaryFileData(fullPath + ".theirs"))
 				{
 					// open merge tool
-					MergeBinaryFileResults result;
-					if (AskUserToResolveBinaryFileCallback != null && AskUserToResolveBinaryFileCallback(fileState, out result))
+					MergeBinaryFileResults mergeBinaryResult;
+					if (AskUserToResolveBinaryFileCallback != null && AskUserToResolveBinaryFileCallback(fileState, out mergeBinaryResult))
 					{
-						switch (result)
+						switch (mergeBinaryResult)
 						{
 							case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true); return false;
 							case MergeBinaryFileResults.Cancel: return false;
 							case MergeBinaryFileResults.KeepMine: File.Copy(fullPath + ".ours", fullPath, true); break;
 							case MergeBinaryFileResults.UseTheirs: File.Copy(fullPath + ".theirs", fullPath, true); break;
-							default: Debug.LogWarning("Unsuported Response: " + result, true); return false;
+							default: Debug.LogWarning("Unsuported Response: " + mergeBinaryResult, true); return false;
 						}
 					}
 					else
@@ -659,27 +727,48 @@ namespace GitItGUI.Core
 				}
 
 				// start external merge tool
-				using (var process = new Process())
+				MergeBinaryFileResults mergeFileResult;
+				if (AskUserToResolveBinaryFileCallback != null && AskUserToResolveBinaryFileCallback(fileState, out mergeFileResult))
 				{
-					process.StartInfo.FileName = AppManager.mergeToolPath;
-					if (AppManager.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
-					else if (AppManager.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
-					else if (AppManager.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{0}.base\" \"{0}.ours\" \"{0}.theirs\" \"{0}.base\"", fullPath);
-					else if (AppManager.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
-					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
-					if (!process.Start())
+					switch (mergeFileResult)
 					{
-						Debug.LogError("Failed to start Merge tool (is it installed?)", true);
+						case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true); return false;
+						case MergeBinaryFileResults.Cancel: return false;
+						case MergeBinaryFileResults.KeepMine: File.Copy(fullPath + ".ours", fullPath + ".base", true); break;
+						case MergeBinaryFileResults.UseTheirs: File.Copy(fullPath + ".theirs", fullPath + ".base", true); break;
 
-						// delete temp files
-						if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
-						if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
-						if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
+						case MergeBinaryFileResults.RunMergeTool:
+							using (var process = new Process())
+							{
+								process.StartInfo.FileName = AppManager.mergeToolPath;
+								if (AppManager.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
+								else if (AppManager.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
+								else if (AppManager.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{0}.base\" \"{0}.ours\" \"{0}.theirs\" \"{0}.base\"", fullPath);
+								else if (AppManager.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
+								process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+								if (!process.Start())
+								{
+									Debug.LogError("Failed to start Merge tool (is it installed?)", true);
 
-						return false;
+									// delete temp files
+									if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
+									if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
+									if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
+
+									return false;
+								}
+
+								process.WaitForExit();
+							}
+							break;
+
+						default: Debug.LogWarning("Unsuported Response: " + mergeFileResult, true); return false;
 					}
-
-					process.WaitForExit();
+				}
+				else
+				{
+					Debug.LogError("Failed to resolve file: " + fileState.filename, true);
+					return false;
 				}
 
 				// get new base hash

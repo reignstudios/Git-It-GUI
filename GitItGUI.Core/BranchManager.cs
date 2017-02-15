@@ -128,7 +128,7 @@ namespace GitItGUI.Core
 				if (File.Exists(settingsPath))
 				{
 					var repoStatus = RepoManager.repo.RetrieveStatus(Settings.repoSettingsFilename);
-					if ((repoStatus | FileStatus.NewInWorkdir) != 0)
+					if ((repoStatus & FileStatus.NewInWorkdir) != 0)
 					{
 						File.Delete(settingsPath);
 						while (File.Exists(settingsPath)) Thread.Sleep(250);

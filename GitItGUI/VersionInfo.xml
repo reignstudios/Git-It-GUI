@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <VersionInfo>
-	<AppVersion>0.1.6.0</AppVersion>
+	<AppVersion>0.1.7.0</AppVersion>
 	<GitVersion>
 		<Windows>2.11.1</Windows>
 		<Mac>2.8.1</Mac>

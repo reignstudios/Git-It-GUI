@@ -178,10 +178,12 @@ namespace GitItGUI
 				return;
 			}
 
+			if (!MessageBox.Show(string.Format("Are you sure you want to merge branch '{0}' into '{1}'?", branch.fullName, BranchManager.activeBranch.FriendlyName), MessageBoxTypes.YesNo)) return;
+
 			var result = BranchManager.MergeBranchIntoActive(branch);
 			if (result == MergeResults.Succeeded)
 			{
-				MessageBox.Show("Merge Succedded!");
+				MessageBox.Show("Merge Succedded!\n(Remember to sync with the server!)");
 			}
 			else if (result == MergeResults.Conflicts && MessageBox.Show("Conflicts detected! Resolve now?", MessageBoxTypes.YesNo))
 			{
@@ -204,6 +206,7 @@ namespace GitItGUI
 				return;
 			}
 
+			if (!MessageBox.Show(string.Format("Are you sure you want to delete branch '{0}'?", branch.fullName), MessageBoxTypes.YesNo)) return;
 			BranchManager.DeleteNonActiveBranch(branch);
 		}
 	}

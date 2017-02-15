@@ -1,6 +1,7 @@
 ﻿using System;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using GitItGUI.Core;
 
 namespace GitItGUI
 {
@@ -41,6 +42,32 @@ namespace GitItGUI
 
 		private void CloneButton_Click(object sender, Avalonia.Interactivity.RoutedEventArgs e)
 		{
+			// valid info
+			if (string.IsNullOrEmpty(urlTextBox.Text))
+			{
+				Debug.Log("Invalid url");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(destinationTextBox.Text))
+			{
+				Debug.Log("Invalid destination path");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(usernameTextBox.Text))
+			{
+				Debug.Log("Invalid username");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(passwordTextBox.Text))
+			{
+				Debug.Log("Invalid password");
+				return;
+			}
+
+			// clone
 			ProcessingPage.singleton.mode = ProcessingPageModes.Clone;
 			ProcessingPage.singleton.cloneSucceeded = false;
 			ProcessingPage.singleton.cloneURL = urlTextBox.Text;

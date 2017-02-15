@@ -64,22 +64,32 @@ namespace GitItGUI.Core
 				settings = Settings.Load<XML.AppSettings>(rootAppSettingsPath + "\\" + Settings.appSettingsFolderName + "\\" + Settings.appSettingsFilename);
 
 				// apply default lfs ignore types
-				if (settings.defaultGitLFS_Exts.Count == 0)
+				var lowerCase = new List<string>()
 				{
-					settings.defaultGitLFS_Exts.AddRange(new List<string>()
-					{
-						".jpg", ".jpeg", ".png", ".bmp", ".tga", ".tif",// image types
-						".psd",// image binary types
-						".ai", ".svg", ".dwg",// vector binary types
-						".ae",// video binary types
-						".mpeg", ".mov", ".avi", ".mp4", ".wmv",// video types
-						".wav", ".mp3", ".ogg", ".wma", ".acc",// audio types
-						".zip", ".7z", ".rar", ".tar", ".gz",// compression types
-						".fbx", ".obj", ".3ds", ".FBX", ".OBJ", ".3DS", ".blend", ".ma", ".mb", ".dae", ".daz", ".stl", ".wrl", ".spp", ".sbs", ".sppr", ".sbsar", ".ztl", ".zpr", ".obg",// 3d formats
-						".pdf", ".doc", ".docx",// doc types
-						".unity", ".unitypackage", ".uasset",// known binary types
-						".bin", ".data", ".raw", ".hex",// unknown binary types
-					});
+					".jpg", ".jpeg", ".png", ".bmp", ".tga", ".tif",// image types
+					".psd",// image binary types
+					".ai", ".svg", ".dwg",// vector binary types
+					".ae",// video binary types
+					".mpeg", ".mov", ".avi", ".mp4", ".wmv",// video types
+					".wav", ".mp3", ".ogg", ".wma", ".acc",// audio types
+					".zip", ".7z", ".rar", ".tar", ".gz",// compression types
+					".fbx", ".obj", ".3ds", ".blend", ".ma", ".mb", ".dae", ".daz", ".stl", ".wrl", ".spp", ".sbs", ".sppr", ".sbsar", ".ztl", ".zpr", ".obg",// 3d formats
+					".pdf", ".doc", ".docx",// doc types
+					".unity", ".unitypackage", ".uasset",// known binary types
+					".bin", ".data", ".raw", ".hex",// unknown binary types
+				};
+
+				var upperCase = new List<string>();
+				for (int i = 0; i != lowerCase.Count; ++i) upperCase.Add(lowerCase[i].ToUpper());
+
+				foreach (var item in lowerCase)
+				{
+					if (!settings.defaultGitLFS_Exts.Contains(item)) settings.defaultGitLFS_Exts.Add(item);
+				}
+
+				foreach (var item in upperCase)
+				{
+					if (!settings.defaultGitLFS_Exts.Contains(item)) settings.defaultGitLFS_Exts.Add(item);
 				}
 
 				// load
@@ -94,6 +104,11 @@ namespace GitItGUI.Core
 			}
 
 			return true;
+		}
+
+		public static bool MergeDiffToolInstalled()
+		{
+			return File.Exists(mergeToolPath);
 		}
 
 		public static void SetMergeDiffTool(MergeDiffTools tool)

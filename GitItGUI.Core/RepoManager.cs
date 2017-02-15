@@ -61,6 +61,12 @@ namespace GitItGUI.Core
 				return true;
 			}
 
+			if (!AppManager.MergeDiffToolInstalled())
+			{
+				Debug.LogError("Merge/Diff tool is not installed!\nGo to app settings and make sure your selected diff tool is installed.", true);
+				return false;
+			}
+
 			bool refreshMode = path == repoPath;
 			
 			try
@@ -415,27 +421,47 @@ namespace GitItGUI.Core
 
 		public static void OpenGitk()
 		{
-			// get gitk path
-			string programFilesx86, programFilesx64;
-			Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
-
-			// open gitk
-			using (var process = new Process())
+			try
 			{
-				process.StartInfo.FileName = programFilesx64 + "\\Git\\cmd\\gitk.exe";
-				process.StartInfo.WorkingDirectory = repoPath;
-				process.StartInfo.Arguments = "";
-				process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
-				if (!process.Start())
-				{
-					Debug.LogError("Failed to start history tool (is it installed?)", true);
-					return;
-				}
+				// get gitk path
+				string programFilesx86, programFilesx64;
+				Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
 
-				process.WaitForExit();
+				// open gitk
+				using (var process = new Process())
+				{
+					process.StartInfo.FileName = programFilesx64 + "\\Git\\cmd\\gitk.exe";
+					process.StartInfo.WorkingDirectory = repoPath;
+					process.StartInfo.Arguments = "";
+					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+					if (!process.Start())
+					{
+						Debug.LogError("Failed to start history tool (is it installed?)", true);
+						return;
+					}
+
+					process.WaitForExit();
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to start history tool: " + e.Message, true);
+				return;
 			}
 
 			Refresh();
+		}
+
+		public static void Optimize()
+		{
+			try
+			{
+				Tools.RunExe("git", "gc", null, false);
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to optamize: " + e.Message, true);
+			}
 		}
 	}
 }
