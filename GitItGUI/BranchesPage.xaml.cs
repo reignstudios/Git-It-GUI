@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GitItGUI.Core;
 using GitItGUI.Tools;
+using Avalonia.Threading;
 
 namespace GitItGUI
 {
@@ -67,6 +68,21 @@ namespace GitItGUI
 		}
 
 		private void RepoManager_RepoRefreshedCallback()
+		{
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				RepoManager_RepoRefreshedCallback_UIThread();
+			}
+			else
+			{
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					RepoManager_RepoRefreshedCallback_UIThread();
+				});
+			}
+		}
+
+		private void RepoManager_RepoRefreshedCallback_UIThread()
 		{
 			bool isAdvancedMode = advancedModeCheckBox.IsChecked;
 
@@ -151,16 +167,9 @@ namespace GitItGUI
 			}
 
 			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
-			if (!branch.isRemote) BranchManager.Checkout(branch);
-			else if (MessageBox.Show("Cannot checkout to remote branch.\nDo you want to create a local one that tracks this remote instead?", MessageBoxTypes.YesNo))//Debug.Log("Cannot checkout to remote branch.\nCreate a local one and copy tracking instead.", true);
-			{
-				string fullName = branch.branchName;
-				if (BranchManager.AddNewBranch(fullName))
-				{
-					BranchManager.Checkout(fullName);
-					BranchManager.AddUpdateTracking(branch.fullName);
-				}
-			}
+			ProcessingPage.singleton.mode = ProcessingPageModes.Switch;
+			ProcessingPage.singleton.switchOtherBranch = branch;
+			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
 		private void MergeBranchButton_Click(object sender, RoutedEventArgs e)
@@ -180,15 +189,9 @@ namespace GitItGUI
 
 			if (!MessageBox.Show(string.Format("Are you sure you want to merge branch '{0}' into '{1}'?", branch.fullName, BranchManager.activeBranch.FriendlyName), MessageBoxTypes.YesNo)) return;
 
-			var result = BranchManager.MergeBranchIntoActive(branch);
-			if (result == MergeResults.Succeeded)
-			{
-				MessageBox.Show("Merge Succedded!\n(Remember to sync with the server!)");
-			}
-			else if (result == MergeResults.Conflicts && MessageBox.Show("Conflicts detected! Resolve now?", MessageBoxTypes.YesNo))
-			{
-				ChangesManager.ResolveAllConflicts();
-			}
+			ProcessingPage.singleton.mode = ProcessingPageModes.Merge;
+			ProcessingPage.singleton.mergeOtherBranch = branch;
+			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
 		private void DeleteBranchButton_Click(object sender, RoutedEventArgs e)

@@ -45,25 +45,25 @@ namespace GitItGUI
 			// valid info
 			if (string.IsNullOrEmpty(urlTextBox.Text))
 			{
-				Debug.Log("Invalid url");
+				MessageBox.Show("Invalid url");
 				return;
 			}
 
 			if (string.IsNullOrEmpty(destinationTextBox.Text))
 			{
-				Debug.Log("Invalid destination path");
+				MessageBox.Show("Invalid destination path");
 				return;
 			}
 
 			if (string.IsNullOrEmpty(usernameTextBox.Text))
 			{
-				Debug.Log("Invalid username");
+				MessageBox.Show("Invalid username");
 				return;
 			}
 
 			if (string.IsNullOrEmpty(passwordTextBox.Text))
 			{
-				Debug.Log("Invalid password");
+				MessageBox.Show("Invalid password");
 				return;
 			}
 

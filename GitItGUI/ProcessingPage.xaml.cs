@@ -14,7 +14,9 @@ namespace GitItGUI
 		Clone,
 		Pull,
 		Push,
-		Sync
+		Sync,
+		Merge,
+		Switch
 	}
 
 	public class ProcessingPage : UserControl, NavigationPage
@@ -24,6 +26,9 @@ namespace GitItGUI
 		public ProcessingPageModes mode = ProcessingPageModes.None;
 		public string clonePath, cloneURL, cloneUsername, clonePassword;
 		public bool cloneSucceeded;
+
+		public BranchState mergeOtherBranch;
+		public BranchState switchOtherBranch;
 
 		private int askToOptamizeSync;
 		private Thread thread;
@@ -36,7 +41,7 @@ namespace GitItGUI
 
 		public void NavigatedFrom()
 		{
-			
+			mode = ProcessingPageModes.None;
 		}
 
 		public async void NavigatedTo()
@@ -82,6 +87,35 @@ namespace GitItGUI
 				RepoManager.UpdateCredentialValues(cloneUsername, clonePassword);
 				RepoManager.SaveSettings();
 				RepoManager.Refresh();
+			}
+			else if (mode == ProcessingPageModes.Merge)
+			{
+				var result = BranchManager.MergeBranchIntoActive(mergeOtherBranch);
+				if (result == MergeResults.Succeeded)
+				{
+					MessageBox.Show("Merge Succedded!\n(Remember to sync with the server!)");
+				}
+				else if (result == MergeResults.Conflicts && MessageBox.Show("Conflicts detected! Resolve now?", MessageBoxTypes.YesNo))
+				{
+					ChangesManager.ResolveAllConflicts();
+				}
+			}
+			else if (mode == ProcessingPageModes.Switch)
+			{
+				if (!switchOtherBranch.isRemote) BranchManager.Checkout(switchOtherBranch);
+				else if (MessageBox.Show("Cannot checkout to remote branch.\nDo you want to create a local one that tracks this remote instead?", MessageBoxTypes.YesNo))
+				{
+					string fullName = switchOtherBranch.branchName;
+					if (BranchManager.AddNewBranch(fullName))
+					{
+						BranchManager.Checkout(fullName);
+						BranchManager.AddUpdateTracking(switchOtherBranch.fullName);
+					}
+				}
+			}
+			else
+			{
+				MessageBox.Show("Unsuported Processing mode: " + mode);
 			}
 
 			MainWindow.LoadPage(PageTypes.MainContent);

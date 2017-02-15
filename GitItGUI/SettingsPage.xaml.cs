@@ -2,6 +2,7 @@
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using GitItGUI.Core;
 using LibGit2Sharp;
 using System;
@@ -62,6 +63,21 @@ namespace GitItGUI
 		}
 
 		private void RepoManager_RepoRefreshedCallback()
+		{
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				RepoManager_RepoRefreshedCallback_UIThread();
+			}
+			else
+			{
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					RepoManager_RepoRefreshedCallback_UIThread();
+				});
+			}
+		}
+
+		private void RepoManager_RepoRefreshedCallback_UIThread()
 		{
 			refreshMode = true;
 			sigNameTextBox.Text = RepoManager.signatureName;

@@ -682,11 +682,19 @@ namespace GitItGUI.Core
 					{
 						switch (mergeBinaryResult)
 						{
-							case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true); return false;
-							case MergeBinaryFileResults.Cancel: return false;
+							case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true);
+								DeleteTempMergeFiles(fullPath);
+								return false;
+
+							case MergeBinaryFileResults.Cancel:
+								DeleteTempMergeFiles(fullPath);
+								return false;
+
 							case MergeBinaryFileResults.KeepMine: File.Copy(fullPath + ".ours", fullPath, true); break;
 							case MergeBinaryFileResults.UseTheirs: File.Copy(fullPath + ".theirs", fullPath, true); break;
-							default: Debug.LogWarning("Unsuported Response: " + mergeBinaryResult, true); return false;
+							default: Debug.LogWarning("Unsuported Response: " + mergeBinaryResult, true);
+								DeleteTempMergeFiles(fullPath);
+								return false;
 						}
 					}
 					else
@@ -696,9 +704,7 @@ namespace GitItGUI.Core
 					}
 
 					// delete temp files
-					if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
-					if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
-					if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
+					DeleteTempMergeFiles(fullPath);
 
 					// stage and finish
 					Commands.Stage(RepoManager.repo, fileState.filename);
@@ -732,8 +738,14 @@ namespace GitItGUI.Core
 				{
 					switch (mergeFileResult)
 					{
-						case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true); return false;
-						case MergeBinaryFileResults.Cancel: return false;
+						case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true);
+							DeleteTempMergeFiles(fullPath);
+							return false;
+
+						case MergeBinaryFileResults.Cancel:
+							DeleteTempMergeFiles(fullPath);
+							return false;
+
 						case MergeBinaryFileResults.KeepMine: File.Copy(fullPath + ".ours", fullPath + ".base", true); break;
 						case MergeBinaryFileResults.UseTheirs: File.Copy(fullPath + ".theirs", fullPath + ".base", true); break;
 
@@ -749,12 +761,7 @@ namespace GitItGUI.Core
 								if (!process.Start())
 								{
 									Debug.LogError("Failed to start Merge tool (is it installed?)", true);
-
-									// delete temp files
-									if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
-									if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
-									if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
-
+									DeleteTempMergeFiles(fullPath);
 									return false;
 								}
 
@@ -762,12 +769,15 @@ namespace GitItGUI.Core
 							}
 							break;
 
-						default: Debug.LogWarning("Unsuported Response: " + mergeFileResult, true); return false;
+						default: Debug.LogWarning("Unsuported Response: " + mergeFileResult, true);
+							DeleteTempMergeFiles(fullPath);
+							return false;
 					}
 				}
 				else
 				{
 					Debug.LogError("Failed to resolve file: " + fileState.filename, true);
+					DeleteTempMergeFiles(fullPath);
 					return false;
 				}
 
@@ -789,11 +799,6 @@ namespace GitItGUI.Core
 					Commands.Stage(RepoManager.repo, fileState.filename);
 				}
 
-				// delete temp files
-				if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
-				if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
-				if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
-
 				// check if user accepts the current state of the merge
 				if (!wasModified)
 				{
@@ -803,6 +808,7 @@ namespace GitItGUI.Core
 						switch (result)
 						{
 							case MergeFileAcceptedResults.Yes:
+								File.Copy(fullPath + ".base", fullPath, true);
 								Commands.Stage(RepoManager.repo, fileState.filename);
 								wasModified = true;
 								break;
@@ -816,9 +822,13 @@ namespace GitItGUI.Core
 					else
 					{
 						Debug.LogError("Failed to ask user if file was resolved: " + fileState.filename, true);
+						DeleteTempMergeFiles(fullPath);
 						return false;
 					}
 				}
+
+				// delete temp files
+				DeleteTempMergeFiles(fullPath);
 			}
 			catch (Exception e)
 			{
@@ -829,6 +839,18 @@ namespace GitItGUI.Core
 			// finish
 			if (refresh) RepoManager.Refresh();
 			return wasModified;
+		}
+
+		private static void DeleteTempMergeFiles(string fullPath)
+		{
+			if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
+			if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
+			if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
+		}
+
+		private static void DeleteTempDiffFiles(string fullPath)
+		{
+			if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
 		}
 
 		public static bool OpenDiffTool(FileState fileState)
@@ -857,9 +879,7 @@ namespace GitItGUI.Core
 					if (!process.Start())
 					{
 						Debug.LogError("Failed to start Diff tool (is it installed?)", true);
-
-						// delete temp files
-						if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
+						DeleteTempDiffFiles(fullPath);
 						return false;
 					}
 
@@ -867,11 +887,11 @@ namespace GitItGUI.Core
 				}
 
 				// delete temp files
-				if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
+				DeleteTempDiffFiles(fullPath);
 			}
 			catch (Exception ex)
 			{
-				if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
+				DeleteTempDiffFiles(fullPath);
 				Debug.LogError("Failed to start Diff tool: " + ex.Message, true);
 			}
 

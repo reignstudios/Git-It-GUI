@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using GitItGUI.Core;
 using GitItGUI.Tools;
 using LibGit2Sharp;
@@ -516,6 +517,21 @@ namespace GitItGUI
 		}
 
 		private void RepoManager_RepoRefreshedCallback()
+		{
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				RepoManager_RepoRefreshedCallback_UIThread();
+			}
+			else
+			{
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					RepoManager_RepoRefreshedCallback_UIThread();
+				});
+			}
+		}
+
+		private void RepoManager_RepoRefreshedCallback_UIThread()
 		{
 			diffTextBox.Text = "";
 			unstagedChangesListViewItems.Clear();
