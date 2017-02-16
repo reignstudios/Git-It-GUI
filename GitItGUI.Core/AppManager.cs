@@ -169,16 +169,15 @@ namespace GitItGUI.Core
 
 			if (found == null)
 			{
-				settings.repositories.Add(item);
-				var buff = settings.repositories[0];
-				settings.repositories[0] = settings.repositories[settings.repositories.Count-1];
-				settings.repositories[settings.repositories.Count-1] = buff;
+				settings.repositories.Insert(0, item);
 			}
-			else
+			else if (index != 0) 
 			{
 				var buff = settings.repositories[0];
-				settings.repositories[0] = found;
-				settings.repositories[index] = buff;
+				settings.repositories.RemoveAt(0);
+				settings.repositories.RemoveAt(index);
+				settings.repositories.Insert(0, found);
+				settings.repositories.Insert(1, buff);
 			}
 
 			// trim
