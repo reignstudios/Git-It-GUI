@@ -146,6 +146,18 @@ namespace GitItGUI.Core
 			}
 		}
 
+		public static void RemoveRepoFromHistory(string repoPath)
+		{
+			foreach (var repo in settings.repositories)
+			{
+				if (repo.path == repoPath)
+				{
+					settings.repositories.Remove(repo);
+					return;
+				}
+			}
+		}
+
 		internal static void AddActiveRepoToHistory()
 		{
 			// add if doesn't exist
@@ -174,8 +186,8 @@ namespace GitItGUI.Core
 			else if (index != 0) 
 			{
 				var buff = settings.repositories[0];
-				settings.repositories.RemoveAt(0);
 				settings.repositories.RemoveAt(index);
+				settings.repositories.RemoveAt(0);
 				settings.repositories.Insert(0, found);
 				settings.repositories.Insert(1, buff);
 			}

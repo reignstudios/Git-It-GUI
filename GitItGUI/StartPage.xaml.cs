@@ -100,6 +100,7 @@ namespace GitItGUI
 				// remove bad repo from list
 				MessageBox.Show("Failed to open repo: " + path);
 				recentStackPanel.Children.Remove(button);
+				AppManager.RemoveRepoFromHistory(path);
 				return;
 			}
 
