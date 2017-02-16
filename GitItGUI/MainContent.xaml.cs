@@ -11,10 +11,15 @@ namespace GitItGUI
 		public static MainContent singleton;
 		public event MainContentPageNavigateMethod MainContentPageNavigatedTo, MainContentPageNavigateFrom;
 
+		private TabControl tabControl;
+		public int tabControlNavigateIndex = -1;
+
 		public MainContent()
 		{
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
+
+			tabControl = this.Find<TabControl>("tabControl");
 		}
 
 		public void NavigatedFrom()
@@ -24,6 +29,8 @@ namespace GitItGUI
 
 		public void NavigatedTo()
 		{
+			if (tabControlNavigateIndex != -1) tabControl.SelectedIndex = tabControlNavigateIndex;
+			tabControlNavigateIndex = -1;
 			if (MainContentPageNavigatedTo != null) MainContentPageNavigatedTo();
 		}
 	}

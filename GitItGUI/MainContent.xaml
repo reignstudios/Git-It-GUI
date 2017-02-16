@@ -1,7 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui" MinWidth="640" MinHeight="400"
 	xmlns:gititgui="clr-namespace:GitItGUI;assembly=GitItGUI">
 
-	<TabControl Margin="0,0,0,0">
+	<TabControl Name="tabControl" Margin="0,0,0,0">
 		<TabItem Name="changesPage" Header="Changes">
 			<gititgui:ChangesPage/>
 		</TabItem>

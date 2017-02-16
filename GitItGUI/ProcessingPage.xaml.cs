@@ -94,10 +94,24 @@ namespace GitItGUI
 				if (result == MergeResults.Succeeded)
 				{
 					MessageBox.Show("Merge Succedded!\n(Remember to sync with the server!)");
+					MainContent.singleton.tabControlNavigateIndex = 0;
+					MainWindow.LoadPage(PageTypes.MainContent);
 				}
-				else if (result == MergeResults.Conflicts && MessageBox.Show("Conflicts detected! Resolve now?", MessageBoxTypes.YesNo))
+				else if (result == MergeResults.Conflicts)
 				{
-					ChangesManager.ResolveAllConflicts();
+					const string warning = "\nIf you notice extra files in your staged area (its OK),\nthis is common after a merge conflic.";
+					const string resolveFailWarning = "Please resolve conflicts then sync your changes with the server!" + warning;
+					if (MessageBox.Show("Conflicts detected! Resolve now?", MessageBoxTypes.YesNo))
+					{
+						if (ChangesManager.ResolveAllConflicts()) MessageBox.Show("Now sync your changes with the server!" + warning);
+						else MessageBox.Show(resolveFailWarning);
+					}
+					else
+					{
+						MessageBox.Show(resolveFailWarning);
+					}
+
+					MainContent.singleton.tabControlNavigateIndex = 0;
 				}
 			}
 			else if (mode == ProcessingPageModes.Switch)
