@@ -3,6 +3,7 @@ using Avalonia.Markup.Xaml;
 using System;
 using GitItGUI.Core;
 using Avalonia.Threading;
+using System.Threading;
 
 namespace GitItGUI
 {
@@ -66,10 +67,14 @@ namespace GitItGUI
 			}
 			else
 			{
+				bool isDone = false;
 				Dispatcher.UIThread.InvokeAsync(delegate
 				{
 					if (alert) MessageBox.Show(value.ToString());
+					isDone = true;
 				});
+
+				while (!isDone) Thread.Sleep(1);
 			}
 		}
 
@@ -93,10 +98,14 @@ namespace GitItGUI
 			}
 			else
 			{
+				bool isDone = false;
 				Dispatcher.UIThread.InvokeAsync(delegate
 				{
 					LoadPage_UIThread(type);
+					isDone = true;
 				});
+
+				while (!isDone) Thread.Sleep(1);
 			}
 		}
 

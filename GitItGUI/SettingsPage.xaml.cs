@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace GitItGUI
 {
@@ -70,10 +71,14 @@ namespace GitItGUI
 			}
 			else
 			{
+				bool isDone = false;
 				Dispatcher.UIThread.InvokeAsync(delegate
 				{
 					RepoManager_RepoRefreshedCallback_UIThread();
+					isDone = true;
 				});
+
+				while (!isDone) Thread.Sleep(1);
 			}
 		}
 

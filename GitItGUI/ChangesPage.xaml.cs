@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -524,10 +525,14 @@ namespace GitItGUI
 			}
 			else
 			{
+				bool isDone = false;
 				Dispatcher.UIThread.InvokeAsync(delegate
 				{
 					RepoManager_RepoRefreshedCallback_UIThread();
+					isDone = true;
 				});
+
+				while (!isDone) Thread.Sleep(1);
 			}
 		}
 
