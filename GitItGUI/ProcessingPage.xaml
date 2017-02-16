@@ -1,7 +1,8 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="500" Design.Height="300">
+﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="800" Design.Height="500">
 	<Grid>
 		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32" Margin="0,-40,0,40">Processing...</TextBlock>
 		<Image Source="resm:GitItGUI.Icons.AppIcon.png?assembly=GitItGUI" Margin="0,30,0,-30" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="64" MaxHeight="64"/>
+		<TextBox Name="statusTextBox" IsReadOnly="True" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Width="400" Margin="0,90,0,-90">Waiting...</TextBox>
 		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="14" Margin="0,-10,0,10">This can take some time on large repositories.</TextBlock>
 	</Grid>
 </UserControl>

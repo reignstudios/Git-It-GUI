@@ -482,7 +482,7 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool Pull()
+		public static bool Pull(StatusUpdateCallbackMethod statusCallback)
 		{
 			bool conflicts = false;
 
@@ -501,7 +501,22 @@ namespace GitItGUI.Core
 				options.FetchOptions = new FetchOptions();
 				options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => RepoManager.credentials;
 				options.FetchOptions.TagFetchMode = TagFetchMode.All;
+				options.FetchOptions.OnProgress = new LibGit2Sharp.Handlers.ProgressHandler(delegate(string serverProgressOutput)
+				{
+					if (statusCallback != null) statusCallback(serverProgressOutput);
+					return true;
+				});
+
+				options.FetchOptions.OnTransferProgress = new LibGit2Sharp.Handlers.TransferProgressHandler(delegate(TransferProgress progress)
+				{
+					if (statusCallback != null) statusCallback(string.Format("Downloading: {0}%", ((progress.ReceivedObjects / (decimal)(progress.TotalObjects+1)) * 100)));
+					return true;
+				});
+
+				Filters.GitLFS.statusCallback = statusCallback;
 				Commands.Pull(RepoManager.repo, RepoManager.signature, options);
+				Filters.GitLFS.statusCallback = null;
+
 				conflicts = ConflictsExist();
 				if (conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
 				else Debug.Log("Pull Succeeded!", !isSyncMode);
@@ -509,14 +524,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to pull: " + e.Message, true);
+				Filters.GitLFS.statusCallback = null;
 				return false;
 			}
 
+			Filters.GitLFS.statusCallback = null;
 			if (!isSyncMode) RepoManager.Refresh();
 			return !conflicts;
 		}
 
-		public static bool Push()
+		public static bool Push(StatusUpdateCallbackMethod statusCallback)
 		{
 			try
 			{
@@ -530,6 +547,7 @@ namespace GitItGUI.Core
 				var options = new PushOptions();
 				if (RepoManager.lfsEnabled)
 				{
+					if (statusCallback != null) statusCallback("Starting Git-LFS pre-push...");
 					options.OnNegotiationCompletedBeforePush = delegate(IEnumerable<PushUpdate> updates)
 					{
 						string outputErr = "", output = "";
@@ -546,12 +564,20 @@ namespace GitItGUI.Core
 
 							process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 							{
-								if (e.Data != null) output += e.Data + Environment.NewLine;
+								if (e.Data != null)
+								{
+									output += e.Data + Environment.NewLine;
+									if (statusCallback != null) statusCallback(e.Data);
+								}
 							};
 
 							process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 							{
-								if (e.Data != null) outputErr += e.Data + Environment.NewLine;
+								if (e.Data != null)
+								{
+									outputErr += e.Data + Environment.NewLine;
+									if (statusCallback != null) statusCallback("ERROR: " + e.Data);
+								}
 							};
 
 							process.Start();
@@ -589,7 +615,10 @@ namespace GitItGUI.Core
 					Debug.LogError("Failed to push (do you have valid permisions?): " + ex.Message, true);
 					pushError = true;
 				};
+
+				Filters.GitLFS.statusCallback = statusCallback;
 				RepoManager.repo.Network.Push(BranchManager.activeBranch, options);
+				Filters.GitLFS.statusCallback = null;
 				
 				if (!pushError)
 				{
@@ -599,18 +628,21 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to push: " + e.Message, true);
+				Filters.GitLFS.statusCallback = null;
 				return false;
 			}
 
+			Filters.GitLFS.statusCallback = null;
 			if (!isSyncMode) RepoManager.Refresh();
 			return true;
 		}
 
-		public static bool Sync()
+		public static bool Sync(StatusUpdateCallbackMethod statusCallback)
 		{
+			if (statusCallback != null) statusCallback("Syncing Started...");
 			isSyncMode = true;
-			bool pass = Pull();
-			if (pass) pass = Push();
+			bool pass = Pull(statusCallback);
+			if (pass) pass = Push(statusCallback);
 			isSyncMode = false;
 			
 			if (!pass)

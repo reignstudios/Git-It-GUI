@@ -8,6 +8,7 @@ namespace GitItGUI.Core.Filters
 {
 	class GitLFS : Filter
 	{
+		public static StatusUpdateCallbackMethod statusCallback;
 		private Process process;
 		private FilterMode mode;
 
@@ -79,6 +80,7 @@ namespace GitItGUI.Core.Filters
 				return;
 			}
 
+			if (statusCallback != null) statusCallback(string.Format("Processing file '{0}' with filter '{1}'", path, mode));
 			this.mode = mode;
 			try
 			{

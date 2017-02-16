@@ -33,10 +33,16 @@ namespace GitItGUI
 		private int askToOptamizeSync;
 		private Thread thread;
 
+		// ui
+		private TextBox statusTextBox;
+
 		public ProcessingPage()
 		{
 			singleton = this;
 			AvaloniaXamlLoader.Load(this);
+
+			// load ui
+			statusTextBox = this.Find<TextBox>("statusTextBox");
 		}
 
 		public void NavigatedFrom()
@@ -46,18 +52,38 @@ namespace GitItGUI
 
 		public async void NavigatedTo()
 		{
+			statusTextBox.Text = "Waiting...";
 			await Task.Delay(500);
 			thread = new Thread(Process);
 			thread.Start();
 		}
 
+		private void StatusUpdateCallback(string status)
+		{
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				statusTextBox.Text = status;
+			}
+			else
+			{
+				bool isDone = false;
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					statusTextBox.Text = status;
+					isDone = true;
+				});
+
+				while (!isDone) Thread.Sleep(1);
+			}
+		}
+
 		private void Process()
 		{
-			if (mode == ProcessingPageModes.Pull) ChangesManager.Pull();
-			else if (mode == ProcessingPageModes.Push) ChangesManager.Push();
+			if (mode == ProcessingPageModes.Pull) ChangesManager.Pull(StatusUpdateCallback);
+			else if (mode == ProcessingPageModes.Push) ChangesManager.Push(StatusUpdateCallback);
 			else if (mode == ProcessingPageModes.Sync)
 			{
-				if (ChangesManager.Sync())
+				if (ChangesManager.Sync(StatusUpdateCallback))
 				{
 					if (askToOptamizeSync == 0 && MessageBox.Show("Would you like to run git optimizers?", MessageBoxTypes.YesNo)) RepoManager.Optimize();
 					++askToOptamizeSync;
@@ -90,7 +116,7 @@ namespace GitItGUI
 			}
 			else if (mode == ProcessingPageModes.Merge)
 			{
-				var result = BranchManager.MergeBranchIntoActive(mergeOtherBranch);
+				var result = BranchManager.MergeBranchIntoActive(mergeOtherBranch, StatusUpdateCallback);
 				if (result == MergeResults.Succeeded)
 				{
 					MessageBox.Show("Merge Succedded!\n(Remember to sync with the server!)");
@@ -116,13 +142,13 @@ namespace GitItGUI
 			}
 			else if (mode == ProcessingPageModes.Switch)
 			{
-				if (!switchOtherBranch.isRemote) BranchManager.Checkout(switchOtherBranch);
+				if (!switchOtherBranch.isRemote) BranchManager.Checkout(switchOtherBranch, StatusUpdateCallback);
 				else if (MessageBox.Show("Cannot checkout to remote branch.\nDo you want to create a local one that tracks this remote instead?", MessageBoxTypes.YesNo))
 				{
 					string fullName = switchOtherBranch.branchName;
 					if (BranchManager.AddNewBranch(fullName))
 					{
-						BranchManager.Checkout(fullName);
+						BranchManager.Checkout(fullName, StatusUpdateCallback);
 						BranchManager.AddUpdateTracking(switchOtherBranch.fullName);
 					}
 				}

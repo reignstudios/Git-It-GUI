@@ -114,12 +114,12 @@ namespace GitItGUI.Core
 			return otherBranches.ToArray();
 		}
 
-		public static bool Checkout(BranchState branch)
+		public static bool Checkout(BranchState branch, StatusUpdateCallbackMethod statusCallback)
 		{
-			return Checkout(branch.fullName);
+			return Checkout(branch.fullName, statusCallback);
 		}
 
-		public static bool Checkout(string name)
+		public static bool Checkout(string name, StatusUpdateCallbackMethod statusCallback)
 		{
 			try
 			{
@@ -130,30 +130,43 @@ namespace GitItGUI.Core
 				var selectedBranch = RepoManager.repo.Branches[name];
 				if (activeBranch.FriendlyName != selectedBranch.FriendlyName)
 				{
-					var newBranch = Commands.Checkout(RepoManager.repo, selectedBranch);
+					var options = new CheckoutOptions();
+					options.OnCheckoutProgress = new LibGit2Sharp.Handlers.CheckoutProgressHandler(delegate(string path, int completedSteps, int totalSteps)
+					{
+						if (statusCallback != null) statusCallback(string.Format("Checking out: {0}%", ((completedSteps / (decimal)(totalSteps+1)) * 100)));
+					});
+
+					Filters.GitLFS.statusCallback = statusCallback;
+					var newBranch = Commands.Checkout(RepoManager.repo, selectedBranch, options);
+					Filters.GitLFS.statusCallback = null;
+
 					if (newBranch.FriendlyName != selectedBranch.FriendlyName)
 					{
 						Debug.LogError("Error checking out branch (do you have pending changes?)", true);
+						Filters.GitLFS.statusCallback = null;
 						return false;
 					}
 				}
 				else
 				{
 					Debug.LogError("Already on branch: " + name, true);
+					Filters.GitLFS.statusCallback = null;
 					return false;
 				}
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("BranchManager.Checkout Failed: " + e.Message, true);
+				Filters.GitLFS.statusCallback = null;
 				return false;
 			}
 
+			Filters.GitLFS.statusCallback = null;
 			RepoManager.Refresh();
 			return true;
 		}
 
-		public static MergeResults MergeBranchIntoActive(BranchState srcBranch)
+		public static MergeResults MergeBranchIntoActive(BranchState srcBranch, StatusUpdateCallbackMethod statusCallback)
 		{
 			MergeResults mergeResult;
 			try
@@ -162,17 +175,29 @@ namespace GitItGUI.Core
 				RepoManager.DeleteRepoSettingsIfUnCommit();
 
 				// merge
+				var options = new MergeOptions();
+				options.OnCheckoutProgress = new LibGit2Sharp.Handlers.CheckoutProgressHandler(delegate(string path, int completedSteps, int totalSteps)
+				{
+					if (statusCallback != null) statusCallback(string.Format("Merging: {0}%", ((completedSteps / (decimal)(totalSteps+1)) * 100)));
+				});
+
 				var srcBround = RepoManager.repo.Branches[srcBranch.fullName];
-				var result = RepoManager.repo.Merge(srcBround, RepoManager.signature);
+
+				Filters.GitLFS.statusCallback = statusCallback;
+				var result = RepoManager.repo.Merge(srcBround, RepoManager.signature, options);
+				Filters.GitLFS.statusCallback = null;
+
 				if (result.Status == MergeStatus.Conflicts) mergeResult = MergeResults.Conflicts;
 				else mergeResult = MergeResults.Succeeded;
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("BranchManager.Merge Failed: " + e.Message, true);
+				Filters.GitLFS.statusCallback = null;
 				return MergeResults.Error;
 			}
 
+			Filters.GitLFS.statusCallback = null;
 			RepoManager.Refresh();
 			return mergeResult;
 		}

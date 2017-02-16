@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 
 namespace GitItGUI.Core
 {
+	public delegate void StatusUpdateCallbackMethod(string status);
+
 	/// <summary>
 	/// Primary git manager
 	/// </summary>
@@ -87,9 +89,19 @@ namespace GitItGUI.Core
 				validateGitignoreCheckbox = settings.validateGitignore;
 				if (!refreshMode && settings.validateGitignore)
 				{
-					if (!File.Exists(path + "\\.gitignore"))
+					string gitIgnorePath = path + "\\.gitignore";
+					if (!File.Exists(gitIgnorePath))
 					{
 						Debug.LogWarning("No '.gitignore' file exists.\nMake sure you add one!", true);
+					}
+					else
+					{
+						string text = File.ReadAllText(gitIgnorePath);
+						if (!text.Contains("*" + Settings.repoUserSettingsFilename))
+						{
+							text += string.Format("{0}{0}*{1}", Environment.NewLine, Settings.repoUserSettingsFilename);
+							File.WriteAllText(gitIgnorePath, text);
+						}
 					}
 				}
 
