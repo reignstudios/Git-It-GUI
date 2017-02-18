@@ -480,6 +480,38 @@ namespace GitItGUI.Core
 			Refresh();
 		}
 
+		public static int UnpackedObjectCount(out string size)
+		{
+			size = null;
+
+			try
+			{
+				string errors;
+				string result = Tools.RunExeOutputErrors("git", "count-objects", null, out errors);
+				if (!string.IsNullOrEmpty(errors) || string.IsNullOrEmpty(result))
+				{
+					Debug.LogError("git gc errors: " + errors, true);
+					return -1;
+				}
+
+				var match = Regex.Match(result, @"(\d*) objects, (\d* kilobytes)");
+				if (match.Groups.Count != 3)
+				{
+					Debug.LogError("git gc invalid result: " + result, true);
+					return -1;
+				}
+				
+				size = match.Groups[2].Value;
+				return int.Parse(match.Groups[1].Value);
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to optamize: " + e.Message, true);
+			}
+
+			return -1;
+		}
+
 		public static void Optimize()
 		{
 			try

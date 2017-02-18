@@ -509,7 +509,7 @@ namespace GitItGUI.Core
 
 				options.FetchOptions.OnTransferProgress = new LibGit2Sharp.Handlers.TransferProgressHandler(delegate(TransferProgress progress)
 				{
-					if (statusCallback != null) statusCallback(string.Format("Downloading: {0}%", ((progress.ReceivedObjects / (decimal)(progress.TotalObjects+1)) * 100)));
+					if (statusCallback != null) statusCallback(string.Format("Downloading: {0}%", (int)((progress.ReceivedObjects / (decimal)(progress.TotalObjects+1)) * 100)));
 					return true;
 				});
 

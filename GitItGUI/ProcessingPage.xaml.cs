@@ -29,8 +29,7 @@ namespace GitItGUI
 
 		public BranchState mergeOtherBranch;
 		public BranchState switchOtherBranch;
-
-		private int askToOptamizeSync;
+		
 		private Thread thread;
 
 		// ui
@@ -85,9 +84,12 @@ namespace GitItGUI
 			{
 				if (ChangesManager.Sync(StatusUpdateCallback))
 				{
-					if (askToOptamizeSync == 0 && MessageBox.Show("Would you like to run git optimizers?", MessageBoxTypes.YesNo)) RepoManager.Optimize();
-					++askToOptamizeSync;
-					if (askToOptamizeSync == 10) askToOptamizeSync = 0;
+					string size;
+					int count = RepoManager.UnpackedObjectCount(out size);
+					if (count >= 1000 && MessageBox.Show(string.Format("Would you like to run git optimizers?\nYou have {0} from {1} unpacked files.\nThis can take over 10 sec to complete!", size, count), MessageBoxTypes.YesNo))
+					{
+						RepoManager.Optimize();
+					}
 				}
 			}
 			else if (mode == ProcessingPageModes.Clone)
