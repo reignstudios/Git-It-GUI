@@ -76,13 +76,45 @@ namespace GitItGUI
 			}
 		}
 
+		private void HandleMergeConflicts()
+		{
+			const string warning = "\nIf you notice extra files in your staged area (its OK),\nthis is common after a merge conflic.";
+			const string resolveFailWarning = "Please resolve conflicts then sync your changes with the server!" + warning;
+			if (MessageBox.Show("Conflicts detected! Resolve now?", MessageBoxTypes.YesNo))
+			{
+				if (ChangesManager.ResolveAllConflicts()) MessageBox.Show("Now sync your changes with the server!" + warning);
+				else MessageBox.Show(resolveFailWarning);
+			}
+			else
+			{
+				MessageBox.Show(resolveFailWarning);
+			}
+
+			MainContent.singleton.tabControlNavigateIndex = 0;
+		}
+
 		private void Process()
 		{
-			if (mode == ProcessingPageModes.Pull) ChangesManager.Pull(StatusUpdateCallback);
-			else if (mode == ProcessingPageModes.Push) ChangesManager.Push(StatusUpdateCallback);
+			// pull
+			if (mode == ProcessingPageModes.Pull)
+			{
+				if (ChangesManager.Pull(StatusUpdateCallback) == SyncMergeResults.Conflicts)
+				{
+					HandleMergeConflicts();
+				}
+			}
+
+			// push
+			else if (mode == ProcessingPageModes.Push)
+			{
+				ChangesManager.Push(StatusUpdateCallback);
+			}
+
+			// sync
 			else if (mode == ProcessingPageModes.Sync)
 			{
-				if (ChangesManager.Sync(StatusUpdateCallback))
+				var result = ChangesManager.Sync(StatusUpdateCallback);
+				if (result == SyncMergeResults.Succeeded)
 				{
 					string size;
 					int count = RepoManager.UnpackedObjectCount(out size);
@@ -91,7 +123,13 @@ namespace GitItGUI
 						RepoManager.Optimize();
 					}
 				}
+				else if (result == SyncMergeResults.Conflicts)
+				{
+					HandleMergeConflicts();
+				}
 			}
+
+			// clone
 			else if (mode == ProcessingPageModes.Clone)
 			{
 				// clone repo
@@ -116,6 +154,8 @@ namespace GitItGUI
 				RepoManager.SaveSettings();
 				RepoManager.Refresh();
 			}
+
+			// merge
 			else if (mode == ProcessingPageModes.Merge)
 			{
 				var result = BranchManager.MergeBranchIntoActive(mergeOtherBranch, StatusUpdateCallback);
@@ -127,21 +167,11 @@ namespace GitItGUI
 				}
 				else if (result == MergeResults.Conflicts)
 				{
-					const string warning = "\nIf you notice extra files in your staged area (its OK),\nthis is common after a merge conflic.";
-					const string resolveFailWarning = "Please resolve conflicts then sync your changes with the server!" + warning;
-					if (MessageBox.Show("Conflicts detected! Resolve now?", MessageBoxTypes.YesNo))
-					{
-						if (ChangesManager.ResolveAllConflicts()) MessageBox.Show("Now sync your changes with the server!" + warning);
-						else MessageBox.Show(resolveFailWarning);
-					}
-					else
-					{
-						MessageBox.Show(resolveFailWarning);
-					}
-
-					MainContent.singleton.tabControlNavigateIndex = 0;
+					HandleMergeConflicts();
 				}
 			}
+
+			// switch
 			else if (mode == ProcessingPageModes.Switch)
 			{
 				if (!switchOtherBranch.isRemote) BranchManager.Checkout(switchOtherBranch, StatusUpdateCallback);
@@ -155,11 +185,14 @@ namespace GitItGUI
 					}
 				}
 			}
+
+			// error
 			else
 			{
 				MessageBox.Show("Unsuported Processing mode: " + mode);
 			}
 
+			// finish
 			MainWindow.LoadPage(PageTypes.MainContent);
 		}
 	}

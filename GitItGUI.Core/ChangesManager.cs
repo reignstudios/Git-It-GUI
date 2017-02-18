@@ -77,6 +77,13 @@ namespace GitItGUI.Core
 		No
 	}
 
+	public enum SyncMergeResults
+	{
+		Succeeded,
+		Conflicts,
+		Error
+	}
+
 	public static class ChangesManager
 	{
 		public delegate bool AskUserToResolveBinaryFileCallbackMethod(FileState fileState, out MergeBinaryFileResults result);
@@ -482,16 +489,16 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool Pull(StatusUpdateCallbackMethod statusCallback)
+		public static SyncMergeResults Pull(StatusUpdateCallbackMethod statusCallback)
 		{
-			bool conflicts = false;
+			var result = SyncMergeResults.Error;
 
 			try
 			{
 				if (!BranchManager.IsTracking())
 				{
 					Debug.LogWarning("Branch is not tracking a remote!", true);
-					return false;
+					return SyncMergeResults.Error;
 				}
 
 				// check for git settings file not in repo history
@@ -517,20 +524,20 @@ namespace GitItGUI.Core
 				Commands.Pull(RepoManager.repo, RepoManager.signature, options);
 				Filters.GitLFS.statusCallback = null;
 
-				conflicts = ConflictsExist();
-				if (conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
+				result = ConflictsExist() ? SyncMergeResults.Conflicts : SyncMergeResults.Succeeded;
+				if (result == SyncMergeResults.Conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
 				else Debug.Log("Pull Succeeded!", !isSyncMode);
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to pull: " + e.Message, true);
 				Filters.GitLFS.statusCallback = null;
-				return false;
+				return SyncMergeResults.Error;
 			}
 
 			Filters.GitLFS.statusCallback = null;
 			if (!isSyncMode) RepoManager.Refresh();
-			return !conflicts;
+			return result;
 		}
 
 		public static bool Push(StatusUpdateCallbackMethod statusCallback)
@@ -637,18 +644,19 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool Sync(StatusUpdateCallbackMethod statusCallback)
+		public static SyncMergeResults Sync(StatusUpdateCallbackMethod statusCallback)
 		{
 			if (statusCallback != null) statusCallback("Syncing Started...");
 			isSyncMode = true;
-			bool pass = Pull(statusCallback);
-			if (pass) pass = Push(statusCallback);
+			var result = Pull(statusCallback);
+			bool pushPass = false;
+			if (result == SyncMergeResults.Succeeded) pushPass = Push(statusCallback);
 			isSyncMode = false;
 			
-			if (!pass)
+			if (result != SyncMergeResults.Succeeded || !pushPass)
 			{
 				Debug.LogError("Failed to Sync changes", true);
-				return false;
+				return result;
 			}
 			else
 			{
@@ -656,7 +664,7 @@ namespace GitItGUI.Core
 			}
 			
 			RepoManager.Refresh();
-			return true;
+			return result;
 		}
 
 		public static bool ConflictsExist()
