@@ -93,12 +93,27 @@ namespace GitItGUI
 			MainContent.singleton.tabControlNavigateIndex = 0;
 		}
 
+		private void CheckForFragmentation()
+		{
+			string size;
+			int count = RepoManager.UnpackedObjectCount(out size);
+			if (count >= 1000 && MessageBox.Show(string.Format("Would you like to run git optimizers?\nYou have {0} from {1} unpacked files.\nThis can take over 10 sec to complete!", size, count), MessageBoxTypes.YesNo))
+			{
+				RepoManager.Optimize();
+			}
+		}
+
 		private void Process()
 		{
 			// pull
 			if (mode == ProcessingPageModes.Pull)
 			{
-				if (ChangesManager.Pull(StatusUpdateCallback) == SyncMergeResults.Conflicts)
+				var result = ChangesManager.Pull(StatusUpdateCallback);
+				if (result == SyncMergeResults.Succeeded)
+				{
+					CheckForFragmentation();
+				}
+				else if (result == SyncMergeResults.Conflicts)
 				{
 					HandleMergeConflicts();
 				}
@@ -107,7 +122,10 @@ namespace GitItGUI
 			// push
 			else if (mode == ProcessingPageModes.Push)
 			{
-				ChangesManager.Push(StatusUpdateCallback);
+				if (ChangesManager.Push(StatusUpdateCallback))
+				{
+					CheckForFragmentation();
+				}
 			}
 
 			// sync
@@ -116,12 +134,7 @@ namespace GitItGUI
 				var result = ChangesManager.Sync(StatusUpdateCallback);
 				if (result == SyncMergeResults.Succeeded)
 				{
-					string size;
-					int count = RepoManager.UnpackedObjectCount(out size);
-					if (count >= 1000 && MessageBox.Show(string.Format("Would you like to run git optimizers?\nYou have {0} from {1} unpacked files.\nThis can take over 10 sec to complete!", size, count), MessageBoxTypes.YesNo))
-					{
-						RepoManager.Optimize();
-					}
+					CheckForFragmentation();
 				}
 				else if (result == SyncMergeResults.Conflicts)
 				{
