@@ -86,6 +86,7 @@ namespace GitItGUI
 
 			// load main repo page
 			grid.IsVisible = true;
+			MainContent.singleton.tabControlNavigateIndex = 0;
 			MainWindow.LoadPage(PageTypes.MainContent);
 		}
 
@@ -105,6 +106,7 @@ namespace GitItGUI
 			}
 
 			// load main repo page
+			MainContent.singleton.tabControlNavigateIndex = 0;
 			MainWindow.LoadPage(PageTypes.MainContent);
 		}
 	}

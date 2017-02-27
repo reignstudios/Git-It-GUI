@@ -80,7 +80,7 @@ namespace GitItGUI.Core
 
 				// check for git lfs
 				lfsEnabled = IsGitLFSRepo();
-
+				
 				// load settings
 				settings = Settings.Load<XML.RepoSettings>(path + "\\" + Settings.repoSettingsFilename);
 				userSettings = Settings.Load<XML.RepoUserSettings>(path + "\\" + Settings.repoUserSettingsFilename);
@@ -118,6 +118,12 @@ namespace GitItGUI.Core
 				
 				BranchManager.OpenRepo(repo);
 				AppManager.AddActiveRepoToHistory();
+
+				// warnings
+				if (userSettings.signatureName.Contains("TODO: ") || userSettings.signatureEmail.Contains("TODO: ") || userSettings.username.Contains("TODO: "))
+				{
+					Debug.LogWarning("Credentials not set, please go to the settings tab!", true);
+				}
 			}
 			catch (Exception e)
 			{

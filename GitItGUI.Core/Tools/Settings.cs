@@ -31,10 +31,10 @@ namespace GitItGUI.Core
 		[XmlRoot("RepoUserSettings")]
 		public class RepoUserSettings
 		{
-			[XmlAttribute("SignatureName")] public string signatureName = "First Last";
-			[XmlAttribute("SignatureEmail")] public string signatureEmail = "username@email.com";
-			[XmlAttribute("Username")] public string username = "Username";
-			[XmlAttribute("Password")] public string password = "password";
+			[XmlAttribute("SignatureName")] public string signatureName = "TODO: First Last";
+			[XmlAttribute("SignatureEmail")] public string signatureEmail = "TODO: username@email.com";
+			[XmlAttribute("Username")] public string username = "TODO: Username";
+			[XmlAttribute("Password")] public string password = "";
 		}
 	}
 	

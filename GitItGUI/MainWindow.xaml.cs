@@ -4,6 +4,7 @@ using System;
 using GitItGUI.Core;
 using Avalonia.Threading;
 using System.Threading;
+using System.IO;
 
 namespace GitItGUI
 {

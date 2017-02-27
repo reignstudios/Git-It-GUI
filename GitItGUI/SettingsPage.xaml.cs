@@ -20,7 +20,7 @@ namespace GitItGUI
 		private bool refreshMode;
 
 		// UI objects
-		Button applyChangesButton, closeRepoButton;
+		Button applyChangesButton;
 		TextBox sigNameTextBox, sigEmailTextBox, usernameTextBox, passwordTextBox;
 		CheckBox gitlfsSupportCheckBox, validateGitignoreCheckbox;
 
@@ -31,7 +31,6 @@ namespace GitItGUI
 
 			// load ui items
 			applyChangesButton = this.Find<Button>("applyChangesButton");
-			closeRepoButton = this.Find<Button>("closeRepoButton");
 			sigNameTextBox = this.Find<TextBox>("sigNameTextBox");
 			sigEmailTextBox = this.Find<TextBox>("sigEmailTextBox");
 			usernameTextBox = this.Find<TextBox>("usernameTextBox");
@@ -41,7 +40,6 @@ namespace GitItGUI
 
 			// apply bindings
 			applyChangesButton.Click += ApplyChangesButton_Click;
-			closeRepoButton.Click += CloseRepoButton_Click;
 			sigNameTextBox.TextInput += TextInputChanged;
 			sigEmailTextBox.TextInput += TextInputChanged;
 			usernameTextBox.TextInput += TextInputChanged;
@@ -54,13 +52,6 @@ namespace GitItGUI
 
 			// bind managers
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
-		}
-
-		private void CloseRepoButton_Click(object sender, RoutedEventArgs e)
-		{
-			applyChangesButton.IsVisible = false;
-			RepoManager.Close();
-			MainWindow.LoadPage(PageTypes.Start);
 		}
 
 		private void RepoManager_RepoRefreshedCallback()
@@ -85,6 +76,7 @@ namespace GitItGUI
 		private void RepoManager_RepoRefreshedCallback_UIThread()
 		{
 			refreshMode = true;
+			applyChangesButton.IsVisible = false;
 			sigNameTextBox.Text = RepoManager.signatureName;
 			sigEmailTextBox.Text = RepoManager.signatureEmail;
 			usernameTextBox.Text = RepoManager.credentialUsername;
