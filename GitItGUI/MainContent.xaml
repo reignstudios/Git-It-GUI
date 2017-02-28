@@ -2,7 +2,7 @@
 	xmlns:gititgui="clr-namespace:GitItGUI;assembly=GitItGUI">
 
 	<Grid>
-		<TextBlock Name="repoName" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" Margin="0,5,0,-5" Height="30">My Repo Name</TextBlock>
+		<TextBlock Name="repoName" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="22" Margin="0,5,0,-5" Height="30">My Repo Name</TextBlock>
 		<Button Name="closeRepoButton" HorizontalAlignment="Right" VerticalAlignment="Top" Width="110" Height="30" Margin="-10,5,10,-5">Close Repo</Button>
 
 		<Grid Margin="0,30,0,0">
