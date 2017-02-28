@@ -2,7 +2,7 @@
 	xmlns:gititgui="clr-namespace:GitItGUI;assembly=GitItGUI"
 	Title="Git-It-GUI"
 	Icon="resm:GitItGUI.Icons.AppIcon.ico?assembly=GitItGUI"
-	Width="1280" Height="800">
+	Width="1280" Height="800" MinWidth="1280" MinHeight="800">
 
 	<Grid>
 		<gititgui:CheckForUpdatesPage Name="checkForUpdatesPage" IsVisible="True"/>

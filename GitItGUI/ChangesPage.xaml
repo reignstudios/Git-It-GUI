@@ -22,12 +22,7 @@
 	</UserControl.DataTemplates>
 
 	<Grid Background="LightGray">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="80*" />
-			<RowDefinition Height="20*" />
-		</Grid.RowDefinitions>
-
-		<Grid Grid.Row="0" Background="LightGray">
+		<Grid Background="LightGray" Margin="0,0,0,120">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="50*" />
 				<ColumnDefinition Width="50*" />
@@ -62,7 +57,7 @@
 			</Grid>
 		</Grid>
 
-		<TabControl Grid.Row="1" Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" Margin="10,10,10,10">
+		<TabControl Background="LightGray" BorderBrush="DarkGray" BorderThickness="2" VerticalAlignment="Bottom" Margin="10,-10,10,10">
 			<TabItem Header="Simple">
 				<Grid Background="White">
 					<Button Name="syncChangesButton" FontSize="18" Content="Sync" Margin="10,10,0,10" HorizontalAlignment="Left" Width="256"/>
