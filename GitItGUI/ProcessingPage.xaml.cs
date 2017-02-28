@@ -146,13 +146,18 @@ namespace GitItGUI
 			else if (mode == ProcessingPageModes.Clone)
 			{
 				// clone repo
-				cloneSucceeded = RepoManager.Clone(cloneURL, clonePath, cloneUsername, clonePassword, out clonePath);
+				cloneSucceeded = RepoManager.Clone(cloneURL, clonePath, cloneUsername, clonePassword, out clonePath, StatusUpdateCallback);
 				if (!cloneSucceeded)
 				{
 					MessageBox.Show("Failed to clone repo: " + clonePath);
 					MainWindow.LoadPage(PageTypes.Clone);
 					return;
 				}
+
+				// update credentials
+				RepoManager.ForceNewSettings();
+				RepoManager.UpdateCredentialValues(cloneUsername, clonePassword);
+				RepoManager.SaveSettings(clonePath);
 
 				// open repo
 				if (!RepoManager.OpenRepo(clonePath))
@@ -161,11 +166,6 @@ namespace GitItGUI
 					MainWindow.LoadPage(PageTypes.Start);
 					return;
 				}
-
-				// update credentials
-				RepoManager.UpdateCredentialValues(cloneUsername, clonePassword);
-				RepoManager.SaveSettings();
-				RepoManager.Refresh();
 			}
 
 			// merge

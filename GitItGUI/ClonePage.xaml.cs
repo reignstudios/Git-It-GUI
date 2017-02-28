@@ -61,12 +61,6 @@ namespace GitItGUI
 				return;
 			}
 
-			if (string.IsNullOrEmpty(passwordTextBox.Text))
-			{
-				MessageBox.Show("Invalid password");
-				return;
-			}
-
 			// clone
 			ProcessingPage.singleton.mode = ProcessingPageModes.Clone;
 			ProcessingPage.singleton.cloneSucceeded = false;

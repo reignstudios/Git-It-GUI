@@ -106,6 +106,7 @@ namespace GitItGUI
 			if (validateGitignoreCheckbox.IsChecked != RepoManager.validateGitignoreCheckbox) RepoManager.UpdateValidateGitignore(validateGitignoreCheckbox.IsChecked);
 			if (gitlfsSupportCheckBox.IsChecked != RepoManager.lfsEnabled)
 			{
+				MessageBox.Show("Git-LFS operations will take extra time to complete!\nBe patient!");
 				if (gitlfsSupportCheckBox.IsChecked) RepoManager.AddGitLFSSupport(true);
 				else RepoManager.RemoveGitLFSSupport(false);
 			}

@@ -77,9 +77,9 @@ namespace GitItGUI.Core
 				// load repo
 				repoPath = path;
 				repo = new Repository(path);
-
+				
 				// check for git lfs
-				lfsEnabled = IsGitLFSRepo();
+				lfsEnabled = IsGitLFSRepo(false);
 				
 				// load settings
 				settings = Settings.Load<XML.RepoSettings>(path + "\\" + Settings.repoSettingsFilename);
@@ -92,7 +92,9 @@ namespace GitItGUI.Core
 					string gitIgnorePath = path + "\\.gitignore";
 					if (!File.Exists(gitIgnorePath))
 					{
-						Debug.LogWarning("No '.gitignore' file exists.\nMake sure you add one!", true);
+						Debug.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
+						string text = string.Format("*{0}", Settings.repoUserSettingsFilename);
+						File.WriteAllText(gitIgnorePath, text);
 					}
 					else
 					{
@@ -168,7 +170,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public static bool Clone(string url, string destination, string username, string password, out string repoPath)
+		public static bool Clone(string url, string destination, string username, string password, out string repoPath, StatusUpdateCallbackMethod statusCallback)
 		{
 			try
 			{
@@ -204,43 +206,60 @@ namespace GitItGUI.Core
 					Username = username,
 					Password = password
 				};
+
+				options.OnProgress += delegate(string serverProgressOutput)
+				{
+					if (statusCallback != null) statusCallback(serverProgressOutput);
+					return true;
+				};
+
+				options.OnTransferProgress = delegate(TransferProgress progress)
+				{
+					if (statusCallback != null) statusCallback(string.Format("Downloading: {0}%", (int)((progress.ReceivedObjects / (decimal)(progress.TotalObjects+1)) * 100)));
+					return true;
+				};
+
+				options.OnCheckoutProgress = delegate(string path, int completedSteps, int totalSteps)
+				{
+					if (statusCallback != null) statusCallback(string.Format("Checking out: {0}%", (int)((completedSteps / (decimal)(totalSteps+1)) * 100)));
+				};
+
+				RunExeCallbackMethod lfsCallback = delegate(string stdLine)
+				{
+					if (statusCallback != null) statusCallback(stdLine);
+				};
 				
 				string result = Repository.Clone(url, repoPath, options);
 				if (result == (repoPath + "\\.git\\"))
 				{
-					string attributes = Path.Combine(repoPath, ".gitattributes");
-					if (File.Exists(attributes))
+					RepoManager.repoPath = repoPath;
+					if (IsGitLFSRepo(true))
 					{
-						string lines = File.ReadAllText(attributes);
-						if (lines.Contains("filter=lfs diff=lfs merge=lfs"))
+						const string errorStringHelper = "\n(please manually run these commands in order\ngit-lfs [install, fetch, checkout])";
+
+						string errors;
+						Tools.RunExeOutputErrors("git-lfs", "install", null, out errors, lfsCallback);
+						if (!string.IsNullOrEmpty(errors))
 						{
-							const string errorStringHelper = "\n(please manually run these commands in order\ngit-lfs [install, fetch, checkout])";
-							RepoManager.repoPath = repoPath;
-
-							string errors;
-							Tools.RunExeOutputErrors("git-lfs", "install", null, out errors);
-							if (!string.IsNullOrEmpty(errors))
-							{
-								Debug.LogError("Failed to init git-lfs on repo" + errorStringHelper, true);
-								return false;
-							}
-
-							Tools.RunExeOutputErrors("git-lfs", "fetch", null, out errors);
-							if (!string.IsNullOrEmpty(errors))
-							{
-								Debug.LogError("Failed to fetch git-lfs files" + errorStringHelper, true);
-								return false;
-							}
-
-							Tools.RunExeOutputErrors("git-lfs", "checkout", null, out errors);
-							if (!string.IsNullOrEmpty(errors))
-							{
-								Debug.LogError("Failed to checkout git-lfs files" + errorStringHelper, true);
-								return false;
-							}
-
-							EnableGitLFSFilter();
+							Debug.LogError("Failed to init git-lfs on repo" + errorStringHelper, true);
+							return false;
 						}
+
+						Tools.RunExeOutputErrors("git-lfs", "fetch", null, out errors, lfsCallback);
+						if (!string.IsNullOrEmpty(errors))
+						{
+							Debug.LogError("Failed to fetch git-lfs files" + errorStringHelper, true);
+							return false;
+						}
+
+						Tools.RunExeOutputErrors("git-lfs", "checkout", null, out errors, lfsCallback);
+						if (!string.IsNullOrEmpty(errors))
+						{
+							Debug.LogError("Failed to checkout git-lfs files" + errorStringHelper, true);
+							return false;
+						}
+
+						EnableGitLFSFilter();
 					}
 
 					return true;
@@ -258,15 +277,24 @@ namespace GitItGUI.Core
 			}
 		}
 
+		public static void ForceNewSettings()
+		{
+			settings = new XML.RepoSettings();
+			userSettings = new XML.RepoUserSettings();
+		}
+
 		/// <summary>
 		/// Saves open repo's settings
 		/// </summary>
-		public static void SaveSettings()
+		public static void SaveSettings(string repoPathOverride = null)
 		{
-			if (!string.IsNullOrEmpty(repoPath) && repo != null)
+			bool canSave = repo != null;
+			if (!string.IsNullOrEmpty(repoPathOverride)) canSave = true;
+			else repoPathOverride = repoPath;
+			if (canSave && !string.IsNullOrEmpty(repoPathOverride))
 			{
-				Settings.Save<XML.RepoSettings>(repoPath + "\\" + Settings.repoSettingsFilename, settings);
-				Settings.Save<XML.RepoUserSettings>(repoPath + "\\" + Settings.repoUserSettingsFilename, userSettings);
+				Settings.Save<XML.RepoSettings>(repoPathOverride + "\\" + Settings.repoSettingsFilename, settings);
+				Settings.Save<XML.RepoUserSettings>(repoPathOverride + "\\" + Settings.repoUserSettingsFilename, userSettings);
 			}
 		}
 		
@@ -308,9 +336,16 @@ namespace GitItGUI.Core
 			settings.validateGitignore = validateGitignore;
 		}
 
-		private static bool IsGitLFSRepo()
+		internal static bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
 		{
-			if (Directory.Exists(repoPath + "\\.git\\lfs") && File.Exists(repoPath + "\\.gitattributes") && File.Exists(repoPath + "\\.git\\hooks\\pre-push"))
+			bool attributesExist = File.Exists(repoPath + "\\.gitattributes");
+			if (returnTrueIfValidAttributes && attributesExist)
+			{
+				string lines = File.ReadAllText(repoPath + "\\.gitattributes");
+				return lines.Contains("filter=lfs diff=lfs merge=lfs");
+			}
+
+			if (attributesExist && Directory.Exists(repoPath + "\\.git\\lfs") && File.Exists(repoPath + "\\.git\\hooks\\pre-push"))
 			{
 				string data = File.ReadAllText(repoPath + "\\.git\\hooks\\pre-push");
 				bool isValid = data.Contains("git-lfs");

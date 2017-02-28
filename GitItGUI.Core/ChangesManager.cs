@@ -504,25 +504,47 @@ namespace GitItGUI.Core
 				// check for git settings file not in repo history
 				RepoManager.DeleteRepoSettingsIfUnCommit();
 
+				// check if git-lfs repo before pull
+				bool isGitLFS = RepoManager.IsGitLFSRepo(false);
+
+				// pull
 				var options = new PullOptions();
 				options.FetchOptions = new FetchOptions();
 				options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => RepoManager.credentials;
 				options.FetchOptions.TagFetchMode = TagFetchMode.All;
-				options.FetchOptions.OnProgress = new LibGit2Sharp.Handlers.ProgressHandler(delegate(string serverProgressOutput)
+				options.FetchOptions.OnProgress = delegate(string serverProgressOutput)
 				{
 					if (statusCallback != null) statusCallback(serverProgressOutput);
 					return true;
-				});
+				};
 
-				options.FetchOptions.OnTransferProgress = new LibGit2Sharp.Handlers.TransferProgressHandler(delegate(TransferProgress progress)
+				options.FetchOptions.OnTransferProgress = delegate(TransferProgress progress)
 				{
 					if (statusCallback != null) statusCallback(string.Format("Downloading: {0}%", (int)((progress.ReceivedObjects / (decimal)(progress.TotalObjects+1)) * 100)));
 					return true;
-				});
+				};
 
+				options.MergeOptions = new MergeOptions();
+				options.MergeOptions.OnCheckoutProgress = delegate(string path, int completedSteps, int totalSteps)
+				{
+					if (statusCallback != null) statusCallback(string.Format("Checking out: {0}%", (int)((completedSteps / (decimal)(totalSteps+1)) * 100)));
+				};
+				
 				Filters.GitLFS.statusCallback = statusCallback;
 				Commands.Pull(RepoManager.repo, RepoManager.signature, options);
 				Filters.GitLFS.statusCallback = null;
+
+				// check if repo git-lfs has changed
+				if (!isGitLFS && RepoManager.IsGitLFSRepo(true))
+				{
+					Debug.LogWarning("Repo seems to now support Git-LFS.\nCritical: You will need to re-pull for these changes!", true);
+					RepoManager.AddGitLFSSupport(false);
+				}
+				else if (isGitLFS && !RepoManager.IsGitLFSRepo(true))
+				{
+					Debug.LogWarning("Repo seems to have removed Git-LFS support.\nYou will need to re-pull for these changes!", true);
+					RepoManager.RemoveGitLFSSupport(false);
+				}
 
 				result = ConflictsExist() ? SyncMergeResults.Conflicts : SyncMergeResults.Succeeded;
 				if (result == SyncMergeResults.Conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
@@ -530,7 +552,8 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to pull: " + e.Message, true);
+				if (e.Message == "Too many redirects or authentication replays") Debug.LogError("Invalid Username or Password", true);
+				else Debug.LogError("Failed to pull: " + e.Message, true);
 				Filters.GitLFS.statusCallback = null;
 				return SyncMergeResults.Error;
 			}
@@ -621,6 +644,12 @@ namespace GitItGUI.Core
 				{
 					Debug.LogError("Failed to push (do you have valid permisions?): " + ex.Message, true);
 					pushError = true;
+				};
+
+				options.OnPushTransferProgress = delegate(int current, int total, long bytes)
+				{
+					if (statusCallback != null) statusCallback(string.Format("Uploading: {0}%", (int)((current / (decimal)(total+1)) * 100)));
+					return true;
 				};
 
 				Filters.GitLFS.statusCallback = statusCallback;

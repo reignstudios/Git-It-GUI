@@ -6,14 +6,10 @@ using System.Text.RegularExpressions;
 
 namespace GitItGUI.Core
 {
+	public delegate void RunExeCallbackMethod(string stdLine);
+
 	static class Tools
 	{
-		#if DEBUG
-		public static bool forceHideWindowOff = false;
-		#else
-		public static bool forceHideWindowOff = false;
-		#endif
-
 		public static void GetProgramFilesPath(out string programFilesx86, out string programFilesx64)
 		{
 			if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432"))) programFilesx86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
@@ -64,7 +60,7 @@ namespace GitItGUI.Core
 			return match.Success;
 		}
 
-		public static void RunExe(string exe, string arguments, string input, bool hideWindow = true)
+		public static void RunExe(string exe, string arguments, string input, RunExeCallbackMethod stdCallback = null)
 		{
 			using (var process = new Process())
 			{
@@ -72,8 +68,27 @@ namespace GitItGUI.Core
 				process.StartInfo.Arguments = arguments;
 				process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 				process.StartInfo.RedirectStandardInput = input != null;
+				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.UseShellExecute = false;
-				process.StartInfo.CreateNoWindow = forceHideWindowOff ? false : hideWindow;
+				process.StartInfo.CreateNoWindow = true;
+
+				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
+				{
+					if (e.Data != null)
+					{
+						if (stdCallback != null) stdCallback(e.Data);
+					}
+				};
+
+				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
+				{
+					if (e.Data != null)
+					{
+						if (stdCallback != null) stdCallback(e.Data);
+					}
+				};
+
 				process.Start();
 				if (input != null)
 				{
@@ -85,7 +100,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public static string RunExeOutput(string exe, string arguments, string input, bool hideWindow = true)
+		public static string RunExeOutput(string exe, string arguments, string input, RunExeCallbackMethod stdCallback = null)
 		{
 			string output = "";
 			using (var process = new Process())
@@ -95,12 +110,25 @@ namespace GitItGUI.Core
 				process.StartInfo.WorkingDirectory = RepoManager.repoPath;
 				process.StartInfo.RedirectStandardInput = input != null;
 				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.UseShellExecute = false;
-				process.StartInfo.CreateNoWindow = forceHideWindowOff ? false : hideWindow;
+				process.StartInfo.CreateNoWindow = true;
 
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null) output += e.Data + Environment.NewLine;
+					if (e.Data != null)
+					{
+						output += e.Data + Environment.NewLine;
+						if (stdCallback != null) stdCallback(e.Data);
+					}
+				};
+
+				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
+				{
+					if (e.Data != null)
+					{
+						if (stdCallback != null) stdCallback(e.Data);
+					}
 				};
 
 				process.Start();
@@ -119,7 +147,7 @@ namespace GitItGUI.Core
 			return output;
 		}
 
-		public static string RunExeOutputErrors(string exe, string arguments, string input, out string errors, bool hideWindow = true)
+		public static string RunExeOutputErrors(string exe, string arguments, string input, out string errors, RunExeCallbackMethod stdCallback = null)
 		{
 			string outputErr = "", output = "";
 			using (var process = new Process())
@@ -131,16 +159,24 @@ namespace GitItGUI.Core
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.UseShellExecute = false;
-				process.StartInfo.CreateNoWindow = forceHideWindowOff ? false : hideWindow;
+				process.StartInfo.CreateNoWindow = true;
 
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null) output += e.Data + Environment.NewLine;
+					if (e.Data != null)
+					{
+						output += e.Data + Environment.NewLine;
+						if (stdCallback != null) stdCallback(e.Data);
+					}
 				};
 
 				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null) outputErr += e.Data + Environment.NewLine;
+					if (e.Data != null)
+					{
+						outputErr += e.Data + Environment.NewLine;
+						if (stdCallback != null) stdCallback(e.Data);
+					}
 				};
 
 				process.Start();

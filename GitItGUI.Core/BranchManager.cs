@@ -131,10 +131,10 @@ namespace GitItGUI.Core
 				if (activeBranch.FriendlyName != selectedBranch.FriendlyName)
 				{
 					var options = new CheckoutOptions();
-					options.OnCheckoutProgress = new LibGit2Sharp.Handlers.CheckoutProgressHandler(delegate(string path, int completedSteps, int totalSteps)
+					options.OnCheckoutProgress = delegate(string path, int completedSteps, int totalSteps)
 					{
 						if (statusCallback != null) statusCallback(string.Format("Checking out: {0}%", (int)((completedSteps / (decimal)(totalSteps+1)) * 100)));
-					});
+					};
 
 					Filters.GitLFS.statusCallback = statusCallback;
 					var newBranch = Commands.Checkout(RepoManager.repo, selectedBranch, options);
@@ -176,10 +176,10 @@ namespace GitItGUI.Core
 
 				// merge
 				var options = new MergeOptions();
-				options.OnCheckoutProgress = new LibGit2Sharp.Handlers.CheckoutProgressHandler(delegate(string path, int completedSteps, int totalSteps)
+				options.OnCheckoutProgress = delegate(string path, int completedSteps, int totalSteps)
 				{
-					if (statusCallback != null) statusCallback(string.Format("Merging: {0}%", (int)((completedSteps / (decimal)(totalSteps+1)) * 100)));
-				});
+					if (statusCallback != null) statusCallback(string.Format("Checking out: {0}%", (int)((completedSteps / (decimal)(totalSteps+1)) * 100)));
+				};
 
 				var srcBround = RepoManager.repo.Branches[srcBranch.fullName];
 

@@ -412,7 +412,7 @@ namespace GitItGUI.Core
 								{
 									if (!IsValidVersion(gitVersion, xmlReader.ReadInnerXml()))
 									{
-										Debug.LogError("Your 'git' version is out of date.", true);
+										Debug.LogError("Your 'git' version is out of date.\nDownload and install with defaults!", true);
 										using (var process = Process.Start("https://git-scm.com/downloads"))
 										{
 											process.WaitForExit();
@@ -431,7 +431,7 @@ namespace GitItGUI.Core
 								{
 									if (!IsValidVersion(gitlfsVersion, xmlReader.ReadInnerXml()))
 									{
-										Debug.LogError("Your 'git-lfs' version is out of date.", true);
+										Debug.LogError("Your 'git-lfs' version is out of date.\nDownload and install with defaults!", true);
 										using (var process = Process.Start("https://git-lfs.github.com/"))
 										{
 											process.WaitForExit();
