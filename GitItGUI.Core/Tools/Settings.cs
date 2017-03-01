@@ -69,7 +69,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public static bool Save<T>(string filename, T settings)
+		public static bool Save<T>(string filename, T settings) where T : new()
 		{
 			string path = Path.GetDirectoryName(filename);
 			if (!Directory.Exists(path)) Directory.CreateDirectory(path);
