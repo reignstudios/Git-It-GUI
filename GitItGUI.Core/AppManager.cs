@@ -304,6 +304,22 @@ namespace GitItGUI.Core
 			return false;
 		}
 
+		private static void DownloadGit()
+		{
+			using (var process = Process.Start("https://git-scm.com/downloads"))
+			{
+				process.WaitForExit();
+			}
+		}
+
+		private static void DownloadGitLFS()
+		{
+			using (var process = Process.Start("https://git-lfs.github.com/"))
+			{
+				process.WaitForExit();
+			}
+		}
+
 		private static void Client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
 		{
 			if (e.Error != null)
@@ -337,6 +353,7 @@ namespace GitItGUI.Core
 					Debug.LogError("git is not installed correctly. (Make sure git is usable in the cmd/terminal)", true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
+					DownloadGit();
 					return;
 				}
 
@@ -349,6 +366,7 @@ namespace GitItGUI.Core
 					Debug.LogError("git-lfs is not installed correctly. (Make sure git-lfs is usable in the cmd/terminal)", true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
+					DownloadGitLFS();
 					return;
 				}
 
@@ -382,6 +400,8 @@ namespace GitItGUI.Core
 					Debug.LogError(string.Format("'git-lfs' version is not compatible with 'git' version installed!"), true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
+					DownloadGit();
+					DownloadGitLFS();
 					return;
 				}
 
@@ -413,10 +433,7 @@ namespace GitItGUI.Core
 									if (!IsValidVersion(gitVersion, xmlReader.ReadInnerXml()))
 									{
 										Debug.LogError("Your 'git' version is out of date.\nDownload and install with defaults!", true);
-										using (var process = Process.Start("https://git-scm.com/downloads"))
-										{
-											process.WaitForExit();
-										}
+										DownloadGit();
 									}
 								}
 
@@ -432,10 +449,7 @@ namespace GitItGUI.Core
 									if (!IsValidVersion(gitlfsVersion, xmlReader.ReadInnerXml()))
 									{
 										Debug.LogError("Your 'git-lfs' version is out of date.\nDownload and install with defaults!", true);
-										using (var process = Process.Start("https://git-lfs.github.com/"))
-										{
-											process.WaitForExit();
-										}
+										DownloadGitLFS();
 									}
 								}
 

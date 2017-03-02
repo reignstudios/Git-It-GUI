@@ -62,7 +62,7 @@ namespace GitItGUI
 		private void RepoManager_RepoRefreshedCallback_UIThread()
 		{
 			string name = RepoManager.repoPath;
-			if (!string.IsNullOrEmpty(name)) repoName.Text = name.Substring(Path.GetDirectoryName(name).Length + 1);
+			if (!string.IsNullOrEmpty(name)) repoName.Text = string.Format("{0} ({1})", name.Substring(Path.GetDirectoryName(name).Length + 1), BranchManager.activeBranch.FriendlyName);
 			else repoName.Text = "";
 		}
 

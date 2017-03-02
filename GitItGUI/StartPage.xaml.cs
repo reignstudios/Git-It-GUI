@@ -77,7 +77,7 @@ namespace GitItGUI
 			}
 
 			// open repo
-			if (!RepoManager.OpenRepo(path))
+			if (!RepoManager.OpenRepo(path, true))
 			{
 				MessageBox.Show("Failed to open repo: " + path);
 				grid.IsVisible = true;
@@ -96,7 +96,7 @@ namespace GitItGUI
 			string path = (string)button.Content;
 
 			// open repo
-			if (!RepoManager.OpenRepo(path))
+			if (!RepoManager.OpenRepo(path, true))
 			{
 				// remove bad repo from list
 				MessageBox.Show("Failed to open repo: " + path);

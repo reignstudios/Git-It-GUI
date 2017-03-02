@@ -406,20 +406,31 @@ namespace GitItGUI
 			return true;
 		}
 
+		private void CheckLocalBranchSyncErrors()
+		{
+			if (BranchManager.IsTracking()) return;
+
+
+		}
+
 		private void PushChangesButton_Advanced_Click(object sender, RoutedEventArgs e)
 		{
+			CheckLocalBranchSyncErrors();
 			ProcessingPage.singleton.mode = ProcessingPageModes.Push;
 			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
 		private void PullChangesButton_Advanced_Click(object sender, RoutedEventArgs e)
 		{
+			CheckLocalBranchSyncErrors();
 			ProcessingPage.singleton.mode = ProcessingPageModes.Pull;
 			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
 		private void SyncChangesButton_Click(object sender, RoutedEventArgs e)
 		{
+			CheckLocalBranchSyncErrors();
+
 			// check if files need to be staged
 			if (ChangesManager.FilesAreUnstaged())
 			{

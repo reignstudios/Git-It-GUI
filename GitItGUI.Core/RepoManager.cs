@@ -55,7 +55,7 @@ namespace GitItGUI.Core
 		/// </summary>
 		/// <param name="path">Path to git repo</param>
 		/// <returns>True if succeeded</returns>
-		public static bool OpenRepo(string path)
+		public static bool OpenRepo(string path, bool checkForSettingErros = false)
 		{
 			// unload repo
 			if (string.IsNullOrEmpty(path))
@@ -122,9 +122,12 @@ namespace GitItGUI.Core
 				AppManager.AddActiveRepoToHistory();
 
 				// warnings
-				if (userSettings.signatureName.Contains("TODO: ") || userSettings.signatureEmail.Contains("TODO: ") || userSettings.username.Contains("TODO: "))
+				if (checkForSettingErros)
 				{
-					Debug.LogWarning("Credentials not set, please go to the settings tab!", true);
+					if (userSettings.signatureName.Contains("TODO: ") || userSettings.signatureEmail.Contains("TODO: ") || userSettings.username.Contains("TODO: "))
+					{
+						Debug.LogWarning("Credentials not set, please go to the settings tab!", true);
+					}
 				}
 			}
 			catch (Exception e)

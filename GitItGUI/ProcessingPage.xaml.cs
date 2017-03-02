@@ -160,7 +160,7 @@ namespace GitItGUI
 				RepoManager.SaveSettings(clonePath);
 
 				// open repo
-				if (!RepoManager.OpenRepo(clonePath))
+				if (!RepoManager.OpenRepo(clonePath, true))
 				{
 					MessageBox.Show("Failed to open repo: " + clonePath);
 					MainWindow.LoadPage(PageTypes.Start);
