@@ -103,6 +103,11 @@ namespace GitItGUI.Core
 			return fileStates.ToArray();
 		}
 
+		private static bool FileStateExists(string filename)
+		{
+			return fileStates.Exists(x => x.filename == filename);
+		}
+
 		internal static bool Refresh()
 		{
 			try
@@ -121,72 +126,72 @@ namespace GitItGUI.Core
 					var state = fileStatus.State;
 					if ((state & FileStatus.ModifiedInWorkdir) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.ModifiedInWorkdir));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.ModifiedInWorkdir));
 						stateHandled = true;
 					}
 
 					if ((state & FileStatus.ModifiedInIndex) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.ModifiedInIndex));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.ModifiedInIndex));
 						stateHandled = true;
 						changesStaged = true;
 					}
 
 					if ((state & FileStatus.NewInWorkdir) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.NewInWorkdir));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.NewInWorkdir));
 						stateHandled = true;
 					}
 
 					if ((state & FileStatus.NewInIndex) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.NewInIndex));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.NewInIndex));
 						stateHandled = true;
 						changesStaged = true;
 					}
 
 					if ((state & FileStatus.DeletedFromWorkdir) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.DeletedFromWorkdir));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.DeletedFromWorkdir));
 						stateHandled = true;
 					}
 
 					if ((state & FileStatus.DeletedFromIndex) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.DeletedFromIndex));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.DeletedFromIndex));
 						stateHandled = true;
 						changesStaged = true;
 					}
 
 					if ((state & FileStatus.RenamedInWorkdir) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.RenamedInWorkdir));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.RenamedInWorkdir));
 						stateHandled = true;
 					}
 
 					if ((state & FileStatus.RenamedInIndex) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.RenamedInIndex));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.RenamedInIndex));
 						stateHandled = true;
 						changesStaged = true;
 					}
 
 					if ((state & FileStatus.TypeChangeInWorkdir) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.TypeChangeInWorkdir));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.TypeChangeInWorkdir));
 						stateHandled = true;
 					}
 
 					if ((state & FileStatus.TypeChangeInIndex) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.TypeChangeInIndex));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.TypeChangeInIndex));
 						stateHandled = true;
 						changesStaged = true;
 					}
 
 					if ((state & FileStatus.Conflicted) != 0)
 					{
-						fileStates.Add(new FileState(fileStatus.FilePath, FileStates.Conflicted));
+						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.Conflicted));
 						stateHandled = true;
 					}
 
@@ -713,6 +718,7 @@ namespace GitItGUI.Core
 				if (fileState.state == FileStates.Conflicted && !ResolveConflict(fileState, false))
 				{
 					Debug.LogError("Resolve conflict failed (aborting pending)", true);
+					if (refresh) RepoManager.Refresh();
 					return false;
 				}
 			}
