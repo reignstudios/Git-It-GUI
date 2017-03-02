@@ -75,7 +75,7 @@ namespace GitItGUI.Core
 
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null)
+					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdCallback != null) stdCallback(e.Data);
 					}
@@ -83,7 +83,7 @@ namespace GitItGUI.Core
 
 				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null)
+					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdCallback != null) stdCallback(e.Data);
 					}
@@ -116,7 +116,7 @@ namespace GitItGUI.Core
 
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null)
+					if (!string.IsNullOrEmpty(e.Data))
 					{
 						output += e.Data + Environment.NewLine;
 						if (stdCallback != null) stdCallback(e.Data);
@@ -125,7 +125,7 @@ namespace GitItGUI.Core
 
 				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null)
+					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdCallback != null) stdCallback(e.Data);
 					}
@@ -163,7 +163,7 @@ namespace GitItGUI.Core
 
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null)
+					if (!string.IsNullOrEmpty(e.Data))
 					{
 						output += e.Data + Environment.NewLine;
 						if (stdCallback != null) stdCallback(e.Data);
@@ -172,7 +172,7 @@ namespace GitItGUI.Core
 
 				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data != null)
+					if (!string.IsNullOrEmpty(e.Data))
 					{
 						outputErr += e.Data + Environment.NewLine;
 						if (stdCallback != null) stdCallback(e.Data);

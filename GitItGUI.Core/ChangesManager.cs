@@ -585,6 +585,8 @@ namespace GitItGUI.Core
 					if (statusCallback != null) statusCallback("Starting Git-LFS pre-push...");
 					options.OnNegotiationCompletedBeforePush = delegate(IEnumerable<PushUpdate> updates)
 					{
+						if (updates.Count() == 0) return true;
+
 						string outputErr = "", output = "";
 						using (var process = new Process())
 						{
@@ -599,7 +601,7 @@ namespace GitItGUI.Core
 
 							process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 							{
-								if (e.Data != null)
+								if (!string.IsNullOrEmpty(e.Data))
 								{
 									output += e.Data + Environment.NewLine;
 									if (statusCallback != null) statusCallback(e.Data);
@@ -608,7 +610,7 @@ namespace GitItGUI.Core
 
 							process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 							{
-								if (e.Data != null)
+								if (!string.IsNullOrEmpty(e.Data))
 								{
 									outputErr += e.Data + Environment.NewLine;
 									if (statusCallback != null) statusCallback("ERROR: " + e.Data);
