@@ -9,6 +9,16 @@ using System.Threading.Tasks;
 
 namespace GitItGUI.Core
 {
+	public class Remote
+	{
+		public string name, url;
+
+		public override string ToString()
+		{
+			return name;
+		}
+	}
+
 	public class BranchState
 	{
 		public Branch branch;
@@ -27,6 +37,7 @@ namespace GitItGUI.Core
 	{
 		public static Branch activeBranch;
 		private static List<BranchState> allBranches;
+		private static List<Remote> remotes;
 
 		internal static void OpenRepo(Repository repo)
 		{
@@ -67,8 +78,14 @@ namespace GitItGUI.Core
 			return activeBranch.TrackedBranch.FriendlyName;
 		}
 
+		public static Remote[] GetRemotes()
+		{
+			return remotes.ToArray();
+		}
+
 		internal static bool Refresh()
 		{
+			// gather branches
 			if (allBranches == null) allBranches = new List<BranchState>();
 			else allBranches.Clear();
 
@@ -83,6 +100,22 @@ namespace GitItGUI.Core
 				b.branchName = branch.FriendlyName.Replace(branch.RemoteName+"/", "");
 				if (branch.IsTracking) b.trackedBranchName = branch.TrackedBranch.FriendlyName;
 				allBranches.Add(b);
+			}
+
+			// gather remotes
+			if (remotes == null) remotes = new List<Remote>();
+			else remotes.Clear();
+
+			var allRemotes = RepoManager.repo.Network.Remotes;
+			foreach (var remote in allRemotes)
+			{
+				var newRemote = new Remote()
+				{
+					name = remote.Name,
+					url = remote.Url
+				};
+
+				remotes.Add(newRemote);
 			}
 
 			return true;
@@ -202,13 +235,37 @@ namespace GitItGUI.Core
 			return mergeResult;
 		}
 
-		public static bool AddNewBranch(string branchName)
+		public static bool AddNewBranch(string branchName, string remoteName = null)
 		{
+			bool success = true;
+
 			try
 			{
+				// create branch
 				var branch = RepoManager.repo.CreateBranch(branchName);
 				Commands.Checkout(RepoManager.repo, branch);
 				activeBranch = branch;
+
+				// push branch to remote
+				if (!string.IsNullOrEmpty(remoteName))
+				{
+					// add remote
+					RepoManager.repo.Branches.Update(activeBranch, b =>
+					{
+						b.Remote = remoteName;
+						b.TrackedBranch = string.Format("refs/remotes/{0}/{1}", remoteName, branchName);
+						b.UpstreamBranch = "refs/heads/" + branchName;
+					});
+
+					// push remote
+					string errors;
+					string result = Tools.RunExeOutputErrors("git", string.Format("push -u {0} {1}", remoteName, branch.FriendlyName), null, out errors);
+					if (!string.IsNullOrEmpty(errors) && !errors.Contains("To create a merge request for"))//NOTE: this ignores false positive noise errors that come from GitLab
+					{
+						Debug.LogError("Push remote failed: " + errors, true);
+						success = false;
+					}
+				}
 			}
 			catch (Exception e)
 			{
@@ -217,7 +274,7 @@ namespace GitItGUI.Core
 			}
 			
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool DeleteNonActiveBranch(BranchState branch)
@@ -257,12 +314,12 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool AddUpdateTracking(BranchState srcRemoteBranch)
+		public static bool CopyTracking(BranchState srcRemoteBranch)
 		{
-			return AddUpdateTracking(srcRemoteBranch.fullName);
+			return CopyTracking(srcRemoteBranch.fullName);
 		}
 
-		public static bool AddUpdateTracking(string srcRemoteBranch)
+		public static bool CopyTracking(string srcRemoteBranch)
 		{
 			try
 			{

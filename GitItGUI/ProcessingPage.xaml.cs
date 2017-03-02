@@ -23,16 +23,17 @@ namespace GitItGUI
 	{
 		public static ProcessingPage singleton;
 
+		// clone
 		public ProcessingPageModes mode = ProcessingPageModes.None;
 		public string clonePath, cloneURL, cloneUsername, clonePassword;
 		public bool cloneSucceeded;
 
+		// branch
 		public BranchState mergeOtherBranch;
 		public BranchState switchOtherBranch;
-		
-		private Thread thread;
 
-		// ui
+		// inverface
+		private Thread thread;
 		private TextBox statusTextBox;
 
 		public ProcessingPage()
@@ -194,7 +195,7 @@ namespace GitItGUI
 					if (BranchManager.AddNewBranch(fullName))
 					{
 						BranchManager.Checkout(fullName, StatusUpdateCallback);
-						BranchManager.AddUpdateTracking(switchOtherBranch.fullName);
+						BranchManager.CopyTracking(switchOtherBranch.fullName);
 					}
 				}
 			}

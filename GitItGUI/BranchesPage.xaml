@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="800" Design.Height="400" xmlns:self="clr-namespace:GitItGUI;assembly=GitItGUI">
+﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="1280" Design.Height="800" xmlns:self="clr-namespace:GitItGUI;assembly=GitItGUI">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="50*" />
@@ -9,16 +9,19 @@
 			<TextBlock FontSize="24" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Active Branch</TextBlock>
 			<TextBlock Height="32" Margin="10,50,10,-50" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Branch Name:</TextBlock>
 			<TextBox Name="activeBranchTextBox" Height="32" Margin="100,50,0,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Current 'Active' branch name"/>
-			<Button Name="addBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,85,-100,10" Width="75" ToolTip.Tip="Add new branch based off 'Active'?">Add</Button>
-			<Button Name="renameBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,85,-180,10" Width="75" ToolTip.Tip="Rename 'Active' branch?">Rename</Button>
+			<Button Name="renameBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,85,-100,10" Width="75" ToolTip.Tip="Rename 'Active' branch?">Rename</Button>
 
 			<TextBlock Name="trackingLabel" FontSize="18" Margin="0,150,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">--- Tracking ---</TextBlock>
 			<TextBlock Name="trackedBranchLabel" Width="82" Height="32" Margin="10,180,10,-180" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Tracked Branch:</TextBlock>
 			<TextBox Name="trackingOriginTextBox" Height="32" Margin="100,180,0,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Active branch tracking origin"/>
 			<TextBlock Name="remoteURLLabel" Width="82" Height="32" Margin="10,215,10,-215" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Remote URL:</TextBlock>
 			<TextBox Name="remoteURLTextBox" Height="32" Margin="100,215,0,-50" VerticalAlignment="Top" Background="White" IsReadOnly="True" ToolTip.Tip="Active branch tracking origin"/>
-			<Button Name="addTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,250,-100,-250" Width="75" ToolTip.Tip="Copy tracking from 'Other' remote branch into 'Active'">*Add</Button>
+			<Button Name="copyTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,250,-100,-250" Width="75" ToolTip.Tip="Copy tracking from 'Other' remote branch into 'Active' branch">Copy</Button>
 			<Button Name="removeTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,250,-180,-250" Width="75" ToolTip.Tip="Remove tracking from 'Active' branch">Remove</Button>
+
+			<TextBlock Name="newBranchLabel" FontSize="18" Margin="0,320,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">--- Create New Branch ---</TextBlock>
+			<Button Name="addBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,360,-100,-360" Width="75" ToolTip.Tip="Add new branch based off 'Active'?">Add</Button>
+			<DropDown Name="remotesDropDown" VerticalAlignment="Top" Margin="180,360,0,-360" Height="28" ToolTip.Tip="Rename 'Active' branch?"/>
 
 			<CheckBox Name="advancedModeCheckBox" Margin="10" HorizontalContentAlignment="Left" VerticalAlignment="Bottom">Advanced Mode</CheckBox>
 		</Grid>

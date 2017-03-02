@@ -30,6 +30,7 @@ namespace GitItGUI
 			AvaloniaXamlLoader.Load(this);
 			App.AttachDevTools(this);
 			Title = "Git-It-GUI v" + VersionInfo.version;
+			Debug.Log(Title);
 
 			// load resources
 			ResourceManager.Init();

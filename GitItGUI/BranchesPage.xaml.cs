@@ -17,11 +17,12 @@ namespace GitItGUI
 		public static BranchesPage singleton;
 
 		// ui objects
-		TextBlock trackingLabel, trackedBranchLabel, remoteURLLabel;
+		TextBlock trackingLabel, trackedBranchLabel, remoteURLLabel, newBranchLabel;
 		TextBox activeBranchTextBox, trackingOriginTextBox, remoteURLTextBox;
 		ListBox otherBranchListView;
-		Button addBranchButton, renameBranchButton, addTrackingButton, removeTrackingButton, switchBranchButton, mergeBranchButton, deleteBranchButton;
+		Button addBranchButton, renameBranchButton, copyTrackingButton, removeTrackingButton, switchBranchButton, mergeBranchButton, deleteBranchButton;
 		CheckBox advancedModeCheckBox;
+		DropDown remotesDropDown;
 
 		List<string> otherBranchListViewItems;
 
@@ -37,7 +38,7 @@ namespace GitItGUI
 			otherBranchListView = this.Find<ListBox>("otherBranchListView");
 			addBranchButton = this.Find<Button>("addBranchButton");
 			renameBranchButton = this.Find<Button>("renameBranchButton");
-			addTrackingButton = this.Find<Button>("addTrackingButton");
+			copyTrackingButton = this.Find<Button>("copyTrackingButton");
 			removeTrackingButton = this.Find<Button>("removeTrackingButton");
 			switchBranchButton = this.Find<Button>("switchBranchButton");
 			mergeBranchButton = this.Find<Button>("mergeBranchButton");
@@ -46,13 +47,15 @@ namespace GitItGUI
 			trackingLabel = this.Find<TextBlock>("trackingLabel");
 			trackedBranchLabel = this.Find<TextBlock>("trackedBranchLabel");
 			remoteURLLabel = this.Find<TextBlock>("remoteURLLabel");
+			newBranchLabel = this.Find<TextBlock>("newBranchLabel");
+			remotesDropDown = this.Find<DropDown>("remotesDropDown");
 
 			// apply bindings
 			otherBranchListViewItems = new List<string>();
 			otherBranchListView.Items = otherBranchListViewItems;
 			addBranchButton.Click += AddBranchButton_Click;
 			renameBranchButton.Click += RenameBranchButton_Click;
-			addTrackingButton.Click += AddTrackingButton_Click;
+			copyTrackingButton.Click += CopyTrackingButton_Click;
 			removeTrackingButton.Click += RemoveTrackingButton_Click;
 			switchBranchButton.Click += SwitchBranchButton_Click;
 			mergeBranchButton.Click += MergeBranchButton_Click;
@@ -65,7 +68,7 @@ namespace GitItGUI
 
 		private void AdvancedModeCheckBox_Click(object sender, RoutedEventArgs e)
 		{
-			RepoManager_RepoRefreshedCallback();
+			RepoManager_RepoRefreshedCallback_UIThread();
 		}
 
 		private void RepoManager_RepoRefreshedCallback()
@@ -96,11 +99,24 @@ namespace GitItGUI
 			renameBranchButton.IsVisible = isAdvancedMode;
 			trackingOriginTextBox.IsVisible = isAdvancedMode;
 			remoteURLTextBox.IsVisible = isAdvancedMode;
-			addTrackingButton.IsVisible = isAdvancedMode;
+			copyTrackingButton.IsVisible = isAdvancedMode;
 			removeTrackingButton.IsVisible = isAdvancedMode;
 			trackingLabel.IsVisible = isAdvancedMode;
 			trackedBranchLabel.IsVisible = isAdvancedMode;
 			remoteURLLabel.IsVisible = isAdvancedMode;
+			newBranchLabel.IsVisible = isAdvancedMode;
+			remotesDropDown.IsVisible = isAdvancedMode;
+
+			// fill remotes drop down
+			if (isAdvancedMode)
+			{
+				var remotes = new List<Core.Remote>();
+				var localRemote = new Core.Remote() {name = "N/A - LOCAL ONLY"};
+				remotes.Add(localRemote);
+				remotes.AddRange(BranchManager.GetRemotes());
+				remotesDropDown.Items = remotes;
+				remotesDropDown.SelectedIndex = 0;
+			}
 
 			// fill other branches list
 			var branches = BranchManager.GetOtherBranches(isAdvancedMode);
@@ -130,8 +146,18 @@ namespace GitItGUI
 
 		private void AddBranchButton_Click(object sender, RoutedEventArgs e)
 		{
+			if (remotesDropDown.SelectedItem == null)
+			{
+				Debug.LogError("Must select remote!", true);
+				return;
+			}
+
+			var remote = (Core.Remote)remotesDropDown.SelectedItem;
+			string remoteName = remote.name;
+			if (remote.url == null) remoteName = null;
+
 			string result;
-			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.AddNewBranch(result);
+			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.AddNewBranch(result, remoteName);
 		}
 
 		private void RenameBranchButton_Click(object sender, RoutedEventArgs e)
@@ -140,7 +166,7 @@ namespace GitItGUI
 			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.RenameActiveBranch(result);
 		}
 
-		private void AddTrackingButton_Click(object sender, RoutedEventArgs e)
+		private void CopyTrackingButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (otherBranchListView.SelectedIndex == -1)
 			{
@@ -155,7 +181,7 @@ namespace GitItGUI
 				return;
 			}
 
-			BranchManager.AddUpdateTracking(branch);
+			BranchManager.CopyTracking(branch);
 		}
 
 		private void RemoveTrackingButton_Click(object sender, RoutedEventArgs e)

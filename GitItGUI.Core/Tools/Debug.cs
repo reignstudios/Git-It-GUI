@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace GitItGUI.Core
 {
@@ -16,21 +17,56 @@ namespace GitItGUI.Core
 		/// </summary>
 		public static event DebugLogCallbackMethod debugLogCallback, debugLogWarningCallback, debugLogErrorCallback;
 
+		private static Stream stream;
+		private static StreamWriter writer;
+
+		static Debug()
+		{
+			try
+			{
+				string logFileName = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+				logFileName += "\\" + Settings.appSettingsFolderName + "\\" + "logs.txt";
+				stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+				writer = new StreamWriter(stream);
+			}
+			catch (Exception e)
+			{
+				LogError("Failed to init debug log file: " + e.Message);
+			}
+		}
+
+		internal static void Dispose()
+		{
+			if (stream != null)
+			{
+				writer.Flush();
+				stream.Flush();
+				stream.Dispose();
+				stream = null;
+			}
+		}
+
 		public static void Log(object value, bool alert = false)
 		{
-			Console.WriteLine("GitItGUI.Core Log: " + value.ToString());
+			string msg = value.ToString();
+			Console.WriteLine(msg);
+			if (writer != null) writer.WriteLine(msg);
 			if (debugLogCallback != null) debugLogCallback(value, alert);
 		}
 
 		public static void LogWarning(object value, bool alert = false)
 		{
-			Console.WriteLine("GitItGUI.Core Log WARNING: " + value.ToString());
+			string msg = "WARNING: " + value.ToString();
+			Console.WriteLine(msg);
+			if (writer != null) writer.WriteLine(msg);
 			if (debugLogWarningCallback != null) debugLogWarningCallback(value, alert);
 		}
 
 		public static void LogError(object value, bool alert = false)
 		{
-			Console.WriteLine("GitItGUI.Core Log ERROR: " + value.ToString());
+			string msg = "ERROR: " + value.ToString();
+			Console.WriteLine(msg);
+			if (writer != null) writer.WriteLine(msg);
 			if (debugLogErrorCallback != null) debugLogErrorCallback(value, alert);
 		}
 	}
