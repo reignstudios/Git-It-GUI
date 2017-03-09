@@ -65,9 +65,8 @@ namespace GitItGUI.Core
 			try
 			{
 				// load settings
-				string rootAppSettingsPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 				char seperator = Path.DirectorySeparatorChar;
-				settings = Settings.Load<XML.AppSettings>(rootAppSettingsPath + seperator + Settings.appSettingsFolderName + seperator + Settings.appSettingsFilename);
+				settings = Settings.Load<XML.AppSettings>(PlatformSettings.appDataPath + seperator + Settings.appSettingsFolderName + seperator + Settings.appSettingsFilename);
 
 				// apply default lfs ignore types
 				var lowerCase = new List<string>()
@@ -228,8 +227,7 @@ namespace GitItGUI.Core
 		public static void SaveSettings()
 		{
 			settings.autoRefreshChanges = autoRefreshChanges;
-			string rootAppSettingsPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-			Settings.Save<XML.AppSettings>(rootAppSettingsPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + Settings.appSettingsFilename, settings);
+			Settings.Save<XML.AppSettings>(PlatformSettings.appDataPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + Settings.appSettingsFilename, settings);
 		}
 
 		/// <summary>

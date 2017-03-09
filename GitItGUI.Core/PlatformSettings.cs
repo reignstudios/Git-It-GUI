@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace GitItGUI.Core
 {
@@ -17,6 +18,7 @@ namespace GitItGUI.Core
 	public static class PlatformSettings
 	{
 		public static readonly Platforms platform;
+		public static readonly string appDataPath;
 
 		static PlatformSettings()
 		{
@@ -28,15 +30,40 @@ namespace GitItGUI.Core
 				case PlatformID.Win32S:
 				case PlatformID.Win32Windows:
 					platform = Platforms.Windows;
+					appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 					break;
 
 				case PlatformID.MacOSX:
 					platform = Platforms.Mac;
+					appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 					break;
-
+					
 				case PlatformID.Unix:
-					platform = Platforms.Linux;
+					platform = IsUnixMac() ? Platforms.Mac : Platforms.Linux;
+					appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 					break;
+			}
+		}
+
+		private static bool IsUnixMac()
+		{
+			try
+			{
+				using (var process = new Process())
+				{
+					process.StartInfo.UseShellExecute = false;
+					process.StartInfo.RedirectStandardOutput = true;
+					process.StartInfo.FileName = "uname";
+					process.Start();
+					process.WaitForExit();
+					string output = process.StandardOutput.ReadToEnd();
+					if (output.Contains("Darwin")) return true;
+					return false;
+				}
+			}
+			catch
+			{
+				return false;
 			}
 		}
 
