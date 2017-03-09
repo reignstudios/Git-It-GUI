@@ -83,6 +83,9 @@ namespace GitItGUI.Core
 				};
 
 				process.Start();
+				process.BeginOutputReadLine();
+				process.BeginErrorReadLine();
+
 				if (input != null)
 				{
 					process.StandardInput.WriteLine(input);
@@ -126,6 +129,7 @@ namespace GitItGUI.Core
 
 				process.Start();
 				process.BeginOutputReadLine();
+				process.BeginErrorReadLine();
 
 				if (input != null)
 				{

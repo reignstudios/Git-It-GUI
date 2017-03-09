@@ -32,7 +32,7 @@ namespace GitItGUI.Core
 	public static class AppManager
 	{
 		private static CheckForUpdatesCallbackMethod checkForUpdatesCallback;
-		private static string checkForUpdatesURL, checkForUpdatesOutOfDateURL;
+		private static string checkForUpdatesOutOfDateURL;
 		internal static XML.AppSettings settings;
 
 		public static string mergeToolPath {get; private set;}
@@ -244,7 +244,6 @@ namespace GitItGUI.Core
 			try
 			{
 				AppManager.checkForUpdatesCallback = checkForUpdatesCallback;
-				checkForUpdatesURL = url;
 				checkForUpdatesOutOfDateURL = outOfDateURL;
 
 				client = new WebClient();

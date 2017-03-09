@@ -21,10 +21,7 @@ namespace MergeConflicPicker
 		static void Main(string[] args)
 		{
 			InitializeLogging();
-			AppBuilder.Configure<App>()
-				.UseWin32()
-				.UseDirect2D1()
-				.Start<MainWindow>();
+			AppBuilder.Configure<App>().UsePlatformDetect().Start<MainWindow>();
 		}
 
 		public static void AttachDevTools(Window window)
