@@ -43,13 +43,18 @@ namespace GitItGUI.Core
 		public static int MaxRepoHistoryCount = 20;
 
 		private static WebClient client;
-		#if WINDOWS
-		private const string platform = "Windows";
-		#elif MAC
-		private const string platform = "Mac";
-		#elif LINUX
-		private const string platform = "Linux";
-		#endif
+		private static string platformName = "Unknown";
+
+		static AppManager()
+		{
+			switch (PlatformSettings.platform)
+			{
+				case Platforms.Windows: platformName = "Windows"; break;
+				case Platforms.Mac: platformName = "Mac"; break;
+				case Platforms.Linux: platformName = "Linux"; break;
+				default: throw new Exception("Unsupported platform: " + PlatformSettings.platform);
+			}
+		}
 
 		/// <summary>
 		/// Must be called before using any other API feature
@@ -61,7 +66,8 @@ namespace GitItGUI.Core
 			{
 				// load settings
 				string rootAppSettingsPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-				settings = Settings.Load<XML.AppSettings>(rootAppSettingsPath + "\\" + Settings.appSettingsFolderName + "\\" + Settings.appSettingsFilename);
+				char seperator = Path.DirectorySeparatorChar;
+				settings = Settings.Load<XML.AppSettings>(rootAppSettingsPath + seperator + Settings.appSettingsFolderName + seperator + Settings.appSettingsFilename);
 
 				// apply default lfs ignore types
 				var lowerCase = new List<string>()
@@ -120,29 +126,46 @@ namespace GitItGUI.Core
 
 		private static void LoadMergeDiffTool()
 		{
-			string programFilesx86, programFilesx64;
-			Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
-			switch (settings.mergeDiffTool)
+			if (PlatformSettings.platform == Platforms.Windows)
 			{
-				case "Meld":
-					mergeDiffTool = MergeDiffTools.Meld;
-					mergeToolPath = programFilesx86 + "\\Meld\\Meld.exe";
-					break;
+				string programFilesx86, programFilesx64;
+				PlatformSettings.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
+				switch (settings.mergeDiffTool)
+				{
+					case "Meld":
+						mergeDiffTool = MergeDiffTools.Meld;
+						mergeToolPath = programFilesx86 + "\\Meld\\Meld.exe";
+						break;
 
-				case "kDiff3":
-					mergeDiffTool = MergeDiffTools.kDiff3;
-					mergeToolPath = programFilesx64 + "\\KDiff3\\kdiff3.exe";
-					break;
+					case "kDiff3":
+						mergeDiffTool = MergeDiffTools.kDiff3;
+						mergeToolPath = programFilesx64 + "\\KDiff3\\kdiff3.exe";
+						break;
 
-				case "P4Merge":
-					mergeDiffTool = MergeDiffTools.P4Merge;
-					mergeToolPath = programFilesx64 + "\\Perforce\\p4merge.exe"; 
-					break;
+					case "P4Merge":
+						mergeDiffTool = MergeDiffTools.P4Merge;
+						mergeToolPath = programFilesx64 + "\\Perforce\\p4merge.exe"; 
+						break;
 
-				case "DiffMerge":
-					mergeDiffTool = MergeDiffTools.DiffMerge;
-					mergeToolPath = programFilesx64 + "\\SourceGear\\Common\\\\DiffMerge\\sgdm.exe";
-					break;
+					case "DiffMerge":
+						mergeDiffTool = MergeDiffTools.DiffMerge;
+						mergeToolPath = programFilesx64 + "\\SourceGear\\Common\\\\DiffMerge\\sgdm.exe";
+						break;
+				}
+			}
+			else if (PlatformSettings.platform == Platforms.Mac)
+			{
+				mergeDiffTool = MergeDiffTools.Meld;
+				mergeToolPath = "";
+			}
+			else if (PlatformSettings.platform == Platforms.Linux)
+			{
+				mergeDiffTool = MergeDiffTools.Meld;
+				mergeToolPath = "";
+			}
+			else
+			{
+				throw new Exception("Unsported platform: " + PlatformSettings.platform);
 			}
 		}
 
@@ -206,7 +229,7 @@ namespace GitItGUI.Core
 		{
 			settings.autoRefreshChanges = autoRefreshChanges;
 			string rootAppSettingsPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-			Settings.Save<XML.AppSettings>(rootAppSettingsPath + "\\" + Settings.appSettingsFolderName + "\\" + Settings.appSettingsFilename, settings);
+			Settings.Save<XML.AppSettings>(rootAppSettingsPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + Settings.appSettingsFilename, settings);
 		}
 
 		/// <summary>
@@ -429,7 +452,7 @@ namespace GitItGUI.Core
 						{
 							while (xmlReader.Read())
 							{
-								if (xmlReader.Name == platform)
+								if (xmlReader.Name == platformName)
 								{
 									if (!IsValidVersion(gitVersion, xmlReader.ReadInnerXml()))
 									{
@@ -445,7 +468,7 @@ namespace GitItGUI.Core
 						{
 							while (xmlReader.Read())
 							{
-								if (xmlReader.Name == platform)
+								if (xmlReader.Name == platformName)
 								{
 									if (!IsValidVersion(gitlfsVersion, xmlReader.ReadInnerXml()))
 									{

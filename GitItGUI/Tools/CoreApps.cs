@@ -1,5 +1,6 @@
 ﻿using GitItGUI.Core;
 using System;
+using System.IO;
 
 namespace GitItGUI.Tools
 {
@@ -48,7 +49,7 @@ namespace GitItGUI.Tools
 
 		public static bool LaunchNameEntry(string caption, out string result)
 		{
-			string exe = Environment.CurrentDirectory + "\\NameEntry.exe";
+			string exe = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "NameEntry.exe";
 			string args = string.Format("-Caption=\"{0}\"", caption);
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, true)) return false;
@@ -58,7 +59,7 @@ namespace GitItGUI.Tools
 
 		public static bool LaunchCommitEntry(string message, out string result)
 		{
-			string exe = Environment.CurrentDirectory + "\\CommitEntry.exe";
+			string exe = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "CommitEntry.exe";
 			string args = string.Format("-Message=\"{0}\"", message);
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, true)) return false;
@@ -68,7 +69,7 @@ namespace GitItGUI.Tools
 
 		public static bool LaunchMessageBox(string title, string message, MessageBoxTypes messageBoxType, out string result)
 		{
-			string exe = Environment.CurrentDirectory + "\\MessageBox.exe";
+			string exe = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "MessageBox.exe";
 			string args = string.Format("-Title=\"{0}\" -Message=\"{1}\" -Type={2}", title, message, "Ok");
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, false)) return false;
@@ -78,7 +79,7 @@ namespace GitItGUI.Tools
 
 		public static bool LaunchBinaryConflicPicker(string fileInConflic, out string result)
 		{
-			string exe = Environment.CurrentDirectory + "\\MergeConflicPicker.exe";
+			string exe = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "MergeConflicPicker.exe";
 			string args = string.Format("-FileInConflic=\"{0}\"", fileInConflic);
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, false)) return false;

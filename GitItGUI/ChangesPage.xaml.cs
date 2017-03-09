@@ -283,7 +283,14 @@ namespace GitItGUI
 		{
 			try
 			{
-				System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename));
+				if (PlatformSettings.platform == Platforms.Windows)
+				{
+					System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename));
+				}
+				else
+				{
+					throw new Exception("Unsuported platform: " + PlatformSettings.platform);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -295,7 +302,14 @@ namespace GitItGUI
 		{
 			try
 			{
-				System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", RepoManager.repoPath, fileState.filename));
+				if (PlatformSettings.platform == Platforms.Windows)
+				{
+					System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", RepoManager.repoPath, fileState.filename));
+				}
+				else
+				{
+					throw new Exception("Unsuported platform: " + PlatformSettings.platform);
+				}
 			}
 			catch (Exception ex)
 			{

@@ -52,6 +52,7 @@
     <Compile Include="AppManager.cs" />
     <Compile Include="BranchManager.cs" />
     <Compile Include="ChangesManager.cs" />
+    <Compile Include="PlatformSettings.cs" />
     <Compile Include="Tools\Debug.cs" />
     <Compile Include="Filters\GitLFS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

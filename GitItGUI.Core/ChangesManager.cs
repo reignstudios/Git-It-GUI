@@ -202,7 +202,7 @@ namespace GitItGUI.Core
 
 					if ((state & FileStatus.Unreadable) != 0)
 					{
-						string fullpath = RepoManager.repoPath + "\\" + fileStatus.FilePath;
+						string fullpath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileStatus.FilePath;
 						if (File.Exists(fullpath))
 						{
 							// disable readonly if this is the cause
@@ -282,7 +282,7 @@ namespace GitItGUI.Core
 			try
 			{
 				// check if file still exists
-				string fullPath = RepoManager.repoPath + "\\" + fileState.filename;
+				string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 				if (!File.Exists(fullPath))
 				{
 					return "<< File Doesn't Exist >>";
@@ -369,7 +369,7 @@ namespace GitItGUI.Core
 			try
 			{
 				if (fileState.state != FileStates.NewInWorkdir) return false;
-				string filePath = RepoManager.repoPath + "\\" + fileState.filename;
+				string filePath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 				if (File.Exists(filePath)) File.Delete(filePath);
 			}
 			catch (Exception e)
@@ -389,7 +389,7 @@ namespace GitItGUI.Core
 				foreach (var fileState in fileStates)
 				{
 					if (fileState.state != FileStates.NewInWorkdir) continue;
-					string filePath = RepoManager.repoPath + "\\" + fileState.filename;
+					string filePath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 					if (File.Exists(filePath)) File.Delete(filePath);
 				}
 			}
@@ -743,7 +743,7 @@ namespace GitItGUI.Core
 				}
 
 				// get info
-				string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename);
+				string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 				var conflict = RepoManager.repo.Index.Conflicts[fileState.filename];
 				var ours = RepoManager.repo.Lookup<Blob>(conflict.Ours.Id);
 				var theirs = RepoManager.repo.Lookup<Blob>(conflict.Theirs.Id);
@@ -934,7 +934,7 @@ namespace GitItGUI.Core
 
 		public static bool OpenDiffTool(FileState fileState)
 		{
-			string fullPath = string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename);
+			string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 
 			try
 			{
@@ -947,7 +947,7 @@ namespace GitItGUI.Core
 
 				// get info and save orig file
 				var changed = RepoManager.repo.Head.Tip[fileState.filename];
-				Tools.SaveFileFromID(string.Format("{0}\\{1}.orig", RepoManager.repoPath, fileState.filename), changed.Target.Id);
+				Tools.SaveFileFromID(string.Format("{0}{1}{2}.orig", RepoManager.repoPath, Path.DirectorySeparatorChar, fileState.filename), changed.Target.Id);
 
 				// open diff tool
 				using (var process = new Process())

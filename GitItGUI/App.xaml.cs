@@ -11,7 +11,6 @@ namespace GitItGUI
 {
 	class App : Application
 	{
-
 		public override void Initialize()
 		{
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -32,9 +31,10 @@ namespace GitItGUI
 		{
 			InitializeLogging();
 			AppBuilder.Configure<App>()
-				.UseWin32()
+				.UsePlatformDetect()
+				//.UseWin32()
 				//.UseSkia()
-				.UseDirect2D1()
+				//.UseDirect2D1()
 				.Start<MainWindow>();
 		}
 

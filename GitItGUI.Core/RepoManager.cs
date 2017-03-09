@@ -82,14 +82,14 @@ namespace GitItGUI.Core
 				lfsEnabled = IsGitLFSRepo(false);
 				
 				// load settings
-				settings = Settings.Load<XML.RepoSettings>(path + "\\" + Settings.repoSettingsFilename);
-				userSettings = Settings.Load<XML.RepoUserSettings>(path + "\\" + Settings.repoUserSettingsFilename);
+				settings = Settings.Load<XML.RepoSettings>(path + Path.DirectorySeparatorChar + Settings.repoSettingsFilename);
+				userSettings = Settings.Load<XML.RepoUserSettings>(path + Path.DirectorySeparatorChar + Settings.repoUserSettingsFilename);
 
 				// check for .gitignore file
 				validateGitignoreCheckbox = settings.validateGitignore;
 				if (!refreshMode && settings.validateGitignore)
 				{
-					string gitIgnorePath = path + "\\.gitignore";
+					string gitIgnorePath = path + Path.DirectorySeparatorChar + ".gitignore";
 					if (!File.Exists(gitIgnorePath))
 					{
 						Debug.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
@@ -161,7 +161,7 @@ namespace GitItGUI.Core
 		internal static void DeleteRepoSettingsIfUnCommit()
 		{
 			// check for git settings file not in repo history
-			string settingsPath = repoPath + "\\" + Settings.repoSettingsFilename;
+			string settingsPath = repoPath + Path.DirectorySeparatorChar + Settings.repoSettingsFilename;
 			if (File.Exists(settingsPath))
 			{
 				var repoStatus = repo.RetrieveStatus(Settings.repoSettingsFilename);
@@ -233,7 +233,7 @@ namespace GitItGUI.Core
 				};
 				
 				string result = Repository.Clone(url, repoPath, options);
-				if (result == (repoPath + "\\.git\\"))
+				if (result == (repoPath + string.Format("{0}.git{0}", Path.DirectorySeparatorChar)))
 				{
 					RepoManager.repoPath = repoPath;
 					if (IsGitLFSRepo(true))
@@ -296,8 +296,8 @@ namespace GitItGUI.Core
 			else repoPathOverride = repoPath;
 			if (canSave && !string.IsNullOrEmpty(repoPathOverride))
 			{
-				Settings.Save<XML.RepoSettings>(repoPathOverride + "\\" + Settings.repoSettingsFilename, settings);
-				Settings.Save<XML.RepoUserSettings>(repoPathOverride + "\\" + Settings.repoUserSettingsFilename, userSettings);
+				Settings.Save<XML.RepoSettings>(repoPathOverride + Path.DirectorySeparatorChar + Settings.repoSettingsFilename, settings);
+				Settings.Save<XML.RepoUserSettings>(repoPathOverride + Path.DirectorySeparatorChar + Settings.repoUserSettingsFilename, userSettings);
 			}
 		}
 		
@@ -341,16 +341,16 @@ namespace GitItGUI.Core
 
 		internal static bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
 		{
-			bool attributesExist = File.Exists(repoPath + "\\.gitattributes");
+			bool attributesExist = File.Exists(repoPath + Path.DirectorySeparatorChar + ".gitattributes");
 			if (returnTrueIfValidAttributes && attributesExist)
 			{
-				string lines = File.ReadAllText(repoPath + "\\.gitattributes");
+				string lines = File.ReadAllText(repoPath + Path.DirectorySeparatorChar + ".gitattributes");
 				return lines.Contains("filter=lfs diff=lfs merge=lfs");
 			}
 
-			if (attributesExist && Directory.Exists(repoPath + "\\.git\\lfs") && File.Exists(repoPath + "\\.git\\hooks\\pre-push"))
+			if (attributesExist && Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)) && File.Exists(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar)))
 			{
-				string data = File.ReadAllText(repoPath + "\\.git\\hooks\\pre-push");
+				string data = File.ReadAllText(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
 				bool isValid = data.Contains("git-lfs");
 				if (isValid)
 				{
@@ -398,10 +398,10 @@ namespace GitItGUI.Core
 			try
 			{
 				// init git lfs
-				if (!Directory.Exists(repoPath + "\\.git\\lfs"))
+				if (!Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)))
 				{
 					Tools.RunExe("git-lfs", "install", null);
-					if (!Directory.Exists(repoPath + "\\.git\\lfs"))
+					if (!Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)))
 					{
 						Debug.LogError("Git-LFS install failed! (Try manually)", true);
 						lfsEnabled = false;
@@ -410,9 +410,9 @@ namespace GitItGUI.Core
 				}
 
 				// add attr file if it doesn't exist
-				if (!File.Exists(repoPath + "\\.gitattributes"))
+				if (!File.Exists(repoPath + Path.DirectorySeparatorChar + ".gitattributes"))
 				{
-					using (var writer = File.CreateText(repoPath + "\\.gitattributes"))
+					using (var writer = File.CreateText(repoPath + Path.DirectorySeparatorChar + ".gitattributes"))
 					{
 						// this will be an empty file...
 					}
@@ -455,9 +455,9 @@ namespace GitItGUI.Core
 			try
 			{
 				// untrack lfs filters
-				if (File.Exists(repoPath + "\\.gitattributes"))
+				if (File.Exists(repoPath + Path.DirectorySeparatorChar + ".gitattributes"))
 				{
-					string data = File.ReadAllText(repoPath + "\\.gitattributes");
+					string data = File.ReadAllText(repoPath + Path.DirectorySeparatorChar + ".gitattributes");
 					var values = Regex.Matches(data, @"(\*\..*)? filter=lfs diff=lfs merge=lfs");
 					foreach (Match value in values)
 					{
@@ -468,8 +468,8 @@ namespace GitItGUI.Core
 
 				// remove lfs repo files
 				Tools.RunExe("git-lfs", "uninstall", null);
-				if (File.Exists(repoPath + "\\.git\\hooks\\pre-push")) File.Delete(repoPath + "\\.git\\hooks\\pre-push");
-				if (Directory.Exists(repoPath + "\\.git\\lfs")) Directory.Delete(repoPath + "\\.git\\lfs", true);
+				if (File.Exists(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar))) File.Delete(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
+				if (Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar))) Directory.Delete(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar), true);
 					
 				// rebase repo
 				if (rebase)
@@ -495,14 +495,20 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				// get gitk path
-				string programFilesx86, programFilesx64;
-				Tools.GetProgramFilesPath(out programFilesx86, out programFilesx64);
-
 				// open gitk
 				using (var process = new Process())
 				{
-					process.StartInfo.FileName = programFilesx64 + "\\Git\\cmd\\gitk.exe";
+					if (PlatformSettings.platform == Platforms.Windows)
+					{
+						string programFilesx86, programFilesx64;
+						PlatformSettings.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
+						process.StartInfo.FileName = programFilesx64 + string.Format("{0}Git{0}cmd{0}gitk.exe", Path.DirectorySeparatorChar);
+					}
+					else
+					{
+						throw new Exception("Unsported platform: " + PlatformSettings.platform);
+					}
+
 					process.StartInfo.WorkingDirectory = repoPath;
 					process.StartInfo.Arguments = "";
 					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
