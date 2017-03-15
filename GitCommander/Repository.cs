@@ -16,6 +16,7 @@ namespace GitCommander
 
 		internal static string repoURL, repoPath;
 
+		#region Repo Methods
 		public static bool Clone(string url, string path)
 		{
 			repoURL = url;
@@ -48,7 +49,9 @@ namespace GitCommander
 			repoURL = null;
 			repoPath = null;
 		}
+		#endregion
 
+		#region Changes Methods
 		public static bool Stage(string filename)
 		{
 			string error;
@@ -134,7 +137,9 @@ namespace GitCommander
 
 			return true;
 		}
+		#endregion
 
+		#region Branches Methods
 		public static bool GetRemotes(out string[] remotes)
 		{
 			string error;
@@ -152,5 +157,6 @@ namespace GitCommander
 			remotes = remoteList.ToArray();
 			return true;
 		}
+		#endregion
     }
 }
