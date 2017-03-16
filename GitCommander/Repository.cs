@@ -95,6 +95,7 @@ namespace GitCommander
 		{
 			string error;
 			lastResult = Tools.RunExe("git", "status", null, out error);// TODO: use stdout callback method to parse results
+			//NOTE TODO: will need to use "git status -u" to list all untracked files
 			lastError = error;
 			if (!string.IsNullOrEmpty(lastError))
 			{
