@@ -11,8 +11,8 @@ namespace GitCommander
     public static class Repository
     {
 		public static bool isOpen {get; private set;}
-		public static string lastResult {get; internal set;}
-		public static string lastError {get; internal set;}
+		public static string lastResult {get; private set;}
+		public static string lastError {get; private set;}
 
 		internal static string repoURL, repoPath;
 
@@ -22,7 +22,7 @@ namespace GitCommander
 			repoURL = url;
 			repoPath = path;
 			string error;
-			lastResult = Tools.RunExeOutputErrors("git", string.Format("clone \"{0}\"", url), null, out error);
+			lastResult = Tools.RunExe("git", string.Format("clone \"{0}\"", url), null, out error);
 			lastError = error;
 
 			return isOpen = string.IsNullOrEmpty(lastError);
@@ -55,7 +55,7 @@ namespace GitCommander
 		public static bool Stage(string filename)
 		{
 			string error;
-			lastResult = Tools.RunExeOutputErrors("git", string.Format("add \"{0}\"", filename), null, out error);
+			lastResult = Tools.RunExe("git", string.Format("add \"{0}\"", filename), null, out error);
 			lastError = error;
 
 			return string.IsNullOrEmpty(lastError);
@@ -64,7 +64,7 @@ namespace GitCommander
 		public static bool Unstage(string filename)
 		{
 			string error;
-			lastResult = Tools.RunExeOutputErrors("git", string.Format("reset \"{0}\"", filename), null, out error);
+			lastResult = Tools.RunExe("git", string.Format("reset \"{0}\"", filename), null, out error);
 			lastError = error;
 
 			return string.IsNullOrEmpty(lastError);
@@ -94,7 +94,7 @@ namespace GitCommander
 		public static bool GetFileStates(out List<FileState> states)
 		{
 			string error;
-			lastResult = Tools.RunExeOutputErrors("git", "status", null, out error);
+			lastResult = Tools.RunExe("git", "status", null, out error);// TODO: use stdout callback method to parse results
 			lastError = error;
 			if (!string.IsNullOrEmpty(lastError))
 			{
@@ -137,13 +137,40 @@ namespace GitCommander
 
 			return true;
 		}
+
+		public static bool Fetch()
+		{
+			string error;
+			lastResult = Tools.RunExe("git", "fetch", null, out error);
+			lastError = error;
+
+			return string.IsNullOrEmpty(lastError);
+		}
+
+		public static bool Pull()
+		{
+			string error;
+			lastResult = Tools.RunExe("git", "pull", null, out error);
+			lastError = error;
+
+			return string.IsNullOrEmpty(lastError);
+		}
+
+		public static bool Push()
+		{
+			string error;
+			lastResult = Tools.RunExe("git", "push", null, out error);
+			lastError = error;
+
+			return string.IsNullOrEmpty(lastError);
+		}
 		#endregion
 
 		#region Branches Methods
 		public static bool GetRemotes(out string[] remotes)
 		{
 			string error;
-			lastResult = Tools.RunExeOutputErrors("git", "remote show", null, out error);
+			lastResult = Tools.RunExe("git", "remote show", null, out error);
 			lastError = error;
 
 			if (!string.IsNullOrEmpty(lastError))
@@ -151,10 +178,24 @@ namespace GitCommander
 				remotes = null;
 				return false;
 			}
+			
+			remotes = lastResult.Split(new string[]{Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+			return true;
+		}
 
-			var remoteList = new List<string>(lastResult.Replace("\r", "").Split('\n'));
-			remoteList.Remove("");
-			remotes = remoteList.ToArray();
+		public static bool GetAllBranches(out string[] branches)
+		{
+			string error;
+			lastResult = Tools.RunExe("git", "branch -a", null, out error);
+			lastError = error;
+
+			if (!string.IsNullOrEmpty(lastError))
+			{
+				branches = null;
+				return false;
+			}
+
+			branches = lastResult.Split(new string[]{Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
 			return true;
 		}
 		#endregion
