@@ -168,6 +168,10 @@ namespace GitCommander
 		#endregion
 
 		#region Branches Methods
+		// "git remote prune origin --dry-run" lists are possilbe remotes to prune
+		// "git remote prune origin" prunes all invalid remotes
+		// "git branch -d <branch name>" deletes branch
+
 		public static bool GetRemotes(out string[] remotes)
 		{
 			string error;
