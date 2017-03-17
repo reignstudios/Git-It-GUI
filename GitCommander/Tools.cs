@@ -9,7 +9,7 @@ namespace GitCommander
 {
 	static class Tools
 	{
-		public delegate void RunExeCallbackMethod(string stdLine);
+		public delegate void RunExeCallbackMethod(string line);
 		
 		public static string RunExe(string exe, string arguments, string input, out string errors, RunExeCallbackMethod stdCallback = null, RunExeCallbackMethod stdErrorCallback = null)
 		{
