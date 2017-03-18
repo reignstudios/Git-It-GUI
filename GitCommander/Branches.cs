@@ -61,28 +61,6 @@ namespace GitCommander
 			return true;
 		}
 
-		public static bool GetRemotes(out string[] remotes)
-		{
-			var remotesList = new List<string>();
-			void stdCallback(string line)
-			{
-				remotesList.Add(line);
-			}
-
-			string error;
-			lastResult = Tools.RunExe("git", "remote show", null, out error, stdCallback);
-			lastError = error;
-
-			if (!string.IsNullOrEmpty(lastError))
-			{
-				remotes = null;
-				return false;
-			}
-			
-			remotes = remotesList.ToArray();
-			return true;
-		}
-
 		// TODO: use "git rev-parse --abbrev-ref --symbolic-full-name @{u} awitte" or "git branch -vv" to get tracking info
 		public static bool GetAllBranches(out Branch[] branches)
 		{

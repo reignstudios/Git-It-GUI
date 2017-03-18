@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Branches.cs" />
     <Compile Include="Changes.cs" />
+    <Compile Include="Remotes.cs" />
     <Compile Include="Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools.cs" />
