@@ -9,7 +9,7 @@ namespace GitCommander
 {
 	public class BranchInfo
 	{
-		public string name, fullname;
+		public string name, fullname, remoteName;
 	}
 
 	public class Branch
@@ -74,16 +74,47 @@ namespace GitCommander
 				if (line[0] == '*')
 				{
 					isActive = true;
-					line = line.Replace("* ", "");
+					line = line.Remove(0, 2);
+				}
+
+				// get name and tracking info
+				string name, fullname, trackingBranchName = null, trackingBranchFullName = null, trackingBranchRemoteName = null;
+				bool isTracking = false;
+				var match = Regex.Match(line, @"(\S*).*\[(.*)\]");
+				if (match.Success)
+				{
+					isTracking = true;
+					fullname = match.Groups[1].Value;
+					name = fullname;
+
+					trackingBranchFullName = match.Groups[2].Value;
+					var values = trackingBranchFullName.Split('/');
+					if (values.Length == 2)
+					{
+						trackingBranchRemoteName = values[0];
+						trackingBranchName = values[1];
+					}
+				}
+				else
+				{
+					match = Regex.Match(line, @"(\S*).*");
+					if (match.Success)
+					{
+						fullname = match.Groups[1].Value;
+						name = fullname;
+					}
+					else
+					{
+						return;
+					}
 				}
 
 				// state vars
-				string fullname = line;
-				string name = line, remoteName = null, headPtrName = null, headPtrFullName = null;
+				string remoteName = null, headPtrName = null, headPtrFullName = null, headPtrRemoteName = null;
 				bool isRemote = false, isHead = false;
 
 				// check if branch is remote head
-				var match = Regex.Match(line, @"remotes/(.*)/HEAD -> (.*)");
+				/*match = Regex.Match(line, @"remotes/(.*)/HEAD -> (.*)");// TODO: check for head FIRST!!!
 				if (match.Success)
 				{
 					isRemote = true;
@@ -93,13 +124,17 @@ namespace GitCommander
 					headPtrFullName = match.Groups[2].Value;
 
 					var values = headPtrFullName.Split('/');
-					if (values.Length == 2) headPtrName = values[1];
-				}
+					if (values.Length == 2)
+					{
+						headPtrRemoteName = values[0];
+						headPtrName = values[1];
+					}
+				}*/
 
 				// check if branch is remote
-				else
+				//else
 				{
-					match = Regex.Match(line, @"remotes/(.*)/(.*)");
+					match = Regex.Match(fullname, @"remotes/(.*)/(.*)");
 					if (match.Success)
 					{
 						isRemote = true;
@@ -116,7 +151,8 @@ namespace GitCommander
 					isActive = isActive,
 					isRemote = isRemote,
 					remoteName = remoteName,
-					isHead = isHead
+					isHead = isHead,
+					isTracking = isTracking,
 				};
 
 				if (isHead)
@@ -124,7 +160,18 @@ namespace GitCommander
 					branch.head = new BranchInfo()
 					{
 						name = headPtrName,
-						fullname = headPtrFullName
+						fullname = headPtrFullName,
+						remoteName = headPtrRemoteName
+					};
+				}
+
+				if (isTracking)
+				{
+					branch.tracking = new BranchInfo()
+					{
+						name = trackingBranchName,
+						fullname = trackingBranchFullName,
+						remoteName = trackingBranchRemoteName
 					};
 				}
 
@@ -132,7 +179,7 @@ namespace GitCommander
 			}
 
 			string error;
-			lastResult = Tools.RunExe("git", "branch -a", null, out error, stdCallback);
+			lastResult = Tools.RunExe("git", "branch -a -vv", null, out error, stdCallback);
 			lastError = error;
 
 			if (!string.IsNullOrEmpty(lastError))
