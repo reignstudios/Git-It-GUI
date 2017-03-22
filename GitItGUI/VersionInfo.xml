@@ -1,14 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <VersionInfo>
-	<AppVersion>0.1.15</AppVersion>
-	<GitVersion>
-		<Windows>2.11.1</Windows>
-		<Mac>2.8.1</Mac>
-		<Linux>1.6.2</Linux>
-	</GitVersion>
-	<Git_LFS_Version>
-		<Windows>1.5.5</Windows>
-		<Mac>1.4.4</Mac>
-		<Linux>1.4.4</Linux>
-	</Git_LFS_Version>
+	<AppVersion>0.2.0</AppVersion>
 </VersionInfo>

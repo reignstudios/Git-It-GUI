@@ -364,6 +364,7 @@ namespace GitItGUI.Core
 				// get git and git-lfs version
 				string gitVersion = null, gitlfsVersion = null;
 				string gitlfsRequiredGitVersion = "0.0.0.0";
+				const string minGitVersion = "2.11.1", minGitLFSVersion = "1.5.5";
 
 				try
 				{
@@ -426,7 +427,29 @@ namespace GitItGUI.Core
 					return;
 				}
 
-				// check versions
+				// check min git versions
+				bool gitValid = true, gitlfsValid = true;
+				if (!IsValidVersion(gitVersion, minGitVersion))
+				{
+					Debug.LogError("Your 'git' version is out of date.\nDownload and install with defaults!", true);
+					gitValid = false;
+				}
+
+				if (!IsValidVersion(gitlfsVersion, minGitLFSVersion))
+				{
+					Debug.LogError("Your 'git-lfs' version is out of date.\nDownload and install with defaults!", true);
+					gitlfsValid = false;
+				}
+
+				if (!gitValid || !gitlfsValid)
+				{
+					if (!gitValid) DownloadGit();
+					if (!gitlfsValid) DownloadGitLFS();
+					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
+					return;
+				}
+
+				// check app version
 				bool canCheckAppVersion = true;
 				using (var reader = new StringReader(e.Result))
 				using (var xmlReader = new XmlTextReader(reader))
@@ -443,38 +466,6 @@ namespace GitItGUI.Core
 								{
 									process.WaitForExit();
 								}
-							}
-						}
-						else if (xmlReader.Name == "GitVersion")
-						{
-							while (xmlReader.Read())
-							{
-								if (xmlReader.Name == platformName)
-								{
-									if (!IsValidVersion(gitVersion, xmlReader.ReadInnerXml()))
-									{
-										Debug.LogError("Your 'git' version is out of date.\nDownload and install with defaults!", true);
-										DownloadGit();
-									}
-								}
-
-								if (xmlReader.Name == "GitVersion") break;
-							}
-						}
-						else if (xmlReader.Name == "Git_LFS_Version")
-						{
-							while (xmlReader.Read())
-							{
-								if (xmlReader.Name == platformName)
-								{
-									if (!IsValidVersion(gitlfsVersion, xmlReader.ReadInnerXml()))
-									{
-										Debug.LogError("Your 'git-lfs' version is out of date.\nDownload and install with defaults!", true);
-										DownloadGitLFS();
-									}
-								}
-
-								if (xmlReader.Name == "GitVersion") break;
 							}
 						}
 					}
