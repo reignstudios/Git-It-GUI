@@ -361,11 +361,12 @@ namespace GitItGUI.Core
 
 			try
 			{
-				// get git and git-lfs version
+				// git and git-lfs versions
 				string gitVersion = null, gitlfsVersion = null;
 				string gitlfsRequiredGitVersion = "0.0.0.0";
 				const string minGitVersion = "2.11.1", minGitLFSVersion = "1.5.5";
 
+				// get git version string
 				try
 				{
 					gitVersion = Tools.RunExeOutput("git", "version", null);
@@ -379,6 +380,7 @@ namespace GitItGUI.Core
 					return;
 				}
 
+				// get git-lfs version string
 				try
 				{
 					gitlfsVersion = Tools.RunExeOutput("git-lfs", "version", null);
@@ -392,6 +394,7 @@ namespace GitItGUI.Core
 					return;
 				}
 
+				// grab git version value
 				var match = Regex.Match(gitVersion, @"git version (.*)\.windows");
 				if (match.Success && match.Groups.Count == 2) gitVersion = match.Groups[1].Value;
 				else
@@ -402,6 +405,7 @@ namespace GitItGUI.Core
 					return;
 				}
 				
+				// grab lfs and required git version value
 				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; windows amd64; go (.*); git ");
 				if (match.Success && match.Groups.Count == 3)
 				{
