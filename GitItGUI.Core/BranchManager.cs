@@ -258,11 +258,10 @@ namespace GitItGUI.Core
 					});
 
 					// push remote
-					string errors;
-					string result = Tools.RunExeOutputErrors("git", string.Format("push -u {0} {1}", remoteName, branch.FriendlyName), null, out errors);
-					if (!string.IsNullOrEmpty(errors) && !errors.Contains("To create a merge request for"))//NOTE: this ignores false positive noise errors that come from GitLab
+					var result = GitCommander.Tools.RunExe("git", string.Format("push -u {0} {1}", remoteName, branch.FriendlyName));
+					if (!string.IsNullOrEmpty(result.stdErrorResult) && !result.stdErrorResult.Contains("To create a merge request for"))//NOTE: this ignores false positive noise errors that come from GitLab
 					{
-						Debug.LogError("Push remote failed: " + errors, true);
+						Debug.LogError("Push remote failed: " + result.stdErrorResult, true);
 						success = false;
 					}
 				}

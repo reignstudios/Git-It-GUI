@@ -20,9 +20,9 @@ namespace GitCommander
 		{
 			repoURL = url;
 			repoPath = path;
-			string error;
-			lastResult = Tools.RunExe("git", string.Format("clone \"{0}\"", url), null, out error);
-			lastError = error;
+			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url));
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			return isOpen = string.IsNullOrEmpty(lastError);
 		}

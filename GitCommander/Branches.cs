@@ -23,18 +23,18 @@ namespace GitCommander
 	{
 		public static bool DeleteBranch(string branch)
 		{
-			string error;
-			lastResult = Tools.RunExe("git", "branch -d " + branch, null, out error);
-			lastError = error;
+			var result = Tools.RunExe("git", "branch -d " + branch);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool PruneRemoteBranches()
 		{
-			string error;
-			lastResult = Tools.RunExe("git", "remote prune origin", null, out error);
-			lastError = error;
+			var result = Tools.RunExe("git", "remote prune origin");
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -46,10 +46,10 @@ namespace GitCommander
 			{
 				branchNameList.Add(line);
 			}
-
-			string error;
-			lastResult = Tools.RunExe("git", "remote prune origin --dry-run", null, out error, stdCallback);
-			lastError = error;
+			
+			var result = Tools.RunExe("git", "remote prune origin --dry-run");
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
@@ -176,10 +176,10 @@ namespace GitCommander
 
 				branchList.Add(branch);
 			}
-
-			string error;
-			lastResult = Tools.RunExe("git", "branch -a -vv", null, out error, stdCallback);
-			lastError = error;
+			
+			var result = Tools.RunExe("git", "branch -a -vv", stdCallback:stdCallback);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{

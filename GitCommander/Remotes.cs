@@ -21,10 +21,10 @@ namespace GitCommander
 				var remote = new Remote() {name = line};
 				remotesList.Add(remote);
 			}
-
-			string error;
-			lastResult = Tools.RunExe("git", "remote show", null, out error, stdCallback);
-			lastError = error;
+			
+			var result = Tools.RunExe("git", "remote show", stdCallback:stdCallback);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
@@ -35,8 +35,9 @@ namespace GitCommander
 			// get remote urls
 			foreach (var remote in remotesList)
 			{
-				lastResult = Tools.RunExe("git", string.Format("git config --get remote.{0}.url", remote.name), null, out error);
-				lastError = error;
+				result = Tools.RunExe("git", string.Format("git config --get remote.{0}.url", remote.name));
+				lastResult = result.stdResult;
+				lastError = result.stdErrorResult;
 
 				if (!string.IsNullOrEmpty(lastError) || !string.IsNullOrEmpty(lastResult))
 				{

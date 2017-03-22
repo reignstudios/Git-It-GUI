@@ -423,8 +423,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				//Commands.Unstage(RepoManager.repo, fileState.filename);// libgit2sharp has some bug on this method
-				Tools.RunExe("git", string.Format("reset \"{0}\"", fileState.filename), null);// use this hack for now
+				if (!GitCommander.Repository.RevertFile(fileState.filename)) return false;
 			}
 			catch (Exception e)
 			{

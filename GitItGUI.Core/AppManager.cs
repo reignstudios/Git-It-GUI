@@ -369,7 +369,9 @@ namespace GitItGUI.Core
 				// get git version string
 				try
 				{
-					gitVersion = Tools.RunExeOutput("git", "version", null);
+					var result = GitCommander.Tools.RunExe("git", "version");
+					if (!string.IsNullOrEmpty(result.stdErrorResult)) throw new Exception("git version error: " + result.stdErrorResult);
+					gitVersion = result.stdResult;
 				}
 				catch
 				{
@@ -383,7 +385,9 @@ namespace GitItGUI.Core
 				// get git-lfs version string
 				try
 				{
-					gitlfsVersion = Tools.RunExeOutput("git-lfs", "version", null);
+					var result = GitCommander.Tools.RunExe("git-lfs", "version");
+					if (!string.IsNullOrEmpty(result.stdErrorResult)) throw new Exception("git-lfs version error: " + result.stdErrorResult);
+					gitlfsVersion = result.stdResult;
 				}
 				catch
 				{

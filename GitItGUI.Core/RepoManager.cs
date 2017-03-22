@@ -227,10 +227,10 @@ namespace GitItGUI.Core
 					if (statusCallback != null) statusCallback(string.Format("Checking out: {0}%", (int)((completedSteps / (decimal)(totalSteps+1)) * 100)));
 				};
 
-				RunExeCallbackMethod lfsCallback = delegate(string stdLine)
+				void stdCallback(string line)
 				{
-					if (statusCallback != null) statusCallback(stdLine);
-				};
+					if (statusCallback != null) statusCallback(line);
+				}
 				
 				string result = Repository.Clone(url, repoPath, options);
 				if (result == (repoPath + string.Format("{0}.git{0}", Path.DirectorySeparatorChar)))
@@ -239,24 +239,23 @@ namespace GitItGUI.Core
 					if (IsGitLFSRepo(true))
 					{
 						const string errorStringHelper = "\n(please manually run these commands in order\ngit-lfs [install, fetch, checkout])";
-
-						string errors;
-						Tools.RunExeOutputErrors("git-lfs", "install", null, out errors, lfsCallback);
-						if (!string.IsNullOrEmpty(errors))
+						
+						var lfsResult = GitCommander.Tools.RunExe("git-lfs", "install");
+						if (!string.IsNullOrEmpty(lfsResult.stdErrorResult))
 						{
 							Debug.LogError("Failed to init git-lfs on repo" + errorStringHelper, true);
 							return false;
 						}
 
-						Tools.RunExeOutputErrors("git-lfs", "fetch", null, out errors, lfsCallback);
-						if (!string.IsNullOrEmpty(errors))
+						lfsResult = GitCommander.Tools.RunExe("git-lfs", "fetch");
+						if (!string.IsNullOrEmpty(lfsResult.stdErrorResult))
 						{
 							Debug.LogError("Failed to fetch git-lfs files" + errorStringHelper, true);
 							return false;
 						}
 
-						Tools.RunExeOutputErrors("git-lfs", "checkout", null, out errors, lfsCallback);
-						if (!string.IsNullOrEmpty(errors))
+						lfsResult = GitCommander.Tools.RunExe("git-lfs", "checkout");
+						if (!string.IsNullOrEmpty(lfsResult.stdErrorResult))
 						{
 							Debug.LogError("Failed to checkout git-lfs files" + errorStringHelper, true);
 							return false;
@@ -400,7 +399,7 @@ namespace GitItGUI.Core
 				// init git lfs
 				if (!Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)))
 				{
-					Tools.RunExe("git-lfs", "install", null);
+					GitCommander.Tools.RunExe("git-lfs", "install");
 					if (!Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)))
 					{
 						Debug.LogError("Git-LFS install failed! (Try manually)", true);
@@ -423,7 +422,7 @@ namespace GitItGUI.Core
 				{
 					foreach (string ext in AppManager.settings.defaultGitLFS_Exts)
 					{
-						Tools.RunExe("git-lfs", string.Format("track \"*{0}\"", ext), null);
+						GitCommander.Tools.RunExe("git-lfs", string.Format("track \"*{0}\"", ext));
 					}
 				}
 
@@ -462,12 +461,12 @@ namespace GitItGUI.Core
 					foreach (Match value in values)
 					{
 						if (value.Groups.Count != 2) continue;
-						Tools.RunExe("git-lfs", string.Format("untrack \"{0}\"", value.Groups[1].Value), null);
+						GitCommander.Tools.RunExe("git-lfs", string.Format("untrack \"{0}\"", value.Groups[1].Value));
 					}
 				}
 
 				// remove lfs repo files
-				Tools.RunExe("git-lfs", "uninstall", null);
+				GitCommander.Tools.RunExe("git-lfs", "uninstall");
 				if (File.Exists(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar))) File.Delete(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
 				if (Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar))) Directory.Delete(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar), true);
 					
@@ -536,18 +535,17 @@ namespace GitItGUI.Core
 
 			try
 			{
-				string errors;
-				string result = Tools.RunExeOutputErrors("git", "count-objects", null, out errors);
-				if (!string.IsNullOrEmpty(errors) || string.IsNullOrEmpty(result))
+				var result = GitCommander.Tools.RunExe("git", "count-objects");
+				if (!string.IsNullOrEmpty(result.stdErrorResult) || string.IsNullOrEmpty(result.stdResult))
 				{
-					Debug.LogError("git gc errors: " + errors, true);
+					Debug.LogError("git gc errors: " + result.stdErrorResult, true);
 					return -1;
 				}
 
-				var match = Regex.Match(result, @"(\d*) objects, (\d* kilobytes)");
+				var match = Regex.Match(result.stdResult, @"(\d*) objects, (\d* kilobytes)");
 				if (match.Groups.Count != 3)
 				{
-					Debug.LogError("git gc invalid result: " + result, true);
+					Debug.LogError("git gc invalid result: " + result.stdResult, true);
 					return -1;
 				}
 				
@@ -566,10 +564,9 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				string errors;
-				string result = Tools.RunExeOutputErrors("git", "gc", null, out errors);
-				if (!string.IsNullOrEmpty(result)) Debug.Log("git gc result: " + result);
-				if (!string.IsNullOrEmpty(errors)) Debug.LogError("git gc errors: " + errors, true);
+				var result = GitCommander.Tools.RunExe("git", "gc");
+				if (!string.IsNullOrEmpty(result.stdResult)) Debug.Log("git gc result: " + result.stdResult);
+				if (!string.IsNullOrEmpty(result.stdErrorResult)) Debug.LogError("git gc errors: " + result.stdErrorResult, true);
 			}
 			catch (Exception e)
 			{

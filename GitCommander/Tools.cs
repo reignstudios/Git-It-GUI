@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 
 namespace GitCommander
 {
-	static class Tools
+	public static class Tools
 	{
 		public delegate void RunExeCallbackMethod(string line);
 		
-		public static string RunExe(string exe, string arguments, string input, out string errors, RunExeCallbackMethod stdCallback = null, RunExeCallbackMethod stdErrorCallback = null)
+		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, string input = null, RunExeCallbackMethod stdCallback = null, RunExeCallbackMethod stdErrorCallback = null, bool stdResultOn = true, bool stdErrorResultOn = true)
 		{
-			string outputErr = "", output = "";
+			if (stdCallback != null) stdResultOn = false;
+			if (stdErrorCallback != null) stdErrorResultOn = false;
+
+			string outputErr = "", output = "", errors = "";
 			using (var process = new Process())
 			{
 				process.StartInfo.FileName = exe;
@@ -30,7 +33,7 @@ namespace GitCommander
 					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdCallback != null) stdCallback(e.Data);
-						else output += e.Data + Environment.NewLine;
+						if (stdResultOn) output += e.Data + Environment.NewLine;
 					}
 				};
 
@@ -39,7 +42,7 @@ namespace GitCommander
 					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdErrorCallback != null) stdErrorCallback(e.Data);
-						else outputErr += e.Data + Environment.NewLine;
+						if (stdErrorResultOn) outputErr += e.Data + Environment.NewLine;
 					}
 				};
 
@@ -58,7 +61,7 @@ namespace GitCommander
 				errors = outputErr;
 			}
 
-			return output;
+			return (output, errors);
 		}
 	}
 }

@@ -187,6 +187,9 @@
       <HintPath>..\packages\System.Reactive.Windows.Threading.3.0.0\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -283,6 +286,10 @@
     <EmbeddedResource Include="Icons\typeChanged.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GitCommander\GitCommander.csproj">
+      <Project>{b27247a7-fb34-41c9-ba20-22c758460d6e}</Project>
+      <Name>GitCommander</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitItGUI.Core\GitItGUI.Core.csproj">
       <Project>{0095000a-55af-4a89-8c5a-02e43caaf1f5}</Project>
       <Name>GitItGUI.Core</Name>

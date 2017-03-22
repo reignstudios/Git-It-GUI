@@ -33,18 +33,27 @@ namespace GitCommander
 	{
 		public static bool Stage(string filename)
 		{
-			string error;
-			lastResult = Tools.RunExe("git", string.Format("add \"{0}\"", filename), null, out error);
-			lastError = error;
+			var result = Tools.RunExe("git", string.Format("add \"{0}\"", filename));
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool Unstage(string filename)
 		{
-			string error;
-			lastResult = Tools.RunExe("git", string.Format("reset \"{0}\"", filename), null, out error);
-			lastError = error;
+			var result = Tools.RunExe("git", string.Format("reset \"{0}\"", filename));
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			return string.IsNullOrEmpty(lastError);
+		}
+
+		public static bool RevertFile(string filename)
+		{
+			var result = Tools.RunExe("git", string.Format("reset \"{0}\"", filename));
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -95,10 +104,10 @@ namespace GitCommander
 					if (AddState(line, "\tmodified:", FileStates.ModifiedInWorkdir, out state)) statesList.Add(state);
 				}
 			}
-
-			string error;
-			lastResult = Tools.RunExe("git", "status", null, out error, stdCallback_Normal);
-			lastError = error;
+			
+			var result = Tools.RunExe("git", "status", stdCallback:stdCallback_Normal);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 			if (!string.IsNullOrEmpty(lastError))
 			{
 				states = null;
@@ -122,8 +131,9 @@ namespace GitCommander
 				}
 			}
 
-			lastResult = Tools.RunExe("git", "status -u", null, out error, stdCallback_Untracked);
-			lastError = error;
+			result = Tools.RunExe("git", "status -u", null, stdCallback_Untracked);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
@@ -137,27 +147,27 @@ namespace GitCommander
 
 		public static bool Fetch()
 		{
-			string error;
-			lastResult = Tools.RunExe("git", "fetch", null, out error);
-			lastError = error;
+			var result = Tools.RunExe("git", "fetch");
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool Pull()
 		{
-			string error;
-			lastResult = Tools.RunExe("git", "pull", null, out error);
-			lastError = error;
+			var result = Tools.RunExe("git", "pull");
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool Push()
 		{
-			string error;
-			lastResult = Tools.RunExe("git", "push", null, out error);
-			lastError = error;
+			var result = Tools.RunExe("git", "push");
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
 
 			return string.IsNullOrEmpty(lastError);
 		}
