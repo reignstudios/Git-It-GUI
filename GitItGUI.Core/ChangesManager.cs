@@ -423,7 +423,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!GitCommander.Repository.RevertFile(fileState.filename)) return false;
+				if (!GitCommander.Repository.Unstage(fileState.filename)) return false;
 			}
 			catch (Exception e)
 			{

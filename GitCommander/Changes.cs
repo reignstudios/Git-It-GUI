@@ -49,9 +49,18 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool RevertFile(string filename)
+		public static bool RevertFile(string activeBranch, string filename)
 		{
-			var result = Tools.RunExe("git", string.Format("reset \"{0}\"", filename));
+			var result = Tools.RunExe("git", string.Format("checkout {0} -- \"{1}\"", activeBranch, filename));
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			return string.IsNullOrEmpty(lastError);
+		}
+
+		public static bool RevertAllChanges()
+		{
+			var result = Tools.RunExe("git", "reset --hard");
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
 
