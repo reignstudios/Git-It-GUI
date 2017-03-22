@@ -60,8 +60,7 @@ namespace GitCommander
 			branchName = branchNameList.ToArray();
 			return true;
 		}
-
-		// TODO: use "git rev-parse --abbrev-ref --symbolic-full-name @{u} awitte" or "git branch -vv" to get tracking info
+		
 		public static bool GetAllBranches(out Branch[] branches)
 		{
 			var branchList = new List<Branch>();
@@ -77,50 +76,19 @@ namespace GitCommander
 					line = line.Remove(0, 2);
 				}
 
-				// get name and tracking info
-				string name, fullname, trackingBranchName = null, trackingBranchFullName = null, trackingBranchRemoteName = null;
-				bool isTracking = false;
-				var match = Regex.Match(line, @"(\S*).*\[(.*)\]");
-				if (match.Success)
-				{
-					isTracking = true;
-					fullname = match.Groups[1].Value;
-					name = fullname;
-
-					trackingBranchFullName = match.Groups[2].Value;
-					var values = trackingBranchFullName.Split('/');
-					if (values.Length == 2)
-					{
-						trackingBranchRemoteName = values[0];
-						trackingBranchName = values[1];
-					}
-				}
-				else
-				{
-					match = Regex.Match(line, @"(\S*).*");
-					if (match.Success)
-					{
-						fullname = match.Groups[1].Value;
-						name = fullname;
-					}
-					else
-					{
-						return;
-					}
-				}
-
 				// state vars
+				string name, fullname, trackingBranchName = null, trackingBranchFullName = null, trackingBranchRemoteName = null;
 				string remoteName = null, headPtrName = null, headPtrFullName = null, headPtrRemoteName = null;
-				bool isRemote = false, isHead = false;
+				bool isRemote = false, isHead = false, isTracking = false;
 
-				// check if branch is remote head
-				/*match = Regex.Match(line, @"remotes/(.*)/HEAD -> (.*)");// TODO: check for head FIRST!!!
+				// get name and tracking info
+				var match = Regex.Match(line, @"remotes/(.*)/HEAD\s*->\s*(\S*)");
 				if (match.Success)
 				{
 					isRemote = true;
 					isHead = true;
 					name = "HEAD";
-					fullname = match.Groups[1].Value + '/' + name;
+					fullname = "remotes/" + match.Groups[1].Value + '/' + name;
 					headPtrFullName = match.Groups[2].Value;
 
 					var values = headPtrFullName.Split('/');
@@ -129,21 +97,50 @@ namespace GitCommander
 						headPtrRemoteName = values[0];
 						headPtrName = values[1];
 					}
-				}*/
-
-				// check if branch is remote
-				//else
+				}
+				else
 				{
-					match = Regex.Match(fullname, @"remotes/(.*)/(.*)");
+					match = Regex.Match(line, @"(\S*).*\[(.*)\]");
 					if (match.Success)
 					{
-						isRemote = true;
-						remoteName = match.Groups[1].Value;
-						name = match.Groups[2].Value;
-						fullname = remoteName + '/' + name;
+						isTracking = true;
+						fullname = match.Groups[1].Value;
+						name = fullname;
+
+						trackingBranchFullName = match.Groups[2].Value;
+						var values = trackingBranchFullName.Split('/');
+						if (values.Length == 2)
+						{
+							trackingBranchRemoteName = values[0];
+							trackingBranchName = values[1];
+						}
+					}
+					else
+					{
+						match = Regex.Match(line, @"(\S*)");
+						if (match.Success)
+						{
+							fullname = match.Groups[1].Value;
+							name = fullname;
+						}
+						else
+						{
+							return;
+						}
 					}
 				}
 
+				// check if branch is remote
+				match = Regex.Match(fullname, @"remotes/(.*)/(.*)");
+				if (match.Success)
+				{
+					isRemote = true;
+					remoteName = match.Groups[1].Value;
+					name = match.Groups[2].Value;
+					fullname = remoteName + '/' + name;
+				}
+
+				// create branch object
 				var branch = new Branch()
 				{
 					name = name,
@@ -155,6 +152,7 @@ namespace GitCommander
 					isTracking = isTracking,
 				};
 
+				// fill head info
 				if (isHead)
 				{
 					branch.head = new BranchInfo()
@@ -165,6 +163,7 @@ namespace GitCommander
 					};
 				}
 
+				// fill tracking info
 				if (isTracking)
 				{
 					branch.tracking = new BranchInfo()
