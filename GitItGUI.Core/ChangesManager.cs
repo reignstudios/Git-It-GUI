@@ -407,7 +407,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				Commands.Stage(RepoManager.repo, fileState.filename);
+				if (!GitCommander.Repository.Stage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -423,7 +423,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!GitCommander.Repository.Unstage(fileState.filename)) return false;
+				if (!GitCommander.Repository.Unstage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -439,7 +439,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				RepoManager.repo.Reset(ResetMode.Hard);
+				if (!GitCommander.Repository.RevertAllChanges()) throw new Exception(GitCommander.Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -453,8 +453,8 @@ namespace GitItGUI.Core
 
 		public static bool RevertFile(FileState fileState)
 		{
-			if (fileState.state == FileStates.ModifiedInIndex && fileState.state == FileStates.ModifiedInWorkdir &&
-				fileState.state == FileStates.DeletedFromIndex && fileState.state == FileStates.DeletedFromWorkdir)
+			if (fileState.state != FileStates.ModifiedInIndex && fileState.state != FileStates.ModifiedInWorkdir &&
+				fileState.state != FileStates.DeletedFromIndex && fileState.state != FileStates.DeletedFromWorkdir)
 			{
 				Debug.LogError("This file is not modified or deleted", true);
 				return false;
@@ -462,9 +462,7 @@ namespace GitItGUI.Core
 
 			try
 			{
-				var options = new CheckoutOptions();
-				options.CheckoutModifiers = CheckoutModifiers.Force;
-				RepoManager.repo.CheckoutPaths(RepoManager.repo.Head.FriendlyName, new string[] {fileState.filename}, options);
+				if (!GitCommander.Repository.RevertFile(BranchManager.activeBranchCommander.fullname, fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -480,8 +478,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				var sig = RepoManager.signature;
-				RepoManager.repo.Commit(commitMessage, sig, sig);
+				if (!GitCommander.Repository.Commit(commitMessage)) throw new Exception(GitCommander.Repository.lastError);
 			}
 			catch (Exception e)
 			{

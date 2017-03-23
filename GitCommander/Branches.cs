@@ -47,7 +47,7 @@ namespace GitCommander
 				branchNameList.Add(line);
 			}
 			
-			var result = Tools.RunExe("git", "remote prune origin --dry-run");
+			var result = Tools.RunExe("git", "remote prune origin --dry-run", stdCallback:stdCallback);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
 

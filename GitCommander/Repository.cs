@@ -30,6 +30,8 @@ namespace GitCommander
 		public static bool Open(string path)
 		{
 			repoPath = path;
+			lastResult = "";
+			lastError = "";
 			//string error;
 			//lastResult = Tools.RunExeOutputErrors("git", "ls-remote --get-url", null, out error);
 			//lastError = error;

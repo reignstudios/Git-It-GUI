@@ -180,5 +180,14 @@ namespace GitCommander
 
 			return string.IsNullOrEmpty(lastError);
 		}
+
+		public static bool Commit(string message)
+		{
+			var result = Tools.RunExe("git", string.Format("commit -m \"{0}\"", message));
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			return string.IsNullOrEmpty(lastError);
+		}
 	}
 }

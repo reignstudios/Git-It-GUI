@@ -77,6 +77,7 @@ namespace GitItGUI.Core
 				// load repo
 				repoPath = path;
 				repo = new Repository(path);
+				if (!GitCommander.Repository.Open(path)) throw new Exception(GitCommander.Repository.lastError);
 				
 				// check for git lfs
 				lfsEnabled = IsGitLFSRepo(false);
@@ -309,6 +310,8 @@ namespace GitItGUI.Core
 				repo.Dispose();
 				repo = null;
 			}
+
+			GitCommander.Repository.Dispose();
 		}
 
 		public static void UpdateSignatureValues(string name, string email)

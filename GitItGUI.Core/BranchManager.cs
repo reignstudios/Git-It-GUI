@@ -36,6 +36,7 @@ namespace GitItGUI.Core
 	public static class BranchManager
 	{
 		public static Branch activeBranch;
+		public static GitCommander.Branch activeBranchCommander;
 		private static List<BranchState> allBranches;
 		private static List<Remote> remotes;
 
