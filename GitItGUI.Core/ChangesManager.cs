@@ -504,57 +504,28 @@ namespace GitItGUI.Core
 
 				// check for git settings file not in repo history
 				RepoManager.DeleteRepoSettingsIfUnCommit();
-
-				// check if git-lfs repo before pull
-				bool isGitLFS = RepoManager.IsGitLFSRepo(false);
-
-				// pull
-				var options = new PullOptions();
-				options.FetchOptions = new FetchOptions();
-				options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => RepoManager.credentials;
-				options.FetchOptions.TagFetchMode = TagFetchMode.All;
-				options.FetchOptions.OnProgress = delegate(string serverProgressOutput)
-				{
-					if (statusCallback != null) statusCallback(serverProgressOutput);
-					return true;
-				};
-
-				options.FetchOptions.OnTransferProgress = delegate(TransferProgress progress)
-				{
-					if (statusCallback != null) statusCallback(string.Format("Downloading: {0}%", (int)((progress.ReceivedObjects / (decimal)(progress.TotalObjects+1)) * 100)));
-					return true;
-				};
-
-				options.MergeOptions = new MergeOptions();
-				options.MergeOptions.OnCheckoutProgress = delegate(string path, int completedSteps, int totalSteps)
-				{
-					if (statusCallback != null) statusCallback(string.Format("Checking out: {0}%", (int)((completedSteps / (decimal)(totalSteps+1)) * 100)));
-				};
 				
-				Filters.GitLFS.statusCallback = statusCallback;
-				Commands.Pull(RepoManager.repo, RepoManager.signature, options);
-				Filters.GitLFS.statusCallback = null;
-
-				// check if repo git-lfs has changed
-				if (!isGitLFS && RepoManager.IsGitLFSRepo(true))
+				// pull changes
+				void stdCallback(string line)
 				{
-					Debug.LogWarning("Repo seems to now support Git-LFS.\nCritical: You will need to re-pull for these changes!", true);
-					RepoManager.AddGitLFSSupport(false);
-				}
-				else if (isGitLFS && !RepoManager.IsGitLFSRepo(true))
-				{
-					Debug.LogWarning("Repo seems to have removed Git-LFS support.\nYou will need to re-pull for these changes!", true);
-					RepoManager.RemoveGitLFSSupport(false);
+					if (statusCallback != null) statusCallback(line);
 				}
 
-				result = ConflictsExist() ? SyncMergeResults.Conflicts : SyncMergeResults.Succeeded;
+				void stdErrorCallback(string line)
+				{
+					if (statusCallback != null) statusCallback(line);
+				}
+
+				result = GitCommander.Repository.Pull(stdCallback, stdErrorCallback) ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
+				result = ConflictsExist() ? SyncMergeResults.Conflicts : result;
+
 				if (result == SyncMergeResults.Conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
-				else Debug.Log("Pull Succeeded!", !isSyncMode);
+				else if (result == SyncMergeResults.Succeeded) Debug.Log("Pull Succeeded!", !isSyncMode);
+				else Debug.Log("Pull Error!", !isSyncMode);
 			}
 			catch (Exception e)
 			{
-				if (e.Message == "Too many redirects or authentication replays") Debug.LogError("Invalid Username or Password", true);
-				else Debug.LogError("Failed to pull: " + e.Message, true);
+				Debug.LogError("Failed to pull: " + e.Message, true);
 				Filters.GitLFS.statusCallback = null;
 				return SyncMergeResults.Error;
 			}
@@ -574,95 +545,13 @@ namespace GitItGUI.Core
 					return false;
 				}
 
-				// pre push git lfs file data
-				var options = new PushOptions();
-				if (RepoManager.lfsEnabled)
+				void stdCallback(string line)
 				{
-					if (statusCallback != null) statusCallback("Starting Git-LFS pre-push...");
-					options.OnNegotiationCompletedBeforePush = delegate(IEnumerable<PushUpdate> updates)
-					{
-						if (updates.Count() == 0) return true;
-
-						string outputErr = "", output = "";
-						using (var process = new Process())
-						{
-							process.StartInfo.FileName = "git-lfs";
-							process.StartInfo.Arguments = "pre-push " + RepoManager.repo.Network.Remotes[BranchManager.activeBranch.RemoteName].Name;
-							process.StartInfo.WorkingDirectory = RepoManager.repoPath;
-							process.StartInfo.CreateNoWindow = true;
-							process.StartInfo.UseShellExecute = false;
-							process.StartInfo.RedirectStandardInput = true;
-							process.StartInfo.RedirectStandardOutput = true;
-							process.StartInfo.RedirectStandardError = true;
-
-							process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
-							{
-								if (!string.IsNullOrEmpty(e.Data))
-								{
-									output += e.Data + Environment.NewLine;
-									if (statusCallback != null) statusCallback(e.Data);
-								}
-							};
-
-							process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
-							{
-								if (!string.IsNullOrEmpty(e.Data))
-								{
-									outputErr += e.Data + Environment.NewLine;
-									if (statusCallback != null) statusCallback("ERROR: " + e.Data);
-								}
-							};
-
-							process.Start();
-							process.BeginOutputReadLine();
-							process.BeginErrorReadLine();
-				
-							foreach (var update in updates)
-							{
-								string value = string.Format("{0} {1} {2} {3}\n", update.SourceRefName, update.SourceObjectId.Sha, update.DestinationRefName, update.DestinationObjectId.Sha);
-								process.StandardInput.Write(value);
-							}
-
-							process.StandardInput.Write("\0");
-							process.StandardInput.Flush();
-							process.StandardInput.Close();
-							process.WaitForExit();
-							
-							if (!string.IsNullOrEmpty(output)) Debug.Log("git-lfs pre-push results: " + output);
-							if (!string.IsNullOrEmpty(outputErr))
-							{
-								Debug.LogError("git-lfs pre-push error results: " + outputErr, true);
-								return false;
-							}
-						}
-
-						return true;
-					};
+					if (statusCallback != null) statusCallback(line);
 				}
-				
-				// post git push
-				options.CredentialsProvider = (_url, _user, _cred) => RepoManager.credentials;
-				bool pushError = false;
-				options.OnPushStatusError = delegate(PushStatusError ex)
-				{
-					Debug.LogError("Failed to push (do you have valid permisions?): " + ex.Message, true);
-					pushError = true;
-				};
 
-				options.OnPushTransferProgress = delegate(int current, int total, long bytes)
-				{
-					if (statusCallback != null) statusCallback(string.Format("Uploading: {0}%", (int)((current / (decimal)(total+1)) * 100)));
-					return true;
-				};
-
-				Filters.GitLFS.statusCallback = statusCallback;
-				RepoManager.repo.Network.Push(BranchManager.activeBranch, options);
-				Filters.GitLFS.statusCallback = null;
-				
-				if (!pushError)
-				{
-					Debug.Log("Push Succeeded!", !isSyncMode);
-				}
+				if (GitCommander.Repository.Push(stdCallback, stdCallback)) Debug.Log("Push Succeeded!", !isSyncMode);
+				else throw new Exception(GitCommander.Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -701,12 +590,16 @@ namespace GitItGUI.Core
 
 		public static bool ConflictsExist()
 		{
-			foreach (var fileState in fileStates)
+			try
 			{
-				if (fileState.state == FileStates.Conflicted) return true;
+				if (!GitCommander.Repository.GetConflitedFiles(out var states)) throw new Exception(GitCommander.Repository.lastError);
+				return states.Length != 0;
 			}
-
-			return false;
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to get file conflicts: " + e.Message);
+				return false;
+			}
 		}
 
 		public static bool ResolveAllConflicts(bool refresh = true)

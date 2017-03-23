@@ -23,6 +23,12 @@ namespace GitCommander
 		Conflicted
 	}
 
+	public enum FileConflictSources
+	{
+		Ours,
+		Theirs
+	}
+
 	public class FileState
 	{
 		public string filePath;
@@ -83,6 +89,7 @@ namespace GitCommander
 				{
 					case "Changes to be committed:": mode = 0; return;
 					case "Changes not staged for commit:": mode = 1; return;
+					case "Unmerged paths:": mode = 2; return;
 				}
 
 				if (mode == 0)
@@ -95,6 +102,11 @@ namespace GitCommander
 				{
 					FileState state;
 					if (AddState(line, "\tmodified:", FileStates.ModifiedInWorkdir, out state)) statesList.Add(state);
+				}
+				else if (mode == 2)
+				{
+					FileState state;
+					if (AddState(line, "\tboth modified:", FileStates.Conflicted, out state)) statesList.Add(state);
 				}
 			}
 			
@@ -138,21 +150,55 @@ namespace GitCommander
 			return true;
 		}
 
-		public static bool Fetch()
+		public static bool GetConflitedFiles(out FileState[] states)
 		{
-			return SimpleGitInvoke("fetch");
+			var statesList = new List<FileState>();
+			void stdCallback(string line)
+			{
+				var state = new FileState()
+				{
+					filePath = line,
+					state = FileStates.Conflicted
+				};
+
+				statesList.Add(state);
+			}
+
+			var result = Tools.RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			states = statesList.ToArray();
+			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool Pull()
+		public static bool SaveConflictedFile(string filename, FileConflictSources source)
 		{
-			return SimpleGitInvoke("pull");
+			string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
+			return SimpleGitInvoke(string.Format("show {1}:'{0}' >'{0}.ours'", filename, sourceName));
 		}
 
-		public static bool Push()
+		public static bool AcceptConflictedFile(string filename, FileConflictSources source)
 		{
-			return SimpleGitInvoke("push");
+			string sourceName = source == FileConflictSources.Ours ? "--ours" : "--theirs";
+			return SimpleGitInvoke(string.Format("git checkout {1} '{0}'", filename, sourceName));
 		}
 
+		public static bool Fetch(StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		{
+			return SimpleGitInvoke("fetch", stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+		}
+
+		public static bool Pull(StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		{
+			return SimpleGitInvoke("pull", stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+		}
+
+		public static bool Push(StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		{
+			return SimpleGitInvoke("push", stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+		}
+		
 		public static bool Commit(string message)
 		{
 			return SimpleGitInvoke(string.Format("commit -m \"{0}\"", message));

@@ -16,20 +16,26 @@ namespace GitCommander
 
 		internal static string repoURL, repoPath;
 
-		private static bool SimpleGitInvoke(string args)
+		private static bool SimpleGitInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 		{
-			var result = Tools.RunExe("git", args);
+			var result = Tools.RunExe("git", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
 
 			return string.IsNullOrEmpty(lastError);
 		}
 		
-		public static bool Clone(string url, string path)
+		public static bool Clone(string url, string path, StdInputCallbackMethod writeUsernameCallback, StdInputCallbackMethod writePasswordCallback, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 		{
+			void stdCallback_CheckUserPass(string line)
+			{
+				// TODO: check for user / pass requests and fire callback to handle them
+				if (stdCallback != null) stdCallback(line);
+			}
+
 			repoURL = url;
 			repoPath = path;
-			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url));
+			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), stdCallback:stdCallback_CheckUserPass, stdErrorCallback:stdErrorCallback);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
 
@@ -38,17 +44,17 @@ namespace GitCommander
 
 		public static bool Open(string path)
 		{
-			repoPath = path;
-			lastResult = "";
-			lastError = "";
-			//string error;
-			//lastResult = Tools.RunExeOutputErrors("git", "ls-remote --get-url", null, out error);
-			//lastError = error;
-			//
-			//repoURL = lastResult.Replace("\n", "");
-			//return isOpen = string.IsNullOrEmpty(lastError);
+			void stdCallback(string line)
+			{
+				repoURL = line;
+			}
 
-			return true;
+			repoPath = path;
+			var result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+			
+			return isOpen = string.IsNullOrEmpty(lastError);
 		}
 
 		public static void Dispose()

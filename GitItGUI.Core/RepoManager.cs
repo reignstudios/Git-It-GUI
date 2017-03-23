@@ -202,75 +202,26 @@ namespace GitItGUI.Core
 				// create folder
 				Directory.CreateDirectory(repoPath);
 
-				// clone
-				var options = new CloneOptions();
-				options.IsBare = false;
-				options.CredentialsProvider = (_url, _user, _cred) => new UsernamePasswordCredentials
-				{
-					Username = username,
-					Password = password
-				};
-
-				options.OnProgress += delegate(string serverProgressOutput)
-				{
-					if (statusCallback != null) statusCallback(serverProgressOutput);
-					return true;
-				};
-
-				options.OnTransferProgress = delegate(TransferProgress progress)
-				{
-					if (statusCallback != null) statusCallback(string.Format("Downloading: {0}%", (int)((progress.ReceivedObjects / (decimal)(progress.TotalObjects+1)) * 100)));
-					return true;
-				};
-
-				options.OnCheckoutProgress = delegate(string path, int completedSteps, int totalSteps)
-				{
-					if (statusCallback != null) statusCallback(string.Format("Checking out: {0}%", (int)((completedSteps / (decimal)(totalSteps+1)) * 100)));
-				};
-
 				void stdCallback(string line)
 				{
 					if (statusCallback != null) statusCallback(line);
 				}
-				
-				string result = Repository.Clone(url, repoPath, options);
-				if (result == (repoPath + string.Format("{0}.git{0}", Path.DirectorySeparatorChar)))
+
+				bool writeUsernameCallback(StreamWriter writer)
 				{
-					RepoManager.repoPath = repoPath;
-					if (IsGitLFSRepo(true))
-					{
-						const string errorStringHelper = "\n(please manually run these commands in order\ngit-lfs [install, fetch, checkout])";
-						
-						var lfsResult = GitCommander.Tools.RunExe("git-lfs", "install");
-						if (!string.IsNullOrEmpty(lfsResult.stdErrorResult))
-						{
-							Debug.LogError("Failed to init git-lfs on repo" + errorStringHelper, true);
-							return false;
-						}
-
-						lfsResult = GitCommander.Tools.RunExe("git-lfs", "fetch");
-						if (!string.IsNullOrEmpty(lfsResult.stdErrorResult))
-						{
-							Debug.LogError("Failed to fetch git-lfs files" + errorStringHelper, true);
-							return false;
-						}
-
-						lfsResult = GitCommander.Tools.RunExe("git-lfs", "checkout");
-						if (!string.IsNullOrEmpty(lfsResult.stdErrorResult))
-						{
-							Debug.LogError("Failed to checkout git-lfs files" + errorStringHelper, true);
-							return false;
-						}
-
-						EnableGitLFSFilter();
-					}
-
+					writer.WriteLine("TODO");// open username dlg
 					return true;
 				}
-				else
+
+				bool writePasswordCallback(StreamWriter writer)
 				{
-					return false;
+					writer.WriteLine("TODO");// open password dlg
+					return true;
 				}
+
+				if (!GitCommander.Repository.Clone(url, repoPath, writeUsernameCallback, writePasswordCallback, stdCallback, stdCallback)) throw new Exception(GitCommander.Repository.lastError);
+				lfsEnabled = IsGitLFSRepo(true);
+				return true;
 			}
 			catch (Exception e)
 			{
@@ -341,7 +292,7 @@ namespace GitItGUI.Core
 			settings.validateGitignore = validateGitignore;
 		}
 
-		internal static bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
+		private static bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
 		{
 			bool attributesExist = File.Exists(repoPath + Path.DirectorySeparatorChar + ".gitattributes");
 			if (returnTrueIfValidAttributes && attributesExist)

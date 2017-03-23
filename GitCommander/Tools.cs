@@ -1,28 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace GitCommander
 {
+	public delegate void StdCallbackMethod(string line);
+	public delegate bool StdInputCallbackMethod(StreamWriter writer);
+
+	public class StdInput
+	{
+		public StdInputCallbackMethod GetStdInputStreamCallback;
+		public string input;
+		public bool autoCloseInputAfterDone = true;
+	}
+
 	public static class Tools
 	{
-		public delegate void RunExeCallbackMethod(string line);
-		
-		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, string input = null, RunExeCallbackMethod stdCallback = null, RunExeCallbackMethod stdErrorCallback = null, bool stdResultOn = true, bool stdErrorResultOn = true)
+		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, StdInput stdInput = null, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null, bool stdResultOn = true)
 		{
 			if (stdCallback != null) stdResultOn = false;
-			if (stdErrorCallback != null) stdErrorResultOn = false;
 
 			string outputErr = "", output = "", errors = "";
 			using (var process = new Process())
 			{
+				// setup start info
 				process.StartInfo.FileName = exe;
 				process.StartInfo.Arguments = arguments;
 				process.StartInfo.WorkingDirectory = Repository.repoPath;
-				process.StartInfo.RedirectStandardInput = input != null;
+				process.StartInfo.RedirectStandardInput = stdInput != null;
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.UseShellExecute = false;
@@ -42,21 +51,32 @@ namespace GitCommander
 					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdErrorCallback != null) stdErrorCallback(e.Data);
-						if (stdErrorResultOn) outputErr += e.Data + Environment.NewLine;
+						outputErr += e.Data + Environment.NewLine;
 					}
 				};
 
+				// start process
 				process.Start();
 				process.BeginOutputReadLine();
 				process.BeginErrorReadLine();
 
-				if (input != null)
+				// write input
+				if (stdInput != null)
 				{
-					process.StandardInput.WriteLine(input);
-					process.StandardInput.Flush();
-					process.StandardInput.Close();
+					while (stdInput.GetStdInputStreamCallback != null)
+					{
+						if (stdInput.GetStdInputStreamCallback(process.StandardInput)) break;
+					}
+
+					if (stdInput.input != null)
+					{
+						process.StandardInput.WriteLine(stdInput.input);
+						process.StandardInput.Flush();
+						if (stdInput.autoCloseInputAfterDone) process.StandardInput.Close();
+					}
 				}
 
+				// wait for process to finish
 				process.WaitForExit();
 				errors = outputErr;
 			}
