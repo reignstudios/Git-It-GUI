@@ -391,14 +391,14 @@ namespace GitItGUI
 
 			// bind event
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
-			ChangesManager.AskUserToResolveBinaryFileCallback += ChangesManager_AskUserToResolveBinaryFileCallback;
+			ChangesManager.AskUserToResolveConflictedFileCallback += ChangesManager_AskUserToResolveConflictedFileCallback;
 			ChangesManager.AskUserIfTheyAcceptMergedFileCallback += ChangesManager_AskUserIfTheyAcceptMergedFileCallback;
 		}
 
-		private bool ChangesManager_AskUserToResolveBinaryFileCallback(FileState fileState, out MergeBinaryFileResults result)
+		private bool ChangesManager_AskUserToResolveConflictedFileCallback(FileState fileState, bool isBinaryFile, out MergeBinaryFileResults result)
 		{
 			string appResult;
-			if (!CoreApps.LaunchBinaryConflicPicker(fileState.filename, out appResult))
+			if (!CoreApps.LaunchMergeConflicPicker(fileState.filename, isBinaryFile, out appResult))
 			{
 				result = MergeBinaryFileResults.Error;
 				return false;

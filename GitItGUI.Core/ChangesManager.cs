@@ -86,8 +86,8 @@ namespace GitItGUI.Core
 
 	public static class ChangesManager
 	{
-		public delegate bool AskUserToResolveBinaryFileCallbackMethod(FileState fileState, out MergeBinaryFileResults result);
-		public static event AskUserToResolveBinaryFileCallbackMethod AskUserToResolveBinaryFileCallback;
+		public delegate bool AskUserToResolveConflictedFileCallbackMethod(FileState fileState, bool isBinaryFile, out MergeBinaryFileResults result);
+		public static event AskUserToResolveConflictedFileCallbackMethod AskUserToResolveConflictedFileCallback;
 
 		public delegate bool AskUserIfTheyAcceptMergedFileCallbackMethod(FileState fileState, out MergeFileAcceptedResults result);
 		public static event AskUserIfTheyAcceptMergedFileCallbackMethod AskUserIfTheyAcceptMergedFileCallback;
@@ -621,6 +621,14 @@ namespace GitItGUI.Core
 		public static bool ResolveConflict(FileState fileState, bool refresh)
 		{
 			bool wasModified = false;
+			string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+			string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
+			void DeleteTempMergeFiles()
+			{
+				if (File.Exists(fullPathBase)) File.Delete(fullPathBase);
+				if (File.Exists(fullPathOurs)) File.Delete(fullPathOurs);
+				if (File.Exists(fullPathTheirs)) File.Delete(fullPathTheirs);
+			}
 
 			try
 			{
@@ -631,37 +639,33 @@ namespace GitItGUI.Core
 					return false;
 				}
 
-				// get info
-				string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
-				var conflict = RepoManager.repo.Index.Conflicts[fileState.filename];
-				var ours = RepoManager.repo.Lookup<Blob>(conflict.Ours.Id);
-				var theirs = RepoManager.repo.Lookup<Blob>(conflict.Theirs.Id);
-
 				// save local temp files
-				Tools.SaveFileFromID(fullPath + ".ours", ours.Id);
-				Tools.SaveFileFromID(fullPath + ".theirs", theirs.Id);
+				if (!GitCommander.Repository.SaveConflictedFile(fileState.filename, GitCommander.FileConflictSources.Ours, out fullPathOurs)) throw new Exception(GitCommander.Repository.lastError);
+				if (!GitCommander.Repository.SaveConflictedFile(fileState.filename, GitCommander.FileConflictSources.Theirs, out fullPathTheirs)) throw new Exception(GitCommander.Repository.lastError);
+				fullPathOurs = RepoManager.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
+				fullPathTheirs = RepoManager.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
 
 				// check if files are binary (if so open select binary file tool)
-				if (ours.IsBinary || theirs.IsBinary || Tools.IsBinaryFileData(fullPath + ".ours") || Tools.IsBinaryFileData(fullPath + ".theirs"))
+				if (Tools.IsBinaryFileData(fullPathOurs) || Tools.IsBinaryFileData(fullPathTheirs))
 				{
 					// open merge tool
 					MergeBinaryFileResults mergeBinaryResult;
-					if (AskUserToResolveBinaryFileCallback != null && AskUserToResolveBinaryFileCallback(fileState, out mergeBinaryResult))
+					if (AskUserToResolveConflictedFileCallback != null && AskUserToResolveConflictedFileCallback(fileState, true, out mergeBinaryResult))
 					{
 						switch (mergeBinaryResult)
 						{
 							case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true);
-								DeleteTempMergeFiles(fullPath);
+								DeleteTempMergeFiles();
 								return false;
 
 							case MergeBinaryFileResults.Cancel:
-								DeleteTempMergeFiles(fullPath);
+								DeleteTempMergeFiles();
 								return false;
 
-							case MergeBinaryFileResults.KeepMine: File.Copy(fullPath + ".ours", fullPath, true); break;
-							case MergeBinaryFileResults.UseTheirs: File.Copy(fullPath + ".theirs", fullPath, true); break;
+							case MergeBinaryFileResults.KeepMine: File.Copy(fullPathOurs, fullPath, true); break;
+							case MergeBinaryFileResults.UseTheirs: File.Copy(fullPathTheirs, fullPath, true); break;
 							default: Debug.LogWarning("Unsuported Response: " + mergeBinaryResult, true);
-								DeleteTempMergeFiles(fullPath);
+								DeleteTempMergeFiles();
 								return false;
 						}
 					}
@@ -672,29 +676,29 @@ namespace GitItGUI.Core
 					}
 
 					// delete temp files
-					DeleteTempMergeFiles(fullPath);
+					DeleteTempMergeFiles();
 
 					// stage and finish
-					Commands.Stage(RepoManager.repo, fileState.filename);
+					if (!GitCommander.Repository.Stage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
 					if (refresh) RepoManager.Refresh();
 					return true;
 				}
 			
 				// copy base and parse
-				File.Copy(fullPath, fullPath + ".base", true);
+				File.Copy(fullPath, fullPathBase, true);
 				string baseFile = File.ReadAllText(fullPath);
 				var match = Regex.Match(baseFile, @"(<<<<<<<\s*\w*[\r\n]*).*(=======[\r\n]*).*(>>>>>>>\s*\w*[\r\n]*)", RegexOptions.Singleline);
 				if (match.Success && match.Groups.Count == 4)
 				{
 					baseFile = baseFile.Replace(match.Groups[1].Value, "").Replace(match.Groups[2].Value, "").Replace(match.Groups[3].Value, "");
-					File.WriteAllText(fullPath + ".base", baseFile);
+					File.WriteAllText(fullPathBase, baseFile);
 				}
 
 				// hash base file
 				byte[] baseHash = null;
 				using (var md5 = MD5.Create())
 				{
-					using (var stream = File.OpenRead(fullPath + ".base"))
+					using (var stream = File.OpenRead(fullPathBase))
 					{
 						baseHash = md5.ComputeHash(stream);
 					}
@@ -702,34 +706,34 @@ namespace GitItGUI.Core
 
 				// start external merge tool
 				MergeBinaryFileResults mergeFileResult;
-				if (AskUserToResolveBinaryFileCallback != null && AskUserToResolveBinaryFileCallback(fileState, out mergeFileResult))
+				if (AskUserToResolveConflictedFileCallback != null && AskUserToResolveConflictedFileCallback(fileState, false, out mergeFileResult))
 				{
 					switch (mergeFileResult)
 					{
 						case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true);
-							DeleteTempMergeFiles(fullPath);
+							DeleteTempMergeFiles();
 							return false;
 
 						case MergeBinaryFileResults.Cancel:
-							DeleteTempMergeFiles(fullPath);
+							DeleteTempMergeFiles();
 							return false;
 
-						case MergeBinaryFileResults.KeepMine: File.Copy(fullPath + ".ours", fullPath + ".base", true); break;
-						case MergeBinaryFileResults.UseTheirs: File.Copy(fullPath + ".theirs", fullPath + ".base", true); break;
+						case MergeBinaryFileResults.KeepMine: File.Copy(fullPathOurs, fullPathBase, true); break;
+						case MergeBinaryFileResults.UseTheirs: File.Copy(fullPathTheirs, fullPathBase, true); break;
 
 						case MergeBinaryFileResults.RunMergeTool:
 							using (var process = new Process())
 							{
 								process.StartInfo.FileName = AppManager.mergeToolPath;
-								if (AppManager.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
-								else if (AppManager.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
-								else if (AppManager.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{0}.base\" \"{0}.ours\" \"{0}.theirs\" \"{0}.base\"", fullPath);
-								else if (AppManager.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}.ours\" \"{0}.base\" \"{0}.theirs\"", fullPath);
+								if (AppManager.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
+								else if (AppManager.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
+								else if (AppManager.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\" \"{0}\"", fullPathBase, fullPathOurs, fullPathTheirs);
+								else if (AppManager.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
 								process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 								if (!process.Start())
 								{
 									Debug.LogError("Failed to start Merge tool (is it installed?)", true);
-									DeleteTempMergeFiles(fullPath);
+									DeleteTempMergeFiles();
 									return false;
 								}
 
@@ -738,14 +742,14 @@ namespace GitItGUI.Core
 							break;
 
 						default: Debug.LogWarning("Unsuported Response: " + mergeFileResult, true);
-							DeleteTempMergeFiles(fullPath);
+							DeleteTempMergeFiles();
 							return false;
 					}
 				}
 				else
 				{
 					Debug.LogError("Failed to resolve file: " + fileState.filename, true);
-					DeleteTempMergeFiles(fullPath);
+					DeleteTempMergeFiles();
 					return false;
 				}
 
@@ -753,7 +757,7 @@ namespace GitItGUI.Core
 				byte[] baseHashChange = null;
 				using (var md5 = MD5.Create())
 				{
-					using (var stream = File.OpenRead(fullPath + ".base"))
+					using (var stream = File.OpenRead(fullPathBase))
 					{
 						baseHashChange = md5.ComputeHash(stream);
 					}
@@ -763,8 +767,8 @@ namespace GitItGUI.Core
 				if (!baseHashChange.SequenceEqual(baseHash))
 				{
 					wasModified = true;
-					File.Copy(fullPath + ".base", fullPath, true);
-					Commands.Stage(RepoManager.repo, fileState.filename);
+					File.Copy(fullPathBase, fullPath, true);
+					if (!GitCommander.Repository.Stage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
 				}
 
 				// check if user accepts the current state of the merge
@@ -776,8 +780,8 @@ namespace GitItGUI.Core
 						switch (result)
 						{
 							case MergeFileAcceptedResults.Yes:
-								File.Copy(fullPath + ".base", fullPath, true);
-								Commands.Stage(RepoManager.repo, fileState.filename);
+								File.Copy(fullPathBase, fullPath, true);
+								if (!GitCommander.Repository.Stage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
 								wasModified = true;
 								break;
 
@@ -790,40 +794,32 @@ namespace GitItGUI.Core
 					else
 					{
 						Debug.LogError("Failed to ask user if file was resolved: " + fileState.filename, true);
-						DeleteTempMergeFiles(fullPath);
+						DeleteTempMergeFiles();
 						return false;
 					}
 				}
-
-				// delete temp files
-				DeleteTempMergeFiles(fullPath);
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to resolve file: " + e.Message, true);
+				DeleteTempMergeFiles();
 				return false;
 			}
-
+			
 			// finish
+			DeleteTempMergeFiles();
 			if (refresh) RepoManager.Refresh();
 			return wasModified;
-		}
-
-		private static void DeleteTempMergeFiles(string fullPath)
-		{
-			if (File.Exists(fullPath + ".base")) File.Delete(fullPath + ".base");
-			if (File.Exists(fullPath + ".ours")) File.Delete(fullPath + ".ours");
-			if (File.Exists(fullPath + ".theirs")) File.Delete(fullPath + ".theirs");
-		}
-
-		private static void DeleteTempDiffFiles(string fullPath)
-		{
-			if (File.Exists(fullPath + ".orig")) File.Delete(fullPath + ".orig");
 		}
 
 		public static bool OpenDiffTool(FileState fileState)
 		{
 			string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+			string fullPathOrig = null;
+			void DeleteTempDiffFiles()
+			{
+				if (File.Exists(fullPathOrig)) File.Delete(fullPathOrig);
+			}
 
 			try
 			{
@@ -835,34 +831,34 @@ namespace GitItGUI.Core
 				}
 
 				// get info and save orig file
-				var changed = RepoManager.repo.Head.Tip[fileState.filename];
-				Tools.SaveFileFromID(string.Format("{0}{1}{2}.orig", RepoManager.repoPath, Path.DirectorySeparatorChar, fileState.filename), changed.Target.Id);
+				if (!GitCommander.Repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(GitCommander.Repository.lastError);
+				fullPathOrig = RepoManager.repoPath + Path.DirectorySeparatorChar + fullPathOrig;
 
 				// open diff tool
 				using (var process = new Process())
 				{
 					process.StartInfo.FileName = AppManager.mergeToolPath;
-					process.StartInfo.Arguments = string.Format("\"{0}.orig\" \"{0}\"", fullPath);
+					process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\"", fullPathOrig, fullPath);
 					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 					if (!process.Start())
 					{
 						Debug.LogError("Failed to start Diff tool (is it installed?)", true);
-						DeleteTempDiffFiles(fullPath);
+						DeleteTempDiffFiles();
 						return false;
 					}
 
 					process.WaitForExit();
 				}
-
-				// delete temp files
-				DeleteTempDiffFiles(fullPath);
 			}
 			catch (Exception ex)
 			{
-				DeleteTempDiffFiles(fullPath);
 				Debug.LogError("Failed to start Diff tool: " + ex.Message, true);
+				DeleteTempDiffFiles();
+				return false;
 			}
 
+			// finish
+			DeleteTempDiffFiles();
 			return true;
 		}
 	}

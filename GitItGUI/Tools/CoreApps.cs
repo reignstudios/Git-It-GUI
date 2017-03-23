@@ -77,10 +77,10 @@ namespace GitItGUI.Tools
 			return value == "Ok";
 		}
 
-		public static bool LaunchBinaryConflicPicker(string fileInConflic, out string result)
+		public static bool LaunchMergeConflicPicker(string fileInConflic, bool isBinaryFile, out string result)
 		{
 			string exe = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "MergeConflicPicker.exe";
-			string args = string.Format("-FileInConflic=\"{0}\"", fileInConflic);
+			string args = string.Format("-FileInConflic=\"{0}\"", fileInConflic);// TODO: pass args isBinaryFile
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, false)) return false;
 			

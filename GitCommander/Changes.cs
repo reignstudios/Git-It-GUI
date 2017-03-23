@@ -172,10 +172,17 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool SaveConflictedFile(string filename, FileConflictSources source)
+		public static bool SaveOriginalFile(string filename, out string savedFilename)
+		{
+			savedFilename = filename + ".orig";
+			return SimpleGitInvoke(string.Format("show HEAD:'{0}' >'{1}'", filename, savedFilename));
+		}
+
+		public static bool SaveConflictedFile(string filename, FileConflictSources source, out string savedFilename)
 		{
 			string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
-			return SimpleGitInvoke(string.Format("show {1}:'{0}' >'{0}.ours'", filename, sourceName));
+			savedFilename = filename + (source == FileConflictSources.Ours ? ".ours" : ".theirs");
+			return SimpleGitInvoke(string.Format("show {1}:'{0}' >'{2}'", filename, sourceName, savedFilename));
 		}
 
 		public static bool AcceptConflictedFile(string filename, FileConflictSources source)
