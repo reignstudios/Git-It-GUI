@@ -33,38 +33,22 @@ namespace GitCommander
 	{
 		public static bool Stage(string filename)
 		{
-			var result = Tools.RunExe("git", string.Format("add \"{0}\"", filename));
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke(string.Format("add \"{0}\"", filename));
 		}
 
 		public static bool Unstage(string filename)
 		{
-			var result = Tools.RunExe("git", string.Format("reset \"{0}\"", filename));
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke(string.Format("reset \"{0}\"", filename));
 		}
 
 		public static bool RevertFile(string activeBranch, string filename)
 		{
-			var result = Tools.RunExe("git", string.Format("checkout {0} -- \"{1}\"", activeBranch, filename));
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke(string.Format("checkout {0} -- \"{1}\"", activeBranch, filename));
 		}
 
 		public static bool RevertAllChanges()
 		{
-			var result = Tools.RunExe("git", "reset --hard");
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke("reset --hard");
 		}
 
 		public static bool GetFileStates(out FileState[] states)
@@ -156,38 +140,22 @@ namespace GitCommander
 
 		public static bool Fetch()
 		{
-			var result = Tools.RunExe("git", "fetch");
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke("fetch");
 		}
 
 		public static bool Pull()
 		{
-			var result = Tools.RunExe("git", "pull");
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke("pull");
 		}
 
 		public static bool Push()
 		{
-			var result = Tools.RunExe("git", "push");
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke("push");
 		}
 
 		public static bool Commit(string message)
 		{
-			var result = Tools.RunExe("git", string.Format("commit -m \"{0}\"", message));
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke(string.Format("commit -m \"{0}\"", message));
 		}
 	}
 }

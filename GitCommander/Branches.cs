@@ -23,20 +23,12 @@ namespace GitCommander
 	{
 		public static bool DeleteBranch(string branch)
 		{
-			var result = Tools.RunExe("git", "branch -d " + branch);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke("branch -d " + branch);
 		}
 
 		public static bool PruneRemoteBranches()
 		{
-			var result = Tools.RunExe("git", "remote prune origin");
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
-
-			return string.IsNullOrEmpty(lastError);
+			return SimpleGitInvoke("remote prune origin");
 		}
 
 		public static bool GetRemotePrunableBrancheNames(out string[] branchName)

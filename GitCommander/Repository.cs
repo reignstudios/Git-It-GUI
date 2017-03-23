@@ -15,6 +15,15 @@ namespace GitCommander
 		public static string lastError {get; private set;}
 
 		internal static string repoURL, repoPath;
+
+		private static bool SimpleGitInvoke(string args)
+		{
+			var result = Tools.RunExe("git", args);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			return string.IsNullOrEmpty(lastError);
+		}
 		
 		public static bool Clone(string url, string path)
 		{
