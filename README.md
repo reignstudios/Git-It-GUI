@@ -13,13 +13,13 @@
 
 - Per project settings saved in .gititgui file.
 
-- Per project user settings saved in .gititgui-user file (don't track this, add to .gitignore!).
+- Per project user settings saved in .gititgui-user file.
 
 - Doesn't allow non resolved files to be staged without warning.
 
 - Supports Meld, kDiff3, P4Merge and DiffMerge with no .gitconfig required.
 
-- Auto check for external Git and Git-LFS updates.
+- Auto checks for Git and Git-LFS min-version requirements.
 
 - gitk for history (maybe something built in later).
 
