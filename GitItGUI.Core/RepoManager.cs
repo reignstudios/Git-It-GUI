@@ -1,4 +1,4 @@
-﻿using LibGit2Sharp;
+﻿using GitCommander;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,16 +22,6 @@ namespace GitItGUI.Core
 		public static event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 
 		/// <summary>
-		/// lib2git repo object
-		/// </summary>
-		public static Repository repo {get; private set;}
-
-		/// <summary>
-		/// Path to active repo
-		/// </summary>
-		public static string repoPath {get; private set;}
-
-		/// <summary>
 		/// True if this is a Git-LFS enabled repo
 		/// </summary>
 		public static bool lfsEnabled {get; private set;}
@@ -45,10 +35,6 @@ namespace GitItGUI.Core
 		
 		private static XML.RepoSettings settings;
 		private static XML.RepoUserSettings userSettings;
-		private static FilterRegistration lfsFilterRegistration;
-
-		internal static Signature signature {get {return new Signature(userSettings.signatureName, userSettings.signatureEmail, DateTimeOffset.UtcNow);}}
-		internal static UsernamePasswordCredentials credentials {get; private set;}
 
 		/// <summary>
 		/// Use to open an existing repo
@@ -70,14 +56,13 @@ namespace GitItGUI.Core
 				return false;
 			}
 
-			bool refreshMode = path == repoPath;
+			bool refreshMode = path == Repository.repoPath;
 			
 			try
 			{
 				// load repo
-				repoPath = path;
-				repo = new Repository(path);
-				if (!GitCommander.Repository.Open(path)) throw new Exception(GitCommander.Repository.lastError);
+				if (refreshMode) Repository.Dispose();
+				if (!Repository.Open(path)) throw new Exception(Repository.lastError);
 				
 				// check for git lfs
 				lfsEnabled = IsGitLFSRepo(false);
@@ -107,19 +92,8 @@ namespace GitItGUI.Core
 						}
 					}
 				}
-
-				// create user objects
-				signatureName = userSettings.signatureName;
-				signatureEmail = userSettings.signatureEmail;
-				credentialUsername = userSettings.username;
-				credentialPassword = userSettings.password;
-				credentials = new UsernamePasswordCredentials
-				{
-					Username = userSettings.username,
-					Password = userSettings.password
-				};
 				
-				BranchManager.OpenRepo(repo);
+				// add repo to history
 				AppManager.AddActiveRepoToHistory();
 
 				// warnings
@@ -148,7 +122,7 @@ namespace GitItGUI.Core
 
 		public static bool Refresh()
 		{
-			return OpenRepo(repoPath);
+			return OpenRepo(Repository.repoPath);
 		}
 
 		private static bool RefreshInternal()
@@ -162,11 +136,11 @@ namespace GitItGUI.Core
 		internal static void DeleteRepoSettingsIfUnCommit()
 		{
 			// check for git settings file not in repo history
-			string settingsPath = repoPath + Path.DirectorySeparatorChar + Settings.repoSettingsFilename;
+			string settingsPath = Repository.repoPath + Path.DirectorySeparatorChar + Settings.repoSettingsFilename;
 			if (File.Exists(settingsPath))
 			{
-				var repoStatus = repo.RetrieveStatus(Settings.repoSettingsFilename);
-				if ((repoStatus & FileStatus.NewInWorkdir) != 0)
+				if (!Repository.GetFileState(Settings.repoSettingsFilename, out var fileState)) throw new Exception(Repository.lastError);
+				if (fileState.IsState(FileStates.NewInWorkdir))
 				{
 					File.Delete(settingsPath);
 					while (File.Exists(settingsPath)) Thread.Sleep(250);
@@ -219,7 +193,7 @@ namespace GitItGUI.Core
 					return true;
 				}
 
-				if (!GitCommander.Repository.Clone(url, repoPath, writeUsernameCallback, writePasswordCallback, stdCallback, stdCallback)) throw new Exception(GitCommander.Repository.lastError);
+				if (!Repository.Clone(url, repoPath, writeUsernameCallback, writePasswordCallback, stdCallback, stdCallback)) throw new Exception(Repository.lastError);
 				lfsEnabled = IsGitLFSRepo(true);
 				return true;
 			}
@@ -242,9 +216,9 @@ namespace GitItGUI.Core
 		/// </summary>
 		public static void SaveSettings(string repoPathOverride = null)
 		{
-			bool canSave = repo != null;
+			bool canSave = Repository.isOpen;
 			if (!string.IsNullOrEmpty(repoPathOverride)) canSave = true;
-			else repoPathOverride = repoPath;
+			else repoPathOverride = Repository.repoPath;
 			if (canSave && !string.IsNullOrEmpty(repoPathOverride))
 			{
 				Settings.Save<XML.RepoSettings>(repoPathOverride + Path.DirectorySeparatorChar + Settings.repoSettingsFilename, settings);
@@ -254,36 +228,7 @@ namespace GitItGUI.Core
 		
 		internal static void Dispose()
 		{
-			repoPath = null;
-
-			if (repo != null)
-			{
-				repo.Dispose();
-				repo = null;
-			}
-
-			GitCommander.Repository.Dispose();
-		}
-
-		public static void UpdateSignatureValues(string name, string email)
-		{
-			userSettings.signatureName = name;
-			userSettings.signatureEmail = email;
-			signatureName = name;
-			signatureEmail = email;
-		}
-
-		public static void UpdateCredentialValues(string username, string password)
-		{
-			userSettings.username = username;
-			userSettings.password = password;
-			credentialUsername = username;
-			credentialPassword = password;
-			credentials = new UsernamePasswordCredentials
-			{
-				Username = username,
-				Password = password
-			};
+			Repository.Dispose();
 		}
 
 		public static void UpdateValidateGitignore(bool validateGitignore)
@@ -294,49 +239,30 @@ namespace GitItGUI.Core
 
 		private static bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
 		{
-			bool attributesExist = File.Exists(repoPath + Path.DirectorySeparatorChar + ".gitattributes");
+			string gitattributesPath = Repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+			bool attributesExist = File.Exists(gitattributesPath);
 			if (returnTrueIfValidAttributes && attributesExist)
 			{
-				string lines = File.ReadAllText(repoPath + Path.DirectorySeparatorChar + ".gitattributes");
+				string lines = File.ReadAllText(gitattributesPath);
 				return lines.Contains("filter=lfs diff=lfs merge=lfs");
 			}
 
-			if (attributesExist && Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)) && File.Exists(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar)))
+			if (attributesExist && Directory.Exists(Repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)) && File.Exists(Repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar)))
 			{
-				string data = File.ReadAllText(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
+				string data = File.ReadAllText(Repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
 				bool isValid = data.Contains("git-lfs");
 				if (isValid)
 				{
-					EnableGitLFSFilter();
+					lfsEnabled = true;
 					return true;
 				}
 				else
 				{
-					DisableGitLFSFilter();
+					lfsEnabled = false;
 				}
 			}
 
 			return false;
-		}
-
-		private static void EnableGitLFSFilter()
-		{
-			// check if filter already active
-			if (lfsFilterRegistration != null || GlobalSettings.GetRegisteredFilters().Contains(lfsFilterRegistration)) return;
-
-			// create lfs filter
-            var filteredFiles = new List<FilterAttributeEntry>()
-            {
-                new FilterAttributeEntry("lfs")
-            };
-            var filter = new Filters.GitLFS("lfs", filteredFiles);
-            lfsFilterRegistration = GlobalSettings.RegisterFilter(filter);
-		}
-
-		private static void DisableGitLFSFilter()
-		{
-           GlobalSettings.DeregisterFilter(lfsFilterRegistration);
-		   lfsFilterRegistration = null;
 		}
 		
 		public static bool AddGitLFSSupport(bool addDefaultIgnoreExts)
@@ -351,10 +277,11 @@ namespace GitItGUI.Core
 			try
 			{
 				// init git lfs
-				if (!Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)))
+				string lfsFolder = Repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar);
+				if (!Directory.Exists(lfsFolder))
 				{
-					GitCommander.Tools.RunExe("git-lfs", "install");
-					if (!Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)))
+					if (!Repository.LFS.Install()) throw new Exception(Repository.lastError);
+					if (!Directory.Exists(lfsFolder))
 					{
 						Debug.LogError("Git-LFS install failed! (Try manually)", true);
 						lfsEnabled = false;
@@ -363,9 +290,10 @@ namespace GitItGUI.Core
 				}
 
 				// add attr file if it doesn't exist
-				if (!File.Exists(repoPath + Path.DirectorySeparatorChar + ".gitattributes"))
+				string gitattributesPath = Repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+				if (!File.Exists(gitattributesPath))
 				{
-					using (var writer = File.CreateText(repoPath + Path.DirectorySeparatorChar + ".gitattributes"))
+					using (var writer = File.CreateText(gitattributesPath))
 					{
 						// this will be an empty file...
 					}
@@ -376,11 +304,10 @@ namespace GitItGUI.Core
 				{
 					foreach (string ext in AppManager.settings.defaultGitLFS_Exts)
 					{
-						GitCommander.Tools.RunExe("git-lfs", string.Format("track \"*{0}\"", ext));
+						if (!Repository.LFS.Track(ext)) throw new Exception(Repository.lastError);
 					}
 				}
-
-				// TODO: validate ext types added successfully
+				
 
 				// finish
 				lfsEnabled = true;
@@ -392,7 +319,6 @@ namespace GitItGUI.Core
 				return false;
 			}
 			
-			EnableGitLFSFilter();
 			return true;
 		}
 
@@ -408,21 +334,22 @@ namespace GitItGUI.Core
 			try
 			{
 				// untrack lfs filters
-				if (File.Exists(repoPath + Path.DirectorySeparatorChar + ".gitattributes"))
+				string gitattributesPath = Repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+				if (File.Exists(gitattributesPath))
 				{
-					string data = File.ReadAllText(repoPath + Path.DirectorySeparatorChar + ".gitattributes");
+					string data = File.ReadAllText(gitattributesPath);
 					var values = Regex.Matches(data, @"(\*\..*)? filter=lfs diff=lfs merge=lfs");
 					foreach (Match value in values)
 					{
 						if (value.Groups.Count != 2) continue;
-						GitCommander.Tools.RunExe("git-lfs", string.Format("untrack \"{0}\"", value.Groups[1].Value));
+						if (!Repository.LFS.Untrack(value.Groups[1].Value)) throw new Exception(Repository.lastError);
 					}
 				}
 
 				// remove lfs repo files
-				GitCommander.Tools.RunExe("git-lfs", "uninstall");
-				if (File.Exists(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar))) File.Delete(repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
-				if (Directory.Exists(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar))) Directory.Delete(repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar), true);
+				if (!Repository.LFS.Uninstall()) throw new Exception(Repository.lastError);
+				if (File.Exists(Repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar))) File.Delete(Repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
+				if (Directory.Exists(Repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar))) Directory.Delete(Repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar), true);
 					
 				// rebase repo
 				if (rebase)
@@ -439,8 +366,7 @@ namespace GitItGUI.Core
 				Environment.Exit(0);// quit for safety as application should restart
 				return false;
 			}
-
-			DisableGitLFSFilter();
+			
 			return true;
 		}
 
@@ -462,7 +388,7 @@ namespace GitItGUI.Core
 						throw new Exception("Unsported platform: " + PlatformSettings.platform);
 					}
 
-					process.StartInfo.WorkingDirectory = repoPath;
+					process.StartInfo.WorkingDirectory = Repository.repoPath;
 					process.StartInfo.Arguments = "";
 					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 					if (!process.Start())
@@ -485,32 +411,17 @@ namespace GitItGUI.Core
 
 		public static int UnpackedObjectCount(out string size)
 		{
-			size = null;
-
 			try
 			{
-				var result = GitCommander.Tools.RunExe("git", "count-objects");
-				if (!string.IsNullOrEmpty(result.stdErrorResult) || string.IsNullOrEmpty(result.stdResult))
-				{
-					Debug.LogError("git gc errors: " + result.stdErrorResult, true);
-					return -1;
-				}
-
-				var match = Regex.Match(result.stdResult, @"(\d*) objects, (\d* kilobytes)");
-				if (match.Groups.Count != 3)
-				{
-					Debug.LogError("git gc invalid result: " + result.stdResult, true);
-					return -1;
-				}
-				
-				size = match.Groups[2].Value;
-				return int.Parse(match.Groups[1].Value);
+				if (!Repository.UnpackedObjectCount(out int count, out size)) throw new Exception(Repository.lastError);
+				return count;
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to optamize: " + e.Message, true);
 			}
 
+			size = null;
 			return -1;
 		}
 
@@ -518,9 +429,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				var result = GitCommander.Tools.RunExe("git", "gc");
-				if (!string.IsNullOrEmpty(result.stdResult)) Debug.Log("git gc result: " + result.stdResult);
-				if (!string.IsNullOrEmpty(result.stdErrorResult)) Debug.LogError("git gc errors: " + result.stdErrorResult, true);
+				if (!Repository.GarbageCollect()) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{

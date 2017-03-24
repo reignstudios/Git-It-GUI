@@ -1,14 +1,12 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using LibGit2Sharp;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using GitItGUI.Core;
 using GitItGUI.Tools;
 using Avalonia.Threading;
 using System.Threading;
+using GitCommander;
 
 namespace GitItGUI
 {
@@ -110,20 +108,20 @@ namespace GitItGUI
 			// fill remotes drop down
 			if (isAdvancedMode)
 			{
-				var remotes = new List<Core.Remote>();
-				var localRemote = new Core.Remote() {name = "N/A - LOCAL ONLY"};
+				var remotes = new List<RemoteState>();
+				var localRemote = new RemoteState("LOCAL", null);
 				remotes.Add(localRemote);
-				remotes.AddRange(BranchManager.GetRemotes());
+				remotes.AddRange(BranchManager.remoteStates);
 				remotesDropDown.Items = remotes;
 				remotesDropDown.SelectedIndex = 0;
 			}
 
 			// fill other branches list
-			var branches = BranchManager.GetOtherBranches(isAdvancedMode);
+			var branches = BranchManager.GetNonActiveBranches(isAdvancedMode);
 			var items = new List<string>();
 			foreach (var branch in branches)
 			{
-				string detailedName = branch.fullName;
+				string detailedName = branch.fullname;
 				if (!isAdvancedMode)
 				{
 					if (!branch.isRemote) items.Add(detailedName);
@@ -131,7 +129,7 @@ namespace GitItGUI
 				else
 				{
 					if (branch.isRemote) detailedName += " <Remote Branch>";
-					else if (branch.isTracking) detailedName += string.Format(" <Local Branch> [tracking remote: {0}]", branch.trackedBranchName);
+					else if (branch.isTracking) detailedName += string.Format(" <Local Branch> [tracking remote: {0}]", branch.tracking.fullname);
 					else detailedName += " <Local Branch>";
 					
 					items.Add(detailedName);
@@ -139,9 +137,18 @@ namespace GitItGUI
 			}
 
 			otherBranchListView.Items = items;
-			activeBranchTextBox.Text = BranchManager.activeBranch.FriendlyName;
-			trackingOriginTextBox.Text = BranchManager.GetTrackedBranchName();
-			remoteURLTextBox.Text = BranchManager.GetRemoteURL();
+			activeBranchTextBox.Text = BranchManager.activeBranch.name;
+			if (BranchManager.activeBranch.isTracking)
+			{
+				trackingOriginTextBox.Text = BranchManager.activeBranch.tracking.fullname;
+				if (BranchManager.activeBranch.remoteState != null) remoteURLTextBox.Text = BranchManager.activeBranch.remoteState.url;
+				else remoteURLTextBox.Text = "";
+			}
+			else
+			{
+				trackingOriginTextBox.Text = "";
+				remoteURLTextBox.Text = "";
+			}
 		}
 
 		private void AddBranchButton_Click(object sender, RoutedEventArgs e)
@@ -152,12 +159,12 @@ namespace GitItGUI
 				return;
 			}
 
-			var remote = (Core.Remote)remotesDropDown.SelectedItem;
+			var remote = (RemoteState)remotesDropDown.SelectedItem;
 			string remoteName = remote.name;
 			if (remote.url == null) remoteName = null;
 
 			string result;
-			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.AddNewBranch(result, remoteName);
+			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.CheckoutNewBranch(result, remoteName);
 		}
 
 		private void RenameBranchButton_Click(object sender, RoutedEventArgs e)
@@ -174,8 +181,8 @@ namespace GitItGUI
 				return;
 			}
 
-			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
-			if (!BranchManager.IsRemote(branch))
+			var branch = BranchManager.GetNonActiveBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
+			if (!BranchManager.activeBranch.isRemote)
 			{
 				Debug.Log("Branch selected is not a 'Remote'", true);
 				return;
@@ -197,7 +204,7 @@ namespace GitItGUI
 				return;
 			}
 
-			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
+			var branch = BranchManager.GetNonActiveBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
 			ProcessingPage.singleton.mode = ProcessingPageModes.Switch;
 			ProcessingPage.singleton.switchOtherBranch = branch;
 			MainWindow.LoadPage(PageTypes.Processing);
@@ -211,14 +218,14 @@ namespace GitItGUI
 				return;
 			}
 
-			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
-			if (branch.branch.FriendlyName == BranchManager.activeBranch.FriendlyName)
+			var branch = BranchManager.GetNonActiveBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
+			if (branch.fullname == BranchManager.activeBranch.fullname)
 			{
 				Debug.LogError("You must select a non active branch", true);
 				return;
 			}
 
-			if (!MessageBox.Show(string.Format("Are you sure you want to merge branch '{0}' into '{1}'?", branch.fullName, BranchManager.activeBranch.FriendlyName), MessageBoxTypes.YesNo)) return;
+			if (!MessageBox.Show(string.Format("Are you sure you want to merge branch '{0}' into '{1}'?", branch.fullname, BranchManager.activeBranch.fullname), MessageBoxTypes.YesNo)) return;
 
 			ProcessingPage.singleton.mode = ProcessingPageModes.Merge;
 			ProcessingPage.singleton.mergeOtherBranch = branch;
@@ -233,14 +240,14 @@ namespace GitItGUI
 				return;
 			}
 
-			var branch = BranchManager.GetOtherBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
-			if (branch.branch.FriendlyName == BranchManager.activeBranch.FriendlyName)
+			var branch = BranchManager.GetNonActiveBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
+			if (branch.fullname == BranchManager.activeBranch.fullname)
 			{
 				Debug.LogError("You must select a non active branch", true);
 				return;
 			}
 
-			if (!MessageBox.Show(string.Format("Are you sure you want to delete branch '{0}'?", branch.fullName), MessageBoxTypes.YesNo)) return;
+			if (!MessageBox.Show(string.Format("Are you sure you want to delete branch '{0}'?", branch.fullname), MessageBoxTypes.YesNo)) return;
 			BranchManager.DeleteNonActiveBranch(branch);
 		}
 	}

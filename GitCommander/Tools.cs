@@ -42,7 +42,11 @@ namespace GitCommander
 					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdCallback != null) stdCallback(e.Data);
-						if (stdResultOn) output += e.Data + Environment.NewLine;
+						if (stdResultOn)
+						{
+							if (output.Length != 0) output += Environment.NewLine;
+							output += e.Data;
+						}
 					}
 				};
 
@@ -51,7 +55,8 @@ namespace GitCommander
 					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdErrorCallback != null) stdErrorCallback(e.Data);
-						outputErr += e.Data + Environment.NewLine;
+						if (outputErr.Length != 0) outputErr += Environment.NewLine;
+						outputErr += e.Data;
 					}
 				};
 

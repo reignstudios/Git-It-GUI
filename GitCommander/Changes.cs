@@ -7,20 +7,23 @@ using System.Threading.Tasks;
 
 namespace GitCommander
 {
+	[Flags]
 	public enum FileStates
 	{
-		Unknown,
-		ModifiedInWorkdir,
-		ModifiedInIndex,
-		NewInWorkdir,
-		NewInIndex,
-		DeletedFromWorkdir,
-		DeletedFromIndex,
-		RenamedInWorkdir,
-		RenamedInIndex,
-		TypeChangeInWorkdir,
-		TypeChangeInIndex,
-		Conflicted
+		Unaltered = 0,
+		ModifiedInWorkdir = 1,
+		ModifiedInIndex = 2,
+		NewInWorkdir = 4,
+		NewInIndex = 8,
+		DeletedFromWorkdir = 16,
+		DeletedFromIndex = 32,
+		RenamedInWorkdir = 64,
+		RenamedInIndex = 128,
+		TypeChangeInWorkdir = 256,
+		TypeChangeInIndex = 512,
+		Conflicted = 1024,
+		Ignored = 2048,
+		Unreadable = 4096
 	}
 
 	public enum FileConflictSources
@@ -31,8 +34,28 @@ namespace GitCommander
 
 	public class FileState
 	{
-		public string filePath;
-		public FileStates state;
+		public string filename {get; internal set;}
+		public FileStates state {get; internal set;}
+
+		public bool IsState(FileStates state)
+		{
+			return (this.state & state) != 0;
+		}
+
+		public bool IsStaged()
+		{
+			return
+				IsState(FileStates.NewInIndex) ||
+				IsState(FileStates.DeletedFromIndex) ||
+				IsState(FileStates.ModifiedInIndex) ||
+				IsState(FileStates.RenamedInIndex) ||
+				IsState(FileStates.TypeChangeInIndex);
+		}
+
+		public override string ToString()
+		{
+			return filename;
+		}
 	}
 
 	public static partial class Repository
@@ -57,118 +80,132 @@ namespace GitCommander
 			return SimpleGitInvoke("reset --hard");
 		}
 
-		public static bool GetFileStates(out FileState[] states)
+		private static void ParseFileState(string line, ref int mode, List<FileState> states)
 		{
-			bool AddState(string line, string type, FileStates stateType, out FileState state)
+			bool AddState(string type, FileStates stateType)
 			{
 				if (line.Contains(type))
 				{
 					var match = Regex.Match(line, type + @"\s*(.*)");
 					if (match.Groups.Count == 2)
 					{
-						state = new FileState()
+						string filePath = match.Groups[1].Value;
+						if (states != null && states.Exists(x => x.filename == filePath))
 						{
-							filePath = match.Groups[1].Value,
-							state = stateType
-						};
-
-						return true;
+							var state = states.Find(x => x.filename == filePath);
+							state.state |= stateType;
+							return true;
+						}
+						else
+						{
+							var state = new FileState()
+							{
+								filename = filePath,
+								state = stateType
+							};
+							
+							states.Add(state);
+							return true;
+						}
 					}
 				}
-
-				state = null;
+				
 				return false;
 			}
 		
 			// gather normal files
-			var statesList = new List<FileState>();
-			int mode = -1;
-			void stdCallback_Normal(string line)
+			switch (line)
 			{
-				switch (line)
-				{
-					case "Changes to be committed:": mode = 0; return;
-					case "Changes not staged for commit:": mode = 1; return;
-					case "Unmerged paths:": mode = 2; return;
-				}
-
-				if (mode == 0)
-				{
-					FileState state;
-					if (AddState(line, "\tnew file:", FileStates.NewInIndex, out state)) statesList.Add(state);
-					else if (AddState(line, "\tmodified:", FileStates.ModifiedInIndex, out state)) statesList.Add(state);
-				}
-				else if (mode == 1)
-				{
-					FileState state;
-					if (AddState(line, "\tmodified:", FileStates.ModifiedInWorkdir, out state)) statesList.Add(state);
-				}
-				else if (mode == 2)
-				{
-					FileState state;
-					if (AddState(line, "\tboth modified:", FileStates.Conflicted, out state)) statesList.Add(state);
-				}
+				case "Changes to be committed:": mode = 0; return;
+				case "Changes not staged for commit:": mode = 1; return;
+				case "Unmerged paths:": mode = 2; return;
+				case "Untracked files:": mode = 3; return;
 			}
 			
-			var result = Tools.RunExe("git", "status", stdCallback:stdCallback_Normal);
+			if (mode == 0)
+			{
+				bool pass = AddState("\tnew file:", FileStates.NewInIndex);
+				if (!pass) pass = AddState("\tmodified:", FileStates.ModifiedInIndex);
+			}
+			else if (mode == 1)
+			{
+				AddState("\tmodified:", FileStates.ModifiedInWorkdir);
+			}
+			else if (mode == 2)
+			{
+				AddState("\tboth modified:", FileStates.Conflicted);
+			}
+			else if (mode == 3)
+			{
+				AddState("\t", FileStates.NewInWorkdir);
+			}
+		}
+
+		public static bool GetFileState(string filename, out FileState fileState)
+		{
+			var states = new List<FileState>();
+			int mode = -1;
+			void stdCallback(string line)
+			{
+				ParseFileState(line, ref mode, states);
+			}
+
+			var result = Tools.RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
 			if (!string.IsNullOrEmpty(lastError))
 			{
-				states = null;
+				fileState = null;
 				return false;
 			}
-
-			// gather untracked files
-			mode = -1;
-			void stdCallback_Untracked(string line)
+			
+			if (states.Count != 0)
 			{
-				if (line == "Untracked files:")
-				{
-					mode = 0;
-					return;
-				}
-
-				if (mode == 0)
-				{
-					FileState state;
-					if (AddState(line, "\t", FileStates.NewInWorkdir, out state)) statesList.Add(state);
-				}
+				fileState = states[0];
+				return true;
 			}
+			else
+			{
+				fileState = null;
+				return false;
+			}
+		}
 
-			result = Tools.RunExe("git", "status -u", null, stdCallback_Untracked);
+		public static bool GetFileStates(out FileState[] fileStates)
+		{
+			var states = new List<FileState>();
+			int mode = -1;
+			void stdCallback(string line)
+			{
+				ParseFileState(line, ref mode, states);
+			}
+			
+			var result = Tools.RunExe("git", "status -u", stdCallback:stdCallback);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
-
 			if (!string.IsNullOrEmpty(lastError))
 			{
-				states = null;
+				fileStates = null;
 				return false;
 			}
 
-			states = statesList.ToArray();
+			fileStates = states.ToArray();
 			return true;
 		}
 
-		public static bool GetConflitedFiles(out FileState[] states)
+		public static bool ConflitedExist(out bool yes)
 		{
-			var statesList = new List<FileState>();
+			bool conflictExist = false;
 			void stdCallback(string line)
 			{
-				var state = new FileState()
-				{
-					filePath = line,
-					state = FileStates.Conflicted
-				};
-
-				statesList.Add(state);
+				conflictExist = true;
 			}
 
 			var result = Tools.RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
-
-			states = statesList.ToArray();
+			
+			yes = conflictExist;
 			return string.IsNullOrEmpty(lastError);
 		}
 
@@ -209,6 +246,13 @@ namespace GitCommander
 		public static bool Commit(string message)
 		{
 			return SimpleGitInvoke(string.Format("commit -m \"{0}\"", message));
+		}
+
+		public static bool GetDiff(string filename, out string diff)
+		{
+			bool result = SimpleGitInvoke(string.Format("diff HEAD '{0}'", filename));
+			diff = lastResult;
+			return result;
 		}
 	}
 }

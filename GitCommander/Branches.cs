@@ -9,14 +9,28 @@ namespace GitCommander
 {
 	public class BranchInfo
 	{
-		public string name, fullname, remoteName;
+		public string name {get; internal set;}
+		public string fullname {get; internal set;}
+		public RemoteState remoteState {get; internal set;}
 	}
 
-	public class Branch
+	public class BranchState
 	{
-		public string name, fullname, remoteName;
-		public bool isActive, isRemote, isTracking, isHead;
-		public BranchInfo head, tracking;
+		public string name {get; internal set;}
+		public string fullname {get; internal set;}
+		public RemoteState remoteState {get; internal set;}
+
+		public bool isActive {get; internal set;}
+		public bool isRemote {get; internal set;}
+		public bool isTracking {get; internal set;}
+		public bool isHeadRef {get; internal set;}
+		public BranchInfo headRef {get; internal set;}
+		public BranchInfo tracking {get; internal set;}
+
+		public override string ToString()
+		{
+			return fullname;
+		}
 	}
 
 	public static partial class Repository
@@ -24,6 +38,31 @@ namespace GitCommander
 		public static bool DeleteBranch(string branch)
 		{
 			return SimpleGitInvoke("branch -d " + branch);
+		}
+
+		public static bool DeleteRemoteBranch(string branch, string remote)
+		{
+			return SimpleGitInvoke(string.Format("push {1} --delete {0}", branch, remote));
+		}
+
+		public static bool RenameActiveBranch(string newBranchName)
+		{
+			return SimpleGitInvoke("branch -m " + newBranchName);
+		}
+
+		public static bool RenameNonActiveBranch(string currentBranchName, string newBranchName)
+		{
+			return SimpleGitInvoke(string.Format("branch -m {0} {1}", currentBranchName, newBranchName));
+		}
+
+		public static bool SetActiveBranchTracking(string fullBranchName)
+		{
+			return SimpleGitInvoke("git branch -u " + fullBranchName);
+		}
+
+		public static bool RemoveActiveBranchTracking()
+		{
+			return SimpleGitInvoke("git branch --unset-upstream");
 		}
 
 		public static bool PruneRemoteBranches()
@@ -53,9 +92,9 @@ namespace GitCommander
 			return true;
 		}
 		
-		public static bool GetAllBranches(out Branch[] branches)
+		public static bool GetBrancheStates(out BranchState[] brancheStates)
 		{
-			var branchList = new List<Branch>();
+			var states = new List<BranchState>();
 			void stdCallback(string line)
 			{
 				line = line.TrimStart();
@@ -133,26 +172,34 @@ namespace GitCommander
 				}
 
 				// create branch object
-				var branch = new Branch()
+				var branch = new BranchState()
 				{
 					name = name,
 					fullname = fullname,
 					isActive = isActive,
 					isRemote = isRemote,
-					remoteName = remoteName,
-					isHead = isHead,
+					isHeadRef = isHead,
 					isTracking = isTracking,
 				};
+
+				if (!string.IsNullOrEmpty(remoteName))
+				{
+					branch.remoteState = new RemoteState() {name = remoteName};
+				}
 
 				// fill head info
 				if (isHead)
 				{
-					branch.head = new BranchInfo()
+					branch.headRef = new BranchInfo()
 					{
 						name = headPtrName,
-						fullname = headPtrFullName,
-						remoteName = headPtrRemoteName
+						fullname = headPtrFullName
 					};
+
+					if (!string.IsNullOrEmpty(headPtrRemoteName))
+					{
+						branch.headRef.remoteState = new RemoteState() {name = headPtrRemoteName};
+					}
 				}
 
 				// fill tracking info
@@ -161,12 +208,16 @@ namespace GitCommander
 					branch.tracking = new BranchInfo()
 					{
 						name = trackingBranchName,
-						fullname = trackingBranchFullName,
-						remoteName = trackingBranchRemoteName
+						fullname = trackingBranchFullName
 					};
+
+					if (!string.IsNullOrEmpty(trackingBranchRemoteName))
+					{
+						branch.tracking.remoteState = new RemoteState() {name = trackingBranchRemoteName};
+					}
 				}
 
-				branchList.Add(branch);
+				states.Add(branch);
 			}
 			
 			var result = Tools.RunExe("git", "branch -a -vv", stdCallback:stdCallback);
@@ -175,12 +226,41 @@ namespace GitCommander
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
-				branches = null;
+				brancheStates = null;
 				return false;
 			}
 
-			branches = branchList.ToArray();
+			// get remote urls
+			foreach (var state in states)
+			{
+				string url;
+				if (state.remoteState != null && GetRemoteURL(state.remoteState.name, out url)) state.remoteState.url = url;
+				if (state.headRef != null && state.headRef.remoteState != null && GetRemoteURL(state.headRef.remoteState.name, out url)) state.headRef.remoteState.url = url;
+				if (state.tracking != null && state.tracking.remoteState != null && GetRemoteURL(state.tracking.remoteState.name, out url)) state.tracking.remoteState.url = url;
+			}
+
+			brancheStates = states.ToArray();
 			return true;
+		}
+
+		public static bool CheckoutExistingBranch(string branch)
+		{
+			return SimpleGitInvoke("checkout " + branch);
+		}
+
+		public static bool CheckoutNewBranch(string branch)
+		{
+			return SimpleGitInvoke("checkout -b " + branch);
+		}
+
+		public static bool PushLocalBranchToRemote(string branch, string remote)
+		{
+			return SimpleGitInvoke(string.Format("push -u {1} {0}", branch, remote));
+		}
+
+		public static bool MergeBranchIntoActive(string branch)
+		{
+			return SimpleGitInvoke("merge " + branch);
 		}
 	}
 }

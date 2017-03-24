@@ -1,10 +1,12 @@
-﻿using System;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using GitItGUI.Core;
 using System.Threading.Tasks;
 using System.Threading;
 using Avalonia.Threading;
+using System.Linq;
+using GitCommander;
+using System;
 
 namespace GitItGUI
 {
@@ -157,7 +159,6 @@ namespace GitItGUI
 
 				// update credentials
 				RepoManager.ForceNewSettings();
-				RepoManager.UpdateCredentialValues(cloneUsername, clonePassword);
 				RepoManager.SaveSettings(clonePath);
 
 				// open repo
@@ -191,11 +192,25 @@ namespace GitItGUI
 				if (!switchOtherBranch.isRemote) BranchManager.Checkout(switchOtherBranch, StatusUpdateCallback);
 				else if (MessageBox.Show("Cannot checkout to remote branch.\nDo you want to create a local one that tracks this remote instead?", MessageBoxTypes.YesNo))
 				{
-					string fullName = switchOtherBranch.branchName;
-					if (BranchManager.AddNewBranch(fullName))
+					string newName = switchOtherBranch.name;
+					int count = 0;
+					while (true)
 					{
-						BranchManager.Checkout(fullName, StatusUpdateCallback);
-						BranchManager.CopyTracking(switchOtherBranch.fullName);
+						++count;
+						if (Array.Exists<BranchState>(BranchManager.branchStates, x => x.name == switchOtherBranch.name))
+						{
+							newName = switchOtherBranch.name + count;
+							continue;
+						}
+						else
+						{
+							break;
+						}
+					}
+
+					if (BranchManager.CheckoutNewBranch(newName))
+					{
+						BranchManager.CopyTracking(switchOtherBranch);
 					}
 				}
 			}

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitCommander;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -185,7 +186,7 @@ namespace GitItGUI.Core
 			// add if doesn't exist
 			var item = new XML.Repository()
 			{
-				path = RepoManager.repoPath
+				path = Repository.repoPath
 			};
 
 			XML.Repository found = null;
@@ -369,9 +370,7 @@ namespace GitItGUI.Core
 				// get git version string
 				try
 				{
-					var result = GitCommander.Tools.RunExe("git", "version");
-					if (!string.IsNullOrEmpty(result.stdErrorResult)) throw new Exception("git version error: " + result.stdErrorResult);
-					gitVersion = result.stdResult;
+					if (!Repository.GetVersion(out gitVersion)) throw new Exception(Repository.lastError);
 				}
 				catch
 				{
@@ -385,9 +384,7 @@ namespace GitItGUI.Core
 				// get git-lfs version string
 				try
 				{
-					var result = GitCommander.Tools.RunExe("git-lfs", "version");
-					if (!string.IsNullOrEmpty(result.stdErrorResult)) throw new Exception("git-lfs version error: " + result.stdErrorResult);
-					gitlfsVersion = result.stdResult;
+					if (!Repository.LFS.GetVersion(out gitlfsVersion)) throw new Exception(Repository.lastError);
 				}
 				catch
 				{

@@ -6,20 +6,49 @@ using System.Threading.Tasks;
 
 namespace GitCommander
 {
-	public class Remote
+	public class RemoteState
 	{
-		public string name, url;
+		public string name {get; internal set;}
+		public string url {get; internal set;}
+
+		public RemoteState() {}
+		public RemoteState(string name, string url)
+		{
+			this.name = name;
+			this.url = url;
+		}
+
+		public override string ToString()
+		{
+			return name;
+		}
 	}
 
 	public static partial class Repository
 	{
-		public static bool GetRemotes(out Remote[] remotes)
+		public static bool GetRemoteURL(string remote, out string url)
 		{
-			var remotesList = new List<Remote>();
+			var result = Tools.RunExe("git", string.Format("config --get remote.{0}.url", remote));
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			if (!string.IsNullOrEmpty(lastError) || string.IsNullOrEmpty(lastResult))
+			{
+				url = null;
+				return false;
+			}
+
+			url = lastResult;
+			return true;
+		}
+
+		public static bool GetRemoteStates(out RemoteState[] remoteStates)
+		{
+			var states = new List<RemoteState>();
 			void stdCallback(string line)
 			{
-				var remote = new Remote() {name = line};
-				remotesList.Add(remote);
+				var remote = new RemoteState() {name = line};
+				states.Add(remote);
 			}
 			
 			var result = Tools.RunExe("git", "remote show", stdCallback:stdCallback);
@@ -28,27 +57,25 @@ namespace GitCommander
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
-				remotes = null;
+				remoteStates = null;
 				return false;
 			}
 
 			// get remote urls
-			foreach (var remote in remotesList)
+			foreach (var remote in states)
 			{
-				result = Tools.RunExe("git", string.Format("git config --get remote.{0}.url", remote.name));
-				lastResult = result.stdResult;
-				lastError = result.stdErrorResult;
-
-				if (!string.IsNullOrEmpty(lastError) || !string.IsNullOrEmpty(lastResult))
+				if (GetRemoteURL(remote.name, out string url))
 				{
-					remotes = null;
+					remote.url = url;
+				}
+				else
+				{
+					remoteStates = null;
 					return false;
 				}
-
-				remote.url = lastResult;
 			}
 			
-			remotes = remotesList.ToArray();
+			remoteStates = states.ToArray();
 			return true;
 		}
 	}

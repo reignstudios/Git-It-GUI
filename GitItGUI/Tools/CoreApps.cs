@@ -1,4 +1,5 @@
-﻿using GitItGUI.Core;
+﻿using GitCommander;
+using GitItGUI.Core;
 using System;
 using System.IO;
 
@@ -15,7 +16,7 @@ namespace GitItGUI.Tools
 			{
 				process.StartInfo.FileName = exe;
 				process.StartInfo.Arguments = arguments;
-				process.StartInfo.WorkingDirectory = RepoManager.repoPath;
+				process.StartInfo.WorkingDirectory = Repository.repoPath;
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.UseShellExecute = false;
 				process.Start();

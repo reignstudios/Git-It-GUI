@@ -4,11 +4,6 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using GitItGUI.Core;
-using LibGit2Sharp;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace GitItGUI
@@ -111,8 +106,8 @@ namespace GitItGUI
 				else RepoManager.RemoveGitLFSSupport(false);
 			}
 
-			RepoManager.UpdateSignatureValues(sigNameTextBox.Text, sigEmailTextBox.Text);
-			RepoManager.UpdateCredentialValues(usernameTextBox.Text, passwordTextBox.Text);
+			//RepoManager.UpdateSignatureValues(sigNameTextBox.Text, sigEmailTextBox.Text);
+			//RepoManager.UpdateCredentialValues(usernameTextBox.Text, passwordTextBox.Text);
 			applyChangesButton.IsVisible = false;
 			RepoManager.SaveSettings();
 			RepoManager.Refresh();

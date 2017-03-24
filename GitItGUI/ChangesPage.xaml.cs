@@ -1,22 +1,14 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.Threading;
+using GitCommander;
 using GitItGUI.Core;
 using GitItGUI.Tools;
-using LibGit2Sharp;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace GitItGUI
@@ -191,11 +183,6 @@ namespace GitItGUI
 		public string Filename {get {return fileState.filename;}}
 		public FileStates State {get {return fileState.state;}}
 
-		public FileItem()
-		{
-			fileState.filename = "ERROR";
-		}
-
 		public FileItem(Bitmap icon, FileState fileState)
 		{
 			this.icon = icon;
@@ -285,7 +272,7 @@ namespace GitItGUI
 			{
 				if (PlatformSettings.platform == Platforms.Windows)
 				{
-					System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", RepoManager.repoPath, fileState.filename));
+					System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", Repository.repoPath, fileState.filename));
 				}
 				else
 				{
@@ -304,7 +291,7 @@ namespace GitItGUI
 			{
 				if (PlatformSettings.platform == Platforms.Windows)
 				{
-					System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", RepoManager.repoPath, fileState.filename));
+					System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", Repository.repoPath, fileState.filename));
 				}
 				else
 				{
@@ -422,7 +409,7 @@ namespace GitItGUI
 
 		private bool CheckLocalBranchSyncErrors()
 		{
-			if (BranchManager.IsTracking()) return true;
+			if (BranchManager.activeBranch.isTracking) return true;
 
 			MessageBox.Show("Local Branch is not tracking a remote!\nPlease use 'advanced' features in the Branch tab to fix.");
 			return false;
@@ -569,7 +556,7 @@ namespace GitItGUI
 			stagedChangesListViewItems.Clear();
 			unstagedChangesListView.Items = null;
 			stagedChangesListView.Items = null;
-			foreach (var fileState in ChangesManager.GetFileChanges())
+			foreach (var fileState in ChangesManager.fileStates)
 			{
 				var item = new FileItem(ResourceManager.GetResource(fileState.state), fileState);
 				if (!fileState.IsStaged()) unstagedChangesListViewItems.Add(item);

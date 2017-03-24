@@ -1,67 +1,14 @@
-﻿using LibGit2Sharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using GitCommander;
 
 namespace GitItGUI.Core
 {
-	public enum FileStates
-	{
-		ModifiedInWorkdir,
-		ModifiedInIndex,
-		NewInWorkdir,
-		NewInIndex,
-		DeletedFromWorkdir,
-		DeletedFromIndex,
-		RenamedInWorkdir,
-		RenamedInIndex,
-		TypeChangeInWorkdir,
-		TypeChangeInIndex,
-		Conflicted
-	}
-
-	public class FileState
-	{
-		public string filename;
-		public FileStates state;
-
-		public FileState(string filename, FileStates state)
-		{
-			this.filename = filename;
-			this.state = state;
-		}
-
-		public bool IsStaged()
-		{
-			switch (state)
-			{
-				case FileStates.NewInIndex:
-				case FileStates.DeletedFromIndex:
-				case FileStates.ModifiedInIndex:
-				case FileStates.RenamedInIndex:
-				case FileStates.TypeChangeInIndex:
-					return true;
-
-				
-				case FileStates.NewInWorkdir:
-				case FileStates.DeletedFromWorkdir:
-				case FileStates.ModifiedInWorkdir:
-				case FileStates.RenamedInWorkdir:
-				case FileStates.TypeChangeInWorkdir:
-				case FileStates.Conflicted:
-					return false;
-			}
-
-			throw new Exception("Unsuported state: " + state);
-		}
-	}
-
 	public enum MergeBinaryFileResults
 	{
 		Error,
@@ -92,169 +39,30 @@ namespace GitItGUI.Core
 		public delegate bool AskUserIfTheyAcceptMergedFileCallbackMethod(FileState fileState, out MergeFileAcceptedResults result);
 		public static event AskUserIfTheyAcceptMergedFileCallbackMethod AskUserIfTheyAcceptMergedFileCallback;
 
-		private static List<FileState> fileStates;
-		public static bool changesExist {get; private set;}
-		public static bool changesStaged {get; private set;}
-
+		public static FileState[] fileStates {get; private set;}
 		private static bool isSyncMode;
-
-		public static FileState[] GetFileChanges()
-		{
-			return fileStates.ToArray();
-		}
-
-		private static bool FileStateExists(string filename)
-		{
-			return fileStates.Exists(x => x.filename == filename);
-		}
 
 		internal static bool Refresh()
 		{
 			try
 			{
-				changesExist = false;
-				changesStaged = false;
-				fileStates = new List<FileState>();
-				bool changesFound = false;
-				var repoStatus = RepoManager.repo.RetrieveStatus();
-				foreach (var fileStatus in repoStatus)
-				{
-					if (fileStatus.FilePath == Settings.repoUserSettingsFilename) continue;
-
-					changesFound = true;
-					bool stateHandled = false;
-					var state = fileStatus.State;
-					if ((state & FileStatus.ModifiedInWorkdir) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.ModifiedInWorkdir));
-						stateHandled = true;
-					}
-
-					if ((state & FileStatus.ModifiedInIndex) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.ModifiedInIndex));
-						stateHandled = true;
-						changesStaged = true;
-					}
-
-					if ((state & FileStatus.NewInWorkdir) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.NewInWorkdir));
-						stateHandled = true;
-					}
-
-					if ((state & FileStatus.NewInIndex) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.NewInIndex));
-						stateHandled = true;
-						changesStaged = true;
-					}
-
-					if ((state & FileStatus.DeletedFromWorkdir) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.DeletedFromWorkdir));
-						stateHandled = true;
-					}
-
-					if ((state & FileStatus.DeletedFromIndex) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.DeletedFromIndex));
-						stateHandled = true;
-						changesStaged = true;
-					}
-
-					if ((state & FileStatus.RenamedInWorkdir) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.RenamedInWorkdir));
-						stateHandled = true;
-					}
-
-					if ((state & FileStatus.RenamedInIndex) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.RenamedInIndex));
-						stateHandled = true;
-						changesStaged = true;
-					}
-
-					if ((state & FileStatus.TypeChangeInWorkdir) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.TypeChangeInWorkdir));
-						stateHandled = true;
-					}
-
-					if ((state & FileStatus.TypeChangeInIndex) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.TypeChangeInIndex));
-						stateHandled = true;
-						changesStaged = true;
-					}
-
-					if ((state & FileStatus.Conflicted) != 0)
-					{
-						if (!FileStateExists(fileStatus.FilePath)) fileStates.Add(new FileState(fileStatus.FilePath, FileStates.Conflicted));
-						stateHandled = true;
-					}
-
-					if ((state & FileStatus.Ignored) != 0)
-					{
-						stateHandled = true;
-					}
-
-					if ((state & FileStatus.Unreadable) != 0)
-					{
-						string fullpath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileStatus.FilePath;
-						if (File.Exists(fullpath))
-						{
-							// disable readonly if this is the cause
-							var attributes = File.GetAttributes(fullpath);
-							if ((attributes & FileAttributes.ReadOnly) != 0) File.SetAttributes(fullpath, FileAttributes.Normal);
-							else
-							{
-								Debug.LogError("Problem will file read (please fix and refresh)\nCause: " + fileStatus.FilePath);
-								continue;
-							}
-
-							// check to make sure file is now readable
-							attributes = File.GetAttributes(fullpath);
-							if ((attributes & FileAttributes.ReadOnly) != 0) Debug.LogError("File is not readable (you will need to fix the issue and refresh\nCause: " + fileStatus.FilePath);
-							else Debug.LogError("Problem will file read (please fix and refresh)\nCause: " + fileStatus.FilePath);
-						}
-						else
-						{
-							Debug.LogError("Expected file doesn't exist: " + fileStatus.FilePath);
-						}
-
-						stateHandled = true;
-					}
-
-					if (!stateHandled)
-					{
-						Debug.LogError("Unsuported File State: " + state);
-					}
-				}
-
-				if (!changesFound) Debug.Log("No Changes, now do some stuff!");
-				else changesExist = true;
+				if (!Repository.GetFileStates(out var states)) throw new Exception(Repository.lastError);
+				fileStates = states;
 				return true;
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to update file status: " + e.Message, true);
+				Debug.LogError("ChangesManager.Refresh Failed: " + e.Message, true);
 				return false;
 			}
-		}
-
-		public static FileState[] GetFileStatuses()
-		{
-			return fileStates.ToArray();
 		}
 
 		public static bool FilesAreStaged()
 		{
 			foreach (var state in fileStates)
 			{
-				if (state.state == FileStates.DeletedFromIndex || state.state == FileStates.ModifiedInIndex ||
-					state.state == FileStates.NewInIndex || state.state == FileStates.RenamedInIndex || state.state == FileStates.TypeChangeInIndex)
+				if (state.IsState(FileStates.DeletedFromIndex) || state.IsState(FileStates.ModifiedInIndex) ||
+					state.IsState(FileStates.NewInIndex) || state.IsState(FileStates.RenamedInIndex) || state.IsState(FileStates.TypeChangeInIndex))
 				{
 					return true;
 				}
@@ -267,8 +75,8 @@ namespace GitItGUI.Core
 		{
 			foreach (var state in fileStates)
 			{
-				if (state.state == FileStates.DeletedFromWorkdir || state.state == FileStates.ModifiedInWorkdir ||
-					state.state == FileStates.NewInWorkdir|| state.state == FileStates.RenamedInWorkdir || state.state == FileStates.TypeChangeInWorkdir)
+				if (state.IsState(FileStates.DeletedFromWorkdir) || state.IsState(FileStates.ModifiedInWorkdir) ||
+					state.IsState(FileStates.NewInWorkdir) || state.IsState(FileStates.RenamedInWorkdir) || state.IsState(FileStates.TypeChangeInWorkdir))
 				{
 					return true;
 				}
@@ -282,59 +90,33 @@ namespace GitItGUI.Core
 			try
 			{
 				// check if file still exists
-				string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+				string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 				if (!File.Exists(fullPath))
 				{
 					return "<< File Doesn't Exist >>";
 				}
 
-				// if new file just grab local data
-				if (fileState.state == FileStates.NewInWorkdir || fileState.state == FileStates.NewInIndex || fileState.state == FileStates.Conflicted)
-				{
-					string value;
-					if (!Tools.IsBinaryFileData(fullPath))
-					{
-						using (var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.None))
-						using (var reader = new StreamReader(stream))
-						{
-							value= reader.ReadToEnd();
-						}
-					}
-					else
-					{
-						value = "<< Binary File >>";
-					}
-
-					return value;
-				}
-
 				// check if binary file
-				var file = RepoManager.repo.Index[fileState.filename];
-				var blob = RepoManager.repo.Lookup<Blob>(file.Id);
-				if (blob.IsBinary || Tools.IsBinaryFileData(fullPath))
+				if (Tools.IsBinaryFileData(fullPath)) return "<< Binary File >>";
+
+				// check for text types diffs
+				if (fileState.IsState(FileStates.ModifiedInWorkdir) || fileState.IsState(FileStates.ModifiedInIndex))
 				{
-					return "<< Binary File >>";
-				}
+					string diff;
+					if (!Repository.GetDiff(fileState.filename, out diff)) throw new Exception(Repository.lastError);
 
-				// check for text types
-				if (fileState.state == FileStates.ModifiedInWorkdir)
-				{
-					var patch = RepoManager.repo.Diff.Compare<Patch>(new List<string>(){fileState.filename});// use this for details about change
-
-					string content = patch.Content;
-
-					var match = Regex.Match(content, @"@@.*?(@@).*?\n(.*)", RegexOptions.Singleline);
-					if (match.Success && match.Groups.Count == 3) content = match.Groups[2].Value.Replace("\\ No newline at end of file\n", "");
+					// remove meta data stage 1
+					var match = Regex.Match(diff, @"@@.*?(@@).*?\n(.*)", RegexOptions.Singleline);
+					if (match.Success && match.Groups.Count == 3) diff = match.Groups[2].Value.Replace("\\ No newline at end of file\n", "");
 
 					// remove meta data stage 2
 					bool search = true;
 					while (search)
 					{
-						patch = RepoManager.repo.Diff.Compare<Patch>(new List<string>() {fileState.filename});
-						match = Regex.Match(content, @"(@@.*?(@@).*?\n)", RegexOptions.Singleline);
+						match = Regex.Match(diff, @"(@@.*?(@@).*?\n)", RegexOptions.Singleline);
 						if (match.Success && match.Groups.Count == 3)
 						{
-							content = content.Replace(match.Groups[1].Value, Environment.NewLine + "<<< ----------- SECTION ----------- >>>" + Environment.NewLine);
+							diff = diff.Replace(match.Groups[1].Value, Environment.NewLine + "<<< ----------- SECTION ----------- >>>" + Environment.NewLine);
 						}
 						else
 						{
@@ -342,14 +124,13 @@ namespace GitItGUI.Core
 						}
 					}
 
-					return content;
+					return diff;
 				}
-				else if (fileState.state == FileStates.ModifiedInIndex ||
-					fileState.state == FileStates.DeletedFromWorkdir || fileState.state == FileStates.DeletedFromIndex ||
-					fileState.state == FileStates.RenamedInWorkdir || fileState.state == FileStates.RenamedInIndex ||
-					fileState.state == FileStates.TypeChangeInWorkdir || fileState.state == FileStates.TypeChangeInIndex)
+
+				// return text
+				else if (!fileState.IsState(FileStates.Unreadable))
 				{
-					return blob.GetContentText();
+					return File.ReadAllText(fullPath);
 				}
 				else
 				{
@@ -369,7 +150,7 @@ namespace GitItGUI.Core
 			try
 			{
 				if (fileState.state != FileStates.NewInWorkdir) return false;
-				string filePath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+				string filePath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 				if (File.Exists(filePath)) File.Delete(filePath);
 			}
 			catch (Exception e)
@@ -388,8 +169,8 @@ namespace GitItGUI.Core
 			{
 				foreach (var fileState in fileStates)
 				{
-					if (fileState.state != FileStates.NewInWorkdir) continue;
-					string filePath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+					if (!fileState.IsState(FileStates.NewInWorkdir)) continue;
+					string filePath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 					if (File.Exists(filePath)) File.Delete(filePath);
 				}
 			}
@@ -407,7 +188,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!GitCommander.Repository.Stage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
+				if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -423,7 +204,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!GitCommander.Repository.Unstage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
+				if (!Repository.Unstage(fileState.filename)) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -439,7 +220,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!GitCommander.Repository.RevertAllChanges()) throw new Exception(GitCommander.Repository.lastError);
+				if (!Repository.RevertAllChanges()) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -462,7 +243,7 @@ namespace GitItGUI.Core
 
 			try
 			{
-				if (!GitCommander.Repository.RevertFile(BranchManager.activeBranchCommander.fullname, fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
+				if (!Repository.RevertFile(BranchManager.activeBranch.fullname, fileState.filename)) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -478,7 +259,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!GitCommander.Repository.Commit(commitMessage)) throw new Exception(GitCommander.Repository.lastError);
+				if (!Repository.Commit(commitMessage)) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
@@ -496,7 +277,7 @@ namespace GitItGUI.Core
 
 			try
 			{
-				if (!BranchManager.IsTracking())
+				if (!BranchManager.activeBranch.isTracking)
 				{
 					Debug.LogWarning("Branch is not tracking a remote!", true);
 					return SyncMergeResults.Error;
@@ -516,7 +297,7 @@ namespace GitItGUI.Core
 					if (statusCallback != null) statusCallback(line);
 				}
 
-				result = GitCommander.Repository.Pull(stdCallback, stdErrorCallback) ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
+				result = Repository.Pull(stdCallback, stdErrorCallback) ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
 				result = ConflictsExist() ? SyncMergeResults.Conflicts : result;
 
 				if (result == SyncMergeResults.Conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
@@ -526,11 +307,9 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to pull: " + e.Message, true);
-				Filters.GitLFS.statusCallback = null;
 				return SyncMergeResults.Error;
 			}
-
-			Filters.GitLFS.statusCallback = null;
+			
 			if (!isSyncMode) RepoManager.Refresh();
 			return result;
 		}
@@ -539,7 +318,7 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!BranchManager.IsTracking())
+				if (!BranchManager.activeBranch.isTracking)
 				{
 					Debug.LogWarning("Branch is not tracking a remote!", true);
 					return false;
@@ -550,17 +329,15 @@ namespace GitItGUI.Core
 					if (statusCallback != null) statusCallback(line);
 				}
 
-				if (GitCommander.Repository.Push(stdCallback, stdCallback)) Debug.Log("Push Succeeded!", !isSyncMode);
-				else throw new Exception(GitCommander.Repository.lastError);
+				if (Repository.Push(stdCallback, stdCallback)) Debug.Log("Push Succeeded!", !isSyncMode);
+				else throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to push: " + e.Message, true);
-				Filters.GitLFS.statusCallback = null;
 				return false;
 			}
-
-			Filters.GitLFS.statusCallback = null;
+			
 			if (!isSyncMode) RepoManager.Refresh();
 			return true;
 		}
@@ -592,12 +369,12 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!GitCommander.Repository.GetConflitedFiles(out var states)) throw new Exception(GitCommander.Repository.lastError);
-				return states.Length != 0;
+				if (!Repository.ConflitedExist(out bool yes)) throw new Exception(Repository.lastError);
+				return yes;
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to get file conflicts: " + e.Message);
+				Debug.LogError("Failed to get file conflicts: " + e.Message, true);
 				return false;
 			}
 		}
@@ -606,7 +383,7 @@ namespace GitItGUI.Core
 		{
 			foreach (var fileState in fileStates)
 			{
-				if (fileState.state == FileStates.Conflicted && !ResolveConflict(fileState, false))
+				if (fileState.IsState(FileStates.Conflicted) && !ResolveConflict(fileState, false))
 				{
 					Debug.LogError("Resolve conflict failed (aborting pending)", true);
 					if (refresh) RepoManager.Refresh();
@@ -621,7 +398,7 @@ namespace GitItGUI.Core
 		public static bool ResolveConflict(FileState fileState, bool refresh)
 		{
 			bool wasModified = false;
-			string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 			string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
 			void DeleteTempMergeFiles()
 			{
@@ -640,10 +417,10 @@ namespace GitItGUI.Core
 				}
 
 				// save local temp files
-				if (!GitCommander.Repository.SaveConflictedFile(fileState.filename, GitCommander.FileConflictSources.Ours, out fullPathOurs)) throw new Exception(GitCommander.Repository.lastError);
-				if (!GitCommander.Repository.SaveConflictedFile(fileState.filename, GitCommander.FileConflictSources.Theirs, out fullPathTheirs)) throw new Exception(GitCommander.Repository.lastError);
-				fullPathOurs = RepoManager.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
-				fullPathTheirs = RepoManager.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
+				if (!Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs)) throw new Exception(Repository.lastError);
+				if (!Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs)) throw new Exception(Repository.lastError);
+				fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
+				fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
 
 				// check if files are binary (if so open select binary file tool)
 				if (Tools.IsBinaryFileData(fullPathOurs) || Tools.IsBinaryFileData(fullPathTheirs))
@@ -679,7 +456,7 @@ namespace GitItGUI.Core
 					DeleteTempMergeFiles();
 
 					// stage and finish
-					if (!GitCommander.Repository.Stage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
+					if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
 					if (refresh) RepoManager.Refresh();
 					return true;
 				}
@@ -768,7 +545,7 @@ namespace GitItGUI.Core
 				{
 					wasModified = true;
 					File.Copy(fullPathBase, fullPath, true);
-					if (!GitCommander.Repository.Stage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
+					if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
 				}
 
 				// check if user accepts the current state of the merge
@@ -781,7 +558,7 @@ namespace GitItGUI.Core
 						{
 							case MergeFileAcceptedResults.Yes:
 								File.Copy(fullPathBase, fullPath, true);
-								if (!GitCommander.Repository.Stage(fileState.filename)) throw new Exception(GitCommander.Repository.lastError);
+								if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
 								wasModified = true;
 								break;
 
@@ -814,7 +591,7 @@ namespace GitItGUI.Core
 
 		public static bool OpenDiffTool(FileState fileState)
 		{
-			string fullPath = RepoManager.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 			string fullPathOrig = null;
 			void DeleteTempDiffFiles()
 			{
@@ -831,8 +608,8 @@ namespace GitItGUI.Core
 				}
 
 				// get info and save orig file
-				if (!GitCommander.Repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(GitCommander.Repository.lastError);
-				fullPathOrig = RepoManager.repoPath + Path.DirectorySeparatorChar + fullPathOrig;
+				if (!Repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(Repository.lastError);
+				fullPathOrig = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOrig;
 
 				// open diff tool
 				using (var process = new Process())
