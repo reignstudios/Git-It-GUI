@@ -3,7 +3,9 @@
 ![alt tag](ScreenShots/Changes.png?raw=true)
 
 
-- Based on libgit2sharp and writen in C# / AvaloniaUI (should support macOS and Linux in the future).
+- Invokes git commands directly allowing any filters to work (including git-lfs).
+
+- Is writen in C# / AvaloniaUI (should support macOS and Linux in the soon).
 
 - Auto check for .gitignore file.
 
