@@ -41,21 +41,28 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 		
-		public static bool Clone(string url, string path, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		public static bool Clone(string url, string path, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
+			StreamWriter stdInWriter = null;
+			void getStdInputStreamCallback(StreamWriter writer)
+			{
+				stdInWriter = writer;
+			}
+			
 			void stdCallback_CheckUserPass(string line)
 			{
-				// TODO: check for user / pass requests and fire callback to handle them
-				if (stdCallback != null) stdCallback(line);
+				if (line.Contains("Username for") && writeUsernameCallback != null) writeUsernameCallback(stdInWriter);
+				if (line.Contains("Password for") && writePasswordCallback != null) writePasswordCallback(stdInWriter);
 			}
-
-			repoURL = url;
-			repoPath = path;
-			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), stdCallback:stdCallback_CheckUserPass, stdErrorCallback:stdErrorCallback);
+			
+			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback_CheckUserPass);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
 
-			return isOpen = string.IsNullOrEmpty(lastError);
+			//return isOpen = string.IsNullOrEmpty(lastError);
+			//Cloning into 'Tools'...
+			if (!string.IsNullOrEmpty(lastError) && !Regex.Match(lastError, @"Cloning into '(.*)'\.\.\.").Success) return false;
+			return true;
 		}
 
 		public static bool Open(string path)

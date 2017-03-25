@@ -176,11 +176,6 @@ namespace GitItGUI.Core
 				// create folder
 				Directory.CreateDirectory(repoPath);
 
-				void stdCallback(string line)
-				{
-					if (statusCallback != null) statusCallback(line);
-				}
-
 				bool writeUsernameCallback(StreamWriter writer)
 				{
 					writer.WriteLine("TODO");// open username dlg
@@ -193,7 +188,7 @@ namespace GitItGUI.Core
 					return true;
 				}
 
-				if (!Repository.Clone(url, repoPath, writeUsernameCallback, writePasswordCallback, stdCallback, stdCallback)) throw new Exception(Repository.lastError);
+				if (!Repository.Clone(url, repoPath, writeUsernameCallback, writePasswordCallback)) throw new Exception(Repository.lastError);
 				lfsEnabled = IsGitLFSRepo(true);
 				return true;
 			}

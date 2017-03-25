@@ -11,10 +11,11 @@ namespace GitCommander
 {
 	public delegate void StdCallbackMethod(string line);
 	public delegate bool StdInputStreamCallbackMethod(StreamWriter writer);
+	public delegate void GetStdInputStreamCallbackMethod(StreamWriter writer);
 
 	public static class Tools
 	{
-		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, StdInputStreamCallbackMethod stdInputStreamCallback = null, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null, bool stdResultOn = true, string stdOutToFilePath = null)
+		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, string workingDirectory = null, StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null, bool stdResultOn = true, string stdOutToFilePath = null)
 		{
 			if (stdCallback != null) stdResultOn = false;
 
@@ -24,8 +25,8 @@ namespace GitCommander
 				// setup start info
 				process.StartInfo.FileName = exe;
 				process.StartInfo.Arguments = arguments;
-				process.StartInfo.WorkingDirectory = Repository.repoPath;
-				process.StartInfo.RedirectStandardInput = stdInputStreamCallback != null;
+				process.StartInfo.WorkingDirectory = workingDirectory == null ? Repository.repoPath : workingDirectory;
+				process.StartInfo.RedirectStandardInput = stdInputStreamCallback != null || getStdInputStreamCallback != null;
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.CreateNoWindow = true;
@@ -72,6 +73,7 @@ namespace GitCommander
 
 				// start process
 				process.Start();
+				if (getStdInputStreamCallback != null) getStdInputStreamCallback(process.StandardInput);
 				process.BeginOutputReadLine();
 				process.BeginErrorReadLine();
 

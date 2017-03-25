@@ -211,7 +211,7 @@ namespace GitCommander
 				conflictExist = true;
 			}
 
-			var result = Tools.RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback);
+			var result = Tools.RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback:stdCallback);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
 			
