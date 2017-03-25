@@ -4,41 +4,51 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GitCommander
 {
 	public delegate void StdCallbackMethod(string line);
-	public delegate bool StdInputCallbackMethod(StreamWriter writer);
-
-	public class StdInput
-	{
-		public StdInputCallbackMethod GetStdInputStreamCallback;
-		public string input;
-		public bool autoCloseInputAfterDone = true;
-	}
+	public delegate bool StdInputStreamCallbackMethod(StreamWriter writer);
 
 	public static class Tools
 	{
-		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, StdInput stdInput = null, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null, bool stdResultOn = true)
+		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, StdInputStreamCallbackMethod stdInputStreamCallback = null, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null, bool stdResultOn = true, string stdOutToFilePath = null)
 		{
 			if (stdCallback != null) stdResultOn = false;
 
-			string outputErr = "", output = "", errors = "";
+			string output = "", errors = "";
 			using (var process = new Process())
 			{
 				// setup start info
 				process.StartInfo.FileName = exe;
 				process.StartInfo.Arguments = arguments;
 				process.StartInfo.WorkingDirectory = Repository.repoPath;
-				process.StartInfo.RedirectStandardInput = stdInput != null;
+				process.StartInfo.RedirectStandardInput = stdInputStreamCallback != null;
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
-				process.StartInfo.UseShellExecute = false;
 				process.StartInfo.CreateNoWindow = true;
+				process.StartInfo.UseShellExecute = false;
 
+				FileStream stdOutStream = null;
+				StreamWriter stdOutStreamWriter = null;
+				if (stdOutToFilePath != null)
+				{
+					stdOutToFilePath = Repository.repoPath + Path.DirectorySeparatorChar + stdOutToFilePath;
+					stdOutStream = new FileStream(stdOutToFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
+					stdOutStreamWriter = new StreamWriter(stdOutStream);
+				}
+				
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
+					if (stdOutToFilePath != null && e.Data != null)
+					{
+						stdOutStreamWriter.WriteLine(e.Data);
+						stdOutStreamWriter.Flush();
+						stdOutStream.Flush();
+					}
+
 					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdCallback != null) stdCallback(e.Data);
@@ -55,8 +65,8 @@ namespace GitCommander
 					if (!string.IsNullOrEmpty(e.Data))
 					{
 						if (stdErrorCallback != null) stdErrorCallback(e.Data);
-						if (outputErr.Length != 0) outputErr += Environment.NewLine;
-						outputErr += e.Data;
+						if (errors.Length != 0) errors += Environment.NewLine;
+						errors += e.Data;
 					}
 				};
 
@@ -66,24 +76,23 @@ namespace GitCommander
 				process.BeginErrorReadLine();
 
 				// write input
-				if (stdInput != null)
+				if (stdInputStreamCallback != null)
 				{
-					while (stdInput.GetStdInputStreamCallback != null)
-					{
-						if (stdInput.GetStdInputStreamCallback(process.StandardInput)) break;
-					}
-
-					if (stdInput.input != null)
-					{
-						process.StandardInput.WriteLine(stdInput.input);
-						process.StandardInput.Flush();
-						if (stdInput.autoCloseInputAfterDone) process.StandardInput.Close();
-					}
+					while (!stdInputStreamCallback(process.StandardInput)) Thread.Sleep(1);
+					process.StandardInput.Flush();
+					process.StandardInput.Close();
 				}
 
 				// wait for process to finish
 				process.WaitForExit();
-				errors = outputErr;
+
+				// close stdOut file
+				if (stdOutStreamWriter != null) stdOutStreamWriter.Dispose();
+				if (stdOutStream != null)
+				{
+					stdOutStream.Close();
+					stdOutStream.Dispose();
+				}
 			}
 
 			return (output, errors);

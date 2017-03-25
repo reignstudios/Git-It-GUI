@@ -65,9 +65,19 @@ namespace GitCommander
 			return SimpleGitInvoke(string.Format("add \"{0}\"", filename));
 		}
 
+		public static bool StageAll()
+		{
+			return SimpleGitInvoke("add -A");
+		}
+
 		public static bool Unstage(string filename)
 		{
 			return SimpleGitInvoke(string.Format("reset \"{0}\"", filename));
+		}
+
+		public static bool UnstageAll()
+		{
+			return SimpleGitInvoke("reset");
 		}
 
 		public static bool RevertFile(string activeBranch, string filename)
@@ -212,20 +222,28 @@ namespace GitCommander
 		public static bool SaveOriginalFile(string filename, out string savedFilename)
 		{
 			savedFilename = filename + ".orig";
-			return SimpleGitInvoke(string.Format("show HEAD:'{0}' >'{1}'", filename, savedFilename));
+			var result = Tools.RunExe("git", string.Format("show HEAD:\"{0}\"", filename), stdOutToFilePath:savedFilename);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool SaveConflictedFile(string filename, FileConflictSources source, out string savedFilename)
 		{
 			string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
 			savedFilename = filename + (source == FileConflictSources.Ours ? ".ours" : ".theirs");
-			return SimpleGitInvoke(string.Format("show {1}:'{0}' >'{2}'", filename, sourceName, savedFilename));
+			var result = Tools.RunExe("git", string.Format("show {1}:\"{0}\"", filename, sourceName), stdOutToFilePath:savedFilename);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool AcceptConflictedFile(string filename, FileConflictSources source)
 		{
 			string sourceName = source == FileConflictSources.Ours ? "--ours" : "--theirs";
-			return SimpleGitInvoke(string.Format("git checkout {1} '{0}'", filename, sourceName));
+			return SimpleGitInvoke(string.Format("git checkout {1} \"{0}\"", filename, sourceName));
 		}
 
 		public static bool Fetch(StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
@@ -250,7 +268,7 @@ namespace GitCommander
 
 		public static bool GetDiff(string filename, out string diff)
 		{
-			bool result = SimpleGitInvoke(string.Format("diff HEAD '{0}'", filename));
+			bool result = SimpleGitInvoke(string.Format("diff HEAD \"{0}\"", filename));
 			diff = lastResult;
 			return result;
 		}

@@ -141,7 +141,7 @@ namespace GitItGUI
 			if (BranchManager.activeBranch.isTracking)
 			{
 				trackingOriginTextBox.Text = BranchManager.activeBranch.tracking.fullname;
-				if (BranchManager.activeBranch.remoteState != null) remoteURLTextBox.Text = BranchManager.activeBranch.remoteState.url;
+				if (BranchManager.activeBranch.tracking.remoteState != null) remoteURLTextBox.Text = BranchManager.activeBranch.tracking.remoteState.url;
 				else remoteURLTextBox.Text = "";
 			}
 			else

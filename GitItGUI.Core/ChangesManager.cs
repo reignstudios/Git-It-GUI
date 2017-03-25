@@ -107,7 +107,11 @@ namespace GitItGUI.Core
 
 					// remove meta data stage 1
 					var match = Regex.Match(diff, @"@@.*?(@@).*?\n(.*)", RegexOptions.Singleline);
-					if (match.Success && match.Groups.Count == 3) diff = match.Groups[2].Value.Replace("\\ No newline at end of file\n", "");
+					if (match.Success && match.Groups.Count == 3)
+					{
+						diff = match.Groups[2].Value.Replace("\\ No newline at end of file" + Environment.NewLine, "");
+						diff = diff.Replace("\\ No newline at end of file", "");
+					}
 
 					// remove meta data stage 2
 					bool search = true;
@@ -184,7 +188,7 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool StageFile(FileState fileState, bool refresh)
+		public static bool StageFile(FileState fileState)
 		{
 			try
 			{
@@ -196,11 +200,27 @@ namespace GitItGUI.Core
 				return false;
 			}
 
-			if (refresh) RepoManager.Refresh();
+			RepoManager.Refresh();
 			return true;
 		}
 
-		public static bool UnstageFile(FileState fileState, bool refresh)
+		public static bool StageAllFiles()
+		{
+			try
+			{
+				if (!Repository.StageAll()) throw new Exception(Repository.lastError);
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to stage item: " + e.Message, true);
+				return false;
+			}
+
+			RepoManager.Refresh();
+			return true;
+		}
+
+		public static bool UnstageFile(FileState fileState)
 		{
 			try
 			{
@@ -212,7 +232,23 @@ namespace GitItGUI.Core
 				return false;
 			}
 
-			if (refresh) RepoManager.Refresh();
+			RepoManager.Refresh();
+			return true;
+		}
+
+		public static bool UnstageAllFiles()
+		{
+			try
+			{
+				if (!Repository.UnstageAll()) throw new Exception(Repository.lastError);
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to unstage item: " + e.Message, true);
+				return false;
+			}
+
+			RepoManager.Refresh();
 			return true;
 		}
 

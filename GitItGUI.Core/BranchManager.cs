@@ -46,7 +46,7 @@ namespace GitItGUI.Core
 			var nonActiveBranches = new List<BranchState>();
 			foreach (var branch in branchStates)
 			{
-				if (activeBranch.name != branch.name)
+				if (activeBranch.fullname != branch.fullname)
 				{
 					if (getRemotes)
 					{

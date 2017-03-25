@@ -40,7 +40,7 @@ namespace GitItGUI
 				case FileStates.RenamedInWorkdir:
 				case FileStates.ModifiedInWorkdir:
 				case FileStates.DeletedFromWorkdir:
-					sender.Stage(true);
+					sender.Stage();
 					break;
 
 				case FileStates.NewInIndex:
@@ -48,7 +48,7 @@ namespace GitItGUI
 				case FileStates.RenamedInIndex:
 				case FileStates.ModifiedInIndex:
 				case FileStates.DeletedFromIndex:
-					sender.Unstage(true);
+					sender.Unstage();
 					break;
 			}
 		}
@@ -249,21 +249,21 @@ namespace GitItGUI
 			}
 		}
 
-		public void Stage(bool refresh)
+		public void Stage()
 		{
 			if (fileState.state == FileStates.Conflicted)
 			{
-				if (MessageBox.Show("File in conflicted state.\nAre you sure you want to stage un-resolved file?", MessageBoxTypes.YesNo)) ChangesManager.StageFile(fileState, refresh);
+				if (MessageBox.Show("File in conflicted state.\nAre you sure you want to stage un-resolved file?", MessageBoxTypes.YesNo)) ChangesManager.StageFile(fileState);
 			}
 			else
 			{
-				ChangesManager.StageFile(fileState, refresh);
+				ChangesManager.StageFile(fileState);
 			}
 		}
 
-		public void Unstage(bool refresh)
+		public void Unstage()
 		{
-			ChangesManager.UnstageFile(fileState, refresh);
+			ChangesManager.UnstageFile(fileState);
 		}
 
 		public void OpenFile()
@@ -474,8 +474,15 @@ namespace GitItGUI
 			var item = unstagedChangesListView.SelectedItem as FileItem;
 			if (item == null)
 			{
-				Debug.Log("Unstaged file must be selected", true);
-				return;
+				//Debug.Log("Unstaged file must be selected", true);
+				//return;
+
+				item = stagedChangesListView.SelectedItem as FileItem;
+				if (item == null)
+				{
+					Debug.Log("Unstaged/staged file must be selected", true);
+					return;
+				}
 			}
 
 			ChangesManager.OpenDiffTool(item.fileState);
@@ -512,22 +519,12 @@ namespace GitItGUI
 
 		private void StageAllButton_Click(object sender, RoutedEventArgs e)
 		{
-			foreach (var item in unstagedChangesListViewItems)
-			{
-				item.Stage(false);
-			}
-
-			RepoManager.Refresh();
+			ChangesManager.StageAllFiles();
 		}
 
 		private void UnstageAllButton_Click(object sender, RoutedEventArgs e)
 		{
-			foreach (var item in stagedChangesListViewItems)
-			{
-				item.Unstage(false);
-			}
-
-			RepoManager.Refresh();
+			ChangesManager.UnstageAllFiles();
 		}
 
 		private void RepoManager_RepoRefreshedCallback()
@@ -565,7 +562,7 @@ namespace GitItGUI
 			unstagedChangesListView.Items = unstagedChangesListViewItems;
 			stagedChangesListView.Items = stagedChangesListViewItems;
 		}
-
+		
 		private void UpdateDiffPanel(FileItem item)
 		{
 			var data = ChangesManager.GetQuickViewData(item.fileState);

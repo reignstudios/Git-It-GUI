@@ -41,7 +41,7 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 		
-		public static bool Clone(string url, string path, StdInputCallbackMethod writeUsernameCallback, StdInputCallbackMethod writePasswordCallback, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		public static bool Clone(string url, string path, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 		{
 			void stdCallback_CheckUserPass(string line)
 			{
@@ -64,13 +64,20 @@ namespace GitCommander
 			{
 				repoURL = line;
 			}
-
-			repoPath = path;
-			var result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback);
+			
+			var result = Tools.RunExe("git", "rev-parse --git-dir");
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+			if (!string.IsNullOrEmpty(lastError)) return false;
+			
+			// get repo url
+			repoURL = "";
+			result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback);
 			lastResult = result.stdResult;
 			lastError = result.stdErrorResult;
 			
-			return isOpen = string.IsNullOrEmpty(lastError);
+			repoPath = path;
+			return isOpen = true;
 		}
 
 		public static bool GetSignature(SignatureLocations location, out string name, out string email)

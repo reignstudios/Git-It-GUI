@@ -137,8 +137,9 @@ namespace GitCommander
 						isTracking = true;
 						fullname = match.Groups[1].Value;
 						name = fullname;
-
-						trackingBranchFullName = match.Groups[2].Value;
+						
+						string trackedBranch = match.Groups[2].Value;
+						trackingBranchFullName = trackedBranch.Contains(":") ? trackedBranch.Split(':')[0] : trackedBranch;
 						var values = trackingBranchFullName.Split('/');
 						if (values.Length == 2)
 						{
@@ -245,7 +246,12 @@ namespace GitCommander
 
 		public static bool CheckoutExistingBranch(string branch)
 		{
-			return SimpleGitInvoke("checkout " + branch);
+			var result = Tools.RunExe("git", "checkout " + branch);
+			lastResult = result.stdResult;
+			lastError = result.stdErrorResult;
+
+			if (!string.IsNullOrEmpty(lastError) && lastError != string.Format("Switched to branch '{0}'", branch)) return false;
+			return true;
 		}
 
 		public static bool CheckoutNewBranch(string branch)
