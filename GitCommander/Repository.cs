@@ -69,7 +69,7 @@ namespace GitCommander
 				}
 			}
 			
-			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback_CheckUserPass, stdErrorCallback:stdErrorCallback);
+			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback_CheckUserPass, stdErrorCallback:stdErrorCallback, stdErrorResultOn:false);
 			lastResult = result.stdResult;
 			
 			return string.IsNullOrEmpty(lastError);

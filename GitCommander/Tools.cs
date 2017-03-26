@@ -17,7 +17,14 @@ namespace GitCommander
 	{
 		public static event StdCallbackMethod StdCallback, StdErrorCallback;
 
-		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, string workingDirectory = null, StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null, bool stdResultOn = true, string stdOutToFilePath = null)
+		public static (string stdResult, string stdErrorResult) RunExe
+		(
+			string exe, string arguments, string workingDirectory = null,
+			StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null,
+			StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null,
+			bool stdResultOn = true, bool stdErrorResultOn = true,
+			string stdOutToFilePath = null
+		)
 		{
 			if (stdCallback != null) stdResultOn = false;
 
@@ -69,8 +76,11 @@ namespace GitCommander
 					if (e.Data == null) return;
 
 					if (stdErrorCallback != null) stdErrorCallback(e.Data);
-					if (errors.Length != 0) errors += Environment.NewLine;
-					errors += e.Data;
+					if (stdErrorResultOn)
+					{
+						if (errors.Length != 0) errors += Environment.NewLine;
+						errors += e.Data;
+					}
 
 					if (StdErrorCallback != null) StdErrorCallback(e.Data);
 				};
