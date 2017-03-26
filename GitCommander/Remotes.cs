@@ -64,7 +64,8 @@ namespace GitCommander
 			// get remote urls
 			foreach (var remote in states)
 			{
-				if (GetRemoteURL(remote.name, out string url))
+				string url;
+				if (GetRemoteURL(remote.name, out url))
 				{
 					remote.url = url;
 				}

@@ -46,7 +46,8 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!Repository.GetFileStates(out var states)) throw new Exception(Repository.lastError);
+				FileState[] states;
+				if (!Repository.GetFileStates(out states)) throw new Exception(Repository.lastError);
 				fileStates = states;
 				return true;
 			}
@@ -321,17 +322,17 @@ namespace GitItGUI.Core
 
 				// check for git settings file not in repo history
 				RepoManager.DeleteRepoSettingsIfUnCommit();
-				
-				// pull changes
-				void stdCallback(string line)
-				{
-					if (statusCallback != null) statusCallback(line);
-				}
 
-				void stdErrorCallback(string line)
+				// pull changes
+				var stdCallback = new StdCallbackMethod(delegate (string line)
 				{
 					if (statusCallback != null) statusCallback(line);
-				}
+				});
+
+				var stdErrorCallback = new StdCallbackMethod(delegate (string line)
+				{
+					if (statusCallback != null) statusCallback(line);
+				});
 
 				result = Repository.Pull(stdCallback, stdErrorCallback) ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
 				result = ConflictsExist() ? SyncMergeResults.Conflicts : result;
@@ -360,10 +361,10 @@ namespace GitItGUI.Core
 					return false;
 				}
 
-				void stdCallback(string line)
+				var stdCallback = new StdCallbackMethod(delegate (string line)
 				{
 					if (statusCallback != null) statusCallback(line);
-				}
+				});
 
 				if (Repository.Push(stdCallback, stdCallback)) Debug.Log("Push Succeeded!", !isSyncMode);
 				else throw new Exception(Repository.lastError);
@@ -405,7 +406,8 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!Repository.ConflitedExist(out bool yes)) throw new Exception(Repository.lastError);
+				bool yes;
+				if (!Repository.ConflitedExist(out yes)) throw new Exception(Repository.lastError);
 				return yes;
 			}
 			catch (Exception e)
@@ -430,18 +432,19 @@ namespace GitItGUI.Core
 			if (refresh) RepoManager.Refresh();
 			return true;
 		}
-		
+
+		private delegate void DeleteTempMergeFilesMethod();
 		public static bool ResolveConflict(FileState fileState, bool refresh)
 		{
 			bool wasModified = false;
 			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 			string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
-			void DeleteTempMergeFiles()
+			var DeleteTempMergeFiles = new DeleteTempMergeFilesMethod(delegate ()
 			{
 				if (File.Exists(fullPathBase)) File.Delete(fullPathBase);
 				if (File.Exists(fullPathOurs)) File.Delete(fullPathOurs);
 				if (File.Exists(fullPathTheirs)) File.Delete(fullPathTheirs);
-			}
+			});
 
 			try
 			{
@@ -625,14 +628,15 @@ namespace GitItGUI.Core
 			return wasModified;
 		}
 
+		private delegate void DeleteTempDiffFilesMethod();
 		public static bool OpenDiffTool(FileState fileState)
 		{
 			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 			string fullPathOrig = null;
-			void DeleteTempDiffFiles()
+			var DeleteTempDiffFiles = new DeleteTempDiffFilesMethod(delegate ()
 			{
 				if (File.Exists(fullPathOrig)) File.Delete(fullPathOrig);
-			}
+			});
 
 			try
 			{

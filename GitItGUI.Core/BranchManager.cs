@@ -22,14 +22,16 @@ namespace GitItGUI.Core
 			try
 			{
 				// gather branches
-				if (!Repository.GetBrancheStates(out var bStates)) throw new Exception(Repository.lastError);
+				BranchState[] bStates;
+				if (!Repository.GetBrancheStates(out bStates)) throw new Exception(Repository.lastError);
 				branchStates = bStates;
 
 				// find active branch
 				activeBranch = Array.Find<BranchState>(branchStates, x => x.isActive);
 
 				// gather remotes
-				if (!Repository.GetRemoteStates(out var rStates)) throw new Exception(Repository.lastError);
+				RemoteState[] rStates;
+				if (!Repository.GetRemoteStates(out rStates)) throw new Exception(Repository.lastError);
 				remoteStates = rStates;
 			}
 			catch (Exception e)
@@ -100,7 +102,8 @@ namespace GitItGUI.Core
 
 				// merge
 				if (!Repository.MergeBranchIntoActive(srcBranch.name)) throw new Exception(Repository.lastError);
-				if (!Repository.ConflitedExist(out bool yes)) throw new Exception(Repository.lastError);
+				bool yes;
+				if (!Repository.ConflitedExist(out yes)) throw new Exception(Repository.lastError);
 				mergeResult = yes ? MergeResults.Conflicts : MergeResults.Succeeded;
 			}
 			catch (Exception e)

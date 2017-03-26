@@ -134,7 +134,8 @@ namespace GitItGUI.Core
 			string settingsPath = Repository.repoPath + Path.DirectorySeparatorChar + Settings.repoSettingsFilename;
 			if (File.Exists(settingsPath))
 			{
-				if (!Repository.GetFileState(Settings.repoSettingsFilename, out var fileState)) throw new Exception(Repository.lastError);
+				FileState fileState;
+				if (!Repository.GetFileState(Settings.repoSettingsFilename, out fileState)) throw new Exception(Repository.lastError);
 				if (fileState.IsState(FileStates.NewInWorkdir))
 				{
 					File.Delete(settingsPath);
@@ -381,7 +382,8 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				if (!Repository.UnpackedObjectCount(out int count, out size)) throw new Exception(Repository.lastError);
+				int count;
+				if (!Repository.UnpackedObjectCount(out count, out size)) throw new Exception(Repository.lastError);
 				return count;
 			}
 			catch (Exception e)
