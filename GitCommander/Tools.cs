@@ -42,11 +42,6 @@ namespace GitCommander
 				process.StartInfo.CreateNoWindow = true;
 				process.StartInfo.UseShellExecute = false;
 
-				if (PlatformSettings.platform == Platforms.Mac)
-				{
-					process.StartInfo.EnvironmentVariables["PATH"] = "/usr/local/bin";
-				}
-
 				FileStream stdOutStream = null;
 				StreamWriter stdOutStreamWriter = null;
 				if (stdOutToFilePath != null)

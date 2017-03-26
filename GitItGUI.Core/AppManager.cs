@@ -397,7 +397,9 @@ namespace GitItGUI.Core
 				}
 
 				// grab git version value
-				var match = Regex.Match(gitVersion, @"git version (.*)\.windows");
+				string appendix = "";
+				if (PlatformSettings.platform == Platforms.Windows) appendix = @"\.windows";
+				var match = Regex.Match(gitVersion, @"git version (.*)" + appendix);
 				if (match.Success && match.Groups.Count == 2) gitVersion = match.Groups[1].Value;
 				else
 				{
@@ -408,11 +410,13 @@ namespace GitItGUI.Core
 				}
 				
 				// grab lfs and required git version value
-				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; (.*) amd64; go (.*); git ");
-				if (match.Success && match.Groups.Count == 3)
+				if (PlatformSettings.platform == Platforms.Windows) appendix = @"; git .*\)";
+				else appendix = @"\)";
+				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; (\w*) (\w*); go (.*)" + appendix);
+				if (match.Success && match.Groups.Count == 5)
 				{
 					gitlfsVersion = match.Groups[1].Value;
-					gitlfsRequiredGitVersion = match.Groups[3].Value;
+					gitlfsRequiredGitVersion = match.Groups[4].Value;
 				}
 				else
 				{
