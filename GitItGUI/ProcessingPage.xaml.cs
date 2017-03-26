@@ -49,6 +49,7 @@ namespace GitItGUI
 
 			// bind events
 			GitCommander.Tools.StdCallback += Tools_StdCallback;
+			GitCommander.Tools.StdWarningCallback += Tools_StdCallback;
 			GitCommander.Tools.StdErrorCallback += Tools_StdCallback;
 		}
 

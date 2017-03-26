@@ -63,16 +63,18 @@ namespace GitItGUI
 
 		private void Debug_debugLogCallback(object value, bool alert)
 		{
+			if (!alert) return;
+
 			if (Dispatcher.UIThread.CheckAccess())
 			{
-				if (alert) MessageBox.Show(value.ToString());
+				MessageBox.Show(value.ToString());
 			}
 			else
 			{
 				bool isDone = false;
 				Dispatcher.UIThread.InvokeAsync(delegate
 				{
-					if (alert) MessageBox.Show(value.ToString());
+					MessageBox.Show(value.ToString());
 					isDone = true;
 				});
 

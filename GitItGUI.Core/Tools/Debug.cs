@@ -29,6 +29,11 @@ namespace GitItGUI.Core
 				logFileName += Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + "logs.txt";
 				stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.None);
 				writer = new StreamWriter(stream);
+
+				// bind events
+				GitCommander.Tools.StdCallback += Tools_StdCallback;
+				GitCommander.Tools.StdWarningCallback += Tools_StdWarningCallback;
+				GitCommander.Tools.StdErrorCallback += Tools_StdErrorCallback;
 			}
 			catch (Exception e)
 			{
@@ -36,6 +41,21 @@ namespace GitItGUI.Core
 			}
 		}
 
+		private static void Tools_StdCallback(string line)
+		{
+			Log(line);
+		}
+
+		private static void Tools_StdWarningCallback(string line)
+		{
+			LogWarning(line);
+		}
+
+		private static void Tools_StdErrorCallback(string line)
+		{
+			LogError(line);
+		}
+		
 		internal static void Dispose()
 		{
 			if (stream != null)
@@ -49,26 +69,35 @@ namespace GitItGUI.Core
 
 		public static void Log(object value, bool alert = false)
 		{
-			string msg = value.ToString();
-			Console.WriteLine(msg);
-			if (writer != null) writer.WriteLine(msg);
-			if (debugLogCallback != null) debugLogCallback(value, alert);
+			lock (stream)
+			{
+				string msg = value.ToString();
+				Console.WriteLine(msg);
+				if (writer != null) writer.WriteLine(msg);
+				if (debugLogCallback != null) debugLogCallback(value, alert);
+			}
 		}
 
 		public static void LogWarning(object value, bool alert = false)
 		{
-			string msg = "WARNING: " + value.ToString();
-			Console.WriteLine(msg);
-			if (writer != null) writer.WriteLine(msg);
-			if (debugLogWarningCallback != null) debugLogWarningCallback(value, alert);
+			lock (stream)
+			{
+				string msg = "WARNING: " + value.ToString();
+				Console.WriteLine(msg);
+				if (writer != null) writer.WriteLine(msg);
+				if (debugLogWarningCallback != null) debugLogWarningCallback(value, alert);
+			}
 		}
 
 		public static void LogError(object value, bool alert = false)
 		{
-			string msg = "ERROR: " + value.ToString();
-			Console.WriteLine(msg);
-			if (writer != null) writer.WriteLine(msg);
-			if (debugLogErrorCallback != null) debugLogErrorCallback(value, alert);
+			lock (stream)
+			{
+				string msg = "ERROR: " + value.ToString();
+				Console.WriteLine(msg);
+				if (writer != null) writer.WriteLine(msg);
+				if (debugLogErrorCallback != null) debugLogErrorCallback(value, alert);
+			}
 		}
 	}
 }

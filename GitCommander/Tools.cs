@@ -16,7 +16,7 @@ namespace GitCommander
 
 	public static class Tools
 	{
-		public static event StdCallbackMethod StdCallback, StdErrorCallback;
+		public static event StdCallbackMethod StdCallback, StdErrorCallback, StdWarningCallback;
 		private static List<string> errorPrefixes;
 
 		static Tools()
@@ -77,7 +77,14 @@ namespace GitCommander
 						output += line;
 					}
 
-					if (StdCallback != null) StdCallback(line);
+					if (line.StartsWith("warning:"))
+					{
+						if (StdWarningCallback != null) StdWarningCallback(line);
+					}
+					else
+					{
+						if (StdCallback != null) StdCallback(line);
+					}
 				});
 				
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
