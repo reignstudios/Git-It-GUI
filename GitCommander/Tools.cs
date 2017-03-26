@@ -17,6 +17,16 @@ namespace GitCommander
 	public static class Tools
 	{
 		public static event StdCallbackMethod StdCallback, StdErrorCallback;
+		private static List<string> errorPrefixes;
+
+		static Tools()
+		{
+			errorPrefixes = new List<string>()
+			{
+				"error:",
+				"fatal:"
+			};
+		}
 		
 		public static Tuple<string, string> RunExe
 		(
@@ -50,40 +60,65 @@ namespace GitCommander
 					stdOutStream = new FileStream(stdOutToFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
 					stdOutStreamWriter = new StreamWriter(stdOutStream);
 				}
-				
-				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
-				{
-					if (e.Data == null) return;
 
+				var outDataReceived = new StdCallbackMethod(delegate(string line)
+				{
 					if (stdOutToFilePath != null)
 					{
-						stdOutStreamWriter.WriteLine(e.Data);
+						stdOutStreamWriter.WriteLine(line);
 						stdOutStreamWriter.Flush();
 						stdOutStream.Flush();
 					}
 					
-					if (stdCallback != null) stdCallback(e.Data);
+					if (stdCallback != null) stdCallback(line);
 					if (stdResultOn)
 					{
 						if (output.Length != 0) output += Environment.NewLine;
-						output += e.Data;
+						output += line;
 					}
 
-					if (StdCallback != null) StdCallback(e.Data);
+					if (StdCallback != null) StdCallback(line);
+				});
+				
+				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
+				{
+					string line = e.Data;
+					if (line == null) return;
+					outDataReceived(line);
 				};
 
 				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (e.Data == null) return;
+					string line = e.Data;
+					if (line == null) return;
 
-					if (stdErrorCallback != null) stdErrorCallback(e.Data);
+					// valid true error
+					bool isError = false;
+					foreach (var prefix in errorPrefixes)
+					{
+						if (line.StartsWith(prefix))
+						{
+							isError = true;
+							break;
+						}
+					}
+
+					// if not error use normal stdout callbacks
+					if (!isError)
+					{
+						outDataReceived(line);
+						return;
+					}
+
+					// invoke error callbacks
+					if (stdErrorCallback != null) stdErrorCallback(line);
 					if (stdErrorResultOn)
 					{
 						if (errors.Length != 0) errors += Environment.NewLine;
-						errors += e.Data;
+						errors += line;
 					}
 
-					if (StdErrorCallback != null) StdErrorCallback(e.Data);
+					if (StdErrorCallback != null) StdErrorCallback(line);
 				};
 
 				// start process

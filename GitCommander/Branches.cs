@@ -249,9 +249,8 @@ namespace GitCommander
 			var result = Tools.RunExe("git", "checkout " + branch);
 			lastResult = result.Item1;
 			lastError = result.Item2;
-
-			if (!string.IsNullOrEmpty(lastError) && lastError != string.Format("Switched to branch '{0}'", branch)) return false;
-			return true;
+			
+			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool CheckoutNewBranch(string branch)

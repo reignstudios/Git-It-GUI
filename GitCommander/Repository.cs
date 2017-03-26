@@ -49,7 +49,7 @@ namespace GitCommander
 				stdInWriter = writer;
 			});
 			
-			var stdCallback_CheckUserPass = new StdCallbackMethod(delegate(string line)
+			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				if (line.Contains("Username for") && writeUsernameCallback != null)
 				{
@@ -60,23 +60,10 @@ namespace GitCommander
 					if (!writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
 				}
 			});
-
-			lastError = "";
-			var stdErrorCallback = new StdCallbackMethod(delegate(string line)
-			{
-				if
-				(
-					!Regex.Match(line, @"Cloning into '(.*)'\.\.\.").Success &&
-					!Regex.Match(line, @"Downloading (.*)(\(.*\))").Success &&
-					!Regex.Match(line, @"Checking out files: (.*)").Success
-				)
-				{
-					lastError += line + Environment.NewLine;
-				}
-			});
 			
-			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback_CheckUserPass, stdErrorCallback:stdErrorCallback, stdErrorResultOn:false);
+			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback);
 			lastResult = result.Item1;
+			lastError = result.Item2;
 			
 			return string.IsNullOrEmpty(lastError);
 		}

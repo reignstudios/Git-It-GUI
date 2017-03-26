@@ -247,19 +247,19 @@ namespace GitCommander
 			return SimpleGitInvoke(string.Format("checkout {1} \"{0}\"", filename, sourceName));
 		}
 
-		public static bool Fetch(StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		public static bool Fetch()
 		{
-			return SimpleGitInvoke("fetch", stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+			return SimpleGitInvoke("fetch");
 		}
 
-		public static bool Pull(StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		public static bool Pull()
 		{
-			return SimpleGitInvoke("pull", stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+			return SimpleGitInvoke("pull");
 		}
 
-		public static bool Push(StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		public static bool Push()
 		{
-			return SimpleGitInvoke("push", stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+			return SimpleGitInvoke("push");
 		}
 		
 		public static bool Commit(string message)

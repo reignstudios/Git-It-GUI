@@ -321,17 +321,7 @@ namespace GitItGUI.Core
 				}
 				
 				// pull changes
-				var stdCallback = new StdCallbackMethod(delegate (string line)
-				{
-					if (statusCallback != null) statusCallback(line);
-				});
-
-				var stdErrorCallback = new StdCallbackMethod(delegate (string line)
-				{
-					if (statusCallback != null) statusCallback(line);
-				});
-
-				result = Repository.Pull(stdCallback, stdErrorCallback) ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
+				result = Repository.Pull() ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
 				result = ConflictsExist() ? SyncMergeResults.Conflicts : result;
 				
 				if (result == SyncMergeResults.Conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
@@ -357,13 +347,8 @@ namespace GitItGUI.Core
 					Debug.LogWarning("Branch is not tracking a remote!", true);
 					return false;
 				}
-
-				var stdCallback = new StdCallbackMethod(delegate (string line)
-				{
-					if (statusCallback != null) statusCallback(line);
-				});
-
-				if (Repository.Push(stdCallback, stdCallback)) Debug.Log("Push Succeeded!", !isSyncMode);
+				
+				if (Repository.Push()) Debug.Log("Push Succeeded!", !isSyncMode);
 				else throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
