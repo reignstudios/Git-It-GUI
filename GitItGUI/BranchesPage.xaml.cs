@@ -164,13 +164,13 @@ namespace GitItGUI
 			if (remote.url == null) remoteName = null;
 
 			string result;
-			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.CheckoutNewBranch(result, remoteName);
+			if (CoreApps.LaunchNameEntry("Enter branch name", false, out result)) BranchManager.CheckoutNewBranch(result, remoteName);
 		}
 
 		private void RenameBranchButton_Click(object sender, RoutedEventArgs e)
 		{
 			string result;
-			if (CoreApps.LaunchNameEntry("Enter branch name", out result)) BranchManager.RenameActiveBranch(result);
+			if (CoreApps.LaunchNameEntry("Enter branch name", false, out result)) BranchManager.RenameActiveBranch(result);
 		}
 
 		private void CopyTrackingButton_Click(object sender, RoutedEventArgs e)

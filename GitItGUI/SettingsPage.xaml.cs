@@ -16,8 +16,8 @@ namespace GitItGUI
 
 		// UI objects
 		Button applyChangesButton;
-		TextBox sigNameTextBox, sigEmailTextBox, usernameTextBox, passwordTextBox;
-		CheckBox gitlfsSupportCheckBox, validateGitignoreCheckbox;
+		TextBox sigNameTextBox, sigEmailTextBox;
+		CheckBox gitlfsSupportCheckBox;
 
 		public SettingsPage()
 		{
@@ -28,19 +28,13 @@ namespace GitItGUI
 			applyChangesButton = this.Find<Button>("applyChangesButton");
 			sigNameTextBox = this.Find<TextBox>("sigNameTextBox");
 			sigEmailTextBox = this.Find<TextBox>("sigEmailTextBox");
-			usernameTextBox = this.Find<TextBox>("usernameTextBox");
-			passwordTextBox = this.Find<TextBox>("passwordTextBox");
 			gitlfsSupportCheckBox = this.Find<CheckBox>("gitlfsSupportCheckBox");
-			validateGitignoreCheckbox = this.Find<CheckBox>("validateGitignoreCheckbox");
 
 			// apply bindings
 			applyChangesButton.Click += ApplyChangesButton_Click;
 			sigNameTextBox.TextInput += TextInputChanged;
 			sigEmailTextBox.TextInput += TextInputChanged;
-			usernameTextBox.TextInput += TextInputChanged;
-			passwordTextBox.TextInput += TextInputChanged;
-			gitlfsSupportCheckBox.Click += CheckboxChanged;
-			validateGitignoreCheckbox.Click += CheckboxChanged;
+			gitlfsSupportCheckBox.Click += CheckboxChanged;;
 
 			// set ui defaults
 			applyChangesButton.IsVisible = false;
@@ -74,10 +68,7 @@ namespace GitItGUI
 			applyChangesButton.IsVisible = false;
 			sigNameTextBox.Text = RepoManager.signatureName;
 			sigEmailTextBox.Text = RepoManager.signatureEmail;
-			usernameTextBox.Text = RepoManager.credentialUsername;
-			passwordTextBox.Text = RepoManager.credentialPassword;
 			gitlfsSupportCheckBox.IsChecked = RepoManager.lfsEnabled;
-			validateGitignoreCheckbox.IsChecked = RepoManager.validateGitignoreCheckbox;
 			refreshMode = false;
 		}
 		
@@ -98,18 +89,18 @@ namespace GitItGUI
 
 		private void ApplyChangesButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (validateGitignoreCheckbox.IsChecked != RepoManager.validateGitignoreCheckbox) RepoManager.UpdateValidateGitignore(validateGitignoreCheckbox.IsChecked);
+			// set signature
+			if (!RepoManager.UpdateSignature(sigNameTextBox.Text, sigEmailTextBox.Text)) return;
+
+			// change lfs
 			if (gitlfsSupportCheckBox.IsChecked != RepoManager.lfsEnabled)
 			{
 				MessageBox.Show("Git-LFS operations will take extra time to complete!\nBe patient!");
 				if (gitlfsSupportCheckBox.IsChecked) RepoManager.AddGitLFSSupport(true);
 				else RepoManager.RemoveGitLFSSupport(false);
 			}
-
-			//RepoManager.UpdateSignatureValues(sigNameTextBox.Text, sigEmailTextBox.Text);
-			//RepoManager.UpdateCredentialValues(usernameTextBox.Text, passwordTextBox.Text);
+			
 			applyChangesButton.IsVisible = false;
-			RepoManager.SaveSettings();
 			RepoManager.Refresh();
 		}
 	}

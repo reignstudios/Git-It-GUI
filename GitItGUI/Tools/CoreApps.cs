@@ -48,10 +48,10 @@ namespace GitItGUI.Tools
 			return false;
 		}
 
-		public static bool LaunchNameEntry(string caption, out string result)
+		public static bool LaunchNameEntry(string caption, bool isPass, out string result)
 		{
 			string exe = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "NameEntry.exe";
-			string args = string.Format("-Caption=\"{0}\"", caption);
+			string args = string.Format("-Caption=\"{0}\" -IsPass={1}", caption, isPass);
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, true)) return false;
 			
@@ -81,7 +81,7 @@ namespace GitItGUI.Tools
 		public static bool LaunchMergeConflicPicker(string fileInConflic, bool isBinaryFile, out string result)
 		{
 			string exe = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "MergeConflicPicker.exe";
-			string args = string.Format("-FileInConflic=\"{0}\"", fileInConflic);// TODO: pass args isBinaryFile
+			string args = string.Format("-FileInConflic=\"{0}\" -IsBinary={1}", fileInConflic, isBinaryFile);
 			string type, value;
 			if (!LaunchCoreApp(exe, args, out type, out value, out result, false)) return false;
 			

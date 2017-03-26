@@ -21,21 +21,6 @@ namespace GitItGUI.Core
 			[XmlElement("Repository")] public List<Repository> repositories = new List<Repository>();
 			[XmlElement("DefaultGitLFS-Ext")] public List<string> defaultGitLFS_Exts = new List<string>();
 		}
-
-		[XmlRoot("RepoSettings")]
-		public class RepoSettings
-		{
-			[XmlAttribute("ValidateGitignore")] public bool validateGitignore = true;
-		}
-
-		[XmlRoot("RepoUserSettings")]
-		public class RepoUserSettings
-		{
-			[XmlAttribute("SignatureName")] public string signatureName = "TODO: First Last";
-			[XmlAttribute("SignatureEmail")] public string signatureEmail = "TODO: username@email.com";
-			[XmlAttribute("Username")] public string username = "TODO: Username";
-			[XmlAttribute("Password")] public string password = "";
-		}
 	}
 	
 	public static class Settings

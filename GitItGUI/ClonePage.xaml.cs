@@ -11,7 +11,7 @@ namespace GitItGUI
 
 		// ui
 		Grid grid;
-		TextBox destinationTextBox, urlTextBox, usernameTextBox, passwordTextBox;
+		TextBox destinationTextBox, urlTextBox;
 		Button destinationSelectButton, cloneButton, cancelButton;
 
 		public ClonePage()
@@ -23,8 +23,6 @@ namespace GitItGUI
 			grid = this.Find<Grid>("grid");
 			destinationTextBox = this.Find<TextBox>("destinationTextBox");
 			urlTextBox = this.Find<TextBox>("urlTextBox");
-			usernameTextBox = this.Find<TextBox>("usernameTextBox");
-			passwordTextBox = this.Find<TextBox>("passwordTextBox");
 			destinationSelectButton = this.Find<Button>("destinationSelectButton");
 			cloneButton = this.Find<Button>("cloneButton");
 			cancelButton = this.Find<Button>("cancelButton");
@@ -55,19 +53,11 @@ namespace GitItGUI
 				return;
 			}
 
-			if (string.IsNullOrEmpty(usernameTextBox.Text))
-			{
-				MessageBox.Show("Invalid username");
-				return;
-			}
-
 			// clone
 			ProcessingPage.singleton.mode = ProcessingPageModes.Clone;
 			ProcessingPage.singleton.cloneSucceeded = false;
 			ProcessingPage.singleton.cloneURL = urlTextBox.Text;
 			ProcessingPage.singleton.clonePath = destinationTextBox.Text;
-			ProcessingPage.singleton.cloneUsername = usernameTextBox.Text;
-			ProcessingPage.singleton.clonePassword = passwordTextBox.Text;
 			MainWindow.LoadPage(PageTypes.Processing);
 		}
 
@@ -97,8 +87,6 @@ namespace GitItGUI
 
 			destinationTextBox.Text = "";
 			urlTextBox.Text = "";
-			usernameTextBox.Text = "";
-			passwordTextBox.Text = "";
 		}
 	}
 }

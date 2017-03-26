@@ -26,15 +26,8 @@ namespace GitItGUI.Core
 		/// </summary>
 		public static bool lfsEnabled {get; private set;}
 
-		public static bool validateGitignoreCheckbox {get; private set;}
-
 		public static string signatureName {get; private set;}
 		public static string signatureEmail {get; private set;}
-		public static string credentialUsername {get; private set;}
-		public static string credentialPassword {get; private set;}
-		
-		private static XML.RepoSettings settings;
-		private static XML.RepoUserSettings userSettings;
 
 		/// <summary>
 		/// Use to open an existing repo
@@ -66,14 +59,9 @@ namespace GitItGUI.Core
 				
 				// check for git lfs
 				lfsEnabled = IsGitLFSRepo(false);
-				
-				// load settings
-				settings = Settings.Load<XML.RepoSettings>(path + Path.DirectorySeparatorChar + Settings.repoSettingsFilename);
-				userSettings = Settings.Load<XML.RepoUserSettings>(path + Path.DirectorySeparatorChar + Settings.repoUserSettingsFilename);
 
 				// check for .gitignore file
-				validateGitignoreCheckbox = settings.validateGitignore;
-				if (!refreshMode && settings.validateGitignore)
+				if (!refreshMode)
 				{
 					string gitIgnorePath = path + Path.DirectorySeparatorChar + ".gitignore";
 					if (!File.Exists(gitIgnorePath))
@@ -96,12 +84,19 @@ namespace GitItGUI.Core
 				// add repo to history
 				AppManager.AddActiveRepoToHistory();
 
-				// warnings
-				if (checkForSettingErros)
+				// get signature
+				if (!refreshMode)
 				{
-					if (userSettings.signatureName.Contains("TODO: ") || userSettings.signatureEmail.Contains("TODO: ") || userSettings.username.Contains("TODO: "))
+					string sigName, sigEmail;
+					if (!Repository.GetSignature(SignatureLocations.Global, out sigName, out sigEmail)) throw new Exception(Repository.lastError);
+					signatureName = sigName;
+					signatureEmail = sigEmail;
+					if (checkForSettingErros)
 					{
-						Debug.LogWarning("Credentials not set, please go to the settings tab!", true);
+						if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
+						{
+							Debug.LogWarning("Credentials not set, please go to the settings tab!", true);
+						}
 					}
 				}
 			}
@@ -148,7 +143,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public static bool Clone(string url, string destination, string username, string password, out string repoPath, StatusUpdateCallbackMethod statusCallback)
+		public static bool Clone(string url, string destination, out string repoPath, StatusUpdateCallbackMethod statusCallback, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
 			try
 			{
@@ -176,18 +171,7 @@ namespace GitItGUI.Core
 				// create folder
 				Directory.CreateDirectory(repoPath);
 
-				bool writeUsernameCallback(StreamWriter writer)
-				{
-					writer.WriteLine("TODO");// open username dlg
-					return true;
-				}
-
-				bool writePasswordCallback(StreamWriter writer)
-				{
-					writer.WriteLine("TODO");// open password dlg
-					return true;
-				}
-
+				// clone
 				if (!Repository.Clone(url, repoPath, writeUsernameCallback, writePasswordCallback)) throw new Exception(Repository.lastError);
 				lfsEnabled = IsGitLFSRepo(true);
 				return true;
@@ -199,37 +183,26 @@ namespace GitItGUI.Core
 				return false;
 			}
 		}
-
-		public static void ForceNewSettings()
-		{
-			settings = new XML.RepoSettings();
-			userSettings = new XML.RepoUserSettings();
-		}
-
-		/// <summary>
-		/// Saves open repo's settings
-		/// </summary>
-		public static void SaveSettings(string repoPathOverride = null)
-		{
-			bool canSave = Repository.isOpen;
-			if (!string.IsNullOrEmpty(repoPathOverride)) canSave = true;
-			else repoPathOverride = Repository.repoPath;
-			if (canSave && !string.IsNullOrEmpty(repoPathOverride))
-			{
-				Settings.Save<XML.RepoSettings>(repoPathOverride + Path.DirectorySeparatorChar + Settings.repoSettingsFilename, settings);
-				Settings.Save<XML.RepoUserSettings>(repoPathOverride + Path.DirectorySeparatorChar + Settings.repoUserSettingsFilename, userSettings);
-			}
-		}
 		
 		internal static void Dispose()
 		{
 			Repository.Dispose();
 		}
 
-		public static void UpdateValidateGitignore(bool validateGitignore)
+		public static bool UpdateSignature(string name, string email)
 		{
-			validateGitignoreCheckbox = validateGitignore;
-			settings.validateGitignore = validateGitignore;
+			try
+			{
+				if (!Repository.SetSignature(SignatureLocations.Global, name, email)) throw new Exception(Repository.lastError);
+				signatureName = name;
+				signatureEmail = email;
+				return true;
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Update Signature: " + e.Message, true);
+				return false;
+			}
 		}
 
 		private static bool IsGitLFSRepo(bool returnTrueIfValidAttributes)

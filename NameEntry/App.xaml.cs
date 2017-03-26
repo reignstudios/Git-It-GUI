@@ -36,7 +36,6 @@ namespace NameEntry
 #if DEBUG
             SerilogLogger.Initialize(new LoggerConfiguration()
                 .MinimumLevel.Warning()
-                .WriteTo.Trace(outputTemplate: "{Area}: {Message}")
                 .CreateLogger());
 #endif
 		}

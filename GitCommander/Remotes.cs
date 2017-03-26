@@ -29,8 +29,8 @@ namespace GitCommander
 		public static bool GetRemoteURL(string remote, out string url)
 		{
 			var result = Tools.RunExe("git", string.Format("config --get remote.{0}.url", remote));
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 
 			if (!string.IsNullOrEmpty(lastError) || string.IsNullOrEmpty(lastResult))
 			{
@@ -45,15 +45,15 @@ namespace GitCommander
 		public static bool GetRemoteStates(out RemoteState[] remoteStates)
 		{
 			var states = new List<RemoteState>();
-			void stdCallback(string line)
+			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				var remote = new RemoteState() {name = line};
 				states.Add(remote);
-			}
+			});
 			
 			var result = Tools.RunExe("git", "remote show", stdCallback:stdCallback);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{

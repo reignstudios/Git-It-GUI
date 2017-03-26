@@ -16,8 +16,8 @@ namespace GitCommander
 	public static class Tools
 	{
 		public static event StdCallbackMethod StdCallback, StdErrorCallback;
-
-		public static (string stdResult, string stdErrorResult) RunExe
+		
+		public static Tuple<string, string> RunExe
 		(
 			string exe, string arguments, string workingDirectory = null,
 			StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null,
@@ -111,7 +111,7 @@ namespace GitCommander
 				}
 			}
 
-			return (output, errors);
+			return new Tuple<string, string>(output, errors);
 		}
 	}
 }

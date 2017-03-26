@@ -90,9 +90,10 @@ namespace GitCommander
 			return SimpleGitInvoke("reset --hard");
 		}
 
+		private delegate bool AddState(string type, FileStates stateType);
 		private static void ParseFileState(string line, ref int mode, List<FileState> states)
 		{
-			bool AddState(string type, FileStates stateType)
+			var addState = new AddState(delegate(string type, FileStates stateType)
 			{
 				if (line.Contains(type))
 				{
@@ -121,7 +122,7 @@ namespace GitCommander
 				}
 				
 				return false;
-			}
+			});
 		
 			// gather normal files
 			switch (line)
@@ -134,20 +135,20 @@ namespace GitCommander
 			
 			if (mode == 0)
 			{
-				bool pass = AddState("\tnew file:", FileStates.NewInIndex);
-				if (!pass) pass = AddState("\tmodified:", FileStates.ModifiedInIndex);
+				bool pass = addState("\tnew file:", FileStates.NewInIndex);
+				if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
 			}
 			else if (mode == 1)
 			{
-				AddState("\tmodified:", FileStates.ModifiedInWorkdir);
+				addState("\tmodified:", FileStates.ModifiedInWorkdir);
 			}
 			else if (mode == 2)
 			{
-				AddState("\tboth modified:", FileStates.Conflicted);
+				addState("\tboth modified:", FileStates.Conflicted);
 			}
 			else if (mode == 3)
 			{
-				AddState("\t", FileStates.NewInWorkdir);
+				addState("\t", FileStates.NewInWorkdir);
 			}
 		}
 
@@ -155,14 +156,14 @@ namespace GitCommander
 		{
 			var states = new List<FileState>();
 			int mode = -1;
-			void stdCallback(string line)
+			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				ParseFileState(line, ref mode, states);
-			}
+			});
 
 			var result = Tools.RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 			if (!string.IsNullOrEmpty(lastError))
 			{
 				fileState = null;
@@ -185,14 +186,14 @@ namespace GitCommander
 		{
 			var states = new List<FileState>();
 			int mode = -1;
-			void stdCallback(string line)
+			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				ParseFileState(line, ref mode, states);
-			}
+			});
 			
 			var result = Tools.RunExe("git", "status -u", stdCallback:stdCallback);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 			if (!string.IsNullOrEmpty(lastError))
 			{
 				fileStates = null;
@@ -206,14 +207,14 @@ namespace GitCommander
 		public static bool ConflitedExist(out bool yes)
 		{
 			bool conflictExist = false;
-			void stdCallback(string line)
+			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				conflictExist = true;
-			}
+			});
 
 			var result = Tools.RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback:stdCallback);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 			
 			yes = conflictExist;
 			return string.IsNullOrEmpty(lastError);
@@ -223,8 +224,8 @@ namespace GitCommander
 		{
 			savedFilename = filename + ".orig";
 			var result = Tools.RunExe("git", string.Format("show HEAD:\"{0}\"", filename), stdOutToFilePath:savedFilename);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -234,8 +235,8 @@ namespace GitCommander
 			string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
 			savedFilename = filename + (source == FileConflictSources.Ours ? ".ours" : ".theirs");
 			var result = Tools.RunExe("git", string.Format("show {1}:\"{0}\"", filename, sourceName), stdOutToFilePath:savedFilename);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -243,7 +244,7 @@ namespace GitCommander
 		public static bool AcceptConflictedFile(string filename, FileConflictSources source)
 		{
 			string sourceName = source == FileConflictSources.Ours ? "--ours" : "--theirs";
-			return SimpleGitInvoke(string.Format("git checkout {1} \"{0}\"", filename, sourceName));
+			return SimpleGitInvoke(string.Format("checkout {1} \"{0}\"", filename, sourceName));
 		}
 
 		public static bool Fetch(StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)

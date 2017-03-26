@@ -138,7 +138,6 @@ namespace GitItGUI
 
 		private void MainWindow_Closed(object sender, EventArgs e)
 		{
-			RepoManager.SaveSettings();
 			AppManager.SaveSettings();
 			AppManager.Dispose();
 		}

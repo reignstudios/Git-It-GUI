@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using System;
 using System.Text.RegularExpressions;
 
@@ -47,6 +48,7 @@ namespace NameEntry
 				switch (values[0])
 				{
 					case "-Caption": captionTextBlock.Text = values[1]; break;
+					case "-IsPass": nameTextBox.Foreground = new SolidColorBrush(values[1] == "True" ? Colors.White : Colors.Black); break;
 
 					default:
 						Console.Write(string.Format("ERROR:Invalid arg type ({0})", values[0]));

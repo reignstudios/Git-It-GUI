@@ -57,12 +57,12 @@ namespace GitCommander
 
 		public static bool SetActiveBranchTracking(string fullBranchName)
 		{
-			return SimpleGitInvoke("git branch -u " + fullBranchName);
+			return SimpleGitInvoke("branch -u " + fullBranchName);
 		}
 
 		public static bool RemoveActiveBranchTracking()
 		{
-			return SimpleGitInvoke("git branch --unset-upstream");
+			return SimpleGitInvoke("branch --unset-upstream");
 		}
 
 		public static bool PruneRemoteBranches()
@@ -73,14 +73,14 @@ namespace GitCommander
 		public static bool GetRemotePrunableBrancheNames(out string[] branchName)
 		{
 			var branchNameList = new List<string>();
-			void stdCallback(string line)
+			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				branchNameList.Add(line);
-			}
+			});
 			
 			var result = Tools.RunExe("git", "remote prune origin --dry-run", stdCallback:stdCallback);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
@@ -95,7 +95,7 @@ namespace GitCommander
 		public static bool GetBrancheStates(out BranchState[] brancheStates)
 		{
 			var states = new List<BranchState>();
-			void stdCallback(string line)
+			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				line = line.TrimStart();
 
@@ -219,11 +219,11 @@ namespace GitCommander
 				}
 
 				states.Add(branch);
-			}
+			});
 			
 			var result = Tools.RunExe("git", "branch -a -vv", stdCallback:stdCallback);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
@@ -247,8 +247,8 @@ namespace GitCommander
 		public static bool CheckoutExistingBranch(string branch)
 		{
 			var result = Tools.RunExe("git", "checkout " + branch);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 
 			if (!string.IsNullOrEmpty(lastError) && lastError != string.Format("Switched to branch '{0}'", branch)) return false;
 			return true;

@@ -11,10 +11,6 @@
 
 - Auto check for Git-LFS install.
 
-- Per project settings saved in .gititgui file.
-
-- Per project user settings saved in .gititgui-user file.
-
 - Doesn't allow non resolved files to be staged without warning.
 
 - Supports Meld, kDiff3, P4Merge and DiffMerge with no .gitconfig required.

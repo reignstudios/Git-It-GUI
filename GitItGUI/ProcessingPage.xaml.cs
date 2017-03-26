@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using System.Linq;
 using GitCommander;
 using System;
+using System.IO;
 
 namespace GitItGUI
 {
@@ -27,7 +28,7 @@ namespace GitItGUI
 
 		// clone
 		public ProcessingPageModes mode = ProcessingPageModes.None;
-		public string clonePath, cloneURL, cloneUsername, clonePassword;
+		public string clonePath, cloneURL;
 		public bool cloneSucceeded;
 
 		// branch
@@ -148,18 +149,38 @@ namespace GitItGUI
 			// clone
 			else if (mode == ProcessingPageModes.Clone)
 			{
+				var writeUsernameCallback = new StdInputStreamCallbackMethod(delegate(StreamWriter writer)
+				{
+					string username;
+					if (Tools.CoreApps.LaunchNameEntry("Enter Username", false, out username))
+					{
+						writer.WriteLine(username);
+						return true;
+					}
+
+					return false;
+				});
+
+				var writePasswordCallback = new StdInputStreamCallbackMethod(delegate(StreamWriter writer)
+				{
+					string username;
+					if (Tools.CoreApps.LaunchNameEntry("Enter Password", true, out username))
+					{
+						writer.WriteLine(username);
+						return true;
+					}
+
+					return false;
+				});
+
 				// clone repo
-				cloneSucceeded = RepoManager.Clone(cloneURL, clonePath, cloneUsername, clonePassword, out clonePath, StatusUpdateCallback);
+				cloneSucceeded = RepoManager.Clone(cloneURL, clonePath, out clonePath, StatusUpdateCallback, writeUsernameCallback, writePasswordCallback);
 				if (!cloneSucceeded)
 				{
 					MessageBox.Show("Failed to clone repo: " + clonePath);
 					MainWindow.LoadPage(PageTypes.Clone);
 					return;
 				}
-
-				// update credentials
-				RepoManager.ForceNewSettings();
-				RepoManager.SaveSettings(clonePath);
 
 				// open repo
 				if (!RepoManager.OpenRepo(clonePath, true))

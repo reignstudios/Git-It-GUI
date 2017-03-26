@@ -35,8 +35,8 @@ namespace GitCommander
 		private static bool SimpleGitInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 		{
 			var result = Tools.RunExe("git", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -44,19 +44,25 @@ namespace GitCommander
 		public static bool Clone(string url, string path, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
 			StreamWriter stdInWriter = null;
-			void getStdInputStreamCallback(StreamWriter writer)
+			var getStdInputStreamCallback = new GetStdInputStreamCallbackMethod(delegate(StreamWriter writer)
 			{
 				stdInWriter = writer;
-			}
+			});
 			
-			void stdCallback_CheckUserPass(string line)
+			var stdCallback_CheckUserPass = new StdCallbackMethod(delegate(string line)
 			{
-				if (line.Contains("Username for") && writeUsernameCallback != null) writeUsernameCallback(stdInWriter);
-				if (line.Contains("Password for") && writePasswordCallback != null) writePasswordCallback(stdInWriter);
-			}
+				if (line.Contains("Username for") && writeUsernameCallback != null)
+				{
+					if (!writeUsernameCallback(stdInWriter)) stdInWriter.WriteLine("");
+				}
+				if (line.Contains("Password for") && writePasswordCallback != null)
+				{
+					if (!writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
+				}
+			});
 
 			lastError = "";
-			void stdErrorCallback(string line)
+			var stdErrorCallback = new StdCallbackMethod(delegate(string line)
 			{
 				if
 				(
@@ -67,31 +73,31 @@ namespace GitCommander
 				{
 					lastError += line + Environment.NewLine;
 				}
-			}
+			});
 			
 			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback_CheckUserPass, stdErrorCallback:stdErrorCallback, stdErrorResultOn:false);
-			lastResult = result.stdResult;
+			lastResult = result.Item1;
 			
 			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool Open(string path)
 		{
-			void stdCallback(string line)
+			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				repoURL = line;
-			}
+			});
 			
 			var result = Tools.RunExe("git", "rev-parse --git-dir");
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 			if (!string.IsNullOrEmpty(lastError)) return false;
 			
 			// get repo url
 			repoURL = "";
 			result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback);
-			lastResult = result.stdResult;
-			lastError = result.stdErrorResult;
+			lastResult = result.Item1;
+			lastError = result.Item2;
 			
 			repoPath = path;
 			return isOpen = true;
@@ -102,22 +108,22 @@ namespace GitCommander
 			name = null;
 			email = null;
 
-			bool result = SimpleGitInvoke("git config --global user.name");
+			bool result = SimpleGitInvoke("config --global user.name");
 			name = lastResult;
 			if (!result) return false;
 
-			result = SimpleGitInvoke("git config --global user.email");
+			result = SimpleGitInvoke("config --global user.email");
 			email = lastResult;
 			return result;
 		}
 
 		public static bool SetSignature(SignatureLocations location, string name, string email)
 		{
-			bool result = SimpleGitInvoke(string.Format("git config --global user.name \"{0}\"", name));
+			bool result = SimpleGitInvoke(string.Format("config --global user.name \"{0}\"", name));
 			name = lastResult;
 			if (!result) return false;
 
-			result = SimpleGitInvoke(string.Format("git config --global user.email \"{0}\"", email));
+			result = SimpleGitInvoke(string.Format("config --global user.email \"{0}\"", email));
 			email = lastResult;
 			return result;
 		}
