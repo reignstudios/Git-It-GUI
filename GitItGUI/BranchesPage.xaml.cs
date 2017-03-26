@@ -241,6 +241,12 @@ namespace GitItGUI
 			}
 
 			var branch = BranchManager.GetNonActiveBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
+			if (branch.isHeadRef)
+			{
+				Debug.Log("Cannot delete HEAD branch", true);
+				return;
+			}
+
 			if (branch.fullname == BranchManager.activeBranch.fullname)
 			{
 				Debug.LogError("You must select a non active branch", true);
