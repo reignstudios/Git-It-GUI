@@ -16,7 +16,7 @@ namespace GitCommander
 
 	public static class Tools
 	{
-		public static event StdCallbackMethod StdCallback, StdErrorCallback, StdWarningCallback;
+		public static event StdCallbackMethod RunExeDebugLineCallback, StdCallback, StdErrorCallback, StdWarningCallback;
 		private static List<string> errorPrefixes;
 
 		static Tools()
@@ -37,6 +37,7 @@ namespace GitCommander
 			string stdOutToFilePath = null
 		)
 		{
+			if (RunExeDebugLineCallback != null) RunExeDebugLineCallback(string.Format("GitCommander: {0} {1}", exe, arguments));
 			if (stdCallback != null) stdResultOn = false;
 
 			string output = "", errors = "";

@@ -31,6 +31,7 @@ namespace GitItGUI.Core
 				writer = new StreamWriter(stream);
 
 				// bind events
+				GitCommander.Tools.RunExeDebugLineCallback += Tools_RunExeDebugLineCallback;
 				GitCommander.Tools.StdCallback += Tools_StdCallback;
 				GitCommander.Tools.StdWarningCallback += Tools_StdWarningCallback;
 				GitCommander.Tools.StdErrorCallback += Tools_StdErrorCallback;
@@ -39,6 +40,11 @@ namespace GitItGUI.Core
 			{
 				LogError("Failed to init debug log file: " + e.Message);
 			}
+		}
+
+		private static void Tools_RunExeDebugLineCallback(string line)
+		{
+			Log(line);
 		}
 
 		private static void Tools_StdCallback(string line)
