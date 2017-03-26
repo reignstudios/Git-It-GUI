@@ -13,10 +13,10 @@
     <ROW Property="ARPURLUPDATEINFO" Value="https://github.com/reignstudios/Git-It-GUI/releases"/>
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Reign-Studios"/>
-    <ROW Property="ProductCode" Value="1033:{EBE5A98D-436E-452A-9C87-3F421B36E067} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{1FCEF059-C37A-4318-B278-2AD53D7A0F33} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Git-It-GUI"/>
-    <ROW Property="ProductVersion" Value="0.1.14" Type="32"/>
+    <ROW Property="ProductVersion" Value="0.2.0" Type="32"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{FD4A5E78-F668-42CE-90BC-D1DDAA792189}"/>
@@ -38,151 +38,142 @@
     <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
     <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
-    <ROW Directory="lib_Dir" Directory_Parent="APPDIR" DefaultDir="lib"/>
-    <ROW Directory="win32_Dir" Directory_Parent="lib_Dir" DefaultDir="win32"/>
-    <ROW Directory="x64_Dir" Directory_Parent="win32_Dir" DefaultDir="x64"/>
-    <ROW Directory="x86_Dir" Directory_Parent="win32_Dir" DefaultDir="x86"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
-    <ROW Component="Avalonia.Animation.dll" ComponentId="{514975B0-3B2B-4ABC-A21F-DE50F76602A8}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Animation.dll"/>
-    <ROW Component="Avalonia.Animation.xml" ComponentId="{BEB14454-C698-4A1C-AEC6-2A14337B3822}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Animation.xml" Type="0"/>
-    <ROW Component="Avalonia.Base.dll" ComponentId="{03B78388-4557-4C69-9CF9-2583DDC2D0F9}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Base.dll"/>
-    <ROW Component="Avalonia.Cairo.dll" ComponentId="{18007903-9F95-41FC-BCAC-71084BB0C446}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Cairo.dll"/>
-    <ROW Component="Avalonia.Controls.dll" ComponentId="{49686464-E2E1-41BA-8972-6B2CD8A40662}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Controls.dll"/>
-    <ROW Component="Avalonia.DesignerSupport.dll" ComponentId="{D08226BA-1B11-4A87-8CC8-93BBF1CD4445}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.DesignerSupport.dll"/>
-    <ROW Component="Avalonia.Diagnostics.dll" ComponentId="{81FC459D-3C48-47ED-8A75-0B8DF4732CEE}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Diagnostics.dll"/>
-    <ROW Component="Avalonia.Direct2D1.dll" ComponentId="{55A5C8F2-1A8A-410F-B188-F89B9B57F1CF}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Direct2D1.dll"/>
-    <ROW Component="Avalonia.DotNetFrameworkRuntime.dll" ComponentId="{8C4B99B9-1B4B-4E5B-9744-6CCCDBDE1321}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.DotNetFrameworkRuntime.dll"/>
-    <ROW Component="Avalonia.Gtk.dll" ComponentId="{3DB3ADFD-071E-4B0B-A8E1-8A27388D4B54}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Gtk.dll"/>
-    <ROW Component="Avalonia.Input.dll" ComponentId="{30248728-63C1-4618-9721-1EAF4FCC827A}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Input.dll"/>
-    <ROW Component="Avalonia.Interactivity.dll" ComponentId="{56B0C727-8D01-4D26-8589-AF695B2B5363}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Interactivity.dll"/>
-    <ROW Component="Avalonia.Layout.dll" ComponentId="{88327D9E-2E55-41EF-9B71-453A99C9359C}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Layout.dll"/>
-    <ROW Component="Avalonia.Logging.Serilog.dll" ComponentId="{1C840E62-4985-4036-AB13-53531743ABC9}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Logging.Serilog.dll"/>
-    <ROW Component="Avalonia.Markup.Xaml.dll" ComponentId="{BD065540-7553-435C-8DBA-434813B6CB60}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Markup.Xaml.dll"/>
-    <ROW Component="Avalonia.Markup.dll" ComponentId="{4BA40DF5-837A-45D1-992D-4A1118D96A1D}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Markup.dll"/>
-    <ROW Component="Avalonia.ReactiveUI.dll" ComponentId="{CCD9220F-A2B6-4730-840C-9825FA52D303}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.ReactiveUI.dll"/>
-    <ROW Component="Avalonia.Skia.Desktop.dll" ComponentId="{3DEFC1F3-AAB1-49AD-8A2D-C52C15E2F716}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Skia.Desktop.dll"/>
-    <ROW Component="Avalonia.Styling.dll" ComponentId="{5B32D1D6-92DA-434A-825D-D3A90CB3D0CC}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Styling.dll"/>
-    <ROW Component="Avalonia.Themes.Default.dll" ComponentId="{4E6D7DAC-222E-4E09-AD52-C2BBB392B359}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Themes.Default.dll"/>
-    <ROW Component="Avalonia.Visuals.dll" ComponentId="{7F284262-FA63-4B2C-BFA3-3889E9B75B00}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Visuals.dll"/>
-    <ROW Component="Avalonia.Win32.dll" ComponentId="{79644358-324F-4B32-961E-3AB923CB0D75}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Win32.dll"/>
-    <ROW Component="CommitEntry.exe" ComponentId="{85E6C4CC-D6A1-4E80-98B9-41777275358B}" Directory_="APPDIR" Attributes="0" KeyPath="CommitEntry.exe"/>
-    <ROW Component="GitCommander.dll" ComponentId="{136770FB-4586-42D3-8309-79F0F8E741F2}" Directory_="APPDIR" Attributes="0" KeyPath="GitCommander.dll"/>
-    <ROW Component="GitItGUI.Core.dll" ComponentId="{CC33673B-F9FD-4759-8521-ECDE7C3FD60C}" Directory_="APPDIR" Attributes="0" KeyPath="GitItGUI.Core.dll"/>
+    <ROW Component="Avalonia.Animation.dll" ComponentId="{6670B300-76F1-421D-AE04-3EEA7A86CA8B}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Animation.dll"/>
+    <ROW Component="Avalonia.Base.dll" ComponentId="{21454AE6-F63D-4D06-BB3B-C9C3909A487C}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Base.dll"/>
+    <ROW Component="Avalonia.Cairo.dll" ComponentId="{54E1CF93-BB19-4860-AAF3-EA3199B43AC8}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Cairo.dll"/>
+    <ROW Component="Avalonia.Controls.dll" ComponentId="{2960B00A-2E6F-4E3A-ACFB-15234792FC6A}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Controls.dll"/>
+    <ROW Component="Avalonia.DesignerSupport.dll" ComponentId="{ED37E3A6-5ACD-4DF8-A3DD-5030CC7824E0}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.DesignerSupport.dll"/>
+    <ROW Component="Avalonia.Diagnostics.dll" ComponentId="{85F2C184-3CD3-4704-91A5-F64DA83EC2C3}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Diagnostics.dll"/>
+    <ROW Component="Avalonia.Direct2D1.dll" ComponentId="{0844609E-09E6-47A1-AF9B-6DAA7062D29D}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Direct2D1.dll"/>
+    <ROW Component="Avalonia.DotNetFrameworkRuntime.dll" ComponentId="{D7AC85F0-FEA1-43E9-A34B-E935B9EEA39A}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.DotNetFrameworkRuntime.dll"/>
+    <ROW Component="Avalonia.Gtk.dll" ComponentId="{3A17123B-16F7-475F-B854-CEBABFF69D8E}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Gtk.dll"/>
+    <ROW Component="Avalonia.Input.dll" ComponentId="{DADA8110-AE18-4469-84E4-284BA691C9A1}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Input.dll"/>
+    <ROW Component="Avalonia.Interactivity.dll" ComponentId="{D948B3BC-552F-4898-ADC6-F3F0EA62D850}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Interactivity.dll"/>
+    <ROW Component="Avalonia.Layout.dll" ComponentId="{B38AA667-1338-4FCC-8720-67007941CF2D}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Layout.dll"/>
+    <ROW Component="Avalonia.Logging.Serilog.dll" ComponentId="{0DEF1F1A-85EE-4561-8EED-F8A3E2F90F18}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Logging.Serilog.dll"/>
+    <ROW Component="Avalonia.Markup.Xaml.dll" ComponentId="{06F2717E-50DB-4162-81DB-E404C3D97D18}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Markup.Xaml.dll"/>
+    <ROW Component="Avalonia.Markup.dll" ComponentId="{EB434649-26E0-41DF-920D-CB0302CDD657}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Markup.dll"/>
+    <ROW Component="Avalonia.ReactiveUI.dll" ComponentId="{939849F4-B29C-4243-8ADA-CA961FB0BFDF}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.ReactiveUI.dll"/>
+    <ROW Component="Avalonia.Skia.Desktop.dll" ComponentId="{8C863CE1-8317-48D9-92D7-8C54FC653AE6}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Skia.Desktop.dll"/>
+    <ROW Component="Avalonia.Styling.dll" ComponentId="{F96196BB-79A0-4BCD-8A3B-8BCDD1C64174}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Styling.dll"/>
+    <ROW Component="Avalonia.Themes.Default.dll" ComponentId="{6E43DA3D-D801-4947-981F-5153FF72C54C}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Themes.Default.dll"/>
+    <ROW Component="Avalonia.Visuals.dll" ComponentId="{C3AC9022-1216-4A2D-BB49-F265E3C1FD00}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Visuals.dll"/>
+    <ROW Component="Avalonia.Win32.dll" ComponentId="{F10400B9-5BE8-4D00-96D9-A9939D81D156}" Directory_="APPDIR" Attributes="0" KeyPath="Avalonia.Win32.dll"/>
+    <ROW Component="CommitEntry.exe" ComponentId="{D9132E11-610A-41A8-B2E1-C8576BDB8A81}" Directory_="APPDIR" Attributes="0" KeyPath="CommitEntry.exe"/>
+    <ROW Component="GitCommander.dll" ComponentId="{7ADCF2E7-7A4E-4D36-AA74-6B4CEFFF650F}" Directory_="APPDIR" Attributes="0" KeyPath="GitCommander.dll"/>
+    <ROW Component="GitItGUI.Core.dll" ComponentId="{E774D9B7-099D-43C4-A180-8A5C215FD2E7}" Directory_="APPDIR" Attributes="0" KeyPath="GitItGUI.Core.dll"/>
     <ROW Component="GitItGUI.exe" ComponentId="{CDA82C62-58F1-4E88-B7BF-2A687391D47E}" Directory_="APPDIR" Attributes="0" KeyPath="GitItGUI.exe"/>
-    <ROW Component="LibGit2Sharp.dll" ComponentId="{11A866DD-B2E1-4ED4-BC3A-7C1A4A2EF518}" Directory_="APPDIR" Attributes="0" KeyPath="LibGit2Sharp.dll"/>
-    <ROW Component="MergeConflicPicker.exe" ComponentId="{2C0BA3A8-6654-4857-84DD-3D066FAA2FB3}" Directory_="APPDIR" Attributes="0" KeyPath="MergeConflicPicker.exe"/>
-    <ROW Component="MessageBox.exe" ComponentId="{35731552-760A-4488-9E9C-2A92CC0A5D3F}" Directory_="APPDIR" Attributes="0" KeyPath="MessageBox.exe"/>
-    <ROW Component="Mono.Cairo.dll" ComponentId="{CD8D8BAD-47C2-42A2-8AEF-9573D012B0B0}" Directory_="APPDIR" Attributes="0" KeyPath="Mono.Cairo.dll"/>
-    <ROW Component="NameEntry.exe" ComponentId="{8823E2E0-11A9-4B17-BE0E-2110CE1624C5}" Directory_="APPDIR" Attributes="0" KeyPath="NameEntry.exe"/>
+    <ROW Component="MergeConflicPicker.exe" ComponentId="{81ACC380-1F2E-4201-8F51-50CE831AA329}" Directory_="APPDIR" Attributes="0" KeyPath="MergeConflicPicker.exe"/>
+    <ROW Component="MessageBox.exe" ComponentId="{C7545ED6-B9CE-46F0-8A26-DB0AA239A827}" Directory_="APPDIR" Attributes="0" KeyPath="MessageBox.exe"/>
+    <ROW Component="Microsoft.Win32.Primitives.dll" ComponentId="{450F1036-BB61-4B35-A9CC-6219C263C515}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Primitives.dll"/>
+    <ROW Component="Mono.Cairo.dll" ComponentId="{31E19138-4C56-4EEE-BB34-FFE5C54DAC40}" Directory_="APPDIR" Attributes="0" KeyPath="Mono.Cairo.dll"/>
+    <ROW Component="NameEntry.exe" ComponentId="{F1E2F9DF-8C32-444E-9D13-319689F276C6}" Directory_="APPDIR" Attributes="0" KeyPath="NameEntry.exe"/>
     <ROW Component="ProductInformation" ComponentId="{5578F502-08C2-4B0E-B8FE-8318417169C2}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{4D58BD27-3184-4206-8B1B-A0B220B0AFC9}" Directory_="SHORTCUTDIR" Attributes="0"/>
-    <ROW Component="Serilog.FullNetFx.dll" ComponentId="{521DE1A3-EFE8-41A7-B9EA-8DA6DE43A303}" Directory_="APPDIR" Attributes="0" KeyPath="Serilog.FullNetFx.dll"/>
-    <ROW Component="Serilog.dll" ComponentId="{BED1C13E-1BBE-4AD3-8CB1-742F5B868649}" Directory_="APPDIR" Attributes="0" KeyPath="Serilog.dll"/>
-    <ROW Component="SharpDX.DXGI.dll" ComponentId="{3FC6D22D-2A1F-49C5-8511-FE34C0029B51}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.DXGI.dll"/>
-    <ROW Component="SharpDX.Direct2D1.dll" ComponentId="{5F9FB1E1-58CC-4028-848B-A7BA6F9F5497}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct2D1.dll"/>
-    <ROW Component="SharpDX.Direct3D11.dll" ComponentId="{74E2ACF4-C5A3-42F4-86AB-220C460C9DA4}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct3D11.dll"/>
-    <ROW Component="SharpDX.dll" ComponentId="{3AA57779-A82C-408F-BB4B-81DC4FA3D319}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.dll"/>
-    <ROW Component="SkiaSharp.dll" ComponentId="{EF4BA992-283E-4D17-AD17-AE79B427801D}" Directory_="APPDIR" Attributes="0" KeyPath="SkiaSharp.dll"/>
-    <ROW Component="Splat.dll" ComponentId="{3EC3BE36-CEA0-46C6-B400-5CAF58E84551}" Directory_="APPDIR" Attributes="0" KeyPath="Splat.dll"/>
-    <ROW Component="Sprache.dll" ComponentId="{5630E990-2994-4498-BF94-6E60099A8576}" Directory_="APPDIR" Attributes="0" KeyPath="Sprache.dll"/>
-    <ROW Component="System.Reactive.Core.dll" ComponentId="{A7CB2672-01C2-4A02-89C5-A451A0D136B4}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Core.dll"/>
-    <ROW Component="System.Reactive.Interfaces.dll" ComponentId="{CCBF8658-1D6F-4671-B92C-516ACFE7DFF9}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Interfaces.dll"/>
-    <ROW Component="System.Reactive.Linq.dll" ComponentId="{7374BFD2-F4BB-44FF-837B-824109EF7FFD}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Linq.dll"/>
-    <ROW Component="System.Reactive.PlatformServices.dll" ComponentId="{15A44B2C-BE7D-4448-98C0-AA37AE05BDCC}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.PlatformServices.dll"/>
-    <ROW Component="System.Reactive.Windows.Threading.dll" ComponentId="{B902D87E-B3D4-467E-B57F-0FEB670204F0}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Windows.Threading.dll"/>
-    <ROW Component="atksharp.dll" ComponentId="{20BE0997-71A3-4163-8406-45D95AC988CB}" Directory_="APPDIR" Attributes="0" KeyPath="atksharp.dll"/>
-    <ROW Component="gdksharp.dll" ComponentId="{5EBD58AB-0A88-4487-A629-81B5664E1164}" Directory_="APPDIR" Attributes="0" KeyPath="gdksharp.dll"/>
-    <ROW Component="git2a5cf255.dll" ComponentId="{75E5355A-6ACF-4474-95B4-AB415BD72268}" Directory_="x64_Dir" Attributes="256" KeyPath="git2a5cf255.dll_1"/>
-    <ROW Component="git2a5cf255.dll_1" ComponentId="{BEEE9C4A-6BB6-47CC-BC95-02898C06046E}" Directory_="x86_Dir" Attributes="0" KeyPath="git2a5cf255.dll_2"/>
-    <ROW Component="glibsharp.dll" ComponentId="{D5AB7093-3A15-464D-B855-36B82BA3ACC3}" Directory_="APPDIR" Attributes="0" KeyPath="glibsharp.dll"/>
-    <ROW Component="gtksharp.dll" ComponentId="{01686217-61AE-4D71-AFDE-6AAAFBCE437D}" Directory_="APPDIR" Attributes="0" KeyPath="gtksharp.dll"/>
-    <ROW Component="libSkiaSharp.dll" ComponentId="{85AFA1B4-2B5C-4EA0-92D0-A0FB191AB334}" Directory_="APPDIR" Attributes="0" KeyPath="libSkiaSharp.dll"/>
-    <ROW Component="pangosharp.dll" ComponentId="{08E143AE-79C9-48DF-86D1-96B30D6062E0}" Directory_="APPDIR" Attributes="0" KeyPath="pangosharp.dll"/>
+    <ROW Component="Serilog.dll" ComponentId="{B013398A-E99E-47A4-BC58-2C483BEE39A9}" Directory_="APPDIR" Attributes="0" KeyPath="Serilog.dll"/>
+    <ROW Component="SharpDX.DXGI.dll" ComponentId="{9B9EBC56-57AF-4CF1-8AAE-E39F1BEE190D}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.DXGI.dll"/>
+    <ROW Component="SharpDX.Direct2D1.dll" ComponentId="{B9BC6A59-C57B-415D-A6E5-38B8CBBCFEDC}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct2D1.dll"/>
+    <ROW Component="SharpDX.Direct3D11.dll" ComponentId="{CF66E5BA-4024-435C-B718-A99FC2654953}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct3D11.dll"/>
+    <ROW Component="SharpDX.dll" ComponentId="{DB06D08D-E1D0-4F05-92BD-1F4FC7BBFE47}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.dll"/>
+    <ROW Component="SkiaSharp.dll" ComponentId="{1E66BCDD-8897-4784-A363-46B7550FA56F}" Directory_="APPDIR" Attributes="0" KeyPath="SkiaSharp.dll"/>
+    <ROW Component="Splat.dll" ComponentId="{0ADE46FD-8A0C-4156-8B3F-64D6247FC88A}" Directory_="APPDIR" Attributes="0" KeyPath="Splat.dll"/>
+    <ROW Component="Sprache.dll" ComponentId="{DCE5A149-AC51-41E4-B3AA-6109A904D374}" Directory_="APPDIR" Attributes="0" KeyPath="Sprache.dll"/>
+    <ROW Component="System.AppContext.dll" ComponentId="{9E6542B3-6E63-4449-8B59-07B53065AC6E}" Directory_="APPDIR" Attributes="0" KeyPath="System.AppContext.dll"/>
+    <ROW Component="System.Console.dll" ComponentId="{FCE6ACDF-CB36-4AC6-91E5-D283710B147D}" Directory_="APPDIR" Attributes="0" KeyPath="System.Console.dll"/>
+    <ROW Component="System.Diagnostics.DiagnosticSource.dll" ComponentId="{46D39CBA-D306-42A7-B7D2-369F0A526C74}" Directory_="APPDIR" Attributes="0" KeyPath="System.Diagnostics.DiagnosticSource.dll"/>
+    <ROW Component="System.Globalization.Calendars.dll" ComponentId="{33EDDEC1-2A3E-4E4A-AD86-B071FD5D2348}" Directory_="APPDIR" Attributes="0" KeyPath="System.Globalization.Calendars.dll"/>
+    <ROW Component="System.IO.Compression.ZipFile.dll" ComponentId="{24B64B18-CC94-4D84-8D2A-791483336A73}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Compression.ZipFile.dll"/>
+    <ROW Component="System.IO.Compression.dll" ComponentId="{31C50C36-E28B-400A-AF73-3840B3A37A8F}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Compression.dll"/>
+    <ROW Component="System.IO.FileSystem.Primitives.dll" ComponentId="{BDD44C9E-B8F5-45B1-B131-38B6599864D2}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.FileSystem.Primitives.dll"/>
+    <ROW Component="System.IO.FileSystem.dll" ComponentId="{AEC4EC26-C908-4E3B-B735-24471693CD83}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.FileSystem.dll"/>
+    <ROW Component="System.Net.Http.dll" ComponentId="{07E84FA1-C447-4FDC-960C-23ECC932A34A}" Directory_="APPDIR" Attributes="0" KeyPath="System.Net.Http.dll"/>
+    <ROW Component="System.Net.Sockets.dll" ComponentId="{4AFD37F0-6A50-414F-845B-B897DDF220F5}" Directory_="APPDIR" Attributes="0" KeyPath="System.Net.Sockets.dll"/>
+    <ROW Component="System.Reactive.Core.dll" ComponentId="{520840EE-98B6-4D5D-8097-6351F7772CD9}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Core.dll"/>
+    <ROW Component="System.Reactive.Interfaces.dll" ComponentId="{BEDBF4A9-D9B9-4AB3-99F1-6BEB246ECD04}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Interfaces.dll"/>
+    <ROW Component="System.Reactive.Linq.dll" ComponentId="{0C3A0AB9-6086-4CA4-923F-D65D5619927F}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Linq.dll"/>
+    <ROW Component="System.Reactive.PlatformServices.dll" ComponentId="{B893A2D0-71CD-4A65-A1C1-D84FD4B6D952}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.PlatformServices.dll"/>
+    <ROW Component="System.Reactive.Windows.Threading.dll" ComponentId="{1CAAD868-1852-4202-8312-E954700AE04A}" Directory_="APPDIR" Attributes="0" KeyPath="System.Reactive.Windows.Threading.dll"/>
+    <ROW Component="System.Runtime.InteropServices.RuntimeIn" ComponentId="{E7B87B2A-D7D7-4AA7-B77D-F305697D705D}" Directory_="APPDIR" Attributes="0" KeyPath="System.Runtime.InteropServices.RuntimeInformation.dll"/>
+    <ROW Component="System.Security.Cryptography.Algorithms." ComponentId="{A014787A-A215-49D3-BB35-CC402921F524}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.Algorithms.dll"/>
+    <ROW Component="System.Security.Cryptography.Encoding.dl" ComponentId="{31CB8FE9-CC4D-4F87-B911-DACE4251EC1E}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.Encoding.dll"/>
+    <ROW Component="System.Security.Cryptography.Primitives." ComponentId="{2648F59A-10C9-4ED5-9229-8ADAB25DCA4B}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.Primitives.dll"/>
+    <ROW Component="System.Security.Cryptography.X509Certifi" ComponentId="{116FC3F1-AAD6-4039-AC98-EB2EC4622F07}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.X509Certificates.dll"/>
+    <ROW Component="atksharp.dll" ComponentId="{D4758FBC-E302-479A-8F42-EC2A49BB901D}" Directory_="APPDIR" Attributes="0" KeyPath="atksharp.dll"/>
+    <ROW Component="gdksharp.dll" ComponentId="{D530E691-65A1-4DD1-A6AE-95BD66A44618}" Directory_="APPDIR" Attributes="0" KeyPath="gdksharp.dll"/>
+    <ROW Component="glibsharp.dll" ComponentId="{144F7074-3F1A-4B34-9206-7A14FFD6B8D1}" Directory_="APPDIR" Attributes="0" KeyPath="glibsharp.dll"/>
+    <ROW Component="gtksharp.dll" ComponentId="{3E9D7236-EE74-452B-99EB-D092A9326D95}" Directory_="APPDIR" Attributes="0" KeyPath="gtksharp.dll"/>
+    <ROW Component="libSkiaSharp.dll" ComponentId="{847560FB-8C82-4D34-AE96-3CA6996A137B}" Directory_="APPDIR" Attributes="0" KeyPath="libSkiaSharp.dll"/>
+    <ROW Component="pangosharp.dll" ComponentId="{C2A20F1D-4F72-4F55-85AD-6587CDE64DDC}" Directory_="APPDIR" Attributes="0" KeyPath="pangosharp.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Avalonia.Animation.dll Avalonia.Animation.xml Avalonia.Base.dll Avalonia.Cairo.dll Avalonia.Controls.dll Avalonia.DesignerSupport.dll Avalonia.Diagnostics.dll Avalonia.Direct2D1.dll Avalonia.DotNetFrameworkRuntime.dll Avalonia.Gtk.dll Avalonia.Input.dll Avalonia.Interactivity.dll Avalonia.Layout.dll Avalonia.Logging.Serilog.dll Avalonia.Markup.Xaml.dll Avalonia.Markup.dll Avalonia.ReactiveUI.dll Avalonia.Skia.Desktop.dll Avalonia.Styling.dll Avalonia.Themes.Default.dll Avalonia.Visuals.dll Avalonia.Win32.dll CommitEntry.exe GitCommander.dll GitItGUI.Core.dll GitItGUI.exe LibGit2Sharp.dll MergeConflicPicker.exe MessageBox.exe Mono.Cairo.dll NameEntry.exe ProductInformation SHORTCUTDIR Serilog.FullNetFx.dll Serilog.dll SharpDX.DXGI.dll SharpDX.Direct2D1.dll SharpDX.Direct3D11.dll SharpDX.dll SkiaSharp.dll Splat.dll Sprache.dll System.Reactive.Core.dll System.Reactive.Interfaces.dll System.Reactive.Linq.dll System.Reactive.PlatformServices.dll System.Reactive.Windows.Threading.dll atksharp.dll gdksharp.dll git2a5cf255.dll git2a5cf255.dll_1 glibsharp.dll gtksharp.dll libSkiaSharp.dll pangosharp.dll"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Avalonia.Animation.dll Avalonia.Base.dll Avalonia.Cairo.dll Avalonia.Controls.dll Avalonia.DesignerSupport.dll Avalonia.Diagnostics.dll Avalonia.Direct2D1.dll Avalonia.DotNetFrameworkRuntime.dll Avalonia.Gtk.dll Avalonia.Input.dll Avalonia.Interactivity.dll Avalonia.Layout.dll Avalonia.Logging.Serilog.dll Avalonia.Markup.Xaml.dll Avalonia.Markup.dll Avalonia.ReactiveUI.dll Avalonia.Skia.Desktop.dll Avalonia.Styling.dll Avalonia.Themes.Default.dll Avalonia.Visuals.dll Avalonia.Win32.dll CommitEntry.exe GitCommander.dll GitItGUI.Core.dll GitItGUI.exe MergeConflicPicker.exe MessageBox.exe Microsoft.Win32.Primitives.dll Mono.Cairo.dll NameEntry.exe ProductInformation SHORTCUTDIR Serilog.dll SharpDX.DXGI.dll SharpDX.Direct2D1.dll SharpDX.Direct3D11.dll SharpDX.dll SkiaSharp.dll Splat.dll Sprache.dll System.AppContext.dll System.Console.dll System.Diagnostics.DiagnosticSource.dll System.Globalization.Calendars.dll System.IO.Compression.ZipFile.dll System.IO.Compression.dll System.IO.FileSystem.Primitives.dll System.IO.FileSystem.dll System.Net.Http.dll System.Net.Sockets.dll System.Reactive.Core.dll System.Reactive.Interfaces.dll System.Reactive.Linq.dll System.Reactive.PlatformServices.dll System.Reactive.Windows.Threading.dll System.Runtime.InteropServices.RuntimeIn System.Security.Cryptography.Algorithms. System.Security.Cryptography.Encoding.dl System.Security.Cryptography.Primitives. System.Security.Cryptography.X509Certifi atksharp.dll gdksharp.dll glibsharp.dll gtksharp.dll libSkiaSharp.dll pangosharp.dll"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
-    <ROW File="Avalonia.Animation.dll" Component_="Avalonia.Animation.dll" FileName="AVALON~1.DLL|Avalonia.Animation.dll" Attributes="0" SourcePath="..\bin\Avalonia.Animation.dll" SelfReg="false" NextFile="Avalonia.Animation.xml"/>
-    <ROW File="Avalonia.Animation.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~1.XML|Avalonia.Animation.xml" Attributes="0" SourcePath="..\bin\Avalonia.Animation.xml" SelfReg="false" NextFile="Avalonia.Base.dll"/>
-    <ROW File="Avalonia.Base.dll" Component_="Avalonia.Base.dll" FileName="AVALON~2.DLL|Avalonia.Base.dll" Attributes="0" SourcePath="..\bin\Avalonia.Base.dll" SelfReg="false" NextFile="Avalonia.Base.xml"/>
-    <ROW File="Avalonia.Base.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~2.XML|Avalonia.Base.xml" Attributes="0" SourcePath="..\bin\Avalonia.Base.xml" SelfReg="false" NextFile="Avalonia.Cairo.dll"/>
+    <ROW File="Avalonia.Animation.dll" Component_="Avalonia.Animation.dll" FileName="AVALON~1.DLL|Avalonia.Animation.dll" Attributes="0" SourcePath="..\bin\Avalonia.Animation.dll" SelfReg="false" NextFile="Avalonia.Base.dll"/>
+    <ROW File="Avalonia.Base.dll" Component_="Avalonia.Base.dll" FileName="AVALON~2.DLL|Avalonia.Base.dll" Attributes="0" SourcePath="..\bin\Avalonia.Base.dll" SelfReg="false" NextFile="Avalonia.Cairo.dll"/>
     <ROW File="Avalonia.Cairo.dll" Component_="Avalonia.Cairo.dll" FileName="AVALON~3.DLL|Avalonia.Cairo.dll" Attributes="0" SourcePath="..\bin\Avalonia.Cairo.dll" SelfReg="false" NextFile="Avalonia.Controls.dll"/>
-    <ROW File="Avalonia.Controls.dll" Component_="Avalonia.Controls.dll" FileName="AVALON~4.DLL|Avalonia.Controls.dll" Attributes="0" SourcePath="..\bin\Avalonia.Controls.dll" SelfReg="false" NextFile="Avalonia.Controls.xml"/>
-    <ROW File="Avalonia.Controls.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~3.XML|Avalonia.Controls.xml" Attributes="0" SourcePath="..\bin\Avalonia.Controls.xml" SelfReg="false" NextFile="Avalonia.DesignerSupport.dll"/>
-    <ROW File="Avalonia.DesignerSupport.dll" Component_="Avalonia.DesignerSupport.dll" FileName="AVALON~5.DLL|Avalonia.DesignerSupport.dll" Attributes="0" SourcePath="..\bin\Avalonia.DesignerSupport.dll" SelfReg="false" NextFile="Avalonia.DesignerSupport.xml"/>
-    <ROW File="Avalonia.DesignerSupport.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~4.XML|Avalonia.DesignerSupport.xml" Attributes="0" SourcePath="..\bin\Avalonia.DesignerSupport.xml" SelfReg="false" NextFile="Avalonia.Diagnostics.dll"/>
-    <ROW File="Avalonia.Diagnostics.dll" Component_="Avalonia.Diagnostics.dll" FileName="AVALON~6.DLL|Avalonia.Diagnostics.dll" Attributes="0" SourcePath="..\bin\Avalonia.Diagnostics.dll" SelfReg="false" NextFile="Avalonia.Diagnostics.xml"/>
-    <ROW File="Avalonia.Diagnostics.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~5.XML|Avalonia.Diagnostics.xml" Attributes="0" SourcePath="..\bin\Avalonia.Diagnostics.xml" SelfReg="false" NextFile="Avalonia.Direct2D1.dll"/>
+    <ROW File="Avalonia.Controls.dll" Component_="Avalonia.Controls.dll" FileName="AVALON~4.DLL|Avalonia.Controls.dll" Attributes="0" SourcePath="..\bin\Avalonia.Controls.dll" SelfReg="false" NextFile="Avalonia.DesignerSupport.dll"/>
+    <ROW File="Avalonia.DesignerSupport.dll" Component_="Avalonia.DesignerSupport.dll" FileName="AVALON~5.DLL|Avalonia.DesignerSupport.dll" Attributes="0" SourcePath="..\bin\Avalonia.DesignerSupport.dll" SelfReg="false" NextFile="Avalonia.Diagnostics.dll"/>
+    <ROW File="Avalonia.Diagnostics.dll" Component_="Avalonia.Diagnostics.dll" FileName="AVALON~6.DLL|Avalonia.Diagnostics.dll" Attributes="0" SourcePath="..\bin\Avalonia.Diagnostics.dll" SelfReg="false" NextFile="Avalonia.Direct2D1.dll"/>
     <ROW File="Avalonia.Direct2D1.dll" Component_="Avalonia.Direct2D1.dll" FileName="AVALON~7.DLL|Avalonia.Direct2D1.dll" Attributes="0" SourcePath="..\bin\Avalonia.Direct2D1.dll" SelfReg="false" NextFile="Avalonia.DotNetFrameworkRuntime.dll"/>
-    <ROW File="Avalonia.DotNetFrameworkRuntime.dll" Component_="Avalonia.DotNetFrameworkRuntime.dll" FileName="AVALON~8.DLL|Avalonia.DotNetFrameworkRuntime.dll" Attributes="0" SourcePath="..\bin\Avalonia.DotNetFrameworkRuntime.dll" SelfReg="false" NextFile="Avalonia.DotNetFrameworkRuntime.xml"/>
-    <ROW File="Avalonia.DotNetFrameworkRuntime.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~6.XML|Avalonia.DotNetFrameworkRuntime.xml" Attributes="0" SourcePath="..\bin\Avalonia.DotNetFrameworkRuntime.xml" SelfReg="false" NextFile="Avalonia.Gtk.dll"/>
+    <ROW File="Avalonia.DotNetFrameworkRuntime.dll" Component_="Avalonia.DotNetFrameworkRuntime.dll" FileName="AVALON~8.DLL|Avalonia.DotNetFrameworkRuntime.dll" Attributes="0" SourcePath="..\bin\Avalonia.DotNetFrameworkRuntime.dll" SelfReg="false" NextFile="Avalonia.Gtk.dll"/>
     <ROW File="Avalonia.Gtk.dll" Component_="Avalonia.Gtk.dll" FileName="AVALON~9.DLL|Avalonia.Gtk.dll" Attributes="0" SourcePath="..\bin\Avalonia.Gtk.dll" SelfReg="false" NextFile="Avalonia.Input.dll"/>
-    <ROW File="Avalonia.Input.dll" Component_="Avalonia.Input.dll" FileName="AVALO~10.DLL|Avalonia.Input.dll" Attributes="0" SourcePath="..\bin\Avalonia.Input.dll" SelfReg="false" NextFile="Avalonia.Input.xml"/>
-    <ROW File="Avalonia.Input.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~7.XML|Avalonia.Input.xml" Attributes="0" SourcePath="..\bin\Avalonia.Input.xml" SelfReg="false" NextFile="Avalonia.Interactivity.dll"/>
-    <ROW File="Avalonia.Interactivity.dll" Component_="Avalonia.Interactivity.dll" FileName="AVALO~11.DLL|Avalonia.Interactivity.dll" Attributes="0" SourcePath="..\bin\Avalonia.Interactivity.dll" SelfReg="false" NextFile="Avalonia.Interactivity.xml"/>
-    <ROW File="Avalonia.Interactivity.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~8.XML|Avalonia.Interactivity.xml" Attributes="0" SourcePath="..\bin\Avalonia.Interactivity.xml" SelfReg="false" NextFile="Avalonia.Layout.dll"/>
-    <ROW File="Avalonia.Layout.dll" Component_="Avalonia.Layout.dll" FileName="AVALO~12.DLL|Avalonia.Layout.dll" Attributes="0" SourcePath="..\bin\Avalonia.Layout.dll" SelfReg="false" NextFile="Avalonia.Layout.xml"/>
-    <ROW File="Avalonia.Layout.xml" Component_="Avalonia.Animation.xml" FileName="AVALON~9.XML|Avalonia.Layout.xml" Attributes="0" SourcePath="..\bin\Avalonia.Layout.xml" SelfReg="false" NextFile="Avalonia.Logging.Serilog.dll"/>
-    <ROW File="Avalonia.Logging.Serilog.dll" Component_="Avalonia.Logging.Serilog.dll" FileName="AVALO~13.DLL|Avalonia.Logging.Serilog.dll" Attributes="0" SourcePath="..\bin\Avalonia.Logging.Serilog.dll" SelfReg="false" NextFile="Avalonia.Logging.Serilog.xml"/>
-    <ROW File="Avalonia.Logging.Serilog.xml" Component_="Avalonia.Animation.xml" FileName="AVALO~10.XML|Avalonia.Logging.Serilog.xml" Attributes="0" SourcePath="..\bin\Avalonia.Logging.Serilog.xml" SelfReg="false" NextFile="Avalonia.Markup.dll"/>
-    <ROW File="Avalonia.Markup.Xaml.dll" Component_="Avalonia.Markup.Xaml.dll" FileName="AVALO~15.DLL|Avalonia.Markup.Xaml.dll" Attributes="0" SourcePath="..\bin\Avalonia.Markup.Xaml.dll" SelfReg="false" NextFile="Avalonia.Markup.Xaml.xml"/>
-    <ROW File="Avalonia.Markup.Xaml.xml" Component_="Avalonia.Animation.xml" FileName="AVALO~11.XML|Avalonia.Markup.Xaml.xml" Attributes="0" SourcePath="..\bin\Avalonia.Markup.Xaml.xml" SelfReg="false" NextFile="Avalonia.Markup.xml"/>
+    <ROW File="Avalonia.Input.dll" Component_="Avalonia.Input.dll" FileName="AVALO~10.DLL|Avalonia.Input.dll" Attributes="0" SourcePath="..\bin\Avalonia.Input.dll" SelfReg="false" NextFile="Avalonia.Interactivity.dll"/>
+    <ROW File="Avalonia.Interactivity.dll" Component_="Avalonia.Interactivity.dll" FileName="AVALO~11.DLL|Avalonia.Interactivity.dll" Attributes="0" SourcePath="..\bin\Avalonia.Interactivity.dll" SelfReg="false" NextFile="Avalonia.Layout.dll"/>
+    <ROW File="Avalonia.Layout.dll" Component_="Avalonia.Layout.dll" FileName="AVALO~12.DLL|Avalonia.Layout.dll" Attributes="0" SourcePath="..\bin\Avalonia.Layout.dll" SelfReg="false" NextFile="Avalonia.Logging.Serilog.dll"/>
+    <ROW File="Avalonia.Logging.Serilog.dll" Component_="Avalonia.Logging.Serilog.dll" FileName="AVALO~13.DLL|Avalonia.Logging.Serilog.dll" Attributes="0" SourcePath="..\bin\Avalonia.Logging.Serilog.dll" SelfReg="false" NextFile="Avalonia.Markup.dll"/>
+    <ROW File="Avalonia.Markup.Xaml.dll" Component_="Avalonia.Markup.Xaml.dll" FileName="AVALO~15.DLL|Avalonia.Markup.Xaml.dll" Attributes="0" SourcePath="..\bin\Avalonia.Markup.Xaml.dll" SelfReg="false" NextFile="Avalonia.ReactiveUI.dll"/>
     <ROW File="Avalonia.Markup.dll" Component_="Avalonia.Markup.dll" FileName="AVALO~14.DLL|Avalonia.Markup.dll" Attributes="0" SourcePath="..\bin\Avalonia.Markup.dll" SelfReg="false" NextFile="Avalonia.Markup.Xaml.dll"/>
-    <ROW File="Avalonia.Markup.xml" Component_="Avalonia.Animation.xml" FileName="AVALO~12.XML|Avalonia.Markup.xml" Attributes="0" SourcePath="..\bin\Avalonia.Markup.xml" SelfReg="false" NextFile="Avalonia.ReactiveUI.dll"/>
     <ROW File="Avalonia.ReactiveUI.dll" Component_="Avalonia.ReactiveUI.dll" FileName="AVALO~16.DLL|Avalonia.ReactiveUI.dll" Attributes="0" SourcePath="..\bin\Avalonia.ReactiveUI.dll" SelfReg="false" NextFile="Avalonia.Skia.Desktop.dll"/>
     <ROW File="Avalonia.Skia.Desktop.dll" Component_="Avalonia.Skia.Desktop.dll" FileName="AVALO~17.DLL|Avalonia.Skia.Desktop.dll" Attributes="0" SourcePath="..\bin\Avalonia.Skia.Desktop.dll" SelfReg="false" NextFile="Avalonia.Styling.dll"/>
-    <ROW File="Avalonia.Styling.dll" Component_="Avalonia.Styling.dll" FileName="AVALO~18.DLL|Avalonia.Styling.dll" Attributes="0" SourcePath="..\bin\Avalonia.Styling.dll" SelfReg="false" NextFile="Avalonia.Styling.xml"/>
-    <ROW File="Avalonia.Styling.xml" Component_="Avalonia.Animation.xml" FileName="AVALO~13.XML|Avalonia.Styling.xml" Attributes="0" SourcePath="..\bin\Avalonia.Styling.xml" SelfReg="false" NextFile="Avalonia.Themes.Default.dll"/>
-    <ROW File="Avalonia.Themes.Default.dll" Component_="Avalonia.Themes.Default.dll" FileName="AVALO~19.DLL|Avalonia.Themes.Default.dll" Attributes="0" SourcePath="..\bin\Avalonia.Themes.Default.dll" SelfReg="false" NextFile="Avalonia.Themes.Default.xml"/>
-    <ROW File="Avalonia.Themes.Default.xml" Component_="Avalonia.Animation.xml" FileName="AVALO~14.XML|Avalonia.Themes.Default.xml" Attributes="0" SourcePath="..\bin\Avalonia.Themes.Default.xml" SelfReg="false" NextFile="Avalonia.Visuals.dll"/>
-    <ROW File="Avalonia.Visuals.dll" Component_="Avalonia.Visuals.dll" FileName="AVALO~20.DLL|Avalonia.Visuals.dll" Attributes="0" SourcePath="..\bin\Avalonia.Visuals.dll" SelfReg="false" NextFile="Avalonia.Visuals.xml"/>
-    <ROW File="Avalonia.Visuals.xml" Component_="Avalonia.Animation.xml" FileName="AVALO~15.XML|Avalonia.Visuals.xml" Attributes="0" SourcePath="..\bin\Avalonia.Visuals.xml" SelfReg="false" NextFile="Avalonia.Win32.dll"/>
+    <ROW File="Avalonia.Styling.dll" Component_="Avalonia.Styling.dll" FileName="AVALO~18.DLL|Avalonia.Styling.dll" Attributes="0" SourcePath="..\bin\Avalonia.Styling.dll" SelfReg="false" NextFile="Avalonia.Themes.Default.dll"/>
+    <ROW File="Avalonia.Themes.Default.dll" Component_="Avalonia.Themes.Default.dll" FileName="AVALO~19.DLL|Avalonia.Themes.Default.dll" Attributes="0" SourcePath="..\bin\Avalonia.Themes.Default.dll" SelfReg="false" NextFile="Avalonia.Visuals.dll"/>
+    <ROW File="Avalonia.Visuals.dll" Component_="Avalonia.Visuals.dll" FileName="AVALO~20.DLL|Avalonia.Visuals.dll" Attributes="0" SourcePath="..\bin\Avalonia.Visuals.dll" SelfReg="false" NextFile="Avalonia.Win32.dll"/>
     <ROW File="Avalonia.Win32.dll" Component_="Avalonia.Win32.dll" FileName="AVALO~21.DLL|Avalonia.Win32.dll" Attributes="0" SourcePath="..\bin\Avalonia.Win32.dll" SelfReg="false" NextFile="CommitEntry.exe"/>
     <ROW File="CommitEntry.exe" Component_="CommitEntry.exe" FileName="COMMIT~1.EXE|CommitEntry.exe" Attributes="0" SourcePath="..\bin\CommitEntry.exe" SelfReg="false" NextFile="gdksharp.dll" DigSign="true"/>
     <ROW File="GitCommander.dll" Component_="GitCommander.dll" FileName="GITCOM~1.DLL|GitCommander.dll" Attributes="0" SourcePath="..\bin\GitCommander.dll" SelfReg="false" NextFile="GitItGUI.Core.dll"/>
     <ROW File="GitItGUI.Core.dll" Component_="GitItGUI.Core.dll" FileName="GITITG~1.DLL|GitItGUI.Core.dll" Attributes="0" SourcePath="..\bin\GitItGUI.Core.dll" SelfReg="false" NextFile="glibsharp.dll"/>
-    <ROW File="GitItGUI.exe" Component_="GitItGUI.exe" FileName="GitItGUI.exe" Attributes="0" SourcePath="..\bin\GitItGUI.exe" SelfReg="false" NextFile="git2a5cf255.dll_1" DigSign="true"/>
-    <ROW File="LibGit2Sharp.dll" Component_="LibGit2Sharp.dll" FileName="LIBGIT~1.DLL|LibGit2Sharp.dll" Attributes="0" SourcePath="..\bin\LibGit2Sharp.dll" SelfReg="false" NextFile="LibGit2Sharp.xml"/>
-    <ROW File="LibGit2Sharp.xml" Component_="Avalonia.Animation.xml" FileName="LIBGIT~1.XML|LibGit2Sharp.xml" Attributes="0" SourcePath="..\bin\LibGit2Sharp.xml" SelfReg="false" NextFile="libSkiaSharp.dll"/>
+    <ROW File="GitItGUI.exe" Component_="GitItGUI.exe" FileName="GitItGUI.exe" Attributes="0" SourcePath="..\bin\GitItGUI.exe" SelfReg="false" NextFile="atksharp.dll" DigSign="true"/>
     <ROW File="MergeConflicPicker.exe" Component_="MergeConflicPicker.exe" FileName="MERGEC~1.EXE|MergeConflicPicker.exe" Attributes="0" SourcePath="..\bin\MergeConflicPicker.exe" SelfReg="false" NextFile="MessageBox.exe" DigSign="true"/>
-    <ROW File="MessageBox.exe" Component_="MessageBox.exe" FileName="MESSAG~1.EXE|MessageBox.exe" Attributes="0" SourcePath="..\bin\MessageBox.exe" SelfReg="false" NextFile="Mono.Cairo.dll" DigSign="true"/>
+    <ROW File="MessageBox.exe" Component_="MessageBox.exe" FileName="MESSAG~1.EXE|MessageBox.exe" Attributes="0" SourcePath="..\bin\MessageBox.exe" SelfReg="false" NextFile="Microsoft.Win32.Primitives.dll" DigSign="true"/>
+    <ROW File="Microsoft.Win32.Primitives.dll" Component_="Microsoft.Win32.Primitives.dll" FileName="MICROS~1.DLL|Microsoft.Win32.Primitives.dll" Attributes="0" SourcePath="..\bin\Microsoft.Win32.Primitives.dll" SelfReg="false" NextFile="Mono.Cairo.dll"/>
     <ROW File="Mono.Cairo.dll" Component_="Mono.Cairo.dll" FileName="MONOCA~1.DLL|Mono.Cairo.dll" Attributes="0" SourcePath="..\bin\Mono.Cairo.dll" SelfReg="false" NextFile="NameEntry.exe"/>
     <ROW File="NameEntry.exe" Component_="NameEntry.exe" FileName="NAMEEN~1.EXE|NameEntry.exe" Attributes="0" SourcePath="..\bin\NameEntry.exe" SelfReg="false" NextFile="pangosharp.dll" DigSign="true"/>
-    <ROW File="Serilog.FullNetFx.dll" Component_="Serilog.FullNetFx.dll" FileName="SERILO~1.DLL|Serilog.FullNetFx.dll" Attributes="0" SourcePath="..\bin\Serilog.FullNetFx.dll" SelfReg="false" NextFile="Serilog.FullNetFx.xml"/>
-    <ROW File="Serilog.FullNetFx.xml" Component_="Avalonia.Animation.xml" FileName="SERILO~1.XML|Serilog.FullNetFx.xml" Attributes="0" SourcePath="..\bin\Serilog.FullNetFx.xml" SelfReg="false" NextFile="Serilog.xml"/>
-    <ROW File="Serilog.dll" Component_="Serilog.dll" FileName="Serilog.dll" Attributes="0" SourcePath="..\bin\Serilog.dll" SelfReg="false" NextFile="Serilog.FullNetFx.dll"/>
-    <ROW File="Serilog.xml" Component_="Avalonia.Animation.xml" FileName="Serilog.xml" Attributes="0" SourcePath="..\bin\Serilog.xml" SelfReg="false" NextFile="SharpDX.Direct2D1.dll"/>
-    <ROW File="SharpDX.DXGI.dll" Component_="SharpDX.DXGI.dll" FileName="SHARPD~3.DLL|SharpDX.DXGI.dll" Attributes="0" SourcePath="..\bin\SharpDX.DXGI.dll" SelfReg="false" NextFile="SharpDX.DXGI.xml"/>
-    <ROW File="SharpDX.DXGI.xml" Component_="Avalonia.Animation.xml" FileName="SHARPD~3.XML|SharpDX.DXGI.xml" Attributes="0" SourcePath="..\bin\SharpDX.DXGI.xml" SelfReg="false" NextFile="SharpDX.xml"/>
-    <ROW File="SharpDX.Direct2D1.dll" Component_="SharpDX.Direct2D1.dll" FileName="SHARPD~1.DLL|SharpDX.Direct2D1.dll" Attributes="0" SourcePath="..\bin\SharpDX.Direct2D1.dll" SelfReg="false" NextFile="SharpDX.Direct2D1.xml"/>
-    <ROW File="SharpDX.Direct2D1.xml" Component_="Avalonia.Animation.xml" FileName="SHARPD~1.XML|SharpDX.Direct2D1.xml" Attributes="0" SourcePath="..\bin\SharpDX.Direct2D1.xml" SelfReg="false" NextFile="SharpDX.Direct3D11.dll"/>
-    <ROW File="SharpDX.Direct3D11.dll" Component_="SharpDX.Direct3D11.dll" FileName="SHARPD~2.DLL|SharpDX.Direct3D11.dll" Attributes="0" SourcePath="..\bin\SharpDX.Direct3D11.dll" SelfReg="false" NextFile="SharpDX.Direct3D11.xml"/>
-    <ROW File="SharpDX.Direct3D11.xml" Component_="Avalonia.Animation.xml" FileName="SHARPD~2.XML|SharpDX.Direct3D11.xml" Attributes="0" SourcePath="..\bin\SharpDX.Direct3D11.xml" SelfReg="false" NextFile="SharpDX.dll"/>
+    <ROW File="Serilog.dll" Component_="Serilog.dll" FileName="Serilog.dll" Attributes="0" SourcePath="..\bin\Serilog.dll" SelfReg="false" NextFile="SharpDX.Direct2D1.dll"/>
+    <ROW File="SharpDX.DXGI.dll" Component_="SharpDX.DXGI.dll" FileName="SHARPD~3.DLL|SharpDX.DXGI.dll" Attributes="0" SourcePath="..\bin\SharpDX.DXGI.dll" SelfReg="false" NextFile="SkiaSharp.dll"/>
+    <ROW File="SharpDX.Direct2D1.dll" Component_="SharpDX.Direct2D1.dll" FileName="SHARPD~1.DLL|SharpDX.Direct2D1.dll" Attributes="0" SourcePath="..\bin\SharpDX.Direct2D1.dll" SelfReg="false" NextFile="SharpDX.Direct3D11.dll"/>
+    <ROW File="SharpDX.Direct3D11.dll" Component_="SharpDX.Direct3D11.dll" FileName="SHARPD~2.DLL|SharpDX.Direct3D11.dll" Attributes="0" SourcePath="..\bin\SharpDX.Direct3D11.dll" SelfReg="false" NextFile="SharpDX.dll"/>
     <ROW File="SharpDX.dll" Component_="SharpDX.dll" FileName="SharpDX.dll" Attributes="0" SourcePath="..\bin\SharpDX.dll" SelfReg="false" NextFile="SharpDX.DXGI.dll"/>
-    <ROW File="SharpDX.xml" Component_="Avalonia.Animation.xml" FileName="SharpDX.xml" Attributes="0" SourcePath="..\bin\SharpDX.xml" SelfReg="false" NextFile="SkiaSharp.dll"/>
-    <ROW File="SkiaSharp.dll" Component_="SkiaSharp.dll" FileName="SKIASH~1.DLL|SkiaSharp.dll" Attributes="0" SourcePath="..\bin\SkiaSharp.dll" SelfReg="false" NextFile="SkiaSharp.xml"/>
-    <ROW File="SkiaSharp.xml" Component_="Avalonia.Animation.xml" FileName="SKIASH~1.XML|SkiaSharp.xml" Attributes="0" SourcePath="..\bin\SkiaSharp.xml" SelfReg="false" NextFile="Splat.dll"/>
+    <ROW File="SkiaSharp.dll" Component_="SkiaSharp.dll" FileName="SKIASH~1.DLL|SkiaSharp.dll" Attributes="0" SourcePath="..\bin\SkiaSharp.dll" SelfReg="false" NextFile="Splat.dll"/>
     <ROW File="Splat.dll" Component_="Splat.dll" FileName="Splat.dll" Attributes="0" SourcePath="..\bin\Splat.dll" SelfReg="false" NextFile="Sprache.dll"/>
-    <ROW File="Sprache.dll" Component_="Sprache.dll" FileName="Sprache.dll" Attributes="0" SourcePath="..\bin\Sprache.dll" SelfReg="false" NextFile="System.Reactive.Core.dll"/>
-    <ROW File="System.Reactive.Core.dll" Component_="System.Reactive.Core.dll" FileName="SYSTEM~1.DLL|System.Reactive.Core.dll" Attributes="0" SourcePath="..\bin\System.Reactive.Core.dll" SelfReg="false" NextFile="System.Reactive.Core.xml"/>
-    <ROW File="System.Reactive.Core.xml" Component_="Avalonia.Animation.xml" FileName="SYSTEM~1.XML|System.Reactive.Core.xml" Attributes="0" SourcePath="..\bin\System.Reactive.Core.xml" SelfReg="false" NextFile="System.Reactive.Interfaces.dll"/>
-    <ROW File="System.Reactive.Interfaces.dll" Component_="System.Reactive.Interfaces.dll" FileName="SYSTEM~2.DLL|System.Reactive.Interfaces.dll" Attributes="0" SourcePath="..\bin\System.Reactive.Interfaces.dll" SelfReg="false" NextFile="System.Reactive.Interfaces.xml"/>
-    <ROW File="System.Reactive.Interfaces.xml" Component_="Avalonia.Animation.xml" FileName="SYSTEM~2.XML|System.Reactive.Interfaces.xml" Attributes="0" SourcePath="..\bin\System.Reactive.Interfaces.xml" SelfReg="false" NextFile="System.Reactive.Linq.dll"/>
-    <ROW File="System.Reactive.Linq.dll" Component_="System.Reactive.Linq.dll" FileName="SYSTEM~3.DLL|System.Reactive.Linq.dll" Attributes="0" SourcePath="..\bin\System.Reactive.Linq.dll" SelfReg="false" NextFile="System.Reactive.Linq.xml"/>
-    <ROW File="System.Reactive.Linq.xml" Component_="Avalonia.Animation.xml" FileName="SYSTEM~3.XML|System.Reactive.Linq.xml" Attributes="0" SourcePath="..\bin\System.Reactive.Linq.xml" SelfReg="false" NextFile="System.Reactive.PlatformServices.dll"/>
-    <ROW File="System.Reactive.PlatformServices.dll" Component_="System.Reactive.PlatformServices.dll" FileName="SYSTEM~4.DLL|System.Reactive.PlatformServices.dll" Attributes="0" SourcePath="..\bin\System.Reactive.PlatformServices.dll" SelfReg="false" NextFile="System.Reactive.PlatformServices.xml"/>
-    <ROW File="System.Reactive.PlatformServices.xml" Component_="Avalonia.Animation.xml" FileName="SYSTEM~4.XML|System.Reactive.PlatformServices.xml" Attributes="0" SourcePath="..\bin\System.Reactive.PlatformServices.xml" SelfReg="false" NextFile="System.Reactive.Windows.Threading.dll"/>
-    <ROW File="System.Reactive.Windows.Threading.dll" Component_="System.Reactive.Windows.Threading.dll" FileName="SYSTEM~5.DLL|System.Reactive.Windows.Threading.dll" Attributes="0" SourcePath="..\bin\System.Reactive.Windows.Threading.dll" SelfReg="false" NextFile="System.Reactive.Windows.Threading.xml"/>
-    <ROW File="System.Reactive.Windows.Threading.xml" Component_="Avalonia.Animation.xml" FileName="SYSTEM~5.XML|System.Reactive.Windows.Threading.xml" Attributes="0" SourcePath="..\bin\System.Reactive.Windows.Threading.xml" SelfReg="false"/>
+    <ROW File="Sprache.dll" Component_="Sprache.dll" FileName="Sprache.dll" Attributes="0" SourcePath="..\bin\Sprache.dll" SelfReg="false" NextFile="System.AppContext.dll"/>
+    <ROW File="System.AppContext.dll" Component_="System.AppContext.dll" FileName="SYSTEM~1.DLL|System.AppContext.dll" Attributes="0" SourcePath="..\bin\System.AppContext.dll" SelfReg="false" NextFile="System.Console.dll"/>
+    <ROW File="System.Console.dll" Component_="System.Console.dll" FileName="SYSTEM~2.DLL|System.Console.dll" Attributes="0" SourcePath="..\bin\System.Console.dll" SelfReg="false" NextFile="System.Diagnostics.DiagnosticSource.dll"/>
+    <ROW File="System.Diagnostics.DiagnosticSource.dll" Component_="System.Diagnostics.DiagnosticSource.dll" FileName="SYSTEM~3.DLL|System.Diagnostics.DiagnosticSource.dll" Attributes="0" SourcePath="..\bin\System.Diagnostics.DiagnosticSource.dll" SelfReg="false" NextFile="System.Globalization.Calendars.dll"/>
+    <ROW File="System.Globalization.Calendars.dll" Component_="System.Globalization.Calendars.dll" FileName="SYSTEM~4.DLL|System.Globalization.Calendars.dll" Attributes="0" SourcePath="..\bin\System.Globalization.Calendars.dll" SelfReg="false" NextFile="System.IO.Compression.dll"/>
+    <ROW File="System.IO.Compression.ZipFile.dll" Component_="System.IO.Compression.ZipFile.dll" FileName="SYSTEM~6.DLL|System.IO.Compression.ZipFile.dll" Attributes="0" SourcePath="..\bin\System.IO.Compression.ZipFile.dll" SelfReg="false" NextFile="System.IO.FileSystem.dll"/>
+    <ROW File="System.IO.Compression.dll" Component_="System.IO.Compression.dll" FileName="SYSTEM~5.DLL|System.IO.Compression.dll" Attributes="0" SourcePath="..\bin\System.IO.Compression.dll" SelfReg="false" NextFile="System.IO.Compression.ZipFile.dll"/>
+    <ROW File="System.IO.FileSystem.Primitives.dll" Component_="System.IO.FileSystem.Primitives.dll" FileName="SYSTEM~8.DLL|System.IO.FileSystem.Primitives.dll" Attributes="0" SourcePath="..\bin\System.IO.FileSystem.Primitives.dll" SelfReg="false" NextFile="System.Net.Http.dll"/>
+    <ROW File="System.IO.FileSystem.dll" Component_="System.IO.FileSystem.dll" FileName="SYSTEM~7.DLL|System.IO.FileSystem.dll" Attributes="0" SourcePath="..\bin\System.IO.FileSystem.dll" SelfReg="false" NextFile="System.IO.FileSystem.Primitives.dll"/>
+    <ROW File="System.Net.Http.dll" Component_="System.Net.Http.dll" FileName="SYSTEM~9.DLL|System.Net.Http.dll" Attributes="0" SourcePath="..\bin\System.Net.Http.dll" SelfReg="false" NextFile="System.Net.Sockets.dll"/>
+    <ROW File="System.Net.Sockets.dll" Component_="System.Net.Sockets.dll" FileName="SYSTE~10.DLL|System.Net.Sockets.dll" Attributes="0" SourcePath="..\bin\System.Net.Sockets.dll" SelfReg="false" NextFile="System.Reactive.Core.dll"/>
+    <ROW File="System.Reactive.Core.dll" Component_="System.Reactive.Core.dll" FileName="SYSTE~11.DLL|System.Reactive.Core.dll" Attributes="0" SourcePath="..\bin\System.Reactive.Core.dll" SelfReg="false" NextFile="System.Reactive.Interfaces.dll"/>
+    <ROW File="System.Reactive.Interfaces.dll" Component_="System.Reactive.Interfaces.dll" FileName="SYSTE~12.DLL|System.Reactive.Interfaces.dll" Attributes="0" SourcePath="..\bin\System.Reactive.Interfaces.dll" SelfReg="false" NextFile="System.Reactive.Linq.dll"/>
+    <ROW File="System.Reactive.Linq.dll" Component_="System.Reactive.Linq.dll" FileName="SYSTE~13.DLL|System.Reactive.Linq.dll" Attributes="0" SourcePath="..\bin\System.Reactive.Linq.dll" SelfReg="false" NextFile="System.Reactive.PlatformServices.dll"/>
+    <ROW File="System.Reactive.PlatformServices.dll" Component_="System.Reactive.PlatformServices.dll" FileName="SYSTE~14.DLL|System.Reactive.PlatformServices.dll" Attributes="0" SourcePath="..\bin\System.Reactive.PlatformServices.dll" SelfReg="false" NextFile="System.Reactive.Windows.Threading.dll"/>
+    <ROW File="System.Reactive.Windows.Threading.dll" Component_="System.Reactive.Windows.Threading.dll" FileName="SYSTE~15.DLL|System.Reactive.Windows.Threading.dll" Attributes="0" SourcePath="..\bin\System.Reactive.Windows.Threading.dll" SelfReg="false" NextFile="System.Runtime.InteropServices.RuntimeInformation.dll"/>
+    <ROW File="System.Runtime.InteropServices.RuntimeInformation.dll" Component_="System.Runtime.InteropServices.RuntimeIn" FileName="SYSTE~16.DLL|System.Runtime.InteropServices.RuntimeInformation.dll" Attributes="0" SourcePath="..\bin\System.Runtime.InteropServices.RuntimeInformation.dll" SelfReg="false" NextFile="System.Security.Cryptography.Algorithms.dll"/>
+    <ROW File="System.Security.Cryptography.Algorithms.dll" Component_="System.Security.Cryptography.Algorithms." FileName="SYSTE~17.DLL|System.Security.Cryptography.Algorithms.dll" Attributes="0" SourcePath="..\bin\System.Security.Cryptography.Algorithms.dll" SelfReg="false" NextFile="System.Security.Cryptography.Encoding.dll"/>
+    <ROW File="System.Security.Cryptography.Encoding.dll" Component_="System.Security.Cryptography.Encoding.dl" FileName="SYSTE~18.DLL|System.Security.Cryptography.Encoding.dll" Attributes="0" SourcePath="..\bin\System.Security.Cryptography.Encoding.dll" SelfReg="false" NextFile="System.Security.Cryptography.Primitives.dll"/>
+    <ROW File="System.Security.Cryptography.Primitives.dll" Component_="System.Security.Cryptography.Primitives." FileName="SYSTE~19.DLL|System.Security.Cryptography.Primitives.dll" Attributes="0" SourcePath="..\bin\System.Security.Cryptography.Primitives.dll" SelfReg="false" NextFile="System.Security.Cryptography.X509Certificates.dll"/>
+    <ROW File="System.Security.Cryptography.X509Certificates.dll" Component_="System.Security.Cryptography.X509Certifi" FileName="SYSTE~20.DLL|System.Security.Cryptography.X509Certificates.dll" Attributes="0" SourcePath="..\bin\System.Security.Cryptography.X509Certificates.dll" SelfReg="false"/>
     <ROW File="atksharp.dll" Component_="atksharp.dll" FileName="ATK-SH~1.DLL|atk-sharp.dll" Attributes="0" SourcePath="..\bin\atk-sharp.dll" SelfReg="false" NextFile="Avalonia.Animation.dll"/>
     <ROW File="gdksharp.dll" Component_="gdksharp.dll" FileName="GDK-SH~1.DLL|gdk-sharp.dll" Attributes="0" SourcePath="..\bin\gdk-sharp.dll" SelfReg="false" NextFile="GitCommander.dll"/>
-    <ROW File="git2a5cf255.dll_1" Component_="git2a5cf255.dll" FileName="GIT2-A~1.DLL|git2-a5cf255.dll" Attributes="0" SourcePath="..\bin\lib\win32\x64\git2-a5cf255.dll" SelfReg="false" NextFile="git2a5cf255.dll_2"/>
-    <ROW File="git2a5cf255.dll_2" Component_="git2a5cf255.dll_1" FileName="GIT2-A~1.DLL|git2-a5cf255.dll" Attributes="0" SourcePath="..\bin\lib\win32\x86\git2-a5cf255.dll" SelfReg="false" NextFile="atksharp.dll"/>
     <ROW File="glibsharp.dll" Component_="glibsharp.dll" FileName="GLIB-S~1.DLL|glib-sharp.dll" Attributes="0" SourcePath="..\bin\glib-sharp.dll" SelfReg="false" NextFile="gtksharp.dll"/>
-    <ROW File="gtksharp.dll" Component_="gtksharp.dll" FileName="GTK-SH~1.DLL|gtk-sharp.dll" Attributes="0" SourcePath="..\bin\gtk-sharp.dll" SelfReg="false" NextFile="LibGit2Sharp.dll"/>
+    <ROW File="gtksharp.dll" Component_="gtksharp.dll" FileName="GTK-SH~1.DLL|gtk-sharp.dll" Attributes="0" SourcePath="..\bin\gtk-sharp.dll" SelfReg="false" NextFile="libSkiaSharp.dll"/>
     <ROW File="libSkiaSharp.dll" Component_="libSkiaSharp.dll" FileName="LIBSKI~1.DLL|libSkiaSharp.dll" Attributes="0" SourcePath="..\bin\libSkiaSharp.dll" SelfReg="false" NextFile="MergeConflicPicker.exe"/>
     <ROW File="pangosharp.dll" Component_="pangosharp.dll" FileName="PANGO-~1.DLL|pango-sharp.dll" Attributes="0" SourcePath="..\bin\pango-sharp.dll" SelfReg="false" NextFile="Serilog.dll"/>
   </COMPONENT>

@@ -75,14 +75,14 @@ namespace GitCommander
 				repoURL = line;
 			});
 			
-			var result = Tools.RunExe("git", "rev-parse --git-dir");
+			var result = Tools.RunExe("git", "rev-parse --git-dir", workingDirectory:path);
 			lastResult = result.Item1;
 			lastError = result.Item2;
 			if (!string.IsNullOrEmpty(lastError)) return false;
 			
 			// get repo url
 			repoURL = "";
-			result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback);
+			result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback, workingDirectory:path);
 			lastResult = result.Item1;
 			lastError = result.Item2;
 			
