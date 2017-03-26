@@ -80,7 +80,7 @@ namespace GitItGUI
 			}
 		}
 
-		private static NavigationPage GetActivePage()
+		private static NavigationPage GetActivePageType()
 		{
 			if (CheckForUpdatesPage.singleton.IsVisible) return CheckForUpdatesPage.singleton;
 			else if (StartPage.singleton.IsVisible) return StartPage.singleton;
@@ -113,7 +113,7 @@ namespace GitItGUI
 
 		private static void LoadPage_UIThread(PageTypes type)
 		{
-			NavigationPage pageFrom = GetActivePage();
+			NavigationPage pageFrom = GetActivePageType();
 			CheckForUpdatesPage.singleton.IsVisible = false;
 			StartPage.singleton.IsVisible = false;
 			AppSettingsPage.singleton.IsVisible = false;
@@ -132,7 +132,7 @@ namespace GitItGUI
 			}
 
 			if (pageFrom != null) pageFrom.NavigatedFrom();
-			NavigationPage pageTo = GetActivePage();
+			NavigationPage pageTo = GetActivePageType();
 			pageTo.NavigatedTo();
 		}
 

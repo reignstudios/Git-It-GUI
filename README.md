@@ -5,7 +5,7 @@
 
 - Invokes git commands directly allowing any filters to work (including git-lfs).
 
-- Is writen in C# / AvaloniaUI (should support macOS and Linux soon).
+- Is writen in C# / AvaloniaUI (should support macOS and Linux/UNIX in the future).
 
 - Auto check for .gitignore file.
 

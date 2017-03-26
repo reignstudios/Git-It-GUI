@@ -64,7 +64,7 @@ namespace GitItGUI.Core
 			return nonActiveBranches.ToArray();
 		}
 
-		public static bool Checkout(BranchState branch, StatusUpdateCallbackMethod statusCallback)
+		public static bool Checkout(BranchState branch)
 		{
 			try
 			{
@@ -88,7 +88,7 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static MergeResults MergeBranchIntoActive(BranchState srcBranch, StatusUpdateCallbackMethod statusCallback)
+		public static MergeResults MergeBranchIntoActive(BranchState srcBranch)
 		{
 			MergeResults mergeResult;
 			try

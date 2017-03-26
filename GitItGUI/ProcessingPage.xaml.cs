@@ -46,6 +46,15 @@ namespace GitItGUI
 
 			// load ui
 			statusTextBox = this.Find<TextBox>("statusTextBox");
+
+			// bind events
+			GitCommander.Tools.StdCallback += Tools_StdCallback;
+			GitCommander.Tools.StdErrorCallback += Tools_StdCallback;
+		}
+
+		private void Tools_StdCallback(string line)
+		{
+			if (mode != ProcessingPageModes.None) StatusUpdateCallback(line);
 		}
 
 		public void NavigatedFrom()
@@ -112,7 +121,7 @@ namespace GitItGUI
 			// pull
 			if (mode == ProcessingPageModes.Pull)
 			{
-				var result = ChangesManager.Pull(StatusUpdateCallback);
+				var result = ChangesManager.Pull();
 				if (result == SyncMergeResults.Succeeded)
 				{
 					CheckForFragmentation();
@@ -126,7 +135,7 @@ namespace GitItGUI
 			// push
 			else if (mode == ProcessingPageModes.Push)
 			{
-				if (ChangesManager.Push(StatusUpdateCallback))
+				if (ChangesManager.Push())
 				{
 					CheckForFragmentation();
 				}
@@ -135,7 +144,7 @@ namespace GitItGUI
 			// sync
 			else if (mode == ProcessingPageModes.Sync)
 			{
-				var result = ChangesManager.Sync(StatusUpdateCallback);
+				var result = ChangesManager.Sync();
 				if (result == SyncMergeResults.Succeeded)
 				{
 					CheckForFragmentation();
@@ -174,7 +183,7 @@ namespace GitItGUI
 				});
 
 				// clone repo
-				cloneSucceeded = RepoManager.Clone(cloneURL, clonePath, out clonePath, StatusUpdateCallback, writeUsernameCallback, writePasswordCallback);
+				cloneSucceeded = RepoManager.Clone(cloneURL, clonePath, out clonePath, writeUsernameCallback, writePasswordCallback);
 				if (!cloneSucceeded)
 				{
 					MessageBox.Show("Failed to clone repo: " + clonePath);
@@ -194,12 +203,13 @@ namespace GitItGUI
 			// merge
 			else if (mode == ProcessingPageModes.Merge)
 			{
-				var result = BranchManager.MergeBranchIntoActive(mergeOtherBranch, StatusUpdateCallback);
+				var result = BranchManager.MergeBranchIntoActive(mergeOtherBranch);
 				if (result == MergeResults.Succeeded)
 				{
 					MessageBox.Show("Merge Succedded!\n(Remember to sync with the server!)");
 					MainContent.singleton.tabControlNavigateIndex = 0;
 					MainWindow.LoadPage(PageTypes.MainContent);
+					return;
 				}
 				else if (result == MergeResults.Conflicts)
 				{
@@ -210,7 +220,7 @@ namespace GitItGUI
 			// switch
 			else if (mode == ProcessingPageModes.Switch)
 			{
-				if (!switchOtherBranch.isRemote) BranchManager.Checkout(switchOtherBranch, StatusUpdateCallback);
+				if (!switchOtherBranch.isRemote) BranchManager.Checkout(switchOtherBranch);
 				else if (MessageBox.Show("Cannot checkout to remote branch.\nDo you want to create a local one that tracks this remote instead?", MessageBoxTypes.YesNo))
 				{
 					string newName = switchOtherBranch.name;

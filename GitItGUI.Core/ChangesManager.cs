@@ -308,7 +308,7 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static SyncMergeResults Pull(StatusUpdateCallbackMethod statusCallback)
+		public static SyncMergeResults Pull()
 		{
 			var result = SyncMergeResults.Error;
 
@@ -338,7 +338,7 @@ namespace GitItGUI.Core
 			return result;
 		}
 
-		public static bool Push(StatusUpdateCallbackMethod statusCallback)
+		public static bool Push()
 		{
 			try
 			{
@@ -361,13 +361,12 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static SyncMergeResults Sync(StatusUpdateCallbackMethod statusCallback)
+		public static SyncMergeResults Sync()
 		{
-			if (statusCallback != null) statusCallback("Syncing Started...");
 			isSyncMode = true;
-			var result = Pull(statusCallback);
+			var result = Pull();
 			bool pushPass = false;
-			if (result == SyncMergeResults.Succeeded) pushPass = Push(statusCallback);
+			if (result == SyncMergeResults.Succeeded) pushPass = Push();
 			isSyncMode = false;
 			
 			if (result != SyncMergeResults.Succeeded || !pushPass)

@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 
 namespace GitItGUI.Core
 {
-	public delegate void StatusUpdateCallbackMethod(string status);
-
 	/// <summary>
 	/// Primary git manager
 	/// </summary>
@@ -129,7 +127,7 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool Clone(string url, string destination, out string repoPath, StatusUpdateCallbackMethod statusCallback, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
+		public static bool Clone(string url, string destination, out string repoPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
 			try
 			{
