@@ -437,8 +437,10 @@ namespace GitItGUI.Core
 				}
 
 				// save local temp files
+				Debug.pauseGitCommanderStdWrites = true;
 				if (!Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs)) throw new Exception(Repository.lastError);
 				if (!Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs)) throw new Exception(Repository.lastError);
+				Debug.pauseGitCommanderStdWrites = false;
 				fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
 				fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
 
@@ -598,6 +600,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
+				Debug.pauseGitCommanderStdWrites = false;
 				Debug.LogError("Failed to resolve file: " + e.Message, true);
 				DeleteTempMergeFiles();
 				return false;
@@ -629,7 +632,9 @@ namespace GitItGUI.Core
 				}
 
 				// get info and save orig file
+				Debug.pauseGitCommanderStdWrites = true;
 				if (!Repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(Repository.lastError);
+				Debug.pauseGitCommanderStdWrites = false;
 				fullPathOrig = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOrig;
 
 				// open diff tool
@@ -650,6 +655,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception ex)
 			{
+				Debug.pauseGitCommanderStdWrites = false;
 				Debug.LogError("Failed to start Diff tool: " + ex.Message, true);
 				DeleteTempDiffFiles();
 				return false;

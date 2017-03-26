@@ -20,6 +20,7 @@ namespace GitItGUI.Core
 
 		private static Stream stream;
 		private static StreamWriter writer;
+		public static bool pauseGitCommanderStdWrites;
 
 		static Debug()
 		{
@@ -49,7 +50,7 @@ namespace GitItGUI.Core
 
 		private static void Tools_StdCallback(string line)
 		{
-			Log(line);
+			if (!pauseGitCommanderStdWrites) Log(line);
 		}
 
 		private static void Tools_StdWarningCallback(string line)
