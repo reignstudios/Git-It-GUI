@@ -104,7 +104,9 @@ namespace GitItGUI.Core
 				if (fileState.IsState(FileStates.ModifiedInWorkdir) || fileState.IsState(FileStates.ModifiedInIndex))
 				{
 					string diff;
+					Debug.pauseGitCommanderStdWrites = true;
 					if (!Repository.GetDiff(fileState.filename, out diff)) throw new Exception(Repository.lastError);
+					Debug.pauseGitCommanderStdWrites = false;
 
 					// remove meta data stage 1
 					var match = Regex.Match(diff, @"@@.*?(@@).*?\n(.*)", RegexOptions.Singleline);
@@ -145,6 +147,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
+				Debug.pauseGitCommanderStdWrites = false;
 				Debug.LogError("Failed to refresh quick view: " + e.Message, true);
 				return null;
 			}
