@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GitItGUI.Core;
+using GitCommander.System;
 using Win = System.Windows.Forms;
 
 namespace GitItGUI

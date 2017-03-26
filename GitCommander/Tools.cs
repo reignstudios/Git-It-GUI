@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using GitCommander.System;
 
 namespace GitCommander
 {
@@ -40,6 +41,11 @@ namespace GitCommander
 				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.CreateNoWindow = true;
 				process.StartInfo.UseShellExecute = false;
+
+				if (PlatformSettings.platform == Platforms.Mac)
+				{
+					process.StartInfo.EnvironmentVariables["PATH"] = "/usr/local/bin";
+				}
 
 				FileStream stdOutStream = null;
 				StreamWriter stdOutStreamWriter = null;

@@ -1,4 +1,5 @@
 ﻿using GitCommander;
+using GitCommander.System;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -365,7 +366,7 @@ namespace GitItGUI.Core
 				// git and git-lfs versions
 				string gitVersion = null, gitlfsVersion = null;
 				string gitlfsRequiredGitVersion = "0.0.0.0";
-				const string minGitVersion = "2.11.1", minGitLFSVersion = "1.5.5";
+				const string minGitVersion = "2.11.0", minGitLFSVersion = "1.5.5";
 
 				// get git version string
 				try
@@ -407,11 +408,11 @@ namespace GitItGUI.Core
 				}
 				
 				// grab lfs and required git version value
-				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; windows amd64; go (.*); git ");
+				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; (.*) amd64; go (.*); git ");
 				if (match.Success && match.Groups.Count == 3)
 				{
 					gitlfsVersion = match.Groups[1].Value;
-					gitlfsRequiredGitVersion = match.Groups[2].Value;
+					gitlfsRequiredGitVersion = match.Groups[3].Value;
 				}
 				else
 				{

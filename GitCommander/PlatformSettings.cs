@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace GitItGUI.Core
+namespace GitCommander.System
 {
 	public enum Platforms
 	{
@@ -37,7 +32,7 @@ namespace GitItGUI.Core
 					platform = Platforms.Mac;
 					appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 					break;
-					
+
 				case PlatformID.Unix:
 					platform = IsUnixMac() ? Platforms.Mac : Platforms.Linux;
 					appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
