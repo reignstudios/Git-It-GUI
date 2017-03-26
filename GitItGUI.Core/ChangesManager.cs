@@ -319,10 +319,7 @@ namespace GitItGUI.Core
 					Debug.LogWarning("Branch is not tracking a remote!", true);
 					return SyncMergeResults.Error;
 				}
-
-				// check for git settings file not in repo history
-				RepoManager.DeleteRepoSettingsIfUnCommit();
-
+				
 				// pull changes
 				var stdCallback = new StdCallbackMethod(delegate (string line)
 				{
@@ -336,7 +333,7 @@ namespace GitItGUI.Core
 
 				result = Repository.Pull(stdCallback, stdErrorCallback) ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
 				result = ConflictsExist() ? SyncMergeResults.Conflicts : result;
-
+				
 				if (result == SyncMergeResults.Conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
 				else if (result == SyncMergeResults.Succeeded) Debug.Log("Pull Succeeded!", !isSyncMode);
 				else Debug.Log("Pull Error!", !isSyncMode);

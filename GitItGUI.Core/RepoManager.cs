@@ -129,22 +129,6 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		internal static void DeleteRepoSettingsIfUnCommit()
-		{
-			// check for git settings file not in repo history
-			string settingsPath = Repository.repoPath + Path.DirectorySeparatorChar + Settings.repoSettingsFilename;
-			if (File.Exists(settingsPath))
-			{
-				FileState fileState;
-				if (!Repository.GetFileState(Settings.repoSettingsFilename, out fileState)) throw new Exception(Repository.lastError);
-				if (fileState.IsState(FileStates.NewInWorkdir))
-				{
-					File.Delete(settingsPath);
-					while (File.Exists(settingsPath)) Thread.Sleep(250);
-				}
-			}
-		}
-
 		public static bool Clone(string url, string destination, out string repoPath, StatusUpdateCallbackMethod statusCallback, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
 			try

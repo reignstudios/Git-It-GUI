@@ -68,10 +68,6 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				// check for git settings file not in repo history
-				RepoManager.DeleteRepoSettingsIfUnCommit();
-
-				// checkout
 				if (activeBranch.name != branch.name)
 				{
 					if (!Repository.CheckoutExistingBranch(branch.name)) throw new Exception(Repository.lastError);
@@ -97,11 +93,8 @@ namespace GitItGUI.Core
 			MergeResults mergeResult;
 			try
 			{
-				// check for git settings file not in repo history
-				RepoManager.DeleteRepoSettingsIfUnCommit();
-
-				// merge
 				if (!Repository.MergeBranchIntoActive(srcBranch.name)) throw new Exception(Repository.lastError);
+
 				bool yes;
 				if (!Repository.ConflitedExist(out yes)) throw new Exception(Repository.lastError);
 				mergeResult = yes ? MergeResults.Conflicts : MergeResults.Succeeded;
