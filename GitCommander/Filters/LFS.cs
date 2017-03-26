@@ -12,8 +12,7 @@ namespace GitCommander
 		{
 			private static bool SimpleLFSInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 			{
-				args = (string.IsNullOrEmpty(args) ? "lfs" : "lfs ") + args;
-				var result = Tools.RunExe("git", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+				var result = Tools.RunExe("git-lfs", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
 				lastResult = result.stdResult;
 				lastError = result.stdErrorResult;
 

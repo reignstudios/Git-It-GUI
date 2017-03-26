@@ -15,6 +15,8 @@ namespace GitCommander
 
 	public static class Tools
 	{
+		public static event StdCallbackMethod StdCallback, StdErrorCallback;
+
 		public static (string stdResult, string stdErrorResult) RunExe(string exe, string arguments, string workingDirectory = null, StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null, bool stdResultOn = true, string stdOutToFilePath = null)
 		{
 			if (stdCallback != null) stdResultOn = false;
@@ -43,32 +45,34 @@ namespace GitCommander
 				
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (stdOutToFilePath != null && e.Data != null)
+					if (e.Data == null) return;
+
+					if (stdOutToFilePath != null)
 					{
 						stdOutStreamWriter.WriteLine(e.Data);
 						stdOutStreamWriter.Flush();
 						stdOutStream.Flush();
 					}
-
-					if (!string.IsNullOrEmpty(e.Data))
+					
+					if (stdCallback != null) stdCallback(e.Data);
+					if (stdResultOn)
 					{
-						if (stdCallback != null) stdCallback(e.Data);
-						if (stdResultOn)
-						{
-							if (output.Length != 0) output += Environment.NewLine;
-							output += e.Data;
-						}
+						if (output.Length != 0) output += Environment.NewLine;
+						output += e.Data;
 					}
+
+					if (StdCallback != null) StdCallback(e.Data);
 				};
 
 				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
-					if (!string.IsNullOrEmpty(e.Data))
-					{
-						if (stdErrorCallback != null) stdErrorCallback(e.Data);
-						if (errors.Length != 0) errors += Environment.NewLine;
-						errors += e.Data;
-					}
+					if (e.Data == null) return;
+
+					if (stdErrorCallback != null) stdErrorCallback(e.Data);
+					if (errors.Length != 0) errors += Environment.NewLine;
+					errors += e.Data;
+
+					if (StdErrorCallback != null) StdErrorCallback(e.Data);
 				};
 
 				// start process
