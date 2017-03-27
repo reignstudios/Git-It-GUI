@@ -68,5 +68,11 @@ namespace GitCommander.System
 			else programFilesx86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 			programFilesx64 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles).Replace(" (x86)", "");
 		}
+
+		public static string ConvertPathToPlatform(string path)
+		{
+			if (platform == Platforms.Windows) return path.Replace('/', '\\');
+			else return path;
+		}
 	}
 }

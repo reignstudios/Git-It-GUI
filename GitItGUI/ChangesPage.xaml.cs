@@ -273,7 +273,7 @@ namespace GitItGUI
 			{
 				if (PlatformSettings.platform == Platforms.Windows)
 				{
-					System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", Repository.repoPath, fileState.filename));
+					System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", Repository.repoPath, PlatformSettings.ConvertPathToPlatform(fileState.filename)));
 				}
 				else
 				{
@@ -292,7 +292,7 @@ namespace GitItGUI
 			{
 				if (PlatformSettings.platform == Platforms.Windows)
 				{
-					System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", Repository.repoPath, fileState.filename));
+					System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", Repository.repoPath, PlatformSettings.ConvertPathToPlatform(fileState.filename)));
 				}
 				else
 				{
