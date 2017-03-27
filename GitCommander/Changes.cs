@@ -252,6 +252,11 @@ namespace GitCommander
 			return SimpleGitInvoke("fetch");
 		}
 
+		public static bool Fetch(string remote, string branch)
+		{
+			return SimpleGitInvoke(string.Format("fetch {0} {1}", remote, branch));
+		}
+
 		public static bool Pull()
 		{
 			return SimpleGitInvoke("pull");
