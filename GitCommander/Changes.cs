@@ -137,10 +137,24 @@ namespace GitCommander
 			{
 				bool pass = addState("\tnew file:", FileStates.NewInIndex);
 				if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
+				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromIndex);
+				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInIndex);
+				// TODO: check for valid unhanled types
+				//if (!pass)
+				//{
+				//	var match = Regex.Match(line, @"\t(.*):");
+				//	if (match.Success)
+				//	{
+						
+				//		return false;
+				//	}
+				//}
 			}
 			else if (mode == 1)
 			{
-				addState("\tmodified:", FileStates.ModifiedInWorkdir);
+				bool pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
+				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromWorkdir);
+				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInWorkdir);
 			}
 			else if (mode == 2)
 			{

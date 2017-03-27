@@ -101,10 +101,11 @@ namespace GitCommander
 					if (line == null) return;
 
 					// valid true error
+					string lineLower = line.ToLower();
 					bool isError = false;
 					foreach (var prefix in errorPrefixes)
 					{
-						if (line.StartsWith(prefix))
+						if (lineLower.StartsWith(prefix))
 						{
 							isError = true;
 							break;
