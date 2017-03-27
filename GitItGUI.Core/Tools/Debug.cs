@@ -79,7 +79,11 @@ namespace GitItGUI.Core
 			lock (stream)
 			{
 				string msg = value.ToString();
+
+				#if DEBUG
 				Console.WriteLine(msg);
+				#endif
+
 				if (writer != null) writer.WriteLine(msg);
 				if (debugLogCallback != null) debugLogCallback(value, alert);
 			}
@@ -90,7 +94,11 @@ namespace GitItGUI.Core
 			lock (stream)
 			{
 				string msg = "WARNING: " + value.ToString();
+
+				#if DEBUG
 				Console.WriteLine(msg);
+				#endif
+
 				if (writer != null) writer.WriteLine(msg);
 				if (debugLogWarningCallback != null) debugLogWarningCallback(value, alert);
 			}
@@ -101,7 +109,11 @@ namespace GitItGUI.Core
 			lock (stream)
 			{
 				string msg = "ERROR: " + value.ToString();
+
+				#if DEBUG
 				Console.WriteLine(msg);
+				#endif
+
 				if (writer != null) writer.WriteLine(msg);
 				if (debugLogErrorCallback != null) debugLogErrorCallback(value, alert);
 			}
