@@ -20,8 +20,9 @@
 			<Button Name="removeTrackingButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,250,-180,-250" Width="75" ToolTip.Tip="Remove tracking from 'Active' branch">Remove</Button>
 
 			<TextBlock Name="newBranchLabel" FontSize="18" Margin="0,320,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">--- Create New Branch ---</TextBlock>
-			<Button Name="addBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,360,-100,-360" Width="75" ToolTip.Tip="Add new branch based off 'Active'?">Add</Button>
-			<DropDown Name="remotesDropDown" VerticalAlignment="Top" Margin="180,360,0,-360" Height="28" ToolTip.Tip="Rename 'Active' branch?"/>
+			<TextBlock Name="newBranchDropdownLabel" Width="82" Height="32" Margin="10,360,10,-360" TextAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Top">Remotes:</TextBlock>
+			<Button Name="addBranchButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,390,-100,-390" Width="75" ToolTip.Tip="Add new branch forked off 'Active'?">Add</Button>
+			<DropDown Name="remotesDropDown" VerticalAlignment="Top" Margin="100,360,0,-360" Height="28"/>
 
 			<CheckBox Name="advancedModeCheckBox" Margin="10" HorizontalContentAlignment="Left" VerticalAlignment="Bottom">Advanced Mode</CheckBox>
 		</Grid>

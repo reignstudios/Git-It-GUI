@@ -311,6 +311,60 @@ namespace GitItGUI.Core
 			return true;
 		}
 
+		public static bool Fetch()
+		{
+			try
+			{
+				if (BranchManager.activeBranch.isTracking)
+				{
+					if (!Repository.Fetch()) throw new Exception(Repository.lastError);
+				}
+				else if (BranchManager.activeBranch.isRemote)
+				{
+					if (!Repository.Fetch(BranchManager.activeBranch.remoteState.name, BranchManager.activeBranch.name)) throw new Exception(Repository.lastError);
+				}
+				else
+				{
+					Debug.LogError("Cannot fetch local only branch");
+					return false;
+				}
+
+				return true;
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Fetch error: " + e.Message, true);
+				return false;
+			}
+		}
+
+		public static bool Fetch(BranchState branch)
+		{
+			try
+			{
+				if (branch.fullname == BranchManager.activeBranch.fullname)
+				{
+					if (!Repository.Fetch()) throw new Exception(Repository.lastError);
+				}
+				else if (branch.isRemote)
+				{
+					if (!Repository.Fetch(branch.remoteState.name, branch.name)) throw new Exception(Repository.lastError);
+				}
+				else
+				{
+					Debug.LogError("Cannot fetch local only branch");
+					return false;
+				}
+
+				return true;
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Fetch error: " + e.Message, true);
+				return false;
+			}
+		}
+
 		public static SyncMergeResults Pull()
 		{
 			var result = SyncMergeResults.Error;
@@ -399,6 +453,11 @@ namespace GitItGUI.Core
 				Debug.LogError("Failed to get file conflicts: " + e.Message, true);
 				return false;
 			}
+		}
+
+		public static bool ChangesExist()
+		{
+			return fileStates.Length != 0;
 		}
 
 		public static bool ResolveAllConflicts(bool refresh = true)

@@ -15,7 +15,7 @@ namespace GitItGUI
 		public static BranchesPage singleton;
 
 		// ui objects
-		TextBlock trackingLabel, trackedBranchLabel, remoteURLLabel, newBranchLabel;
+		TextBlock trackingLabel, trackedBranchLabel, remoteURLLabel, newBranchLabel, newBranchDropdownLabel;
 		TextBox activeBranchTextBox, trackingOriginTextBox, remoteURLTextBox;
 		ListBox otherBranchListView;
 		Button addBranchButton, renameBranchButton, copyTrackingButton, removeTrackingButton, switchBranchButton, mergeBranchButton, deleteBranchButton;
@@ -46,6 +46,7 @@ namespace GitItGUI
 			trackedBranchLabel = this.Find<TextBlock>("trackedBranchLabel");
 			remoteURLLabel = this.Find<TextBlock>("remoteURLLabel");
 			newBranchLabel = this.Find<TextBlock>("newBranchLabel");
+			newBranchDropdownLabel = this.Find<TextBlock>("newBranchDropdownLabel");
 			remotesDropDown = this.Find<DropDown>("remotesDropDown");
 
 			// apply bindings
@@ -103,6 +104,7 @@ namespace GitItGUI
 			trackedBranchLabel.IsVisible = isAdvancedMode;
 			remoteURLLabel.IsVisible = isAdvancedMode;
 			newBranchLabel.IsVisible = isAdvancedMode;
+			newBranchDropdownLabel.IsVisible = isAdvancedMode;
 			remotesDropDown.IsVisible = isAdvancedMode;
 
 			// fill remotes drop down
@@ -182,7 +184,7 @@ namespace GitItGUI
 			}
 
 			var branch = BranchManager.GetNonActiveBranches(advancedModeCheckBox.IsChecked)[otherBranchListView.SelectedIndex];
-			if (!BranchManager.activeBranch.isRemote)
+			if (!branch.isRemote)
 			{
 				Debug.Log("Branch selected is not a 'Remote'", true);
 				return;
@@ -229,7 +231,7 @@ namespace GitItGUI
 
 			if (MessageBox.Show(string.Format("Would you like to fetch remote '{0}' changes before merging?", branch.fullname), MessageBoxTypes.YesNo))
 			{
-				if (!BranchManager.Fetch(branch)) return;
+				if (!ChangesManager.Fetch(branch)) return;
 			}
 
 			ProcessingPage.singleton.mode = ProcessingPageModes.Merge;

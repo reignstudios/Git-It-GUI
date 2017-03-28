@@ -205,31 +205,27 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool Fetch(BranchState branch)
+		public static bool IsUpToDateWithRemote(out bool yes)
 		{
+			if (!activeBranch.isTracking)
+			{
+				yes = true;
+				return true;
+			}
+
 			try
 			{
-				if (branch.fullname == activeBranch.fullname)
-				{
-					if (!Repository.Fetch()) throw new Exception(Repository.lastError);
-				}
-				else if (branch.isRemote)
-				{
-					if (!Repository.Fetch(branch.remoteState.name, branch.name)) throw new Exception(Repository.lastError);
-				}
-				else
-				{
-					Debug.LogError("Cannot fetch local only branch");
-					return false;
-				}
-
-				return true;
+				if (!Repository.Fetch(activeBranch.tracking.remoteState.name, activeBranch.tracking.name)) throw new Exception(Repository.lastError);
+				if (!Repository.IsUpToDateWithRemote(out yes)) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Fetch error: " + e.Message, true);
+				Debug.LogError("Remove Branch Error: " + e.Message, true);
+				yes = false;
 				return false;
 			}
+			
+			return true;
 		}
 	}
 }

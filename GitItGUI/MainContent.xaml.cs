@@ -63,7 +63,15 @@ namespace GitItGUI
 		private void RepoManager_RepoRefreshedCallback_UIThread()
 		{
 			string name = Repository.repoPath;
-			if (!string.IsNullOrEmpty(name)) repoName.Text = string.Format("{0} ({1})", name.Substring(Path.GetDirectoryName(name).Length + 1), BranchManager.activeBranch.fullname);
+			if (!string.IsNullOrEmpty(name))
+			{
+				string syncText = "";
+				bool yes;
+				if (ChangesManager.ChangesExist()) syncText = " - [changes exist]";
+				else if (BranchManager.IsUpToDateWithRemote(out yes)) syncText = yes ? "" : " - [out of sync]";
+				else syncText = " - [sync check error]";
+				repoName.Text = string.Format("{0} ({1}){2}", name.Substring(Path.GetDirectoryName(name).Length + 1), BranchManager.activeBranch.fullname, syncText);
+			}
 			else repoName.Text = "";
 		}
 
