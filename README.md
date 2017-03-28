@@ -21,6 +21,8 @@
 
 Note: This is built using the nightly builds of Avalonia: https://github.com/AvaloniaUI/Avalonia/wiki/Using-nightly-build-feed
 
+LOGS: These will be stored in "C:\ProgramData\GitItGUI\logs.txt" on windows
+
 macOS NOTE: To debug you need to:
     - Install git via homebrew: "brew install git" and "brew install git-lfs"
     - Set "VS for Mac" Enviroment var in proj settings: "PATH" = "/usr/local/bin"
