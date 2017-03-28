@@ -204,5 +204,32 @@ namespace GitItGUI.Core
 			RepoManager.Refresh();
 			return true;
 		}
+
+		public static bool Fetch(BranchState branch)
+		{
+			try
+			{
+				if (branch.fullname == activeBranch.fullname)
+				{
+					if (!Repository.Fetch()) throw new Exception(Repository.lastError);
+				}
+				else if (branch.isRemote)
+				{
+					if (!Repository.Fetch(branch.remoteState.name, branch.name)) throw new Exception(Repository.lastError);
+				}
+				else
+				{
+					Debug.LogError("Cannot fetch local only branch");
+					return false;
+				}
+
+				return true;
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Fetch error: " + e.Message, true);
+				return false;
+			}
+		}
 	}
 }

@@ -227,6 +227,11 @@ namespace GitItGUI
 
 			if (!MessageBox.Show(string.Format("Are you sure you want to merge branch '{0}' into '{1}'?", branch.fullname, BranchManager.activeBranch.fullname), MessageBoxTypes.YesNo)) return;
 
+			if (MessageBox.Show(string.Format("Would you like to fetch remote '{0}' changes before merging?", branch.fullname), MessageBoxTypes.YesNo))
+			{
+				if (!BranchManager.Fetch(branch)) return;
+			}
+
 			ProcessingPage.singleton.mode = ProcessingPageModes.Merge;
 			ProcessingPage.singleton.mergeOtherBranch = branch;
 			MainWindow.LoadPage(PageTypes.Processing);
