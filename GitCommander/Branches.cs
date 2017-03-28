@@ -268,17 +268,19 @@ namespace GitCommander
 			return SimpleGitInvoke("merge " + branch);
 		}
 
-		public static bool IsUpToDateWithRemote(out bool yes)
+		public static bool IsUpToDateWithRemote(string remote, string branch, out bool yes)
 		{
 			yes = true;
 			bool isUpToDate = true;
 			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
-				var match = Regex.Match(line, @"Your branch is ahead of '(.*)' by (\d*) commit.");
+				//var match = Regex.Match(line, @"Your branch is ahead of '(.*)' by (\d*) commit.");
+				var match = Regex.Match(line, @"commit (.*)");
 				if (match.Success) isUpToDate = false;
 			});
 
-			var result = Tools.RunExe("git", "status", stdCallback:stdCallback);
+			//var result = Tools.RunExe("git", "status", stdCallback:stdCallback);
+			var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback:stdCallback);
 			lastResult = result.Item1;
 			lastError = result.Item2;
 

@@ -215,8 +215,8 @@ namespace GitItGUI.Core
 
 			try
 			{
-				if (!Repository.Fetch(activeBranch.tracking.remoteState.name, activeBranch.tracking.name)) throw new Exception(Repository.lastError);
-				if (!Repository.IsUpToDateWithRemote(out yes)) throw new Exception(Repository.lastError);
+				//if (!Repository.Fetch(activeBranch.tracking.remoteState.name, activeBranch.tracking.name)) throw new Exception(Repository.lastError);
+				if (!Repository.IsUpToDateWithRemote(activeBranch.tracking.remoteState.name, activeBranch.tracking.name, out yes)) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
