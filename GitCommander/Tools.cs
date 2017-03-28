@@ -27,6 +27,12 @@ namespace GitCommander
 				"fatal:"
 			};
 		}
+
+		public static void AddErrorCode(string errorCode)
+		{
+			errorCode = errorCode.ToLower();
+			if (!errorPrefixes.Contains(errorCode)) errorPrefixes.Add(errorCode);
+		}
 		
 		public static Tuple<string, string> RunExe
 		(
@@ -52,7 +58,9 @@ namespace GitCommander
 				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.CreateNoWindow = true;
 				process.StartInfo.UseShellExecute = false;
-
+				process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+				process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+				
 				FileStream stdOutStream = null;
 				StreamWriter stdOutStreamWriter = null;
 				if (stdOutToFilePath != null)

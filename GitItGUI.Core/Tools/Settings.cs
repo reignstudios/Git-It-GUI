@@ -8,9 +8,9 @@ namespace GitItGUI.Core
 {
 	namespace XML
 	{
-		public class Repository
+		public class CustomErrorCodes
 		{
-			[XmlText] public string path = "";
+			[XmlElement("ErrorCode")] public List<string> errorCodes = new List<string>();
 		}
 
 		[XmlRoot("AppSettings")]
@@ -18,7 +18,8 @@ namespace GitItGUI.Core
 		{
 			[XmlAttribute("MergeDiffTool")] public string mergeDiffTool = "P4Merge";
 			[XmlAttribute("AutoRefreshChanges")] public bool autoRefreshChanges = true;
-			[XmlElement("Repository")] public List<Repository> repositories = new List<Repository>();
+			[XmlElement("CustomErrorCodes")] public CustomErrorCodes customErrorCodes = new CustomErrorCodes();
+			[XmlElement("Repository")] public List<string> repositories = new List<string>();
 			[XmlElement("DefaultGitLFS-Ext")] public List<string> defaultGitLFS_Exts = new List<string>();
 		}
 	}

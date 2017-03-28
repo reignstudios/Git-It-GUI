@@ -40,7 +40,7 @@ namespace GitItGUI.Core
 		public static string mergeToolPath {get; private set;}
 		public static MergeDiffTools mergeDiffTool {get; private set;}
 		public static bool autoRefreshChanges;
-		public static IReadOnlyList<XML.Repository> repositories {get{return settings.repositories;}}
+		public static IReadOnlyList<string> repositories {get{return settings.repositories;}}
 
 		public static int MaxRepoHistoryCount = 20;
 
@@ -69,6 +69,15 @@ namespace GitItGUI.Core
 				// load settings
 				char seperator = Path.DirectorySeparatorChar;
 				settings = Settings.Load<XML.AppSettings>(PlatformSettings.appDataPath + seperator + Settings.appSettingsFolderName + seperator + Settings.appSettingsFilename);
+
+				// add custom error codes to git commander
+				if (settings.customErrorCodes != null)
+				{
+					foreach (var code in settings.customErrorCodes.errorCodes)
+					{
+						GitCommander.Tools.AddErrorCode(code);
+					}
+				}
 
 				// apply default lfs ignore types
 				var lowerCase = new List<string>()
@@ -174,7 +183,7 @@ namespace GitItGUI.Core
 		{
 			foreach (var repo in settings.repositories)
 			{
-				if (repo.path == repoPath)
+				if (repo == repoPath)
 				{
 					settings.repositories.Remove(repo);
 					return;
@@ -185,16 +194,11 @@ namespace GitItGUI.Core
 		internal static void AddActiveRepoToHistory()
 		{
 			// add if doesn't exist
-			var item = new XML.Repository()
-			{
-				path = Repository.repoPath
-			};
-
-			XML.Repository found = null;
+			string found = null;
 			int index = 0;
 			foreach (var repo in settings.repositories)
 			{
-				if (repo.path == item.path)
+				if (repo == Repository.repoPath)
 				{
 					found = repo;
 					break;
@@ -205,7 +209,7 @@ namespace GitItGUI.Core
 
 			if (found == null)
 			{
-				settings.repositories.Insert(0, item);
+				settings.repositories.Insert(0, Repository.repoPath);
 			}
 			else if (index != 0) 
 			{

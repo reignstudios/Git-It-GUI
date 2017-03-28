@@ -303,7 +303,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to commit: " + e.Message);
+				Debug.LogError("Failed to commit: " + e.Message, true);
 				return false;
 			}
 

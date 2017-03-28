@@ -53,7 +53,7 @@ namespace GitItGUI
 			foreach (var repo in AppManager.repositories)
 			{
 				var button = new Button();
-				button.Content = repo.path;
+				button.Content = repo;
 				button.Click += RecentButton_Click;
 				recentStackPanel.Children.Add(button);
 			}
