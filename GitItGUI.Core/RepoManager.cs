@@ -66,17 +66,7 @@ namespace GitItGUI.Core
 					if (!File.Exists(gitIgnorePath))
 					{
 						Debug.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
-						string text = string.Format("*{0}", Settings.repoUserSettingsFilename);
-						File.WriteAllText(gitIgnorePath, text);
-					}
-					else
-					{
-						string text = File.ReadAllText(gitIgnorePath);
-						if (!text.Contains("*" + Settings.repoUserSettingsFilename))
-						{
-							text += string.Format("{0}{0}*{1}", Environment.NewLine, Settings.repoUserSettingsFilename);
-							File.WriteAllText(gitIgnorePath, text);
-						}
+						File.WriteAllText(gitIgnorePath, "");
 					}
 				}
 				
