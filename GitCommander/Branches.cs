@@ -23,8 +23,9 @@ namespace GitCommander
 		public bool isActive {get; internal set;}
 		public bool isRemote {get; internal set;}
 		public bool isTracking {get; internal set;}
-		public bool isHeadRef {get; internal set;}
-		public BranchInfo headRef {get; internal set;}
+		public bool isHead {get; internal set;}
+		public bool isHeadDetached {get; internal set;}
+		public BranchInfo headPtr {get; internal set;}
 		public BranchInfo tracking {get; internal set;}
 
 		public override string ToString()
@@ -110,7 +111,7 @@ namespace GitCommander
 				// state vars
 				string name, fullname, trackingBranchName = null, trackingBranchFullName = null, trackingBranchRemoteName = null;
 				string remoteName = null, headPtrName = null, headPtrFullName = null, headPtrRemoteName = null;
-				bool isRemote = false, isHead = false, isTracking = false;
+				bool isRemote = false, isHead = false, headPtrExists = false, isHeadDetached = false, isTracking = false;
 
 				// get name and tracking info
 				var match = Regex.Match(line, @"remotes/(.*)/HEAD\s*->\s*(\S*)");
@@ -118,6 +119,7 @@ namespace GitCommander
 				{
 					isRemote = true;
 					isHead = true;
+					headPtrExists = true;
 					name = "HEAD";
 					fullname = "remotes/" + match.Groups[1].Value + '/' + name;
 					headPtrFullName = match.Groups[2].Value;
@@ -131,33 +133,49 @@ namespace GitCommander
 				}
 				else
 				{
-					match = Regex.Match(line, @"(\S*).*\[(.*)\]");
+					match = Regex.Match(line, @"\(HEAD detached at (.*)/(.*)\)");
 					if (match.Success)
 					{
-						isTracking = true;
-						fullname = match.Groups[1].Value;
-						name = fullname;
-						
-						string trackedBranch = match.Groups[2].Value;
-						trackingBranchFullName = trackedBranch.Contains(":") ? trackedBranch.Split(':')[0] : trackedBranch;
-						var values = trackingBranchFullName.Split('/');
-						if (values.Length == 2)
-						{
-							trackingBranchRemoteName = values[0];
-							trackingBranchName = values[1];
-						}
+						isHead = true;
+						isHeadDetached = true;
+						isRemote = true;
+						name = "HEAD";
+						remoteName = match.Groups[1].Value;
+						fullname = remoteName + '/' + name;
+
+						headPtrRemoteName = remoteName;
+						headPtrName = match.Groups[2].Value;
 					}
 					else
 					{
-						match = Regex.Match(line, @"(\S*)");
+						match = Regex.Match(line, @"(\S*).*\[(.*)\]");
 						if (match.Success)
 						{
+							isTracking = true;
 							fullname = match.Groups[1].Value;
 							name = fullname;
+						
+							string trackedBranch = match.Groups[2].Value;
+							trackingBranchFullName = trackedBranch.Contains(":") ? trackedBranch.Split(':')[0] : trackedBranch;
+							var values = trackingBranchFullName.Split('/');
+							if (values.Length == 2)
+							{
+								trackingBranchRemoteName = values[0];
+								trackingBranchName = values[1];
+							}
 						}
 						else
 						{
-							return;
+							match = Regex.Match(line, @"(\S*)");
+							if (match.Success)
+							{
+								fullname = match.Groups[1].Value;
+								name = fullname;
+							}
+							else
+							{
+								return;
+							}
 						}
 					}
 				}
@@ -170,6 +188,7 @@ namespace GitCommander
 					remoteName = match.Groups[1].Value;
 					name = match.Groups[2].Value;
 					fullname = remoteName + '/' + name;
+					if (name == "HEAD") isHead = true;
 				}
 
 				// create branch object
@@ -179,7 +198,8 @@ namespace GitCommander
 					fullname = fullname,
 					isActive = isActive,
 					isRemote = isRemote,
-					isHeadRef = isHead,
+					isHead = isHead,
+					isHeadDetached = isHeadDetached,
 					isTracking = isTracking,
 				};
 
@@ -189,9 +209,9 @@ namespace GitCommander
 				}
 
 				// fill head info
-				if (isHead)
+				if (headPtrExists)
 				{
-					branch.headRef = new BranchInfo()
+					branch.headPtr = new BranchInfo()
 					{
 						name = headPtrName,
 						fullname = headPtrFullName
@@ -199,7 +219,7 @@ namespace GitCommander
 
 					if (!string.IsNullOrEmpty(headPtrRemoteName))
 					{
-						branch.headRef.remoteState = new RemoteState() {name = headPtrRemoteName};
+						branch.headPtr.remoteState = new RemoteState() {name = headPtrRemoteName};
 					}
 				}
 
@@ -236,7 +256,7 @@ namespace GitCommander
 			{
 				string url;
 				if (state.remoteState != null && GetRemoteURL(state.remoteState.name, out url)) state.remoteState.url = url;
-				if (state.headRef != null && state.headRef.remoteState != null && GetRemoteURL(state.headRef.remoteState.name, out url)) state.headRef.remoteState.url = url;
+				if (state.headPtr != null && state.headPtr.remoteState != null && GetRemoteURL(state.headPtr.remoteState.name, out url)) state.headPtr.remoteState.url = url;
 				if (state.tracking != null && state.tracking.remoteState != null && GetRemoteURL(state.tracking.remoteState.name, out url)) state.tracking.remoteState.url = url;
 			}
 

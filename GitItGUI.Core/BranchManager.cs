@@ -28,6 +28,11 @@ namespace GitItGUI.Core
 
 				// find active branch
 				activeBranch = Array.Find<BranchState>(branchStates, x => x.isActive);
+				if (activeBranch.isRemote)
+				{
+					Debug.LogError("Active repo branch cannot be a remote: " + activeBranch.fullname, true);
+					return false;
+				}
 
 				// gather remotes
 				RemoteState[] rStates;
