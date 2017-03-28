@@ -121,32 +121,9 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				// get repo name
-				var match = Regex.Match(url, @"(.*)/(.*\.git)");
-				repoPath = null;
-				if (match.Groups.Count == 3 && !string.IsNullOrEmpty(match.Groups[2].Value))
-				{
-					repoPath = match.Groups[2].Value.Replace(".git", "");
-					repoPath = Path.Combine(destination, repoPath);
-				}
-				else
-				{
-					Debug.LogError("Failed to parse url for repo name: " + url, true);
-					return false;
-				}
-
-				// valid folder is free
-				if (Directory.Exists(repoPath))
-				{
-					Debug.LogError("Folder already exists: " + repoPath, true);
-					return false;
-				}
-
-				// create folder
-				Directory.CreateDirectory(repoPath);
-
 				// clone
-				if (!Repository.Clone(url, repoPath, writeUsernameCallback, writePasswordCallback)) throw new Exception(Repository.lastError);
+				if (!Repository.Clone(url, destination, out repoPath, writeUsernameCallback, writePasswordCallback)) throw new Exception(Repository.lastError);
+				repoPath = destination + Path.DirectorySeparatorChar + repoPath;
 				lfsEnabled = IsGitLFSRepo(true);
 				return true;
 			}

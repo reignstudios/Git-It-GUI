@@ -41,7 +41,7 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 		
-		public static bool Clone(string url, string path, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
+		public static bool Clone(string url, string path, out string repoClonedPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
 			StreamWriter stdInWriter = null;
 			var getStdInputStreamCallback = new GetStdInputStreamCallbackMethod(delegate(StreamWriter writer)
@@ -49,15 +49,21 @@ namespace GitCommander
 				stdInWriter = writer;
 			});
 			
+			string repoClonedPathTemp = null;
 			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
-				if (line.Contains("Username for") && writeUsernameCallback != null)
+				if (line.Contains("Username for"))
 				{
-					if (!writeUsernameCallback(stdInWriter)) stdInWriter.WriteLine("");
+					if (writeUsernameCallback != null && !writeUsernameCallback(stdInWriter)) stdInWriter.WriteLine("");
 				}
-				if (line.Contains("Password for") && writePasswordCallback != null)
+				else if (line.Contains("Password for"))
 				{
-					if (!writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
+					if (writePasswordCallback != null && !writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
+				}
+				else if (line.Contains("Cloning into"))
+				{
+					var match = Regex.Match(line, @"Cloning into '(.*)'\.\.\.");
+					if (match.Success) repoClonedPathTemp = match.Groups[1].Value;
 				}
 			});
 			
@@ -65,6 +71,7 @@ namespace GitCommander
 			lastResult = result.Item1;
 			lastError = result.Item2;
 			
+			repoClonedPath = repoClonedPathTemp;
 			return string.IsNullOrEmpty(lastError);
 		}
 
