@@ -91,7 +91,7 @@ namespace GitCommander
 		}
 
 		private delegate bool AddState(string type, FileStates stateType);
-		private static void ParseFileState(string line, ref int mode, List<FileState> states)
+		private static bool ParseFileState(string line, ref int mode, List<FileState> states)
 		{
 			var addState = new AddState(delegate(string type, FileStates stateType)
 			{
@@ -127,58 +127,64 @@ namespace GitCommander
 			// gather normal files
 			switch (line)
 			{
-				case "Changes to be committed:": mode = 0; return;
-				case "Changes not staged for commit:": mode = 1; return;
-				case "Unmerged paths:": mode = 2; return;
-				case "Untracked files:": mode = 3; return;
+				case "Changes to be committed:": mode = 0; return true;
+				case "Changes not staged for commit:": mode = 1; return true;
+				case "Unmerged paths:": mode = 2; return true;
+				case "Untracked files:": mode = 3; return true;
 			}
 			
+			bool pass = false;
 			if (mode == 0)
 			{
-				bool pass = addState("\tnew file:", FileStates.NewInIndex);
+				pass = addState("\tnew file:", FileStates.NewInIndex);
 				if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
 				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromIndex);
 				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInIndex);
-				// TODO: check for valid unhanled types
-				//if (!pass)
-				//{
-				//	var match = Regex.Match(line, @"\t(.*):");
-				//	if (match.Success)
-				//	{
-						
-				//		return false;
-				//	}
-				//}
 			}
 			else if (mode == 1)
 			{
-				bool pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
+				pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
 				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromWorkdir);
 				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInWorkdir);
 			}
 			else if (mode == 2)
 			{
-				addState("\tboth modified:", FileStates.Conflicted);
+				pass = addState("\tboth modified:", FileStates.Conflicted);
 			}
 			else if (mode == 3)
 			{
-				addState("\t", FileStates.NewInWorkdir);
+				pass = addState("\t", FileStates.NewInWorkdir);
 			}
+
+			if (!pass)
+			{
+				var match = Regex.Match(line, @"\t(.*):");
+				if (match.Success) return false;
+			}
+
+			return true;
 		}
 
 		public static bool GetFileState(string filename, out FileState fileState)
 		{
 			var states = new List<FileState>();
 			int mode = -1;
+			bool failedToParse = false;
 			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
-				ParseFileState(line, ref mode, states);
+				if (!ParseFileState(line, ref mode, states)) failedToParse = true;
 			});
 
 			var result = Tools.RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
 			lastResult = result.Item1;
 			lastError = result.Item2;
 			if (!string.IsNullOrEmpty(lastError))
+			{
+				fileState = null;
+				return false;
+			}
+
+			if (failedToParse)
 			{
 				fileState = null;
 				return false;
@@ -200,15 +206,22 @@ namespace GitCommander
 		{
 			var states = new List<FileState>();
 			int mode = -1;
+			bool failedToParse = false;
 			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
-				ParseFileState(line, ref mode, states);
+				if (!ParseFileState(line, ref mode, states))failedToParse = true;
 			});
 			
 			var result = Tools.RunExe("git", "status -u", stdCallback:stdCallback);
 			lastResult = result.Item1;
 			lastError = result.Item2;
 			if (!string.IsNullOrEmpty(lastError))
+			{
+				fileStates = null;
+				return false;
+			}
+
+			if (failedToParse)
 			{
 				fileStates = null;
 				return false;
