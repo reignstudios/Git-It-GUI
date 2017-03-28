@@ -106,7 +106,7 @@ namespace GitItGUI.Core
 				return false;
 			}
 			
-			return RefreshInternal();
+			return RefreshInternal(refreshMode);
 		}
 
 		public static bool Close()
@@ -119,9 +119,9 @@ namespace GitItGUI.Core
 			return OpenRepo(Repository.repoPath);
 		}
 
-		private static bool RefreshInternal()
+		private static bool RefreshInternal(bool refreshMode)
 		{
-			if (!BranchManager.Refresh()) return false;
+			if (!BranchManager.Refresh(refreshMode)) return false;
 			if (!ChangesManager.Refresh()) return false;
 			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 			return true;

@@ -17,7 +17,7 @@ namespace GitItGUI.Core
 		public static BranchState[] branchStates {get; private set;}
 		public static RemoteState[] remoteStates {get; private set;}
 
-		internal static bool Refresh()
+		internal static bool Refresh(bool refreshMode)
 		{
 			try
 			{
@@ -31,7 +31,8 @@ namespace GitItGUI.Core
 				if (activeBranch.isRemote)
 				{
 					Debug.LogError("Active repo branch cannot be a remote: " + activeBranch.fullname, true);
-					return false;
+					if (refreshMode) Environment.Exit(0);
+					else return false;
 				}
 
 				// gather remotes
