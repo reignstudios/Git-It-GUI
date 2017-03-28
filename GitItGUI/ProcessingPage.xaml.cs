@@ -229,7 +229,7 @@ namespace GitItGUI
 					while (true)
 					{
 						++count;
-						if (Array.Exists<BranchState>(BranchManager.branchStates, x => x.name == switchOtherBranch.name))
+						if (Array.Exists<BranchState>(BranchManager.branchStates, x => x.fullname == newName))
 						{
 							newName = switchOtherBranch.name + count;
 							continue;
