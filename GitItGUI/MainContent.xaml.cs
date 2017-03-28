@@ -43,26 +43,9 @@ namespace GitItGUI
 
 		private void RepoManager_RepoRefreshedCallback()
 		{
-			if (Dispatcher.UIThread.CheckAccess())
-			{
-				RepoManager_RepoRefreshedCallback_UIThread();
-			}
-			else
-			{
-				bool isDone = false;
-				Dispatcher.UIThread.InvokeAsync(delegate
-				{
-					RepoManager_RepoRefreshedCallback_UIThread();
-					isDone = true;
-				});
-
-				while (!isDone) Thread.Sleep(1);
-			}
-		}
-
-		private void RepoManager_RepoRefreshedCallback_UIThread()
-		{
+			// get status
 			string name = Repository.repoPath;
+			string text;
 			if (!string.IsNullOrEmpty(name))
 			{
 				string syncText = "";
@@ -70,9 +53,29 @@ namespace GitItGUI
 				if (ChangesManager.ChangesExist()) syncText = " - [changes exist]";
 				else if (BranchManager.IsUpToDateWithRemote(out yes)) syncText = yes ? "" : " - [out of sync]";
 				else syncText = " - [sync check error]";
-				repoName.Text = string.Format("{0} ({1}){2}", name.Substring(Path.GetDirectoryName(name).Length + 1), BranchManager.activeBranch.fullname, syncText);
+				text = string.Format("{0} ({1}){2}", name.Substring(Path.GetDirectoryName(name).Length + 1), BranchManager.activeBranch.fullname, syncText);
 			}
-			else repoName.Text = "";
+			else
+			{
+				text = "";
+			}
+
+			// set status
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				repoName.Text = text;
+			}
+			else
+			{
+				bool isDone = false;
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					repoName.Text = text;
+					isDone = true;
+				});
+
+				while (!isDone) Thread.Sleep(1);
+			}
 		}
 
 		public void NavigatedFrom()
