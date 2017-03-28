@@ -63,23 +63,7 @@ namespace GitItGUI
 
 		private void Debug_debugLogCallback(object value, bool alert)
 		{
-			if (!alert) return;
-
-			if (Dispatcher.UIThread.CheckAccess())
-			{
-				MessageBox.Show(value.ToString());
-			}
-			else
-			{
-				bool isDone = false;
-				Dispatcher.UIThread.InvokeAsync(delegate
-				{
-					MessageBox.Show(value.ToString());
-					isDone = true;
-				});
-
-				while (!isDone) Thread.Sleep(1);
-			}
+			if (alert) MessageBox.Show(value.ToString());
 		}
 
 		private static NavigationPage GetActivePageType()
