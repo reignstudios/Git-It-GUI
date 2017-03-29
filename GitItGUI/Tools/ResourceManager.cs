@@ -38,31 +38,12 @@ namespace GitItGUI
 
 		public static Bitmap GetResource(FileStates state)
 		{
-			switch (state)
-			{
-				case FileStates.NewInIndex:
-				case FileStates.NewInWorkdir:
-					return iconNew;
-
-				case FileStates.DeletedFromIndex:
-				case FileStates.DeletedFromWorkdir:
-					return iconDeleted;
-
-				case FileStates.ModifiedInIndex:
-				case FileStates.ModifiedInWorkdir:
-					return iconModified;
-
-				case FileStates.RenamedInIndex:
-				case FileStates.RenamedInWorkdir:
-					return iconRenamed;
-
-				case FileStates.TypeChangeInIndex:
-				case FileStates.TypeChangeInWorkdir:
-					return iconTypeChanged;
-
-				case FileStates.Conflicted:
-					return iconConflicted;
-			}
+			if (FileState.IsAnyStates(state, new FileStates[]{FileStates.NewInIndex, FileStates.NewInWorkdir})) return iconNew;
+			if (FileState.IsAnyStates(state, new FileStates[]{FileStates.DeletedFromIndex, FileStates.DeletedFromWorkdir})) return iconDeleted;
+			if (FileState.IsAnyStates(state, new FileStates[]{FileStates.ModifiedInIndex, FileStates.ModifiedInWorkdir})) return iconModified;
+			if (FileState.IsAnyStates(state, new FileStates[]{FileStates.RenamedInIndex, FileStates.RenamedInWorkdir})) return iconRenamed;
+			if (FileState.IsAnyStates(state, new FileStates[]{FileStates.TypeChangeInIndex, FileStates.TypeChangeInWorkdir})) return iconTypeChanged;
+			if (FileState.IsAnyStates(state, new FileStates[]{FileStates.Conflicted})) return iconConflicted;
 
 			throw new Exception("Unsuported state: " + state);
 		}

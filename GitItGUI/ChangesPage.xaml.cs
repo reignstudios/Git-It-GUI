@@ -34,23 +34,32 @@ namespace GitItGUI
 
 		public void Execute(object parameter)
 		{
-			switch (sender.State)
+			var states = new FileStates[]
 			{
-				case FileStates.NewInWorkdir:
-				case FileStates.TypeChangeInWorkdir:
-				case FileStates.RenamedInWorkdir:
-				case FileStates.ModifiedInWorkdir:
-				case FileStates.DeletedFromWorkdir:
-					sender.Stage();
-					break;
+				FileStates.NewInWorkdir,
+				FileStates.TypeChangeInWorkdir,
+				FileStates.RenamedInWorkdir,
+				FileStates.ModifiedInWorkdir,
+				FileStates.DeletedFromWorkdir
+			};
+			if (FileState.IsAnyStates(sender.State, states))
+			{
+				sender.Stage();
+				return;
+			}
 
-				case FileStates.NewInIndex:
-				case FileStates.TypeChangeInIndex:
-				case FileStates.RenamedInIndex:
-				case FileStates.ModifiedInIndex:
-				case FileStates.DeletedFromIndex:
-					sender.Unstage();
-					break;
+			states = new FileStates[]
+			{
+				FileStates.NewInIndex,
+				FileStates.TypeChangeInIndex,
+				FileStates.RenamedInIndex,
+				FileStates.ModifiedInIndex,
+				FileStates.DeletedFromIndex
+			};
+			if (FileState.IsAnyStates(sender.State, states))
+			{
+				sender.Stage();
+				return;
 			}
 		}
 	}
@@ -252,7 +261,7 @@ namespace GitItGUI
 
 		public void Stage()
 		{
-			if (fileState.state == FileStates.Conflicted)
+			if (fileState.HasState(FileStates.Conflicted))
 			{
 				if (MessageBox.Show("File in conflicted state.\nAre you sure you want to stage un-resolved file?", MessageBoxTypes.YesNo)) ChangesManager.StageFile(fileState);
 			}
@@ -475,9 +484,6 @@ namespace GitItGUI
 			var item = unstagedChangesListView.SelectedItem as FileItem;
 			if (item == null)
 			{
-				//Debug.Log("Unstaged file must be selected", true);
-				//return;
-
 				item = stagedChangesListView.SelectedItem as FileItem;
 				if (item == null)
 				{
@@ -557,8 +563,8 @@ namespace GitItGUI
 			foreach (var fileState in ChangesManager.fileStates)
 			{
 				var item = new FileItem(ResourceManager.GetResource(fileState.state), fileState);
-				if (!fileState.IsStaged()) unstagedChangesListViewItems.Add(item);
-				else stagedChangesListViewItems.Add(item);
+				if (fileState.IsUnstaged()) unstagedChangesListViewItems.Add(item);
+				if (fileState.IsStaged()) stagedChangesListViewItems.Add(item);
 			}
 			unstagedChangesListView.Items = unstagedChangesListViewItems;
 			stagedChangesListView.Items = stagedChangesListViewItems;

@@ -62,8 +62,8 @@ namespace GitItGUI.Core
 		{
 			foreach (var state in fileStates)
 			{
-				if (state.IsState(FileStates.DeletedFromIndex) || state.IsState(FileStates.ModifiedInIndex) ||
-					state.IsState(FileStates.NewInIndex) || state.IsState(FileStates.RenamedInIndex) || state.IsState(FileStates.TypeChangeInIndex))
+				if (state.HasState(FileStates.DeletedFromIndex) || state.HasState(FileStates.ModifiedInIndex) ||
+					state.HasState(FileStates.NewInIndex) || state.HasState(FileStates.RenamedInIndex) || state.HasState(FileStates.TypeChangeInIndex))
 				{
 					return true;
 				}
@@ -76,8 +76,8 @@ namespace GitItGUI.Core
 		{
 			foreach (var state in fileStates)
 			{
-				if (state.IsState(FileStates.DeletedFromWorkdir) || state.IsState(FileStates.ModifiedInWorkdir) ||
-					state.IsState(FileStates.NewInWorkdir) || state.IsState(FileStates.RenamedInWorkdir) || state.IsState(FileStates.TypeChangeInWorkdir))
+				if (state.HasState(FileStates.DeletedFromWorkdir) || state.HasState(FileStates.ModifiedInWorkdir) ||
+					state.HasState(FileStates.NewInWorkdir) || state.HasState(FileStates.RenamedInWorkdir) || state.HasState(FileStates.TypeChangeInWorkdir))
 				{
 					return true;
 				}
@@ -101,7 +101,7 @@ namespace GitItGUI.Core
 				if (Tools.IsBinaryFileData(fullPath)) return "<< Binary File >>";
 
 				// check for text types diffs
-				if (fileState.IsState(FileStates.ModifiedInWorkdir) || fileState.IsState(FileStates.ModifiedInIndex))
+				if (fileState.HasState(FileStates.ModifiedInWorkdir) || fileState.HasState(FileStates.ModifiedInIndex))
 				{
 					string diff;
 					Debug.pauseGitCommanderStdWrites = true;
@@ -135,7 +135,7 @@ namespace GitItGUI.Core
 				}
 
 				// return text
-				else if (!fileState.IsState(FileStates.Unreadable))
+				else if (!fileState.HasState(FileStates.Unreadable))
 				{
 					return File.ReadAllText(fullPath);
 				}
@@ -155,29 +155,31 @@ namespace GitItGUI.Core
 
 		public static bool DeleteUntrackedUnstagedFile(FileState fileState, bool refresh)
 		{
+			bool success = true;
 			try
 			{
-				if (fileState.state != FileStates.NewInWorkdir) return false;
+				if (!fileState.HasState(FileStates.NewInWorkdir)) return false;
 				string filePath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 				if (File.Exists(filePath)) File.Delete(filePath);
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to delete item: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			if (refresh) RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool DeleteUntrackedUnstagedFiles(bool refresh)
 		{
+			bool success = true;
 			try
 			{
 				foreach (var fileState in fileStates)
 				{
-					if (!fileState.IsState(FileStates.NewInWorkdir)) continue;
+					if (!fileState.HasState(FileStates.NewInWorkdir)) continue;
 					string filePath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 					if (File.Exists(filePath)) File.Delete(filePath);
 				}
@@ -185,15 +187,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to delete item: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			if (refresh) RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool StageFile(FileState fileState)
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
@@ -201,15 +204,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to stage item: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool StageAllFiles()
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.StageAll()) throw new Exception(Repository.lastError);
@@ -217,15 +221,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to stage item: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool UnstageFile(FileState fileState)
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.Unstage(fileState.filename)) throw new Exception(Repository.lastError);
@@ -233,15 +238,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to unstage item: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool UnstageAllFiles()
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.UnstageAll()) throw new Exception(Repository.lastError);
@@ -249,15 +255,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to unstage item: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool RevertAll()
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.RevertAllChanges()) throw new Exception(Repository.lastError);
@@ -265,22 +272,23 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to reset: " + e.Message);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool RevertFile(FileState fileState)
 		{
-			if (fileState.state != FileStates.ModifiedInIndex && fileState.state != FileStates.ModifiedInWorkdir &&
-				fileState.state != FileStates.DeletedFromIndex && fileState.state != FileStates.DeletedFromWorkdir)
+			if (!fileState.HasState(FileStates.ModifiedInIndex) && !fileState.HasState(FileStates.ModifiedInWorkdir) &&
+				!fileState.HasState(FileStates.DeletedFromIndex) && !fileState.HasState(FileStates.DeletedFromWorkdir))
 			{
 				Debug.LogError("This file is not modified or deleted", true);
 				return false;
 			}
 
+			bool success = true;
 			try
 			{
 				if (!Repository.RevertFile(BranchManager.activeBranch.fullname, fileState.filename)) throw new Exception(Repository.lastError);
@@ -288,15 +296,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to reset file: " + e.Message);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool CommitStagedChanges(string commitMessage)
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.Commit(commitMessage)) throw new Exception(Repository.lastError);
@@ -304,11 +313,11 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to commit: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool Fetch()
@@ -388,7 +397,7 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to pull: " + e.Message, true);
-				return SyncMergeResults.Error;
+				result = SyncMergeResults.Error;
 			}
 			
 			if (!isSyncMode) RepoManager.Refresh();
@@ -397,6 +406,7 @@ namespace GitItGUI.Core
 
 		public static bool Push()
 		{
+			bool success = true;
 			try
 			{
 				if (!BranchManager.activeBranch.isTracking)
@@ -411,11 +421,11 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Failed to push: " + e.Message, true);
-				return false;
+				success = false;
 			}
 			
 			if (!isSyncMode) RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static SyncMergeResults Sync()
@@ -426,15 +436,8 @@ namespace GitItGUI.Core
 			if (result == SyncMergeResults.Succeeded) pushPass = Push();
 			isSyncMode = false;
 			
-			if (result != SyncMergeResults.Succeeded || !pushPass)
-			{
-				Debug.LogError("Failed to Sync changes", true);
-				return result;
-			}
-			else
-			{
-				Debug.Log("Sync succeeded!", true);
-			}
+			if (result != SyncMergeResults.Succeeded || !pushPass) Debug.LogError("Failed to Sync changes", true);
+			else Debug.Log("Sync succeeded!", true);
 			
 			RepoManager.Refresh();
 			return result;
@@ -464,7 +467,7 @@ namespace GitItGUI.Core
 		{
 			foreach (var fileState in fileStates)
 			{
-				if (fileState.IsState(FileStates.Conflicted) && !ResolveConflict(fileState, false))
+				if (fileState.HasState(FileStates.Conflicted) && !ResolveConflict(fileState, false))
 				{
 					Debug.LogError("Resolve conflict failed (aborting pending)", true);
 					if (refresh) RepoManager.Refresh();
@@ -479,7 +482,7 @@ namespace GitItGUI.Core
 		private delegate void DeleteTempMergeFilesMethod();
 		public static bool ResolveConflict(FileState fileState, bool refresh)
 		{
-			bool wasModified = false;
+			bool wasModified = false, success = true;
 			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 			string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
 			var DeleteTempMergeFiles = new DeleteTempMergeFilesMethod(delegate ()
@@ -492,7 +495,7 @@ namespace GitItGUI.Core
 			try
 			{
 				// make sure file needs to be resolved
-				if (fileState.state != FileStates.Conflicted)
+				if (!fileState.HasState(FileStates.Conflicted))
 				{
 					Debug.LogError("File not in conflicted state: " + fileState.filename, true);
 					return false;
@@ -516,33 +519,26 @@ namespace GitItGUI.Core
 						switch (mergeBinaryResult)
 						{
 							case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true);
-								DeleteTempMergeFiles();
-								return false;
+								goto FINISH;
 
 							case MergeBinaryFileResults.Cancel:
-								DeleteTempMergeFiles();
-								return false;
+								goto FINISH;
 
 							case MergeBinaryFileResults.KeepMine: File.Copy(fullPathOurs, fullPath, true); break;
 							case MergeBinaryFileResults.UseTheirs: File.Copy(fullPathTheirs, fullPath, true); break;
 							default: Debug.LogWarning("Unsuported Response: " + mergeBinaryResult, true);
-								DeleteTempMergeFiles();
-								return false;
+								goto FINISH;
 						}
 					}
 					else
 					{
 						Debug.LogError("Failed to resolve file: " + fileState.filename, true);
-						return false;
+						goto FINISH;
 					}
-
-					// delete temp files
-					DeleteTempMergeFiles();
 
 					// stage and finish
 					if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
-					if (refresh) RepoManager.Refresh();
-					return true;
+					goto FINISH;
 				}
 			
 				// copy base and parse
@@ -572,12 +568,10 @@ namespace GitItGUI.Core
 					switch (mergeFileResult)
 					{
 						case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true);
-							DeleteTempMergeFiles();
-							return false;
+							goto FINISH;
 
 						case MergeBinaryFileResults.Cancel:
-							DeleteTempMergeFiles();
-							return false;
+							goto FINISH;
 
 						case MergeBinaryFileResults.KeepMine: File.Copy(fullPathOurs, fullPathBase, true); break;
 						case MergeBinaryFileResults.UseTheirs: File.Copy(fullPathTheirs, fullPathBase, true); break;
@@ -588,14 +582,13 @@ namespace GitItGUI.Core
 								process.StartInfo.FileName = AppManager.mergeToolPath;
 								if (AppManager.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
 								else if (AppManager.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
-								else if (AppManager.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\" \"{0}\"", fullPathBase, fullPathOurs, fullPathTheirs);
+								else if (AppManager.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{1}\" \"{0}\" \"{2}\" \"{1}\"", fullPathOurs, fullPathBase, fullPathTheirs);
 								else if (AppManager.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
 								process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 								if (!process.Start())
 								{
 									Debug.LogError("Failed to start Merge tool (is it installed?)", true);
-									DeleteTempMergeFiles();
-									return false;
+									goto FINISH;
 								}
 
 								process.WaitForExit();
@@ -603,15 +596,13 @@ namespace GitItGUI.Core
 							break;
 
 						default: Debug.LogWarning("Unsuported Response: " + mergeFileResult, true);
-							DeleteTempMergeFiles();
-							return false;
+							goto FINISH;
 					}
 				}
 				else
 				{
 					Debug.LogError("Failed to resolve file: " + fileState.filename, true);
-					DeleteTempMergeFiles();
-					return false;
+					goto FINISH;
 				}
 
 				// get new base hash
@@ -649,28 +640,31 @@ namespace GitItGUI.Core
 							case MergeFileAcceptedResults.No:
 								break;
 
-							default: Debug.LogWarning("Unsuported Response: " + result, true); return false;
+							default: Debug.LogWarning("Unsuported Response: " + result, true); goto FINISH;
 						}
 					}
 					else
 					{
 						Debug.LogError("Failed to ask user if file was resolved: " + fileState.filename, true);
-						DeleteTempMergeFiles();
-						return false;
+						goto FINISH;
 					}
 				}
+
+				success = true;
 			}
 			catch (Exception e)
 			{
 				Debug.pauseGitCommanderStdWrites = false;
 				Debug.LogError("Failed to resolve file: " + e.Message, true);
 				DeleteTempMergeFiles();
-				return false;
+				success = false;
 			}
 			
 			// finish
+			FINISH:;
 			DeleteTempMergeFiles();
 			if (refresh) RepoManager.Refresh();
+			if (!success) return false;
 			return wasModified;
 		}
 
@@ -687,7 +681,7 @@ namespace GitItGUI.Core
 			try
 			{
 				// get selected item
-				if (fileState.state != FileStates.ModifiedInIndex && fileState.state != FileStates.ModifiedInWorkdir)
+				if (!fileState.HasState(FileStates.ModifiedInIndex) && !fileState.HasState(FileStates.ModifiedInWorkdir))
 				{
 					Debug.LogError("This file is not modified", true);
 					return false;

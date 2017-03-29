@@ -72,6 +72,7 @@ namespace GitItGUI.Core
 
 		public static bool Checkout(BranchState branch)
 		{
+			bool success = true;
 			try
 			{
 				if (activeBranch.name != branch.name)
@@ -81,17 +82,17 @@ namespace GitItGUI.Core
 				else
 				{
 					Debug.LogError("Already on branch: " + branch.name, true);
-					return false;
+					success = false;
 				}
 			}
 			catch (Exception e)
 			{
 				Debug.LogError("BranchManager.Checkout Failed: " + e.Message, true);
-				return false;
+				success = false;
 			}
 			
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static MergeResults MergeBranchIntoActive(BranchState srcBranch)
@@ -108,7 +109,7 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("BranchManager.Merge Failed: " + e.Message, true);
-				return MergeResults.Error;
+				mergeResult = MergeResults.Error;
 			}
 			
 			RepoManager.Refresh();
@@ -117,6 +118,7 @@ namespace GitItGUI.Core
 
 		public static bool CheckoutNewBranch(string branchName, string remoteName = null)
 		{
+			bool success = true;
 			try
 			{
 				// create branch
@@ -138,15 +140,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Add new Branch Error: " + e.Message, true);
-				return false;
+				success = false;
 			}
 			
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool DeleteNonActiveBranch(BranchState branch)
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.DeleteBranch(branch.name)) throw new Exception(Repository.lastError);
@@ -154,15 +157,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Delete new Branch Error: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool RenameActiveBranch(string newBranchName)
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.RenameActiveBranch(newBranchName)) throw new Exception(Repository.lastError);
@@ -170,15 +174,16 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Rename new Branch Error: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 		
 		public static bool CopyTracking(BranchState srcRemoteBranch)
 		{
+			bool success = true;
 			try
 			{
 				if (!Repository.SetActiveBranchTracking(srcRemoteBranch.fullname)) throw new Exception(Repository.lastError);
@@ -186,17 +191,18 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Add/Update tracking Branch Error: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool RemoveTracking()
 		{
 			if (!activeBranch.isTracking) return true;
 
+			bool success = true;
 			try
 			{
 				if (!Repository.RemoveActiveBranchTracking()) throw new Exception(Repository.lastError);
@@ -204,11 +210,11 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				Debug.LogError("Remove Branch Error: " + e.Message, true);
-				return false;
+				success = false;
 			}
 
 			RepoManager.Refresh();
-			return true;
+			return success;
 		}
 
 		public static bool IsUpToDateWithRemote(out bool yes)

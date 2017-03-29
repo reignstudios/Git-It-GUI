@@ -29,7 +29,7 @@ namespace GitItGUI
 			// load main page
 			AvaloniaXamlLoader.Load(this);
 			App.AttachDevTools(this);
-			Title = "Git-It-GUI v" + VersionInfo.version;
+			Title = "Git-It-GUI v" + VersionInfo.versionType;
 			Debug.Log(Title);
 
 			// load resources

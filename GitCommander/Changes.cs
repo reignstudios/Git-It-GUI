@@ -37,19 +37,59 @@ namespace GitCommander
 		public string filename {get; internal set;}
 		public FileStates state {get; internal set;}
 
-		public bool IsState(FileStates state)
+		public static bool IsAllStates(FileStates stateFlag, FileStates[] states)
+		{
+			foreach (var state in states)
+			{
+				if ((stateFlag & state) == 0) return false;
+			}
+
+			return true;
+		}
+
+		public static bool IsAnyStates(FileStates stateFlag, FileStates[] states)
+		{
+			foreach (var state in states)
+			{
+				if ((stateFlag & state) != 0) return true;
+			}
+
+			return false;
+		}
+
+		public bool IsAllStates(FileStates[] states)
+		{
+			return IsAllStates(state, states);
+		}
+
+		public bool IsAnyStates(FileStates[] states)
+		{
+			return IsAnyStates(state, states);
+		}
+
+		public bool HasState(FileStates state)
 		{
 			return (this.state & state) != 0;
+		}
+
+		public bool IsUnstaged()
+		{
+			return
+				HasState(FileStates.NewInWorkdir) ||
+				HasState(FileStates.DeletedFromWorkdir) ||
+				HasState(FileStates.ModifiedInWorkdir) ||
+				HasState(FileStates.RenamedInWorkdir) ||
+				HasState(FileStates.TypeChangeInWorkdir);
 		}
 
 		public bool IsStaged()
 		{
 			return
-				IsState(FileStates.NewInIndex) ||
-				IsState(FileStates.DeletedFromIndex) ||
-				IsState(FileStates.ModifiedInIndex) ||
-				IsState(FileStates.RenamedInIndex) ||
-				IsState(FileStates.TypeChangeInIndex);
+				HasState(FileStates.NewInIndex) ||
+				HasState(FileStates.DeletedFromIndex) ||
+				HasState(FileStates.ModifiedInIndex) ||
+				HasState(FileStates.RenamedInIndex) ||
+				HasState(FileStates.TypeChangeInIndex);
 		}
 
 		public override string ToString()
