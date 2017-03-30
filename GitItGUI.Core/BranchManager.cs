@@ -70,18 +70,19 @@ namespace GitItGUI.Core
 			return nonActiveBranches.ToArray();
 		}
 
-		public static bool Checkout(BranchState branch)
+		public static bool Checkout(BranchState branch, bool useFullname = false)
 		{
 			bool success = true;
 			try
 			{
-				if (activeBranch.name != branch.name)
+				string name = useFullname ? branch.fullname : branch.name;
+				if (activeBranch.name != name)
 				{
-					if (!Repository.CheckoutExistingBranch(branch.name)) throw new Exception(Repository.lastError);
+					if (!Repository.CheckoutBranch(name)) throw new Exception(Repository.lastError);
 				}
 				else
 				{
-					Debug.LogError("Already on branch: " + branch.name, true);
+					Debug.LogError("Already on branch: " + name, true);
 					success = false;
 				}
 			}

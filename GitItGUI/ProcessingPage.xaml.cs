@@ -224,25 +224,14 @@ namespace GitItGUI
 				if (!switchOtherBranch.isRemote) BranchManager.Checkout(switchOtherBranch);
 				else if (MessageBox.Show("Cannot checkout to remote branch.\nDo you want to create a local one that tracks this remote instead?", MessageBoxTypes.YesNo))
 				{
-					string newName = switchOtherBranch.name;
-					int count = 0;
-					while (true)
+					if (Array.Exists<BranchState>(BranchManager.branchStates, x => x.fullname == switchOtherBranch.name))
 					{
-						++count;
-						if (Array.Exists<BranchState>(BranchManager.branchStates, x => x.fullname == newName))
-						{
-							newName = switchOtherBranch.name + count;
-							continue;
-						}
-						else
-						{
-							break;
-						}
+						MessageBox.Show(string.Format("A local branch under '{0}' already exists, checking out to it instead.", switchOtherBranch.name));
+						BranchManager.Checkout(Array.Find<BranchState>(BranchManager.branchStates, x => x.fullname == switchOtherBranch.name));
 					}
-
-					if (BranchManager.CheckoutNewBranch(newName))
+					else
 					{
-						BranchManager.CopyTracking(switchOtherBranch);
+						BranchManager.Checkout(switchOtherBranch);
 					}
 				}
 			}

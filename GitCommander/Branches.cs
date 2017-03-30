@@ -264,7 +264,7 @@ namespace GitCommander
 			return true;
 		}
 
-		public static bool CheckoutExistingBranch(string branch)
+		public static bool CheckoutBranch(string branch)
 		{
 			var result = Tools.RunExe("git", "checkout " + branch);
 			lastResult = result.Item1;

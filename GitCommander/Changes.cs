@@ -79,7 +79,8 @@ namespace GitCommander
 				HasState(FileStates.DeletedFromWorkdir) ||
 				HasState(FileStates.ModifiedInWorkdir) ||
 				HasState(FileStates.RenamedInWorkdir) ||
-				HasState(FileStates.TypeChangeInWorkdir);
+				HasState(FileStates.TypeChangeInWorkdir) ||
+				HasState(FileStates.Conflicted);
 		}
 
 		public bool IsStaged()
