@@ -26,8 +26,9 @@ namespace GitItGUI.Core
 		{
 			try
 			{
-				string logFileName = PlatformSettings.appDataPath;
-				logFileName += Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + "logs.txt";
+				string logDir = PlatformSettings.appDataPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName;
+				if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
+				string logFileName = logDir + Path.DirectorySeparatorChar + "logs.txt";
 				stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.None);
 				writer = new StreamWriter(stream);
 
