@@ -63,7 +63,7 @@ namespace GitItGUI.Core
 			LogError(line);
 		}
 		
-		internal static void Dispose()
+		public static void Dispose()
 		{
 			if (stream != null)
 			{

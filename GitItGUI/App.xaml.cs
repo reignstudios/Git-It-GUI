@@ -23,7 +23,13 @@ namespace GitItGUI
 		{
 			var ex = e.ExceptionObject as Exception;
 			string msg = "Unknown";
-			if (ex != null) msg = ex.Message;
+			if (ex != null)
+			{
+				Core.Debug.LogError("Critical Error: " + Environment.NewLine + ex.StackTrace);
+				Core.Debug.Dispose();
+				msg = ex.Message;
+			}
+
 			MessageBox.Show("Critical Error: " + msg);
 		}
 
