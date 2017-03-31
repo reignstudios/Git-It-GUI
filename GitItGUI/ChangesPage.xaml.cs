@@ -58,7 +58,7 @@ namespace GitItGUI
 			};
 			if (FileState.IsAnyStates(sender.State, states))
 			{
-				sender.Stage();
+				sender.Unstage();
 				return;
 			}
 		}
