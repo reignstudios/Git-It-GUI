@@ -36,9 +36,9 @@ namespace GitCommander
 
 	public static partial class Repository
 	{
-		public static bool DeleteBranch(string branch)
+		public static bool DeleteBranch(string branch, bool isRemote)
 		{
-			return SimpleGitInvoke("branch -d " + branch);
+			return SimpleGitInvoke(string.Format("branch {1} {0}", branch, isRemote ? "-dr" : "-d"));
 		}
 
 		public static bool DeleteRemoteBranch(string branch, string remote)

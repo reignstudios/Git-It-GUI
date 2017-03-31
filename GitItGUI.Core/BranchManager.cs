@@ -153,7 +153,7 @@ namespace GitItGUI.Core
 			bool success = true;
 			try
 			{
-				if (!Repository.DeleteBranch(branch.name)) throw new Exception(Repository.lastError);
+				if (!Repository.DeleteBranch(branch.fullname, branch.isRemote)) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
