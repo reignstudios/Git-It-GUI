@@ -52,22 +52,26 @@ namespace GitCommander
 			string repoClonedPathTemp = null;
 			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
-				if (line.Contains("Username for"))
-				{
-					if (writeUsernameCallback != null && !writeUsernameCallback(stdInWriter)) stdInWriter.WriteLine("");
-				}
-				else if (line.Contains("Password for"))
-				{
-					if (writePasswordCallback != null && !writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
-				}
-				else if (line.Contains("Cloning into"))
+				if (line.StartsWith("Cloning into"))
 				{
 					var match = Regex.Match(line, @"Cloning into '(.*)'\.\.\.");
 					if (match.Success) repoClonedPathTemp = match.Groups[1].Value;
 				}
 			});
+
+			var stdErrorCallback = new StdCallbackMethod(delegate(string line)
+			{
+				if (line.StartsWith("Username for"))
+				{
+					if (writeUsernameCallback == null || !writeUsernameCallback(stdInWriter)) stdInWriter.WriteLine("");
+				}
+				else if (line.StartsWith("Password for"))
+				{
+					if (writePasswordCallback == null || !writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
+				}
+			});
 			
-			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback);
+			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
 			lastResult = result.Item1;
 			lastError = result.Item2;
 			

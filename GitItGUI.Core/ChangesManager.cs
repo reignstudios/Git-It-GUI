@@ -503,11 +503,14 @@ namespace GitItGUI.Core
 
 				// save local temp files
 				Debug.pauseGitCommanderStdWrites = true;
-				if (!Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs)) throw new Exception(Repository.lastError);
-				if (!Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs)) throw new Exception(Repository.lastError);
-				Debug.pauseGitCommanderStdWrites = false;
+				bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
 				fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
+				if (!fileCreated) throw new Exception(Repository.lastError);
+
+				fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
 				fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
+				if (!fileCreated) throw new Exception(Repository.lastError);
+				Debug.pauseGitCommanderStdWrites = false;
 
 				// check if files are binary (if so open select binary file tool)
 				if (Tools.IsBinaryFileData(fullPathOurs) || Tools.IsBinaryFileData(fullPathTheirs))

@@ -191,6 +191,8 @@ namespace GitCommander
 			else if (mode == 2)
 			{
 				pass = addState("\tboth modified:", FileStates.Conflicted);
+				if (!pass) pass = addState("\tdeleted by us:", FileStates.Conflicted);
+				if (!pass) pass = addState("\tdeleted by them:", FileStates.Conflicted);
 			}
 			else if (mode == 3)
 			{
