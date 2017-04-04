@@ -231,7 +231,11 @@ namespace GitItGUI
 
 			if (branch.isRemote && MessageBox.Show(string.Format("Would you like to fetch remote '{0}' changes before merging?", branch.fullname), MessageBoxTypes.YesNo))
 			{
-				if (!ChangesManager.Fetch(branch)) return;
+				ProcessingPage.singleton.fetchBeforeMerge = true;
+			}
+			else
+			{
+				ProcessingPage.singleton.fetchBeforeMerge = false;
 			}
 
 			ProcessingPage.singleton.mode = ProcessingPageModes.Merge;

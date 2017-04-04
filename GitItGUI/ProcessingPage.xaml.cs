@@ -34,6 +34,7 @@ namespace GitItGUI
 		// branch
 		public BranchState mergeOtherBranch;
 		public BranchState switchOtherBranch;
+		public bool fetchBeforeMerge;
 
 		// inverface
 		private Thread thread;
@@ -204,6 +205,13 @@ namespace GitItGUI
 			// merge
 			else if (mode == ProcessingPageModes.Merge)
 			{
+				if (fetchBeforeMerge && !ChangesManager.Fetch(mergeOtherBranch))
+				{
+					MessageBox.Show("Failed to fetch!");
+					MainWindow.LoadPage(PageTypes.MainContent);
+					return;
+				}
+
 				var result = BranchManager.MergeBranchIntoActive(mergeOtherBranch);
 				if (result == MergeResults.Succeeded)
 				{
