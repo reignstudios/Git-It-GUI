@@ -291,37 +291,45 @@ namespace GitCommander
 		public static bool IsUpToDateWithRemote(string remote, string branch, out bool yes)
 		{
 			// check for changes not in sync
-			yes = true;
-			bool isUpToDate = true;
-			var stdCallback_log = new StdCallbackMethod(delegate(string line)
+			//yes = true;
+			//bool isUpToDate = true;
+			//var stdCallback_log = new StdCallbackMethod(delegate(string line)
+			//{
+			//	var match = Regex.Match(line, @"commit (.*)");
+			//	if (match.Success) isUpToDate = false;
+			//});
+			
+			//var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback:stdCallback_log);
+			//lastResult = result.Item1;
+			//lastError = result.Item2;
+			//yes = isUpToDate;
+			
+			//return string.IsNullOrEmpty(lastError);
+			
+			string remoteChangeset = "...1";
+			var stdCallback_remote = new StdCallbackMethod(delegate(string line)
 			{
-				var match = Regex.Match(line, @"commit (.*)");
-				if (match.Success) isUpToDate = false;
+				var parts = line.Split('\t');
+				if (parts.Length == 2) remoteChangeset = parts[0];
+				else remoteChangeset = line;
 			});
 			
-			var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback:stdCallback_log);
+			var result = Tools.RunExe("git", string.Format("ls-remote {0} {1}", remote, branch), stdCallback:stdCallback_remote);
 			lastResult = result.Item1;
 			lastError = result.Item2;
-			yes = isUpToDate;
-			//if (!string.IsNullOrEmpty(lastError)) return false;
-			//else if (!isUpToDate) return true;
-			return string.IsNullOrEmpty(lastError);
 
-			// if git log doesn't pick up anything try status
-			/*var stdCallback_status = new StdCallbackMethod(delegate(string line)
+			string localChangeset = "...2";
+			var stdCallback_local = new StdCallbackMethod(delegate(string line)
 			{
-				var match = Regex.Match(line, @"Your branch is ahead of '(.*)' by (\d*) commit.");
-				if (match.Success) isUpToDate = false;
-
-				match = Regex.Match(line, @"Your branch is behind '(.*)' by (\d*) commits");
-				if (match.Success) isUpToDate = false;
+				localChangeset = line;
 			});
-
-			result = Tools.RunExe("git", "status", stdCallback:stdCallback_status);
+			
+			result = Tools.RunExe("git", string.Format("rev-parse {0}/{1}", remote, branch), stdCallback:stdCallback_local);
 			lastResult = result.Item1;
 			lastError = result.Item2;
-			yes = isUpToDate;
-			return string.IsNullOrEmpty(lastError);*/
+
+			yes = remoteChangeset == localChangeset;
+			return string.IsNullOrEmpty(lastError);
 		}
 	}
 }
