@@ -101,7 +101,7 @@ namespace GitItGUI.Core
 			MergeResults mergeResult;
 			try
 			{
-				if (!Repository.MergeBranchIntoActive(srcBranch.name)) throw new Exception(Repository.lastError);
+				if (!Repository.MergeBranchIntoActive(srcBranch.fullname)) throw new Exception(Repository.lastError);
 
 				bool yes;
 				if (!Repository.ConflitedExist(out yes)) throw new Exception(Repository.lastError);
