@@ -1,4 +1,5 @@
 # Git-It-GUI
+Download: https://github.com/reignstudios/Git-It-GUI/releases
 
 ![alt tag](ScreenShots/Changes.png?raw=true)
 

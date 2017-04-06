@@ -105,23 +105,25 @@ namespace GitCommander
 		{
 			name = null;
 			email = null;
+			string globalValue = (location == SignatureLocations.Global) ? " --global" : "";
 
-			bool result = SimpleGitInvoke("config --global user.name");
+			bool result = SimpleGitInvoke(string.Format("config{0} user.name", globalValue));
 			name = lastResult;
 			if (!result) return false;
 
-			result = SimpleGitInvoke("config --global user.email");
+			result = SimpleGitInvoke(string.Format("config{0} user.email", globalValue));
 			email = lastResult;
 			return result;
 		}
 
 		public static bool SetSignature(SignatureLocations location, string name, string email)
 		{
-			bool result = SimpleGitInvoke(string.Format("config --global user.name \"{0}\"", name));
+			string globalValue = (location == SignatureLocations.Global) ? " --global" : "";
+			bool result = SimpleGitInvoke(string.Format("config{1} user.name \"{0}\"", name, globalValue));
 			name = lastResult;
 			if (!result) return false;
 
-			result = SimpleGitInvoke(string.Format("config --global user.email \"{0}\"", email));
+			result = SimpleGitInvoke(string.Format("config{1} user.email \"{0}\"", email, globalValue));
 			email = lastResult;
 			return result;
 		}
