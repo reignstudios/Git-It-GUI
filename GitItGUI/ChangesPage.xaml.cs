@@ -451,9 +451,9 @@ namespace GitItGUI
 			}
 
 			// check if files need to be commit
-			if (ChangesManager.FilesAreStaged())
+			if (ChangesManager.FilesAreStaged() || ChangesManager.CompletedMergeCommitPending())
 			{
-				if (!CommitChanges()) return;
+				if (!CommitChanges(false)) return;
 			}
 
 			// sync changes
@@ -463,12 +463,12 @@ namespace GitItGUI
 
 		private void CommitStagedButton_Click(object sender, RoutedEventArgs e)
 		{
-			CommitChanges();
+			CommitChanges(true);
 		}
 
-		private bool CommitChanges()
+		private bool CommitChanges(bool validate)
 		{
-			if (!ChangesManager.FilesAreStaged())
+			if (validate && !ChangesManager.FilesAreStaged() && !ChangesManager.CompletedMergeCommitPending())
 			{
 				MessageBox.Show("No files have been staged to commit");
 				return false;
