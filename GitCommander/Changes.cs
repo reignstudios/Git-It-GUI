@@ -32,10 +32,19 @@ namespace GitCommander
 		Theirs
 	}
 
+	public enum FileConflictTypes
+	{
+		None,
+		Changes,
+		DeletedByUs,
+		DeletedByThem
+	}
+
 	public class FileState
 	{
 		public string filename {get; internal set;}
 		public FileStates state {get; internal set;}
+		public FileConflictTypes conflictType {get; internal set;}
 
 		public static bool IsAllStates(FileStates stateFlag, FileStates[] states)
 		{
@@ -131,10 +140,10 @@ namespace GitCommander
 			return SimpleGitInvoke("reset --hard");
 		}
 
-		private delegate bool AddState(string type, FileStates stateType);
+		private delegate bool AddState(string type, FileStates stateType, FileConflictTypes conflictType = FileConflictTypes.None);
 		private static bool ParseFileState(string line, ref int mode, List<FileState> states)
 		{
-			var addState = new AddState(delegate(string type, FileStates stateType)
+			var addState = new AddState(delegate(string type, FileStates stateType, FileConflictTypes conflictType)
 			{
 				if (line.Contains(type))
 				{
@@ -153,7 +162,8 @@ namespace GitCommander
 							var state = new FileState()
 							{
 								filename = filePath,
-								state = stateType
+								state = stateType,
+								conflictType = conflictType
 							};
 							
 							states.Add(state);
@@ -190,9 +200,9 @@ namespace GitCommander
 			}
 			else if (mode == 2)
 			{
-				pass = addState("\tboth modified:", FileStates.Conflicted);
-				if (!pass) pass = addState("\tdeleted by us:", FileStates.Conflicted);
-				if (!pass) pass = addState("\tdeleted by them:", FileStates.Conflicted);
+				pass = addState("\tboth modified:", FileStates.Conflicted, FileConflictTypes.Changes);
+				if (!pass) pass = addState("\tdeleted by us:", FileStates.Conflicted, FileConflictTypes.DeletedByUs);
+				if (!pass) pass = addState("\tdeleted by them:", FileStates.Conflicted, FileConflictTypes.DeletedByThem);
 			}
 			else if (mode == 3)
 			{
@@ -315,6 +325,27 @@ namespace GitCommander
 		{
 			string sourceName = source == FileConflictSources.Ours ? "--ours" : "--theirs";
 			return SimpleGitInvoke(string.Format("checkout {1} \"{0}\"", filename, sourceName));
+		}
+
+		public static bool RemoveFile(string filename)
+		{
+			return SimpleGitInvoke(string.Format("rm \"{0}\"", filename));
+		}
+
+		public static bool CompletedMergeCommitPending(out bool yes)
+		{
+			bool mergeCommitPending = false;
+			var stdCallback = new StdCallbackMethod(delegate(string line)
+			{
+				if (line == "All conflicts fixed but you are still merging.") mergeCommitPending = true;
+			});
+
+			var result = Tools.RunExe("git", "status", null, stdCallback:stdCallback);
+			lastResult = result.Item1;
+			lastError = result.Item2;
+			
+			yes = mergeCommitPending;
+			return string.IsNullOrEmpty(lastError);
 		}
 
 		public static bool Fetch()

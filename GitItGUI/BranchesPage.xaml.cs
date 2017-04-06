@@ -18,7 +18,7 @@ namespace GitItGUI
 		TextBlock trackingLabel, trackedBranchLabel, remoteURLLabel, newBranchLabel, newBranchDropdownLabel;
 		TextBox activeBranchTextBox, trackingOriginTextBox, remoteURLTextBox;
 		ListBox otherBranchListView;
-		Button addBranchButton, renameBranchButton, copyTrackingButton, removeTrackingButton, switchBranchButton, mergeBranchButton, deleteBranchButton;
+		Button addBranchButton, renameBranchButton, copyTrackingButton, removeTrackingButton, switchBranchButton, mergeBranchButton, deleteBranchButton, pruneBranchButton;
 		CheckBox advancedModeCheckBox;
 		DropDown remotesDropDown;
 
@@ -41,6 +41,7 @@ namespace GitItGUI
 			switchBranchButton = this.Find<Button>("switchBranchButton");
 			mergeBranchButton = this.Find<Button>("mergeBranchButton");
 			deleteBranchButton = this.Find<Button>("deleteBranchButton");
+			pruneBranchButton = this.Find<Button>("pruneBranchButton");
 			advancedModeCheckBox = this.Find<CheckBox>("advancedModeCheckBox");
 			trackingLabel = this.Find<TextBlock>("trackingLabel");
 			trackedBranchLabel = this.Find<TextBlock>("trackedBranchLabel");
@@ -59,6 +60,7 @@ namespace GitItGUI
 			switchBranchButton.Click += SwitchBranchButton_Click;
 			mergeBranchButton.Click += MergeBranchButton_Click;
 			deleteBranchButton.Click += DeleteBranchButton_Click;
+			pruneBranchButton.Click += PruneBranchButton_Click;
 			advancedModeCheckBox.Click += AdvancedModeCheckBox_Click;
 
 			// bind events
@@ -106,6 +108,7 @@ namespace GitItGUI
 			newBranchLabel.IsVisible = isAdvancedMode;
 			newBranchDropdownLabel.IsVisible = isAdvancedMode;
 			remotesDropDown.IsVisible = isAdvancedMode;
+			pruneBranchButton.IsVisible = isAdvancedMode;
 
 			// fill remotes drop down
 			if (isAdvancedMode)
@@ -266,6 +269,12 @@ namespace GitItGUI
 
 			if (!MessageBox.Show(string.Format("Are you sure you want to delete branch '{0}'?", branch.fullname), MessageBoxTypes.YesNo)) return;
 			BranchManager.DeleteNonActiveBranch(branch);
+		}
+
+		private void PruneBranchButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (!MessageBox.Show("Are you sure you want to prune remote branches?\nThis will remove unused remote branches!", MessageBoxTypes.YesNo)) return;
+			BranchManager.PruneRemoteBranches();
 		}
 	}
 }

@@ -463,6 +463,21 @@ namespace GitItGUI.Core
 			return fileStates.Length != 0;
 		}
 
+		public static bool CompletedMergeCommitPending()
+		{
+			try
+			{
+				bool yes;
+				if (!Repository.CompletedMergeCommitPending(out yes)) throw new Exception(Repository.lastError);
+				return yes;
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to check for pending merge commit: " + e.Message, true);
+				return false;
+			}
+		}
+
 		public static bool ResolveAllConflicts(bool refresh = true)
 		{
 			foreach (var fileState in fileStates)
@@ -500,20 +515,26 @@ namespace GitItGUI.Core
 					Debug.LogError("File not in conflicted state: " + fileState.filename, true);
 					return false;
 				}
-
+				
 				// save local temp files
 				Debug.pauseGitCommanderStdWrites = true;
-				bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
-				fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
-				if (!fileCreated) throw new Exception(Repository.lastError);
+				if (fileState.conflictType != FileConflictTypes.DeletedByUs)
+				{
+					bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
+					fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
+					if (!fileCreated) throw new Exception(Repository.lastError);
+				}
 
-				fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
-				fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
-				if (!fileCreated) throw new Exception(Repository.lastError);
+				if (fileState.conflictType != FileConflictTypes.DeletedByThem)
+				{
+					bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
+					fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
+					if (!fileCreated) throw new Exception(Repository.lastError);
+				}
 				Debug.pauseGitCommanderStdWrites = false;
 
-				// check if files are binary (if so open select binary file tool)
-				if (Tools.IsBinaryFileData(fullPathOurs) || Tools.IsBinaryFileData(fullPathTheirs))
+				// check if files are binary (if so open select binary file tool) [if file conflict is because of deletion this method is also used]
+				if (fileState.conflictType != FileConflictTypes.Changes || Tools.IsBinaryFileData(fullPathOurs) || Tools.IsBinaryFileData(fullPathTheirs))
 				{
 					// open merge tool
 					MergeBinaryFileResults mergeBinaryResult;
@@ -527,10 +548,39 @@ namespace GitItGUI.Core
 							case MergeBinaryFileResults.Cancel:
 								goto FINISH;
 
-							case MergeBinaryFileResults.KeepMine: File.Copy(fullPathOurs, fullPath, true); break;
-							case MergeBinaryFileResults.UseTheirs: File.Copy(fullPathTheirs, fullPath, true); break;
-							default: Debug.LogWarning("Unsuported Response: " + mergeBinaryResult, true);
-								goto FINISH;
+							case MergeBinaryFileResults.KeepMine:
+								if (fileState.conflictType == FileConflictTypes.Changes)
+								{
+									if (!Repository.AcceptConflictedFile(fullPath, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
+								}
+								else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
+								{
+									File.Copy(fullPathOurs, fullPath, true);
+									if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+								}
+								else if (fileState.conflictType == FileConflictTypes.DeletedByUs)
+								{
+									if (!Repository.RemoveFile(fileState.filename)) throw new Exception(Repository.lastError);
+								}
+								break;
+
+							case MergeBinaryFileResults.UseTheirs:
+								if (fileState.conflictType == FileConflictTypes.Changes)
+								{
+									if (!Repository.AcceptConflictedFile(fullPath, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
+								}
+								else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
+								{
+									if (!Repository.RemoveFile(fileState.filename)) throw new Exception(Repository.lastError);
+								}
+								else if (fileState.conflictType == FileConflictTypes.DeletedByUs)
+								{
+									File.Copy(fullPathTheirs, fullPath, true);
+									if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+								}
+								break;
+
+							default: Debug.LogWarning("Unsuported Response: " + mergeBinaryResult, true); goto FINISH;
 						}
 					}
 					else
@@ -539,8 +589,7 @@ namespace GitItGUI.Core
 						goto FINISH;
 					}
 
-					// stage and finish
-					if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+					// finish
 					goto FINISH;
 				}
 			
@@ -576,8 +625,15 @@ namespace GitItGUI.Core
 						case MergeBinaryFileResults.Cancel:
 							goto FINISH;
 
-						case MergeBinaryFileResults.KeepMine: File.Copy(fullPathOurs, fullPathBase, true); break;
-						case MergeBinaryFileResults.UseTheirs: File.Copy(fullPathTheirs, fullPathBase, true); break;
+						case MergeBinaryFileResults.KeepMine:
+							//File.Copy(fullPathOurs, fullPathBase, true);
+							if (!Repository.AcceptConflictedFile(fullPath, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
+							goto FINISH;
+
+						case MergeBinaryFileResults.UseTheirs:
+							//File.Copy(fullPathTheirs, fullPathBase, true);
+							if (!Repository.AcceptConflictedFile(fullPath, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
+							goto FINISH;
 
 						case MergeBinaryFileResults.RunMergeTool:
 							using (var process = new Process())

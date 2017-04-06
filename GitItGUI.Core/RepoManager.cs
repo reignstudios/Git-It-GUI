@@ -77,7 +77,7 @@ namespace GitItGUI.Core
 				if (!refreshMode)
 				{
 					string sigName, sigEmail;
-					if (!Repository.GetSignature(SignatureLocations.Global, out sigName, out sigEmail)) throw new Exception(Repository.lastError);
+					Repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail);
 					signatureName = sigName;
 					signatureEmail = sigEmail;
 					if (checkForSettingErros)

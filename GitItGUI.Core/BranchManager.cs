@@ -239,5 +239,22 @@ namespace GitItGUI.Core
 			
 			return true;
 		}
+
+		public static bool PruneRemoteBranches()
+		{
+			bool success = true;
+			try
+			{
+				if (!Repository.PruneRemoteBranches()) throw new Exception(Repository.lastError);
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Failed to prune branches: " + e.Message, true);
+				success = false;
+			}
+
+			RepoManager.Refresh();
+			return success;
+		}
 	}
 }

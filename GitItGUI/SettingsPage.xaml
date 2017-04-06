@@ -1,7 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="740" Design.Height="500">
 	<Grid>
 		<Grid Background="LightGray">
-			<TextBlock FontSize="24" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Global Git Settings</TextBlock>
+			<TextBlock FontSize="24" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">Git Settings</TextBlock>
 			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="75*" />
