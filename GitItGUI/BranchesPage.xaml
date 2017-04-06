@@ -33,7 +33,7 @@
 			<Button Name="switchBranchButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10" Width="75" ToolTip.Tip="Switch to selected 'Other' branch?">Switch</Button>
 			<Button Name="mergeBranchButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,-10,-90,10" Width="75" ToolTip.Tip="Merge selected 'Other' changes into 'Active'?">Merge</Button>
 			<Button Name="deleteBranchButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="170,-10,-170,10" Width="75" ToolTip.Tip="Delete selected 'Other' branch?">Delete</Button>
-			<Button Name="pruneBranchButton" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-10,-10,10,10" Width="75" ToolTip.Tip="Remove remote branches no longer living on the server">Prune</Button>
+			<Button Name="pruneBranchButton" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-10,-10,10,10" Width="75" ToolTip.Tip="Remove remote branches no longer living on the server">Cleanup</Button>
 		</Grid>
 	</Grid>
 </UserControl>
