@@ -290,45 +290,31 @@ namespace GitCommander
 
 		public static bool IsUpToDateWithRemote(string remote, string branch, out bool yes)
 		{
-			// check for changes not in sync
-			//yes = true;
-			//bool isUpToDate = true;
-			//var stdCallback_log = new StdCallbackMethod(delegate(string line)
-			//{
-			//	var match = Regex.Match(line, @"commit (.*)");
-			//	if (match.Success) isUpToDate = false;
-			//});
-			
-			//var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback:stdCallback_log);
-			//lastResult = result.Item1;
-			//lastError = result.Item2;
-			//yes = isUpToDate;
-			
-			//return string.IsNullOrEmpty(lastError);
-			
-			string remoteChangeset = "...1";
-			var stdCallback_remote = new StdCallbackMethod(delegate(string line)
+			bool isUpToDate = true;
+			var stdCallback_log = new StdCallbackMethod(delegate (string line)
 			{
-				var parts = line.Split('\t');
-				if (parts.Length == 2) remoteChangeset = parts[0];
-				else remoteChangeset = line;
+				var match = Regex.Match(line, @"commit (.*)");
+				if (match.Success) isUpToDate = false;
 			});
-			
-			var result = Tools.RunExe("git", string.Format("ls-remote {0} {1}", remote, branch), stdCallback:stdCallback_remote);
+
+			var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback: stdCallback_log);
 			lastResult = result.Item1;
 			lastError = result.Item2;
+			yes = isUpToDate;
+			if (!isUpToDate) return string.IsNullOrEmpty(lastError);
 
-			string localChangeset = "...2";
-			var stdCallback_local = new StdCallbackMethod(delegate(string line)
+			isUpToDate = true;
+			var stdCallback_fetch = new StdCallbackMethod(delegate (string line)
 			{
-				localChangeset = line;
+				var match = Regex.Match(line, string.Format(@"\s*(.*)\.\.(.*)\s*{1}\s*->\s*{0}/{1}", remote, branch));
+				if (match.Success && match.Groups[1].Value != match.Groups[2].Value) isUpToDate = false;
 			});
-			
-			result = Tools.RunExe("git", string.Format("rev-parse {0}/{1}", remote, branch), stdCallback:stdCallback_local);
+
+			result = Tools.RunExe("git", string.Format("fetch {0} {1} --dry-run", remote, branch), stdCallback: stdCallback_fetch);
 			lastResult = result.Item1;
 			lastError = result.Item2;
+			if (!isUpToDate) yes = false;
 
-			yes = remoteChangeset == localChangeset;
 			return string.IsNullOrEmpty(lastError);
 		}
 	}
