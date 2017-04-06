@@ -61,7 +61,7 @@
 			<TabItem Header="Simple">
 				<Grid Background="White">
 					<Button Name="syncChangesButton" FontSize="18" Content="Sync" Margin="10,10,0,10" HorizontalAlignment="Left" Width="256"/>
-					<TextBlock Margin="280,10,10,10" HorizontalAlignment="Left" TextWrapping="Wrap">Git stores changes locally on your computer. To sync your local changes to the sever, press the Sync button.</TextBlock>
+					<TextBlock Margin="280,10,10,10" HorizontalAlignment="Left" TextWrapping="Wrap">Git stores changes locally on your computer. To sync changes with the server, press the Sync button.</TextBlock>
 				</Grid>
 			</TabItem>
 
