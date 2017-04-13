@@ -23,7 +23,8 @@ namespace GitCommander
 		TypeChangeInIndex = 512,
 		Conflicted = 1024,
 		Ignored = 2048,
-		Unreadable = 4096
+		Unreadable = 4096,
+		Copied = 8192
 	}
 
 	public enum FileConflictSources
@@ -140,10 +141,10 @@ namespace GitCommander
 			return SimpleGitInvoke("reset --hard");
 		}
 
-		private delegate bool AddState(string type, FileStates stateType, FileConflictTypes conflictType = FileConflictTypes.None);
+		private delegate bool AddState(string type, FileStates stateType, FileConflictTypes conflictType = FileConflictTypes.None, FileStates specialState = FileStates.Unaltered);
 		private static bool ParseFileState(string line, ref int mode, List<FileState> states)
 		{
-			var addState = new AddState(delegate(string type, FileStates stateType, FileConflictTypes conflictType)
+			var addState = new AddState(delegate(string type, FileStates stateType, FileConflictTypes conflictType, FileStates specialState)
 			{
 				if (line.Contains(type))
 				{
@@ -151,6 +152,20 @@ namespace GitCommander
 					if (match.Groups.Count == 2)
 					{
 						string filePath = match.Groups[1].Value;
+						if (stateType == FileStates.Copied)
+						{
+							match = Regex.Match(filePath, @"(.*)\s->\s(.*)");
+							if (match.Success)
+							{
+								filePath = match.Groups[2].Value;
+								stateType |= specialState;
+							}
+							else
+							{
+								throw new Exception("Failed to parse copied status type");
+							}
+						}
+
 						if (states != null && states.Exists(x => x.filename == filePath))
 						{
 							var state = states.Find(x => x.filename == filePath);
@@ -191,12 +206,15 @@ namespace GitCommander
 				if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
 				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromIndex);
 				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInIndex);
+				if (!pass) pass = addState("\tcopied:", FileStates.Copied, specialState:FileStates.NewInIndex);
 			}
 			else if (mode == 1)
 			{
 				pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
 				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromWorkdir);
 				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInWorkdir);
+				if (!pass) pass = addState("\tcopied:", FileStates.Copied, specialState:FileStates.NewInWorkdir);
+				if (!pass) pass = addState("\tnew file:", FileStates.NewInWorkdir);// call this just in case (should be done in untracked)
 			}
 			else if (mode == 2)
 			{
