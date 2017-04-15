@@ -517,21 +517,30 @@ namespace GitItGUI.Core
 				}
 				
 				// save local temp files
-				Debug.pauseGitCommanderStdWrites = true;
-				if (fileState.conflictType != FileConflictTypes.DeletedByUs)
+				if (fileState.conflictType == FileConflictTypes.DeletedByBoth)
 				{
-					bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
-					fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
-					if (!fileCreated) throw new Exception(Repository.lastError);
+					Debug.Log("Auto resolving file that was deleted by both branches: " + fileState.filename, true);
+					if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+					goto FINISH;
 				}
+				else
+				{
+					Debug.pauseGitCommanderStdWrites = true;
+					if (fileState.conflictType != FileConflictTypes.DeletedByUs)
+					{
+						bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
+						fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
+						if (!fileCreated) throw new Exception(Repository.lastError);
+					}
 
-				if (fileState.conflictType != FileConflictTypes.DeletedByThem)
-				{
-					bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
-					fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
-					if (!fileCreated) throw new Exception(Repository.lastError);
+					if (fileState.conflictType != FileConflictTypes.DeletedByThem)
+					{
+						bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
+						fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
+						if (!fileCreated) throw new Exception(Repository.lastError);
+					}
+					Debug.pauseGitCommanderStdWrites = false;
 				}
-				Debug.pauseGitCommanderStdWrites = false;
 
 				// check if files are binary (if so open select binary file tool) [if file conflict is because of deletion this method is also used]
 				if (fileState.conflictType != FileConflictTypes.Changes || Tools.IsBinaryFileData(fullPathOurs) || Tools.IsBinaryFileData(fullPathTheirs))
@@ -551,7 +560,7 @@ namespace GitItGUI.Core
 							case MergeBinaryFileResults.KeepMine:
 								if (fileState.conflictType == FileConflictTypes.Changes)
 								{
-									if (!Repository.AcceptConflictedFile(fullPath, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
+									if (!Repository.AcceptConflictedFile(fileState.filename, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
 								}
 								else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
 								{
@@ -567,7 +576,7 @@ namespace GitItGUI.Core
 							case MergeBinaryFileResults.UseTheirs:
 								if (fileState.conflictType == FileConflictTypes.Changes)
 								{
-									if (!Repository.AcceptConflictedFile(fullPath, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
+									if (!Repository.AcceptConflictedFile(fileState.filename, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
 								}
 								else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
 								{
@@ -626,14 +635,16 @@ namespace GitItGUI.Core
 							goto FINISH;
 
 						case MergeBinaryFileResults.KeepMine:
-							//File.Copy(fullPathOurs, fullPathBase, true);
-							if (!Repository.AcceptConflictedFile(fullPath, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
-							goto FINISH;
+							File.Copy(fullPathOurs, fullPathBase, true);
+							break;
+							//if (!Repository.AcceptConflictedFile(fileState.filename, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
+							//goto FINISH;
 
 						case MergeBinaryFileResults.UseTheirs:
-							//File.Copy(fullPathTheirs, fullPathBase, true);
-							if (!Repository.AcceptConflictedFile(fullPath, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
-							goto FINISH;
+							File.Copy(fullPathTheirs, fullPathBase, true);
+							break;
+							//if (!Repository.AcceptConflictedFile(fileState.filename, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
+							//goto FINISH;
 
 						case MergeBinaryFileResults.RunMergeTool:
 							using (var process = new Process())
