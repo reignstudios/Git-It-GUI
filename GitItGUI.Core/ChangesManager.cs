@@ -637,14 +637,10 @@ namespace GitItGUI.Core
 						case MergeBinaryFileResults.KeepMine:
 							File.Copy(fullPathOurs, fullPathBase, true);
 							break;
-							//if (!Repository.AcceptConflictedFile(fileState.filename, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
-							//goto FINISH;
 
 						case MergeBinaryFileResults.UseTheirs:
 							File.Copy(fullPathTheirs, fullPathBase, true);
 							break;
-							//if (!Repository.AcceptConflictedFile(fileState.filename, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
-							//goto FINISH;
 
 						case MergeBinaryFileResults.RunMergeTool:
 							using (var process = new Process())
