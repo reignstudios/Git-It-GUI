@@ -25,6 +25,7 @@ namespace GitItGUI
 	public class ProcessingPage : UserControl, NavigationPage
 	{
 		public static ProcessingPage singleton;
+		public static volatile bool isActive;
 
 		// clone
 		public ProcessingPageModes mode = ProcessingPageModes.None;
@@ -62,10 +63,12 @@ namespace GitItGUI
 		public void NavigatedFrom()
 		{
 			mode = ProcessingPageModes.None;
+			isActive = false;
 		}
 
 		public async void NavigatedTo()
 		{
+			isActive = true;
 			statusTextBox.Text = "Waiting...";
 			await Task.Delay(500);
 			thread = new Thread(Process);
