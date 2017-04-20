@@ -560,7 +560,8 @@ namespace GitItGUI.Core
 							case MergeBinaryFileResults.KeepMine:
 								if (fileState.conflictType == FileConflictTypes.Changes)
 								{
-									if (!Repository.AcceptConflictedFile(fileState.filename, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
+									if (!Repository.CheckoutConflictedFile(fileState.filename, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
+									if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
 								}
 								else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
 								{
@@ -576,7 +577,8 @@ namespace GitItGUI.Core
 							case MergeBinaryFileResults.UseTheirs:
 								if (fileState.conflictType == FileConflictTypes.Changes)
 								{
-									if (!Repository.AcceptConflictedFile(fileState.filename, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
+									if (!Repository.CheckoutConflictedFile(fileState.filename, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
+									if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
 								}
 								else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
 								{

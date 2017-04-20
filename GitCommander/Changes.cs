@@ -334,7 +334,7 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool AcceptConflictedFile(string filename, FileConflictSources source)
+		public static bool CheckoutConflictedFile(string filename, FileConflictSources source)
 		{
 			string sourceName = source == FileConflictSources.Ours ? "--ours" : "--theirs";
 			return SimpleGitInvoke(string.Format("checkout {1} \"{0}\"", filename, sourceName));
