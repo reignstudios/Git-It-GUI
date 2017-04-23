@@ -300,8 +300,10 @@ namespace GitCommander
 			var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback: stdCallback_log);
 			lastResult = result.Item1;
 			lastError = result.Item2;
-			yes = isUpToDate;
-			if (!isUpToDate) return string.IsNullOrEmpty(lastError);
+			bool remoteDoesntHaveBranch = lastError.Contains("unknown revision or path not in the working tree");
+			yes = isUpToDate && !remoteDoesntHaveBranch;
+			if (!isUpToDate && !remoteDoesntHaveBranch) return string.IsNullOrEmpty(lastError);
+			if (remoteDoesntHaveBranch) return true;
 
 			isUpToDate = true;
 			var stdCallback_fetch = new StdCallbackMethod(delegate (string line)

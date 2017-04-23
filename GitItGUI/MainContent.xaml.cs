@@ -43,6 +43,39 @@ namespace GitItGUI
 
 		private void RepoManager_RepoRefreshedCallback()
 		{
+			// check if repo has anything commited
+			if (BranchManager.isEmpty)
+			{
+				bool pass = false;
+				if (MessageBox.Show("This is an emtpy repo, a 'README.md' file will be auto commit.\nThis is required to put the repo in a usable state.", MessageBoxTypes.OkCancel))
+				{
+					const string readme = "README.mb";
+					string readmePath = Repository.repoPath + '\\' + readme;
+					if (!File.Exists(readmePath))
+					{
+						using (var writer = File.CreateText(readmePath))
+						{
+							writer.Write("TODO");
+						}
+					}
+
+					pass = Repository.Stage(readme);
+					if (pass) pass = Repository.Commit("First Commit!\nAdded readme file!");
+				}
+				
+				if (pass)
+				{
+					RepoManager.Refresh();
+					return;
+				}
+				else
+				{
+					RepoManager.Close();
+					MainWindow.LoadPage(PageTypes.Start);
+					return;
+				}
+			}
+
 			// get status
 			string name = Repository.repoPath;
 			string text;

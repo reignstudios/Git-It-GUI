@@ -142,17 +142,24 @@ namespace GitItGUI
 			}
 
 			otherBranchListView.Items = items;
-			activeBranchTextBox.Text = BranchManager.activeBranch.name;
-			if (BranchManager.activeBranch.isTracking)
+			if (BranchManager.activeBranch != null)
 			{
-				trackingOriginTextBox.Text = BranchManager.activeBranch.tracking.fullname;
-				if (BranchManager.activeBranch.tracking.remoteState != null) remoteURLTextBox.Text = BranchManager.activeBranch.tracking.remoteState.url;
-				else remoteURLTextBox.Text = "";
+				activeBranchTextBox.Text = BranchManager.activeBranch.name;
+				if (BranchManager.activeBranch.isTracking)
+				{
+					trackingOriginTextBox.Text = BranchManager.activeBranch.tracking.fullname;
+					if (BranchManager.activeBranch.tracking.remoteState != null) remoteURLTextBox.Text = BranchManager.activeBranch.tracking.remoteState.url;
+					else remoteURLTextBox.Text = "";
+				}
+				else
+				{
+					trackingOriginTextBox.Text = "";
+					remoteURLTextBox.Text = "";
+				}
 			}
 			else
 			{
-				trackingOriginTextBox.Text = "";
-				remoteURLTextBox.Text = "";
+				activeBranchTextBox.Text = "??? (NO CHANGES COMMITED) ???";
 			}
 		}
 

@@ -13,18 +13,32 @@ namespace GitItGUI.Core
 
 	public static class BranchManager
 	{
+		public static bool isEmpty {get; private set;}
 		public static BranchState activeBranch {get; private set;}
 		public static BranchState[] branchStates {get; private set;}
 		public static RemoteState[] remoteStates {get; private set;}
 
 		internal static bool Refresh(bool refreshMode)
 		{
+			isEmpty = false;
+
 			try
 			{
 				// gather branches
 				BranchState[] bStates;
 				if (!Repository.GetBrancheStates(out bStates)) throw new Exception(Repository.lastError);
 				branchStates = bStates;
+
+				// check for new repo state
+				if (branchStates.Length == 0)
+				{
+					isEmpty = true;
+					activeBranch = null;
+					branchStates = null;
+					remoteStates = null;
+					Debug.LogWarning("New branch, nothing commit!");
+					return true;
+				}
 
 				// find active branch
 				activeBranch = Array.Find<BranchState>(branchStates, x => x.isActive);
@@ -51,6 +65,8 @@ namespace GitItGUI.Core
 
 		public static BranchState[] GetNonActiveBranches(bool getRemotes)
 		{
+			if (branchStates == null) return new BranchState[0];
+
 			var nonActiveBranches = new List<BranchState>();
 			foreach (var branch in branchStates)
 			{
@@ -72,6 +88,8 @@ namespace GitItGUI.Core
 
 		public static bool Checkout(BranchState branch, bool useFullname = false)
 		{
+			if (activeBranch == null) return false;
+
 			bool success = true;
 			try
 			{
@@ -201,6 +219,7 @@ namespace GitItGUI.Core
 
 		public static bool RemoveTracking()
 		{
+			if (activeBranch == null) return false;
 			if (!activeBranch.isTracking) return true;
 
 			bool success = true;
@@ -220,6 +239,12 @@ namespace GitItGUI.Core
 
 		public static bool IsUpToDateWithRemote(out bool yes)
 		{
+			if (activeBranch == null)
+			{
+				yes = false;
+				return false;
+			}
+
 			if (!activeBranch.isTracking)
 			{
 				yes = true;
