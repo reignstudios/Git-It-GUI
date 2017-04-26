@@ -526,7 +526,17 @@ namespace GitItGUI
 
 		private void StageAllButton_Click(object sender, RoutedEventArgs e)
 		{
-			ChangesManager.StageAllFiles();
+			if (ChangesManager.ConflictsExist())
+			{
+				if (MessageBox.Show("File in conflicts exist.\nAre you sure you want to stage un-resolved files?", MessageBoxTypes.YesNo))
+				{
+					ChangesManager.StageAllFiles();
+				}
+			}
+			else
+			{
+				ChangesManager.StageAllFiles();
+			}
 		}
 
 		private void UnstageAllButton_Click(object sender, RoutedEventArgs e)

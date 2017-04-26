@@ -37,7 +37,7 @@ using System.Runtime.InteropServices;
 
 public static class VersionInfo
 {
-	public const string version = "0.2.15";
+	public const string version = "0.2.16";
 	#if DEBUG
 	public const string versionType = version + "b";
 	#else

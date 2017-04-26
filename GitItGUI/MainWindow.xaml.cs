@@ -5,6 +5,7 @@ using GitItGUI.Core;
 using Avalonia.Threading;
 using System.Threading;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace GitItGUI
 {
@@ -22,9 +23,34 @@ namespace GitItGUI
 	{
 		public static MainWindow singleton;
 
+		[DllImport("User32.dll")]
+		private static extern bool SetForegroundWindow(IntPtr handle);
+
+		[DllImport("User32.dll")]
+		private static extern bool ShowWindow(IntPtr handle, int nCmdShow);
+		private const int SW_RESTORE = 9;
+
+		[DllImport("User32.dll")]
+		private static extern bool IsIconic(IntPtr handle);
+
 		public MainWindow()
 		{
 			singleton = this;
+
+			// validate this is the only process
+			var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+			foreach (var process in System.Diagnostics.Process.GetProcesses())
+			{
+				if (currentProcess.Id == process.Id) continue;
+				if (currentProcess.ProcessName == process.ProcessName)
+				{
+					var handle = process.MainWindowHandle;
+					if (IsIconic(handle)) ShowWindow(handle, SW_RESTORE);
+					SetForegroundWindow(handle);
+					Environment.Exit(1);
+					return;
+				}
+			}
 
 			// load main page
 			AvaloniaXamlLoader.Load(this);
