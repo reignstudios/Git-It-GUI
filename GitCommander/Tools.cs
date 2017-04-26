@@ -65,19 +65,14 @@ namespace GitCommander
 				StreamWriter stdOutStreamWriter = null;
 				if (stdOutToFilePath != null)
 				{
-					stdOutToFilePath = Repository.repoPath + Path.DirectorySeparatorChar + stdOutToFilePath;
+					stdOutToFilePath = Repository.repoPath + Path.DirectorySeparatorChar + stdOutToFilePath.Replace('/', Path.DirectorySeparatorChar);
 					stdOutStream = new FileStream(stdOutToFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
 					stdOutStreamWriter = new StreamWriter(stdOutStream);
 				}
 
 				var outDataReceived = new StdCallbackMethod(delegate(string line)
 				{
-					if (stdOutToFilePath != null)
-					{
-						stdOutStreamWriter.WriteLine(line);
-						stdOutStreamWriter.Flush();
-						stdOutStream.Flush();
-					}
+					if (stdOutToFilePath != null) stdOutStreamWriter.WriteLine(line);
 					
 					if (stdCallback != null) stdCallback(line);
 					if (stdResultOn)
@@ -156,10 +151,10 @@ namespace GitCommander
 				process.WaitForExit();
 
 				// close stdOut file
-				if (stdOutStreamWriter != null) stdOutStreamWriter.Dispose();
+				if (stdOutStreamWriter != null) stdOutStreamWriter.Flush();
 				if (stdOutStream != null)
 				{
-					stdOutStream.Close();
+					stdOutStream.Flush();
 					stdOutStream.Dispose();
 				}
 			}

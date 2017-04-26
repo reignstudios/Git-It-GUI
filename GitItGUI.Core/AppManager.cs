@@ -410,6 +410,7 @@ namespace GitItGUI.Core
 					Debug.LogError("Failed to grab git version!", true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
+					DownloadGit();
 					return;
 				}
 				
@@ -427,6 +428,7 @@ namespace GitItGUI.Core
 					Debug.LogError("Failed to grab git-lfs version!", true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
+					DownloadGitLFS();
 					return;
 				}
 

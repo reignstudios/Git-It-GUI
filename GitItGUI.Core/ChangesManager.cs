@@ -498,7 +498,7 @@ namespace GitItGUI.Core
 		public static bool ResolveConflict(FileState fileState, bool refresh)
 		{
 			bool wasModified = false, success = true;
-			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
 			string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
 			var DeleteTempMergeFiles = new DeleteTempMergeFilesMethod(delegate ()
 			{
@@ -509,6 +509,9 @@ namespace GitItGUI.Core
 
 			try
 			{
+				// make sure file is in a normal state
+				File.SetAttributes(fullPath, FileAttributes.Normal);
+
 				// make sure file needs to be resolved
 				if (!fileState.HasState(FileStates.Conflicted))
 				{
@@ -529,14 +532,14 @@ namespace GitItGUI.Core
 					if (fileState.conflictType != FileConflictTypes.DeletedByUs)
 					{
 						bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
-						fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs;
+						fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs.Replace('/', Path.DirectorySeparatorChar);
 						if (!fileCreated) throw new Exception(Repository.lastError);
 					}
 
 					if (fileState.conflictType != FileConflictTypes.DeletedByThem)
 					{
 						bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
-						fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs;
+						fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs.Replace('/', Path.DirectorySeparatorChar);
 						if (!fileCreated) throw new Exception(Repository.lastError);
 					}
 					Debug.pauseGitCommanderStdWrites = false;
@@ -605,13 +608,16 @@ namespace GitItGUI.Core
 				}
 			
 				// copy base and parse
-				File.Copy(fullPath, fullPathBase, true);
 				string baseFile = File.ReadAllText(fullPath);
 				var match = Regex.Match(baseFile, @"(<<<<<<<\s*\w*[\r\n]*).*(=======[\r\n]*).*(>>>>>>>\s*\w*[\r\n]*)", RegexOptions.Singleline);
 				if (match.Success && match.Groups.Count == 4)
 				{
 					baseFile = baseFile.Replace(match.Groups[1].Value, "").Replace(match.Groups[2].Value, "").Replace(match.Groups[3].Value, "");
 					File.WriteAllText(fullPathBase, baseFile);
+				}
+				else
+				{
+					File.Copy(fullPath, fullPathBase, true);
 				}
 
 				// hash base file
@@ -739,7 +745,7 @@ namespace GitItGUI.Core
 		private delegate void DeleteTempDiffFilesMethod();
 		public static bool OpenDiffTool(FileState fileState)
 		{
-			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
 			string fullPathOrig = null;
 			var DeleteTempDiffFiles = new DeleteTempDiffFilesMethod(delegate ()
 			{
