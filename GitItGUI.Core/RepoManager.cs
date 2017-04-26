@@ -18,7 +18,7 @@ namespace GitItGUI.Core
 	public static class RepoManager
 	{
 		private static object lockObj = new object();
-		public static bool isRefreshing {get; private set;}
+		private static volatile bool isRefreshing;
 
 		public delegate void RepoRefreshedCallbackMethod();
 		public static event RepoRefreshedCallbackMethod RepoRefreshedCallback;
@@ -110,12 +110,18 @@ namespace GitItGUI.Core
 			return OpenRepo(null);
 		}
 
-		public static bool Refresh()
+		public static void Refresh()
 		{
-			isRefreshing = true;
-			bool result = OpenRepo(Repository.repoPath);
-			isRefreshing = false;
-			return result;
+			if (isRefreshing) return;
+			var thread = new Thread(delegate()
+			{
+				if (isRefreshing) return;
+				isRefreshing = true;
+				bool result = OpenRepo(Repository.repoPath);
+				isRefreshing = false;
+			});
+
+			thread.Start();
 		}
 
 		private static bool RefreshInternal(bool refreshMode)

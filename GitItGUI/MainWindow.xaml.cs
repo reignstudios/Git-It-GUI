@@ -19,9 +19,10 @@ namespace GitItGUI
 		Clone
 	}
 	
-	public class MainWindow : Window
+	public class MainWindow : Window, System.Windows.Forms.IWin32Window
 	{
 		public static MainWindow singleton;
+		public IntPtr Handle {get; private set;}
 
 		[DllImport("User32.dll")]
 		private static extern bool SetForegroundWindow(IntPtr handle);
@@ -39,6 +40,7 @@ namespace GitItGUI
 
 			// validate this is the only process
 			var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+			Handle = currentProcess.MainWindowHandle;
 			foreach (var process in System.Diagnostics.Process.GetProcesses())
 			{
 				if (currentProcess.Id == process.Id) continue;
@@ -51,7 +53,7 @@ namespace GitItGUI
 					return;
 				}
 			}
-
+			
 			// load main page
 			AvaloniaXamlLoader.Load(this);
 			App.AttachDevTools(this);
@@ -82,9 +84,9 @@ namespace GitItGUI
 
 		private void MainWindow_Activated(object sender, EventArgs e)
 		{
-			#if !DEBUG
-			if (MainContent.singleton.IsVisible && AppManager.autoRefreshChanges && !ProcessingPage.isActive && !RepoManager.isRefreshing) RepoManager.Refresh();
-			#endif
+			//#if !DEBUG
+			if (MainContent.singleton.IsVisible && AppManager.autoRefreshChanges && !ProcessingPage.isActive) RepoManager.Refresh();
+			//#endif
 		}
 
 		private void Debug_debugLogCallback(object value, bool alert)

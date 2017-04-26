@@ -35,9 +35,9 @@ namespace GitItGUI
 				Win.DialogResult result = Win.DialogResult.None;
 				switch (type)
 				{
-					case MessageBoxTypes.Ok: result = Win.MessageBox.Show(message, title, Win.MessageBoxButtons.OK); break;
-					case MessageBoxTypes.OkCancel: result = Win.MessageBox.Show(message, title, Win.MessageBoxButtons.OKCancel); break;
-					case MessageBoxTypes.YesNo: result = Win.MessageBox.Show(message, title, Win.MessageBoxButtons.YesNo); break;
+					case MessageBoxTypes.Ok: result = Win.MessageBox.Show(MainWindow.singleton, message, title, Win.MessageBoxButtons.OK); break;
+					case MessageBoxTypes.OkCancel: result = Win.MessageBox.Show(MainWindow.singleton, message, title, Win.MessageBoxButtons.OKCancel); break;
+					case MessageBoxTypes.YesNo: result = Win.MessageBox.Show(MainWindow.singleton, message, title, Win.MessageBoxButtons.YesNo); break;
 				}
 
 				if (result == Win.DialogResult.OK || result == Win.DialogResult.Yes) return true;
