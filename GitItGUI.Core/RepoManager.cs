@@ -17,6 +17,9 @@ namespace GitItGUI.Core
 	/// </summary>
 	public static class RepoManager
 	{
+		private static object lockObj = new object();
+		public static bool isRefreshing {get; private set;}
+
 		public delegate void RepoRefreshedCallbackMethod();
 		public static event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 
@@ -35,68 +38,71 @@ namespace GitItGUI.Core
 		/// <returns>True if succeeded</returns>
 		public static bool OpenRepo(string path, bool checkForSettingErros = false)
 		{
-			// unload repo
-			if (string.IsNullOrEmpty(path))
+			lock (lockObj)
 			{
-				Dispose();
-				return true;
-			}
-
-			if (!AppManager.MergeDiffToolInstalled())
-			{
-				Debug.LogError("Merge/Diff tool is not installed!\nGo to app settings and make sure your selected diff tool is installed.", true);
-				return false;
-			}
-
-			bool refreshMode = path == Repository.repoPath;
-			
-			try
-			{
-				// load repo
-				if (refreshMode) Repository.Dispose();
-				if (!Repository.Open(path)) throw new Exception(Repository.lastError);
-				
-				// check for git lfs
-				lfsEnabled = IsGitLFSRepo(false);
-
-				// check for .gitignore file
-				if (!refreshMode)
+				// unload repo
+				if (string.IsNullOrEmpty(path))
 				{
-					string gitIgnorePath = path + Path.DirectorySeparatorChar + ".gitignore";
-					if (!File.Exists(gitIgnorePath))
-					{
-						Debug.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
-						File.WriteAllText(gitIgnorePath, "");
-					}
+					Dispose();
+					return true;
 				}
-				
-				// add repo to history
-				AppManager.AddActiveRepoToHistory();
 
-				// get signature
-				if (!refreshMode)
+				if (!AppManager.MergeDiffToolInstalled())
 				{
-					string sigName, sigEmail;
-					Repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail);
-					signatureName = sigName;
-					signatureEmail = sigEmail;
-					if (checkForSettingErros)
+					Debug.LogError("Merge/Diff tool is not installed!\nGo to app settings and make sure your selected diff tool is installed.", true);
+					return false;
+				}
+
+				bool refreshMode = path == Repository.repoPath;
+			
+				try
+				{
+					// load repo
+					if (refreshMode) Repository.Dispose();
+					if (!Repository.Open(path)) throw new Exception(Repository.lastError);
+				
+					// check for git lfs
+					lfsEnabled = IsGitLFSRepo(false);
+
+					// check for .gitignore file
+					if (!refreshMode)
 					{
-						if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
+						string gitIgnorePath = path + Path.DirectorySeparatorChar + ".gitignore";
+						if (!File.Exists(gitIgnorePath))
 						{
-							Debug.LogWarning("Credentials not set, please go to the settings tab!", true);
+							Debug.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
+							File.WriteAllText(gitIgnorePath, "");
+						}
+					}
+				
+					// add repo to history
+					AppManager.AddActiveRepoToHistory();
+
+					// get signature
+					if (!refreshMode)
+					{
+						string sigName, sigEmail;
+						Repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail);
+						signatureName = sigName;
+						signatureEmail = sigEmail;
+						if (checkForSettingErros)
+						{
+							if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
+							{
+								Debug.LogWarning("Credentials not set, please go to the settings tab!", true);
+							}
 						}
 					}
 				}
-			}
-			catch (Exception e)
-			{
-				Debug.LogError("RepoManager.OpenRepo Failed: " + e.Message);
-				Dispose();
-				return false;
-			}
+				catch (Exception e)
+				{
+					Debug.LogError("RepoManager.OpenRepo Failed: " + e.Message);
+					Dispose();
+					return false;
+				}
 			
-			return RefreshInternal(refreshMode);
+				return RefreshInternal(refreshMode);
+			}
 		}
 
 		public static bool Close()
@@ -106,7 +112,10 @@ namespace GitItGUI.Core
 
 		public static bool Refresh()
 		{
-			return OpenRepo(Repository.repoPath);
+			isRefreshing = true;
+			bool result = OpenRepo(Repository.repoPath);
+			isRefreshing = false;
+			return result;
 		}
 
 		private static bool RefreshInternal(bool refreshMode)

@@ -57,7 +57,7 @@ namespace GitItGUI
 		private void MainWindow_Activated(object sender, EventArgs e)
 		{
 			#if !DEBUG
-			if (MainContent.singleton.IsVisible && AppManager.autoRefreshChanges && !ProcessingPage.isActive) RepoManager.Refresh();
+			if (MainContent.singleton.IsVisible && AppManager.autoRefreshChanges && !ProcessingPage.isActive && !RepoManager.isRefreshing) RepoManager.Refresh();
 			#endif
 		}
 

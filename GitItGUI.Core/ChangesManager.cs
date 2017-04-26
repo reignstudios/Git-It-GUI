@@ -497,7 +497,7 @@ namespace GitItGUI.Core
 		private delegate void DeleteTempMergeFilesMethod();
 		public static bool ResolveConflict(FileState fileState, bool refresh)
 		{
-			bool wasModified = false, success = true;
+			bool success = true;
 			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
 			string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
 			var DeleteTempMergeFiles = new DeleteTempMergeFilesMethod(delegate ()
@@ -554,10 +554,11 @@ namespace GitItGUI.Core
 					{
 						switch (mergeBinaryResult)
 						{
-							case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true);
-								goto FINISH;
+							case MergeBinaryFileResults.Error:
+								throw new Exception("Error trying to resolve file: " + fileState.filename);
 
 							case MergeBinaryFileResults.Cancel:
+								success = false;
 								goto FINISH;
 
 							case MergeBinaryFileResults.KeepMine:
@@ -594,13 +595,12 @@ namespace GitItGUI.Core
 								}
 								break;
 
-							default: Debug.LogWarning("Unsuported Response: " + mergeBinaryResult, true); goto FINISH;
+							default: throw new Exception("Unsuported Response: " + mergeBinaryResult);
 						}
 					}
 					else
 					{
-						Debug.LogError("Failed to resolve file: " + fileState.filename, true);
-						goto FINISH;
+						throw new Exception("Failed to resolve file: " + fileState.filename);
 					}
 
 					// finish
@@ -636,10 +636,11 @@ namespace GitItGUI.Core
 				{
 					switch (mergeFileResult)
 					{
-						case MergeBinaryFileResults.Error: Debug.LogWarning("Error trying to resolve file: " + fileState.filename, true);
-							goto FINISH;
+						case MergeBinaryFileResults.Error:
+							throw new Exception("Error trying to resolve file: " + fileState.filename);
 
 						case MergeBinaryFileResults.Cancel:
+							success = false;
 							goto FINISH;
 
 						case MergeBinaryFileResults.KeepMine:
@@ -661,22 +662,19 @@ namespace GitItGUI.Core
 								process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 								if (!process.Start())
 								{
-									Debug.LogError("Failed to start Merge tool (is it installed?)", true);
-									goto FINISH;
+									throw new Exception("Failed to start Merge tool (is it installed?)");
 								}
 
 								process.WaitForExit();
 							}
 							break;
 
-						default: Debug.LogWarning("Unsuported Response: " + mergeFileResult, true);
-							goto FINISH;
+						default: throw new Exception("Unsuported Response: " + mergeFileResult);
 					}
 				}
 				else
 				{
-					Debug.LogError("Failed to resolve file: " + fileState.filename, true);
-					goto FINISH;
+					throw new Exception("Failed to resolve file: " + fileState.filename);
 				}
 
 				// get new base hash
@@ -690,6 +688,7 @@ namespace GitItGUI.Core
 				}
 
 				// check if file was modified
+				bool wasModified = false;
 				if (!baseHashChange.SequenceEqual(baseHash))
 				{
 					wasModified = true;
@@ -712,19 +711,17 @@ namespace GitItGUI.Core
 								break;
 
 							case MergeFileAcceptedResults.No:
+								success = false;
 								break;
 
-							default: Debug.LogWarning("Unsuported Response: " + result, true); goto FINISH;
+							default: throw new Exception("Unsuported Response: " + result);
 						}
 					}
 					else
 					{
-						Debug.LogError("Failed to ask user if file was resolved: " + fileState.filename, true);
-						goto FINISH;
+						throw new Exception("Failed to ask user if file was resolved: " + fileState.filename);
 					}
 				}
-
-				success = true;
 			}
 			catch (Exception e)
 			{
@@ -738,8 +735,7 @@ namespace GitItGUI.Core
 			FINISH:;
 			DeleteTempMergeFiles();
 			if (refresh) RepoManager.Refresh();
-			if (!success) return false;
-			return wasModified;
+			return success;
 		}
 
 		private delegate void DeleteTempDiffFilesMethod();
