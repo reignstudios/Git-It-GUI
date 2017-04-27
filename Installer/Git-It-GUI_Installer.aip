@@ -13,10 +13,10 @@
     <ROW Property="ARPURLUPDATEINFO" Value="https://github.com/reignstudios/Git-It-GUI/releases"/>
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Reign-Studios"/>
-    <ROW Property="ProductCode" Value="1033:{C8B248A7-843A-4E7F-9A96-B13941C78373} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{023AEA2F-36BE-47E8-9CCC-74434106B6EF} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Git-It-GUI"/>
-    <ROW Property="ProductVersion" Value="0.2.16" Type="32"/>
+    <ROW Property="ProductVersion" Value="0.2.17" Type="32"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{FD4A5E78-F668-42CE-90BC-D1DDAA792189}"/>
