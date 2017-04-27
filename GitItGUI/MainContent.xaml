@@ -23,7 +23,9 @@
 					<gititgui:SettingsPage/>
 				</TabItem>
 			</TabControl>
-		</Grid> 
+		</Grid>
+
+		<TextBlock Name="refreshTextBlock" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32" Margin="0,0,0,0">Refreshing...</TextBlock>
 	</Grid>
 
 </UserControl>

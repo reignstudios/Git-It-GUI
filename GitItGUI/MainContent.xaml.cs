@@ -17,7 +17,7 @@ namespace GitItGUI
 		public static MainContent singleton;
 		public event MainContentPageNavigateMethod MainContentPageNavigatedTo, MainContentPageNavigateFrom;
 
-		private TextBlock repoName;
+		private TextBlock repoName, refreshTextBlock;
 		private Button closeRepoButton;
 		private TabControl tabControl;
 		public int tabControlNavigateIndex = -1;
@@ -30,6 +30,8 @@ namespace GitItGUI
 			repoName = this.Find<TextBlock>("repoName");
 			closeRepoButton = this.Find<Button>("closeRepoButton");
 			tabControl = this.Find<TabControl>("tabControl");
+			refreshTextBlock = this.Find<TextBlock>("refreshTextBlock");
+			refreshTextBlock.IsVisible = false;
 
 			closeRepoButton.Click += CloseRepoButton_Click;
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
@@ -119,6 +121,7 @@ namespace GitItGUI
 				repoName.IsVisible = !start;
 				closeRepoButton.IsVisible = !start;
 				tabControl.IsVisible = !start;
+				refreshTextBlock.IsVisible = start;
 			}
 			else
 			{
@@ -127,6 +130,7 @@ namespace GitItGUI
 					repoName.IsVisible = !start;
 					closeRepoButton.IsVisible = !start;
 					tabControl.IsVisible = !start;
+					refreshTextBlock.IsVisible = start;
 				});
 			}
 		}
