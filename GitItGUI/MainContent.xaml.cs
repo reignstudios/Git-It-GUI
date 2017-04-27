@@ -33,6 +33,7 @@ namespace GitItGUI
 
 			closeRepoButton.Click += CloseRepoButton_Click;
 			RepoManager.RepoRefreshedCallback += RepoManager_RepoRefreshedCallback;
+			RepoManager.RepoRefreshingCallback += RepoManager_RepoRefreshingCallback;
 		}
 
 		private void CloseRepoButton_Click(object sender, RoutedEventArgs e)
@@ -108,6 +109,25 @@ namespace GitItGUI
 				});
 
 				while (!isDone) Thread.Sleep(1);
+			}
+		}
+
+		private void RepoManager_RepoRefreshingCallback(bool start)
+		{
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				repoName.IsVisible = !start;
+				closeRepoButton.IsVisible = !start;
+				tabControl.IsVisible = !start;
+			}
+			else
+			{
+				Dispatcher.UIThread.InvokeAsync(delegate
+				{
+					repoName.IsVisible = !start;
+					closeRepoButton.IsVisible = !start;
+					tabControl.IsVisible = !start;
+				});
 			}
 		}
 

@@ -23,6 +23,9 @@ namespace GitItGUI.Core
 		public delegate void RepoRefreshedCallbackMethod();
 		public static event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 
+		public delegate void RepoRefreshingCallbackMethod(bool start);
+		public static event RepoRefreshingCallbackMethod RepoRefreshingCallback;
+
 		/// <summary>
 		/// True if this is a Git-LFS enabled repo
 		/// </summary>
@@ -113,12 +116,15 @@ namespace GitItGUI.Core
 		public static void Refresh()
 		{
 			if (isRefreshing) return;
+			
 			var thread = new Thread(delegate()
 			{
 				if (isRefreshing) return;
 				isRefreshing = true;
+				if (RepoRefreshingCallback != null) RepoRefreshingCallback(true);
 				bool result = OpenRepo(Repository.repoPath);
 				isRefreshing = false;
+				if (RepoRefreshingCallback != null) RepoRefreshingCallback(false);
 			});
 
 			thread.Start();
