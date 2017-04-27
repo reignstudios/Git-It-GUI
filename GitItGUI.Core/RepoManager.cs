@@ -113,21 +113,30 @@ namespace GitItGUI.Core
 			return OpenRepo(null);
 		}
 
-		public static void Refresh()
+		public static void Refresh(bool useNewThread = false)
 		{
 			if (isRefreshing) return;
 			
-			var thread = new Thread(delegate()
+			if (useNewThread)
 			{
-				if (isRefreshing) return;
+				var thread = new Thread(delegate()
+				{
+					if (isRefreshing) return;
+					isRefreshing = true;
+					if (RepoRefreshingCallback != null) RepoRefreshingCallback(true);
+					bool result = OpenRepo(Repository.repoPath);
+					isRefreshing = false;
+					if (RepoRefreshingCallback != null) RepoRefreshingCallback(false);
+				});
+
+				thread.Start();
+			}
+			else
+			{
 				isRefreshing = true;
-				if (RepoRefreshingCallback != null) RepoRefreshingCallback(true);
 				bool result = OpenRepo(Repository.repoPath);
 				isRefreshing = false;
-				if (RepoRefreshingCallback != null) RepoRefreshingCallback(false);
-			});
-
-			thread.Start();
+			}
 		}
 
 		private static bool RefreshInternal(bool refreshMode)
