@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommitEntry", "CommitEntry\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MergeConflicPicker", "MergeConflicPicker\MergeConflicPicker.csproj", "{B0A50262-1677-453D-96F7-9169A622BE5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitKantan", "GitKantan\GitKantan.csproj", "{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +74,14 @@ Global
 		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|Any CPU.ActiveCfg = Release|x86
 		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|x86.ActiveCfg = Release|x86
 		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|x86.Build.0 = Release|x86
+		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Debug|x86.Build.0 = Debug|Any CPU
+		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Release|x86.ActiveCfg = Release|Any CPU
+		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
