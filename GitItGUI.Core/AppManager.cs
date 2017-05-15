@@ -91,7 +91,7 @@ namespace GitItGUI.Core
 					".zip", ".7z", ".rar", ".tar", ".gz",// compression types
 					".fbx", ".obj", ".3ds", ".blend", ".ma", ".mb", ".dae", ".daz", ".stl", ".wrl", ".spp", ".sbs", ".sppr", ".sbsar", ".ztl", ".zpr", ".obg",// 3d formats
 					".pdf", ".doc", ".docx",// doc types
-					".unity", ".unitypackage", ".uasset",// known binary types
+					".unity", ".unitypackage", ".uasset", ".asset", ".exr",// known binary types
 					".bin", ".data", ".raw", ".hex",// unknown binary types
 				};
 
