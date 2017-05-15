@@ -88,6 +88,7 @@
     <Compile Include="Tools\CoreApps.cs" />
     <Compile Include="Tools\MessageBox.cs" />
     <Compile Include="Tools\ResourceManager.cs" />
+    <Compile Include="Tools\SimplePreviewer.cs" />
     <EmbeddedResource Include="App.xaml" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
