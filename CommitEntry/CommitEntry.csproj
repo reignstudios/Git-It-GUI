@@ -62,8 +62,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\SkiaSharp.1.57.1\build\net45\SkiaSharp.targets" Condition="Exists('..\packages\SkiaSharp.1.57.1\build\net45\SkiaSharp.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\SkiaSharp.1.57.1\build\net45\SkiaSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SkiaSharp.1.57.1\build\net45\SkiaSharp.targets'))" />
+    <Error Condition="!Exists('..\packages\Avalonia.Skia.Linux.Natives.1.57.1.4\build\net45\Avalonia.Skia.Linux.Natives.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Avalonia.Skia.Linux.Natives.1.57.1.4\build\net45\Avalonia.Skia.Linux.Natives.targets'))" />
+  </Target>
+  <Import Project="..\packages\Avalonia.Skia.Linux.Natives.1.57.1.4\build\net45\Avalonia.Skia.Linux.Natives.targets" Condition="Exists('..\packages\Avalonia.Skia.Linux.Natives.1.57.1.4\build\net45\Avalonia.Skia.Linux.Natives.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
