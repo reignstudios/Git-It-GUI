@@ -1,0 +1,17 @@
+﻿<Window x:Class="GitItGUI.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GitItGUI.UI.Screens"
+		xmlns:test="clr-namespace:GitItGUI.UI.Screens.RepoTabs"
+        mc:Ignorable="d"
+        Title="Git-It-GUI" Width="800" Height="500" WindowStartupLocation="CenterScreen">
+	<Grid>
+		<!--<local:StartScreen/>
+		<Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32">
+			<Image Source="Images/Settings.png"/>
+		</Button>-->
+		<local:RepoScreen/>
+	</Grid>
+</Window>

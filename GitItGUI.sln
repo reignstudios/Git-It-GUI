@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitItGUI", "GitItGUI\GitItGUI.csproj", "{070DA903-20AF-4E2F-BCD4-24541F5EC7E3}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommitEntry", "CommitEntry\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MergeConflicPicker", "MergeConflicPicker\MergeConflicPicker.csproj", "{B0A50262-1677-453D-96F7-9169A622BE5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitKantan", "GitKantan\GitKantan.csproj", "{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitItGUI.UI", "GitItGUI.UI\GitItGUI.UI.csproj", "{FDE13BE2-4869-4930-BDED-96F010B1CC64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,16 +74,19 @@ Global
 		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|Any CPU.ActiveCfg = Release|x86
 		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|x86.ActiveCfg = Release|x86
 		{B0A50262-1677-453D-96F7-9169A622BE5A}.Release|x86.Build.0 = Release|x86
-		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Debug|x86.Build.0 = Debug|Any CPU
-		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Release|Any CPU.Build.0 = Release|Any CPU
-		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Release|x86.ActiveCfg = Release|Any CPU
-		{51B6E902-7A42-4FBA-8CAB-5F6A950DD005}.Release|x86.Build.0 = Release|Any CPU
+		{FDE13BE2-4869-4930-BDED-96F010B1CC64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDE13BE2-4869-4930-BDED-96F010B1CC64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDE13BE2-4869-4930-BDED-96F010B1CC64}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FDE13BE2-4869-4930-BDED-96F010B1CC64}.Debug|x86.Build.0 = Debug|Any CPU
+		{FDE13BE2-4869-4930-BDED-96F010B1CC64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDE13BE2-4869-4930-BDED-96F010B1CC64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDE13BE2-4869-4930-BDED-96F010B1CC64}.Release|x86.ActiveCfg = Release|Any CPU
+		{FDE13BE2-4869-4930-BDED-96F010B1CC64}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8BA33591-E8DD-47A2-A0B1-80AC0D3E1F79}
 	EndGlobalSection
 EndGlobal
