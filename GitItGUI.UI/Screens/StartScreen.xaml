@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
 	<Grid>
-		<Image Source="../Images/AppIconFade.png" HorizontalAlignment="Center" VerticalAlignment="Top" Width="230" Height="230" Margin="0,0,0,0" Opacity=".5"/>
+		<Image Source="../Images/AppIconFade.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="230" Height="230" Margin="-50,-50,0,0" Opacity=".25"/>
 		<Label Content="Git-It-GUI" FontWeight="Bold" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="32"/>
 		<Label Content="Select a repo below from the history list or open/clone/create one" Margin="0,60,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="12"/>
 		<Border Margin="10,91,10,10" BorderBrush="Gray" BorderThickness="2">
