@@ -21,6 +21,9 @@
 			<TabItem Header="Settings">
 				<local:SettingsTab/>
 			</TabItem>
+			<TabItem Header="Terminal">
+				<!--<local:SettingsTab/>-->
+			</TabItem>
 		</TabControl>
 	</Grid>
 </UserControl>
