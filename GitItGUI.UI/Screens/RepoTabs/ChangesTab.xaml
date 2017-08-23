@@ -19,10 +19,18 @@
 			</Grid.RowDefinitions>
 
 			<Border Grid.Row="0" BorderBrush="Gray" BorderThickness="2" Margin="10,10,5,5">
-				<Grid Background="#DDDDFF">
+				<Grid Background="#DDFFDD">
 					<Label Content="Un-Staged Changes" FontWeight="Bold" Margin="10,10,10,0" VerticalAlignment="Top"/>
-					<Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,10,0">
+					<Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,10,0" Click="Button_Click">
 						<TextBlock Text="▼" Margin="0,-2,0,0"/>
+						<Button.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="Stage Selected"/>
+								<Separator/>
+								<MenuItem Header="Revert Selected"/>
+								<MenuItem Header="CleanUp (Remove untracked files)"/>
+							</ContextMenu>
+						</Button.ContextMenu>
 					</Button>
 					<ListBox Margin="10,41,10,10" SelectionMode="Extended">
 						<ListBoxItem>
@@ -30,7 +38,14 @@
 								<Button Width="20" Height="20" HorizontalAlignment="Left" Background="Transparent" BorderThickness="1" BorderBrush="LightGray">
 									<Image Source="../../Images/deleted.png"/>
 								</Button>
-								<Label Margin="18,0,0,0">file.txt</Label>
+								<Label Margin="18,0,0,0" Content="file.txt">
+									<Label.ContextMenu>
+										<ContextMenu>
+											<MenuItem Header="Open file"/>
+											<MenuItem Header="Open file location"/>
+										</ContextMenu>
+									</Label.ContextMenu>
+								</Label>
 							</Grid>
 						</ListBoxItem>
 						<ListBoxItem>
@@ -54,10 +69,15 @@
 			</Border>
 
 			<Border Grid.Row="1" BorderBrush="Gray" BorderThickness="2" Margin="10,5,5,10">
-				<Grid Background="#DDFFDD">
+				<Grid Background="#FFDDDD">
 					<Label Content="Staged Changes" Margin="10,10,10,0" FontWeight="Bold" VerticalAlignment="Top"/>
 					<Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,10,0">
 						<TextBlock Text="▼" Margin="0,-2,0,0"/>
+						<Button.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="Un-Stage Selected"/>
+							</ContextMenu>
+						</Button.ContextMenu>
 					</Button>
 					<ListBox Margin="10,41,10,10" SelectionMode="Extended">
 						<ListBoxItem>file.txt</ListBoxItem>
@@ -82,7 +102,7 @@
 			</Border>
 
 			<Border Grid.Row="1" BorderBrush="Gray" BorderThickness="2" Margin="5,5,10,10">
-				<Grid Background="#FFDDDD">
+				<Grid Background="#DDDDFF">
 					<Label Content="Commit Message..." Margin="10,10,10,0" FontWeight="Bold" VerticalAlignment="Top"/>
 					<TextBox Margin="10,41,10,35" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
 					<Button Content="Commit" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75"/>

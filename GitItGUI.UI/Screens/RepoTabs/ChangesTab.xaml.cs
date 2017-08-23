@@ -35,5 +35,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			range.Text = "- Subtraction";
 			range.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Red);
 		}
-    }
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			var button = (Button)sender;
+			button.ContextMenu.IsOpen = true;
+		}
+	}
 }
