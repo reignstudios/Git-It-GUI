@@ -15,8 +15,12 @@
 			<TabItem Header="Branches">
 				<local:BranchesTab/>
 			</TabItem>
-			<TabItem Header="History"/>
-			<TabItem Header="Settings"/>
+			<TabItem Header="History">
+				<local:HistoryTab/>
+			</TabItem>
+			<TabItem Header="Settings">
+				<local:SettingsTab/>
+			</TabItem>
 		</TabControl>
 	</Grid>
 </UserControl>
