@@ -8,10 +8,7 @@
         mc:Ignorable="d"
         Title="Git-It-GUI" Width="800" Height="500" WindowStartupLocation="CenterScreen">
 	<Grid>
-		<!--<local:StartScreen/>
-		<Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32">
-			<Image Source="Images/Settings.png"/>
-		</Button>-->
-		<local:RepoScreen/>
+		<local:StartScreen x:Name="startScreen"/>
+		<!--<local:RepoScreen x:Name="repoScreen"/>-->
 	</Grid>
 </Window>

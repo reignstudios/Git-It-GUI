@@ -72,6 +72,9 @@
     <Compile Include="Screens\RepoTabs\SettingsTab.xaml.cs">
       <DependentUpon>SettingsTab.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Screens\SettingsScreen.xaml.cs">
+      <DependentUpon>SettingsScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Screens\StartScreen.xaml.cs">
       <DependentUpon>StartScreen.xaml</DependentUpon>
     </Compile>
@@ -107,6 +110,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Screens\SettingsScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Screens\StartScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -139,7 +146,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\AppIconFade.png" />
     <Resource Include="Images\AppIcon.ico" />
     <Resource Include="Images\AppIcon.png" />
     <Content Include="Images\AppIcon.svg" />
