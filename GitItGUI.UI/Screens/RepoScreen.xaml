@@ -22,7 +22,7 @@
 				<local:SettingsTab/>
 			</TabItem>
 			<TabItem Header="Terminal">
-				<!--<local:SettingsTab/>-->
+				<local:TerminalTab/>
 			</TabItem>
 		</TabControl>
 	</Grid>

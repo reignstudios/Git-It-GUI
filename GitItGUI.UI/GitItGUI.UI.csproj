@@ -72,6 +72,9 @@
     <Compile Include="Screens\RepoTabs\SettingsTab.xaml.cs">
       <DependentUpon>SettingsTab.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Screens\RepoTabs\TerminalTab.xaml.cs">
+      <DependentUpon>TerminalTab.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Screens\SettingsScreen.xaml.cs">
       <DependentUpon>SettingsScreen.xaml</DependentUpon>
     </Compile>
@@ -107,6 +110,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Screens\RepoTabs\SettingsTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Screens\RepoTabs\TerminalTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
