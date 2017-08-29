@@ -11,7 +11,7 @@ namespace GitItGUI.Core
 	/// <param name="alert">Whether or not the UI should alert the user. (Normally a MessageBox)</param>
 	public delegate void DebugLogCallbackMethod(object value, bool alert);
 
-	public static class Debug
+	public static class DebugLog
 	{
 		/// <summary>
 		/// Use to hook internal logging methods
@@ -22,11 +22,11 @@ namespace GitItGUI.Core
 		private static StreamWriter writer;
 		public static bool pauseGitCommanderStdWrites;
 
-		static Debug()
+		static DebugLog()
 		{
 			try
 			{
-				string logDir = PlatformSettings.appDataPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName;
+				string logDir = PlatformInfo.appDataPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName;
 				if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
 				string logFileName = logDir + Path.DirectorySeparatorChar + "logs.txt";
 				stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -68,56 +68,45 @@ namespace GitItGUI.Core
 		{
 			if (stream != null)
 			{
-				writer.Flush();
-				stream.Flush();
-				stream.Dispose();
-				stream = null;
+				lock (stream)
+				{
+					writer.Flush();
+					stream.Flush();
+					stream.Dispose();
+					stream = null;
+				}
+			}
+		}
+
+		private static void Write(string value, bool alert)
+		{
+			if (stream == null) return;
+			lock (stream)
+			{
+				if (stream == null) return;
+
+				#if DEBUG
+				Console.WriteLine(value);
+				#endif
+
+				if (writer != null) writer.WriteLine(value);
+				if (debugLogCallback != null) debugLogCallback(value, alert);
 			}
 		}
 
 		public static void Log(object value, bool alert = false)
 		{
-			lock (stream)
-			{
-				string msg = value.ToString();
-
-				#if DEBUG
-				Console.WriteLine(msg);
-				#endif
-
-				if (writer != null) writer.WriteLine(msg);
-				if (debugLogCallback != null) debugLogCallback(value, alert);
-			}
+			Write(value.ToString(), alert);
 		}
 
 		public static void LogWarning(object value, bool alert = false)
 		{
-			lock (stream)
-			{
-				string msg = "WARNING: " + value.ToString();
-
-				#if DEBUG
-				Console.WriteLine(msg);
-				#endif
-
-				if (writer != null) writer.WriteLine(msg);
-				if (debugLogWarningCallback != null) debugLogWarningCallback(value, alert);
-			}
+			Write("WARNING: " + value.ToString(), alert);
 		}
 
 		public static void LogError(object value, bool alert = false)
 		{
-			lock (stream)
-			{
-				string msg = "ERROR: " + value.ToString();
-
-				#if DEBUG
-				Console.WriteLine(msg);
-				#endif
-
-				if (writer != null) writer.WriteLine(msg);
-				if (debugLogErrorCallback != null) debugLogErrorCallback(value, alert);
-			}
+			Write("ERROR: " + value.ToString(), alert);
 		}
 	}
 }

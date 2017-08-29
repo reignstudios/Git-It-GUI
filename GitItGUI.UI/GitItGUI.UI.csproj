@@ -82,7 +82,7 @@
     <Compile Include="Screens\StartScreen.xaml.cs">
       <DependentUpon>StartScreen.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utils\Platform.cs" />
+    <Compile Include="PlatformUtils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

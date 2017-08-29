@@ -19,7 +19,7 @@ namespace GitItGUI.UI.Screens
 
 		private void openButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (Platform.SelectFolder(out string folderPath))
+			if (PlatformUtils.SelectFolder(out string folderPath))
 			{
 				// TODO: open repo first
 				MainWindow.singleton.Navigate(RepoScreen.singleton);

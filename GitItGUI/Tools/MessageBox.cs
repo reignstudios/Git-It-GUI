@@ -30,7 +30,7 @@ namespace GitItGUI
 
 		public static bool Show(string message, string title, MessageBoxTypes type)
 		{
-			if (PlatformSettings.platform == Platforms.Windows)
+			if (PlatformInfo.platform == Platforms.Windows)
 			{
 				Win.DialogResult result = Win.DialogResult.None;
 				switch (type)

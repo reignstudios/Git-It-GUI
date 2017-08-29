@@ -31,18 +31,18 @@ namespace GitItGUI.Core
 		Error
 	}
 
-	public static class ChangesManager
+	public partial class RepoManager
 	{
 		public delegate bool AskUserToResolveConflictedFileCallbackMethod(FileState fileState, bool isBinaryFile, out MergeBinaryFileResults result);
-		public static event AskUserToResolveConflictedFileCallbackMethod AskUserToResolveConflictedFileCallback;
+		public event AskUserToResolveConflictedFileCallbackMethod AskUserToResolveConflictedFileCallback;
 
 		public delegate bool AskUserIfTheyAcceptMergedFileCallbackMethod(FileState fileState, out MergeFileAcceptedResults result);
-		public static event AskUserIfTheyAcceptMergedFileCallbackMethod AskUserIfTheyAcceptMergedFileCallback;
+		public event AskUserIfTheyAcceptMergedFileCallbackMethod AskUserIfTheyAcceptMergedFileCallback;
 
-		public static FileState[] fileStates {get; private set;}
-		private static bool isSyncMode;
+		public FileState[] fileStates {get; private set;}
+		private bool isSyncMode;
 
-		internal static bool Refresh()
+		private bool RefreshChanges()
 		{
 			try
 			{
@@ -53,12 +53,12 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("ChangesManager.Refresh Failed: " + e.Message, true);
+				DebugLog.LogError("ChangesManager.Refresh Failed: " + e.Message, true);
 				return false;
 			}
 		}
 
-		public static bool FilesAreStaged()
+		public bool FilesAreStaged()
 		{
 			foreach (var state in fileStates)
 			{
@@ -72,7 +72,7 @@ namespace GitItGUI.Core
 			return false;
 		}
 
-		public static bool FilesAreUnstaged()
+		public bool FilesAreUnstaged()
 		{
 			foreach (var state in fileStates)
 			{
@@ -86,7 +86,7 @@ namespace GitItGUI.Core
 			return false;
 		}
 
-		public static object GetQuickViewData(FileState fileState)
+		public object GetQuickViewData(FileState fileState)
 		{
 			try
 			{
@@ -104,9 +104,9 @@ namespace GitItGUI.Core
 				if (fileState.HasState(FileStates.ModifiedInWorkdir) || fileState.HasState(FileStates.ModifiedInIndex))
 				{
 					string diff;
-					Debug.pauseGitCommanderStdWrites = true;
+					DebugLog.pauseGitCommanderStdWrites = true;
 					if (!Repository.GetDiff(fileState.filename, out diff)) throw new Exception(Repository.lastError);
-					Debug.pauseGitCommanderStdWrites = false;
+					DebugLog.pauseGitCommanderStdWrites = false;
 
 					// remove meta data stage 1
 					var match = Regex.Match(diff, @"@@.*?(@@).*?\n(.*)", RegexOptions.Singleline);
@@ -141,19 +141,19 @@ namespace GitItGUI.Core
 				}
 				else
 				{
-					Debug.LogError("Unsuported FileStatus: " + fileState.filename, true);
+					DebugLog.LogError("Unsuported FileStatus: " + fileState.filename, true);
 					return null;
 				}
 			}
 			catch (Exception e)
 			{
-				Debug.pauseGitCommanderStdWrites = false;
-				Debug.LogError("Failed to refresh quick view: " + e.Message, true);
+				DebugLog.pauseGitCommanderStdWrites = false;
+				DebugLog.LogError("Failed to refresh quick view: " + e.Message, true);
 				return null;
 			}
 		}
 
-		public static bool DeleteUntrackedUnstagedFile(FileState fileState, bool refresh)
+		public bool DeleteUntrackedUnstagedFile(FileState fileState, bool refresh)
 		{
 			bool success = true;
 			try
@@ -164,15 +164,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to delete item: " + e.Message, true);
+				DebugLog.LogError("Failed to delete item: " + e.Message, true);
 				success = false;
 			}
 
-			if (refresh) RepoManager.Refresh();
+			if (refresh) Refresh();
 			return success;
 		}
 
-		public static bool DeleteUntrackedUnstagedFiles(bool refresh)
+		public bool DeleteUntrackedUnstagedFiles(bool refresh)
 		{
 			bool success = true;
 			try
@@ -186,15 +186,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to delete item: " + e.Message, true);
+				DebugLog.LogError("Failed to delete item: " + e.Message, true);
 				success = false;
 			}
 
-			if (refresh) RepoManager.Refresh();
+			if (refresh) Refresh();
 			return success;
 		}
 
-		public static bool StageFile(FileState fileState)
+		public bool StageFile(FileState fileState)
 		{
 			bool success = true;
 			try
@@ -203,15 +203,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to stage item: " + e.Message, true);
+				DebugLog.LogError("Failed to stage item: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool StageAllFiles()
+		public bool StageAllFiles()
 		{
 			bool success = true;
 			try
@@ -220,15 +220,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to stage item: " + e.Message, true);
+				DebugLog.LogError("Failed to stage item: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool UnstageFile(FileState fileState)
+		public bool UnstageFile(FileState fileState)
 		{
 			bool success = true;
 			try
@@ -237,15 +237,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to unstage item: " + e.Message, true);
+				DebugLog.LogError("Failed to unstage item: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool UnstageAllFiles()
+		public bool UnstageAllFiles()
 		{
 			bool success = true;
 			try
@@ -254,15 +254,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to unstage item: " + e.Message, true);
+				DebugLog.LogError("Failed to unstage item: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool RevertAll()
+		public bool RevertAll()
 		{
 			bool success = true;
 			try
@@ -271,39 +271,39 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to reset: " + e.Message);
+				DebugLog.LogError("Failed to reset: " + e.Message);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool RevertFile(FileState fileState)
+		public bool RevertFile(FileState fileState)
 		{
 			if (!fileState.HasState(FileStates.ModifiedInIndex) && !fileState.HasState(FileStates.ModifiedInWorkdir) &&
 				!fileState.HasState(FileStates.DeletedFromIndex) && !fileState.HasState(FileStates.DeletedFromWorkdir))
 			{
-				Debug.LogError("This file is not modified or deleted", true);
+				DebugLog.LogError("This file is not modified or deleted", true);
 				return false;
 			}
 
 			bool success = true;
 			try
 			{
-				if (!Repository.RevertFile(BranchManager.activeBranch.fullname, fileState.filename)) throw new Exception(Repository.lastError);
+				if (!Repository.RevertFile(activeBranch.fullname, fileState.filename)) throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to reset file: " + e.Message);
+				DebugLog.LogError("Failed to reset file: " + e.Message);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool CommitStagedChanges(string commitMessage)
+		public bool CommitStagedChanges(string commitMessage)
 		{
 			bool success = true;
 			try
@@ -312,29 +312,29 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to commit: " + e.Message, true);
+				DebugLog.LogError("Failed to commit: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool Fetch()
+		public bool Fetch()
 		{
 			try
 			{
-				if (BranchManager.activeBranch.isTracking)
+				if (activeBranch.isTracking)
 				{
 					if (!Repository.Fetch()) throw new Exception(Repository.lastError);
 				}
-				else if (BranchManager.activeBranch.isRemote)
+				else if (activeBranch.isRemote)
 				{
-					if (!Repository.Fetch(BranchManager.activeBranch.remoteState.name, BranchManager.activeBranch.name)) throw new Exception(Repository.lastError);
+					if (!Repository.Fetch(activeBranch.remoteState.name, activeBranch.name)) throw new Exception(Repository.lastError);
 				}
 				else
 				{
-					Debug.LogError("Cannot fetch local only branch");
+					DebugLog.LogError("Cannot fetch local only branch");
 					return false;
 				}
 
@@ -342,16 +342,16 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Fetch error: " + e.Message, true);
+				DebugLog.LogError("Fetch error: " + e.Message, true);
 				return false;
 			}
 		}
 
-		public static bool Fetch(BranchState branch)
+		public bool Fetch(BranchState branch)
 		{
 			try
 			{
-				if (branch.fullname == BranchManager.activeBranch.fullname)
+				if (branch.fullname == activeBranch.fullname)
 				{
 					if (!Repository.Fetch()) throw new Exception(Repository.lastError);
 				}
@@ -361,7 +361,7 @@ namespace GitItGUI.Core
 				}
 				else
 				{
-					Debug.LogError("Cannot fetch local only branch");
+					DebugLog.LogError("Cannot fetch local only branch");
 					return false;
 				}
 
@@ -369,20 +369,20 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Fetch error: " + e.Message, true);
+				DebugLog.LogError("Fetch error: " + e.Message, true);
 				return false;
 			}
 		}
 
-		public static SyncMergeResults Pull()
+		public SyncMergeResults Pull()
 		{
 			var result = SyncMergeResults.Error;
 
 			try
 			{
-				if (!BranchManager.activeBranch.isTracking)
+				if (!activeBranch.isTracking)
 				{
-					Debug.LogWarning("Branch is not tracking a remote!", true);
+					DebugLog.LogWarning("Branch is not tracking a remote!", true);
 					return SyncMergeResults.Error;
 				}
 				
@@ -390,45 +390,45 @@ namespace GitItGUI.Core
 				result = Repository.Pull() ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
 				result = ConflictsExist() ? SyncMergeResults.Conflicts : result;
 				
-				if (result == SyncMergeResults.Conflicts) Debug.LogWarning("Merge failed, conflicts exist (please resolve)", true);
-				else if (result == SyncMergeResults.Succeeded) Debug.Log("Pull Succeeded!", !isSyncMode);
-				else Debug.Log("Pull Error!", !isSyncMode);
+				if (result == SyncMergeResults.Conflicts) DebugLog.LogWarning("Merge failed, conflicts exist (please resolve)", true);
+				else if (result == SyncMergeResults.Succeeded) DebugLog.Log("Pull Succeeded!", !isSyncMode);
+				else DebugLog.Log("Pull Error!", !isSyncMode);
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to pull: " + e.Message, true);
+				DebugLog.LogError("Failed to pull: " + e.Message, true);
 				result = SyncMergeResults.Error;
 			}
 			
-			if (!isSyncMode) RepoManager.Refresh();
+			if (!isSyncMode) Refresh();
 			return result;
 		}
 
-		public static bool Push()
+		public bool Push()
 		{
 			bool success = true;
 			try
 			{
-				if (!BranchManager.activeBranch.isTracking)
+				if (!activeBranch.isTracking)
 				{
-					Debug.LogWarning("Branch is not tracking a remote!", true);
+					DebugLog.LogWarning("Branch is not tracking a remote!", true);
 					return false;
 				}
 				
-				if (Repository.Push()) Debug.Log("Push Succeeded!", !isSyncMode);
+				if (Repository.Push()) DebugLog.Log("Push Succeeded!", !isSyncMode);
 				else throw new Exception(Repository.lastError);
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to push: " + e.Message, true);
+				DebugLog.LogError("Failed to push: " + e.Message, true);
 				success = false;
 			}
 			
-			if (!isSyncMode) RepoManager.Refresh();
+			if (!isSyncMode) Refresh();
 			return success;
 		}
 
-		public static SyncMergeResults Sync()
+		public SyncMergeResults Sync()
 		{
 			isSyncMode = true;
 			var result = Pull();
@@ -436,14 +436,14 @@ namespace GitItGUI.Core
 			if (result == SyncMergeResults.Succeeded) pushPass = Push();
 			isSyncMode = false;
 			
-			if (result != SyncMergeResults.Succeeded || !pushPass) Debug.LogError("Failed to Sync changes", true);
-			else Debug.Log("Sync succeeded!", true);
+			if (result != SyncMergeResults.Succeeded || !pushPass) DebugLog.LogError("Failed to Sync changes", true);
+			else DebugLog.Log("Sync succeeded!", true);
 			
-			RepoManager.Refresh();
+			Refresh();
 			return result;
 		}
 
-		public static bool ConflictsExist()
+		public bool ConflictsExist()
 		{
 			try
 			{
@@ -453,17 +453,17 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to get file conflicts: " + e.Message, true);
+				DebugLog.LogError("Failed to get file conflicts: " + e.Message, true);
 				return false;
 			}
 		}
 
-		public static bool ChangesExist()
+		public bool ChangesExist()
 		{
 			return fileStates.Length != 0;
 		}
 
-		public static bool CompletedMergeCommitPending()
+		public bool CompletedMergeCommitPending()
 		{
 			try
 			{
@@ -473,29 +473,29 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to check for pending merge commit: " + e.Message, true);
+				DebugLog.LogError("Failed to check for pending merge commit: " + e.Message, true);
 				return false;
 			}
 		}
 
-		public static bool ResolveAllConflicts(bool refresh = true)
+		public bool ResolveAllConflicts(bool refresh = true)
 		{
 			foreach (var fileState in fileStates)
 			{
 				if (fileState.HasState(FileStates.Conflicted) && !ResolveConflict(fileState, false))
 				{
-					Debug.LogError("Resolve conflict failed (aborting pending)", true);
-					if (refresh) RepoManager.Refresh();
+					DebugLog.LogError("Resolve conflict failed (aborting pending)", true);
+					if (refresh) Refresh();
 					return false;
 				}
 			}
 
-			if (refresh) RepoManager.Refresh();
+			if (refresh) Refresh();
 			return true;
 		}
 
 		private delegate void DeleteTempMergeFilesMethod();
-		public static bool ResolveConflict(FileState fileState, bool refresh)
+		public bool ResolveConflict(FileState fileState, bool refresh)
 		{
 			bool success = true;
 			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
@@ -515,20 +515,20 @@ namespace GitItGUI.Core
 				// make sure file needs to be resolved
 				if (!fileState.HasState(FileStates.Conflicted))
 				{
-					Debug.LogError("File not in conflicted state: " + fileState.filename, true);
+					DebugLog.LogError("File not in conflicted state: " + fileState.filename, true);
 					return false;
 				}
 				
 				// save local temp files
 				if (fileState.conflictType == FileConflictTypes.DeletedByBoth)
 				{
-					Debug.Log("Auto resolving file that was deleted by both branches: " + fileState.filename, true);
+					DebugLog.Log("Auto resolving file that was deleted by both branches: " + fileState.filename, true);
 					if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
 					goto FINISH;
 				}
 				else
 				{
-					Debug.pauseGitCommanderStdWrites = true;
+					DebugLog.pauseGitCommanderStdWrites = true;
 					if (fileState.conflictType != FileConflictTypes.DeletedByUs)
 					{
 						bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
@@ -542,7 +542,7 @@ namespace GitItGUI.Core
 						fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs.Replace('/', Path.DirectorySeparatorChar);
 						if (!fileCreated) throw new Exception(Repository.lastError);
 					}
-					Debug.pauseGitCommanderStdWrites = false;
+					DebugLog.pauseGitCommanderStdWrites = false;
 				}
 
 				// check if files are binary (if so open select binary file tool) [if file conflict is because of deletion this method is also used]
@@ -725,8 +725,8 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.pauseGitCommanderStdWrites = false;
-				Debug.LogError("Failed to resolve file: " + e.Message, true);
+				DebugLog.pauseGitCommanderStdWrites = false;
+				DebugLog.LogError("Failed to resolve file: " + e.Message, true);
 				DeleteTempMergeFiles();
 				success = false;
 			}
@@ -734,12 +734,12 @@ namespace GitItGUI.Core
 			// finish
 			FINISH:;
 			DeleteTempMergeFiles();
-			if (refresh) RepoManager.Refresh();
+			if (refresh) Refresh();
 			return success;
 		}
 
 		private delegate void DeleteTempDiffFilesMethod();
-		public static bool OpenDiffTool(FileState fileState)
+		public bool OpenDiffTool(FileState fileState)
 		{
 			string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
 			string fullPathOrig = null;
@@ -753,14 +753,14 @@ namespace GitItGUI.Core
 				// get selected item
 				if (!fileState.HasState(FileStates.ModifiedInIndex) && !fileState.HasState(FileStates.ModifiedInWorkdir))
 				{
-					Debug.LogError("This file is not modified", true);
+					DebugLog.LogError("This file is not modified", true);
 					return false;
 				}
 
 				// get info and save orig file
-				Debug.pauseGitCommanderStdWrites = true;
+				DebugLog.pauseGitCommanderStdWrites = true;
 				if (!Repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(Repository.lastError);
-				Debug.pauseGitCommanderStdWrites = false;
+				DebugLog.pauseGitCommanderStdWrites = false;
 				fullPathOrig = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOrig;
 
 				// open diff tool
@@ -771,7 +771,7 @@ namespace GitItGUI.Core
 					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 					if (!process.Start())
 					{
-						Debug.LogError("Failed to start Diff tool (is it installed?)", true);
+						DebugLog.LogError("Failed to start Diff tool (is it installed?)", true);
 						DeleteTempDiffFiles();
 						return false;
 					}
@@ -781,8 +781,8 @@ namespace GitItGUI.Core
 			}
 			catch (Exception ex)
 			{
-				Debug.pauseGitCommanderStdWrites = false;
-				Debug.LogError("Failed to start Diff tool: " + ex.Message, true);
+				DebugLog.pauseGitCommanderStdWrites = false;
+				DebugLog.LogError("Failed to start Diff tool: " + ex.Message, true);
 				DeleteTempDiffFiles();
 				return false;
 			}

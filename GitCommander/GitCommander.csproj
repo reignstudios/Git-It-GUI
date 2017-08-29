@@ -42,14 +42,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Branches.cs" />
-    <Compile Include="Changes.cs" />
+    <Compile Include="Repository_Branches.cs" />
+    <Compile Include="Repository_Changes.cs" />
     <Compile Include="Filters\LFS.cs" />
-    <Compile Include="Remotes.cs" />
+    <Compile Include="Repository_Remotes.cs" />
     <Compile Include="Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools.cs" />
-    <Compile Include="PlatformSettings.cs" />
+    <Compile Include="PlatformInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

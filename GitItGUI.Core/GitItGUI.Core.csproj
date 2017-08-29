@@ -44,28 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App\Application.cs" />
     <Compile Include="AppManager.cs" />
-    <Compile Include="App\AppSettingsPage.cs" />
-    <Compile Include="App\BranchesPage.cs" />
-    <Compile Include="App\ChangesPage.cs" />
-    <Compile Include="App\MessageBox.cs" />
-    <Compile Include="App\Page.cs" />
-    <Compile Include="App\Popups\CommitEntryPopup.cs" />
-    <Compile Include="App\HistoryPage.cs" />
-    <Compile Include="App\Popups\MergeConflictPickerPopup.cs" />
-    <Compile Include="App\Popups\MessageBoxPopup.cs" />
-    <Compile Include="App\Popups\NameEntryPopup.cs" />
-    <Compile Include="App\RepoPage.cs" />
-    <Compile Include="App\SettingsPage.cs" />
-    <Compile Include="App\StartPage.cs" />
-    <Compile Include="BranchManager.cs" />
-    <Compile Include="ChangesManager.cs" />
-    <Compile Include="Tools\Debug.cs" />
+    <Compile Include="RepoManager_Branches.cs" />
+    <Compile Include="RepoManager_Changes.cs" />
+    <Compile Include="DebugLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepoManager.cs" />
-    <Compile Include="Tools\Settings.cs" />
-    <Compile Include="Tools\Tools.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Tools.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GitCommander\GitCommander.csproj">

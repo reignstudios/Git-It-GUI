@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace GitCommander
 {
@@ -23,7 +18,7 @@ namespace GitCommander
 		public static string repoURL {get; private set;}
 		public static string repoPath {get; private set;}
 
-		public static void Dispose()
+		public static void Close()
 		{
 			isOpen = false;
 			lastResult = null;
@@ -81,6 +76,8 @@ namespace GitCommander
 
 		public static bool Open(string path)
 		{
+			Close();
+
 			var stdCallback = new StdCallbackMethod(delegate(string line)
 			{
 				repoURL = line;
@@ -99,6 +96,14 @@ namespace GitCommander
 			
 			repoPath = path;
 			return isOpen = true;
+		}
+
+		public static void ForceOpen(string repoPath, string repoURL)
+		{
+			Close();
+			Repository.repoPath = repoPath;
+			Repository.repoURL = repoURL;
+			isOpen = true;
 		}
 
 		public static bool GetSignature(SignatureLocations location, out string name, out string email)

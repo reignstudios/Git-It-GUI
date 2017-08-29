@@ -280,13 +280,13 @@ namespace GitItGUI
 		{
 			try
 			{
-				if (PlatformSettings.platform == Platforms.Windows)
+				if (PlatformInfo.platform == Platforms.Windows)
 				{
-					System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", Repository.repoPath, PlatformSettings.ConvertPathToPlatform(fileState.filename)));
+					System.Diagnostics.Process.Start("explorer.exe", string.Format("{0}\\{1}", Repository.repoPath, PlatformInfo.ConvertPathToPlatform(fileState.filename)));
 				}
 				else
 				{
-					throw new Exception("Unsuported platform: " + PlatformSettings.platform);
+					throw new Exception("Unsuported platform: " + PlatformInfo.platform);
 				}
 			}
 			catch (Exception ex)
@@ -299,13 +299,13 @@ namespace GitItGUI
 		{
 			try
 			{
-				if (PlatformSettings.platform == Platforms.Windows)
+				if (PlatformInfo.platform == Platforms.Windows)
 				{
-					System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", Repository.repoPath, PlatformSettings.ConvertPathToPlatform(fileState.filename)));
+					System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", Repository.repoPath, PlatformInfo.ConvertPathToPlatform(fileState.filename)));
 				}
 				else
 				{
-					throw new Exception("Unsuported platform: " + PlatformSettings.platform);
+					throw new Exception("Unsuported platform: " + PlatformInfo.platform);
 				}
 			}
 			catch (Exception ex)

@@ -11,14 +11,14 @@ namespace GitItGUI.Core
 		Error
 	}
 
-	public static class BranchManager
+	public partial class RepoManager
 	{
-		public static bool isEmpty {get; private set;}
-		public static BranchState activeBranch {get; private set;}
-		public static BranchState[] branchStates {get; private set;}
-		public static RemoteState[] remoteStates {get; private set;}
+		public bool isEmpty {get; private set;}
+		public BranchState activeBranch {get; private set;}
+		public BranchState[] branchStates {get; private set;}
+		public RemoteState[] remoteStates {get; private set;}
 
-		internal static bool Refresh(bool refreshMode)
+		private bool RefreshBranches(bool refreshMode)
 		{
 			isEmpty = false;
 
@@ -36,7 +36,7 @@ namespace GitItGUI.Core
 					activeBranch = null;
 					branchStates = null;
 					remoteStates = null;
-					Debug.LogWarning("New branch, nothing commit!");
+					DebugLog.LogWarning("New branch, nothing commit!");
 					return true;
 				}
 
@@ -44,7 +44,7 @@ namespace GitItGUI.Core
 				activeBranch = Array.Find<BranchState>(branchStates, x => x.isActive);
 				if (activeBranch.isRemote)
 				{
-					Debug.LogError("Active repo branch cannot be a remote: " + activeBranch.fullname, true);
+					DebugLog.LogError("Active repo branch cannot be a remote: " + activeBranch.fullname, true);
 					if (refreshMode) Environment.Exit(0);
 					else return false;
 				}
@@ -56,14 +56,14 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("BranchManager.Refresh Failed: " + e.Message, true);
+				DebugLog.LogError("BranchManager.Refresh Failed: " + e.Message, true);
 				return false;
 			}
 
 			return true;
 		}
 
-		public static BranchState[] GetNonActiveBranches(bool getRemotes)
+		public BranchState[] GetNonActiveBranches(bool getRemotes)
 		{
 			if (branchStates == null) return new BranchState[0];
 
@@ -86,7 +86,7 @@ namespace GitItGUI.Core
 			return nonActiveBranches.ToArray();
 		}
 
-		public static bool Checkout(BranchState branch, bool useFullname = false)
+		public bool Checkout(BranchState branch, bool useFullname = false)
 		{
 			if (activeBranch == null) return false;
 
@@ -100,21 +100,21 @@ namespace GitItGUI.Core
 				}
 				else
 				{
-					Debug.LogError("Already on branch: " + name, true);
+					DebugLog.LogError("Already on branch: " + name, true);
 					success = false;
 				}
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("BranchManager.Checkout Failed: " + e.Message, true);
+				DebugLog.LogError("BranchManager.Checkout Failed: " + e.Message, true);
 				success = false;
 			}
 			
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static MergeResults MergeBranchIntoActive(BranchState srcBranch)
+		public MergeResults MergeBranchIntoActive(BranchState srcBranch)
 		{
 			MergeResults mergeResult;
 			try
@@ -127,15 +127,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("BranchManager.Merge Failed: " + e.Message, true);
+				DebugLog.LogError("BranchManager.Merge Failed: " + e.Message, true);
 				mergeResult = MergeResults.Error;
 			}
 			
-			RepoManager.Refresh();
+			Refresh();
 			return mergeResult;
 		}
 
-		public static bool CheckoutNewBranch(string branchName, string remoteName = null)
+		public bool CheckoutNewBranch(string branchName, string remoteName = null)
 		{
 			bool success = true;
 			try
@@ -158,15 +158,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Add new Branch Error: " + e.Message, true);
+				DebugLog.LogError("Add new Branch Error: " + e.Message, true);
 				success = false;
 			}
 			
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool DeleteNonActiveBranch(BranchState branch)
+		public bool DeleteNonActiveBranch(BranchState branch)
 		{
 			bool success = true;
 			try
@@ -175,15 +175,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Delete new Branch Error: " + e.Message, true);
+				DebugLog.LogError("Delete new Branch Error: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool RenameActiveBranch(string newBranchName)
+		public bool RenameActiveBranch(string newBranchName)
 		{
 			bool success = true;
 			try
@@ -192,15 +192,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Rename new Branch Error: " + e.Message, true);
+				DebugLog.LogError("Rename new Branch Error: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 		
-		public static bool CopyTracking(BranchState srcRemoteBranch)
+		public bool CopyTracking(BranchState srcRemoteBranch)
 		{
 			bool success = true;
 			try
@@ -209,15 +209,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Add/Update tracking Branch Error: " + e.Message, true);
+				DebugLog.LogError("Add/Update tracking Branch Error: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool RemoveTracking()
+		public bool RemoveTracking()
 		{
 			if (activeBranch == null) return false;
 			if (!activeBranch.isTracking) return true;
@@ -229,15 +229,15 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Remove Branch Error: " + e.Message, true);
+				DebugLog.LogError("Remove Branch Error: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 
-		public static bool IsUpToDateWithRemote(out bool yes)
+		public bool IsUpToDateWithRemote(out bool yes)
 		{
 			if (activeBranch == null)
 			{
@@ -257,7 +257,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Remove Branch Error: " + e.Message, true);
+				DebugLog.LogError("Remove Branch Error: " + e.Message, true);
 				yes = false;
 				return false;
 			}
@@ -265,7 +265,7 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool PruneRemoteBranches()
+		public bool PruneRemoteBranches()
 		{
 			bool success = true;
 			try
@@ -274,11 +274,11 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to prune branches: " + e.Message, true);
+				DebugLog.LogError("Failed to prune branches: " + e.Message, true);
 				success = false;
 			}
 
-			RepoManager.Refresh();
+			Refresh();
 			return success;
 		}
 	}

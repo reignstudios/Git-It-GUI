@@ -15,105 +15,101 @@ namespace GitItGUI.Core
 	/// <summary>
 	/// Primary git manager
 	/// </summary>
-	public static class RepoManager
+	public partial class RepoManager
 	{
-		private static object lockObj = new object();
-		private static volatile bool isRefreshing;
+		private bool isRefreshing;
 
 		public delegate void RepoRefreshedCallbackMethod();
-		public static event RepoRefreshedCallbackMethod RepoRefreshedCallback;
+		public event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 
 		public delegate void RepoRefreshingCallbackMethod(bool start);
-		public static event RepoRefreshingCallbackMethod RepoRefreshingCallback;
+		public event RepoRefreshingCallbackMethod RepoRefreshingCallback;
 
 		/// <summary>
 		/// True if this is a Git-LFS enabled repo
 		/// </summary>
-		public static bool lfsEnabled {get; private set;}
+		public bool lfsEnabled {get; private set;}
 
-		public static string signatureName {get; private set;}
-		public static string signatureEmail {get; private set;}
+		public string signatureName {get; private set;}
+		public string signatureEmail {get; private set;}
 
 		/// <summary>
 		/// Use to open an existing repo
 		/// </summary>
 		/// <param name="path">Path to git repo</param>
 		/// <returns>True if succeeded</returns>
-		public static bool OpenRepo(string path, bool checkForSettingErros = false)
+		public bool OpenRepo(string path, bool checkForSettingErros = false)
 		{
-			lock (lockObj)
+			// unload repo
+			if (string.IsNullOrEmpty(path))
 			{
-				// unload repo
-				if (string.IsNullOrEmpty(path))
-				{
-					Dispose();
-					return true;
-				}
-
-				if (!AppManager.MergeDiffToolInstalled())
-				{
-					Debug.LogError("Merge/Diff tool is not installed!\nGo to app settings and make sure your selected diff tool is installed.", true);
-					return false;
-				}
-
-				bool refreshMode = path == Repository.repoPath;
-			
-				try
-				{
-					// load repo
-					if (refreshMode) Repository.Dispose();
-					if (!Repository.Open(path)) throw new Exception(Repository.lastError);
-				
-					// check for git lfs
-					lfsEnabled = IsGitLFSRepo(false);
-
-					// check for .gitignore file
-					if (!refreshMode)
-					{
-						string gitIgnorePath = path + Path.DirectorySeparatorChar + ".gitignore";
-						if (!File.Exists(gitIgnorePath))
-						{
-							Debug.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
-							File.WriteAllText(gitIgnorePath, "");
-						}
-					}
-				
-					// add repo to history
-					AppManager.AddActiveRepoToHistory();
-
-					// get signature
-					if (!refreshMode)
-					{
-						string sigName, sigEmail;
-						Repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail);
-						signatureName = sigName;
-						signatureEmail = sigEmail;
-						if (checkForSettingErros)
-						{
-							if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
-							{
-								Debug.LogWarning("Credentials not set, please go to the settings tab!", true);
-							}
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					Debug.LogError("RepoManager.OpenRepo Failed: " + e.Message);
-					Dispose();
-					return false;
-				}
-			
-				return RefreshInternal(refreshMode);
+				Dispose();
+				return true;
 			}
+
+			if (!AppManager.MergeDiffToolInstalled())
+			{
+				DebugLog.LogError("Merge/Diff tool is not installed!\nGo to app settings and make sure your selected diff tool is installed.", true);
+				return false;
+			}
+
+			bool refreshMode = path == Repository.repoPath;
+			
+			try
+			{
+				// load repo
+				if (refreshMode) Repository.Close();
+				if (!Repository.Open(path)) throw new Exception(Repository.lastError);
+				
+				// check for git lfs
+				lfsEnabled = IsGitLFSRepo(false);
+
+				// check for .gitignore file
+				if (!refreshMode)
+				{
+					string gitIgnorePath = path + Path.DirectorySeparatorChar + ".gitignore";
+					if (!File.Exists(gitIgnorePath))
+					{
+						DebugLog.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
+						File.WriteAllText(gitIgnorePath, "");
+					}
+				}
+				
+				// add repo to history
+				AppManager.AddActiveRepoToHistory();
+
+				// get signature
+				if (!refreshMode)
+				{
+					string sigName, sigEmail;
+					Repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail);
+					signatureName = sigName;
+					signatureEmail = sigEmail;
+					if (checkForSettingErros)
+					{
+						if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
+						{
+							DebugLog.LogWarning("Credentials not set, please go to the settings tab!", true);
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				DebugLog.LogError("RepoManager.OpenRepo Failed: " + e.Message);
+				Dispose();
+				return false;
+			}
+			
+			return RefreshInternal(refreshMode);
 		}
 
-		public static bool Close()
+		public bool Close()
 		{
 			return OpenRepo(null);
 		}
 
-		public static void Refresh(bool useNewThread = false)
+		public void Refresh(bool useNewThread = false)
 		{
 			if (isRefreshing) return;
 			
@@ -139,15 +135,15 @@ namespace GitItGUI.Core
 			}
 		}
 
-		private static bool RefreshInternal(bool refreshMode)
+		private bool RefreshInternal(bool refreshMode)
 		{
-			if (!BranchManager.Refresh(refreshMode)) return false;
-			if (!ChangesManager.Refresh()) return false;
+			if (!RefreshBranches(refreshMode)) return false;
+			if (!RefreshChanges()) return false;
 			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 			return true;
 		}
 
-		public static bool Clone(string url, string destination, out string repoPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
+		public bool Clone(string url, string destination, out string repoPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
 			try
 			{
@@ -159,18 +155,18 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Clone error: " + e.Message, true);
+				DebugLog.LogError("Clone error: " + e.Message, true);
 				repoPath = null;
 				return false;
 			}
 		}
 		
-		internal static void Dispose()
+		internal void Dispose()
 		{
-			Repository.Dispose();
+			Repository.Close();
 		}
 
-		public static bool UpdateSignature(string name, string email)
+		public bool UpdateSignature(string name, string email)
 		{
 			try
 			{
@@ -181,12 +177,12 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Update Signature: " + e.Message, true);
+				DebugLog.LogError("Update Signature: " + e.Message, true);
 				return false;
 			}
 		}
 
-		private static bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
+		private bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
 		{
 			string gitattributesPath = Repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
 			bool attributesExist = File.Exists(gitattributesPath);
@@ -214,12 +210,12 @@ namespace GitItGUI.Core
 			return false;
 		}
 		
-		public static bool AddGitLFSSupport(bool addDefaultIgnoreExts)
+		public bool AddGitLFSSupport(bool addDefaultIgnoreExts)
 		{
 			// check if already init
 			if (lfsEnabled)
 			{
-				Debug.LogWarning("Git LFS already enabled on repo", true);
+				DebugLog.LogWarning("Git LFS already enabled on repo", true);
 				return false;
 			}
 
@@ -232,7 +228,7 @@ namespace GitItGUI.Core
 					if (!Repository.LFS.Install()) throw new Exception(Repository.lastError);
 					if (!Directory.Exists(lfsFolder))
 					{
-						Debug.LogError("Git-LFS install failed! (Try manually)", true);
+						DebugLog.LogError("Git-LFS install failed! (Try manually)", true);
 						lfsEnabled = false;
 						return false;
 					}
@@ -263,7 +259,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Add Git-LFS Error: " + e.Message, true);
+				DebugLog.LogError("Add Git-LFS Error: " + e.Message, true);
 				Environment.Exit(0);// quit for safety as application should restart
 				return false;
 			}
@@ -271,12 +267,12 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool RemoveGitLFSSupport(bool rebase)
+		public bool RemoveGitLFSSupport(bool rebase)
 		{
 			// check if not init
 			if (!lfsEnabled)
 			{
-				Debug.LogWarning("Git LFS is not enabled on repo", true);
+				DebugLog.LogWarning("Git LFS is not enabled on repo", true);
 				return false;
 			}
 
@@ -311,7 +307,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Remove Git-LFS Error: " + e.Message, true);
+				DebugLog.LogError("Remove Git-LFS Error: " + e.Message, true);
 				Environment.Exit(0);// quit for safety as application should restart
 				return false;
 			}
@@ -319,22 +315,22 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static void OpenGitk()
+		public void OpenGitk()
 		{
 			try
 			{
 				// open gitk
 				using (var process = new Process())
 				{
-					if (PlatformSettings.platform == Platforms.Windows)
+					if (PlatformInfo.platform == Platforms.Windows)
 					{
 						string programFilesx86, programFilesx64;
-						PlatformSettings.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
+						PlatformInfo.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
 						process.StartInfo.FileName = programFilesx64 + string.Format("{0}Git{0}cmd{0}gitk.exe", Path.DirectorySeparatorChar);
 					}
 					else
 					{
-						throw new Exception("Unsported platform: " + PlatformSettings.platform);
+						throw new Exception("Unsported platform: " + PlatformInfo.platform);
 					}
 
 					process.StartInfo.WorkingDirectory = Repository.repoPath;
@@ -342,7 +338,7 @@ namespace GitItGUI.Core
 					process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 					if (!process.Start())
 					{
-						Debug.LogError("Failed to start history tool (is it installed?)", true);
+						DebugLog.LogError("Failed to start history tool (is it installed?)", true);
 						return;
 					}
 
@@ -351,14 +347,14 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to start history tool: " + e.Message, true);
+				DebugLog.LogError("Failed to start history tool: " + e.Message, true);
 				return;
 			}
 
 			Refresh();
 		}
 
-		public static int UnpackedObjectCount(out string size)
+		public int UnpackedObjectCount(out string size)
 		{
 			try
 			{
@@ -368,14 +364,14 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to optamize: " + e.Message, true);
+				DebugLog.LogError("Failed to optamize: " + e.Message, true);
 			}
 
 			size = null;
 			return -1;
 		}
 
-		public static void Optimize()
+		public void Optimize()
 		{
 			try
 			{
@@ -383,7 +379,45 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to optamize: " + e.Message, true);
+				DebugLog.LogError("Failed to optamize: " + e.Message, true);
+			}
+		}
+
+		public void OpenFile(string filePath)
+		{
+			try
+			{
+				if (PlatformInfo.platform == Platforms.Windows)
+				{
+					Process.Start("explorer.exe", filePath);
+				}
+				else
+				{
+					throw new Exception("Unsuported platform: " + PlatformInfo.platform);
+				}
+			}
+			catch (Exception ex)
+			{
+				DebugLog.LogError("Failed to open file: " + ex.Message, true);
+			}
+		}
+
+		public void OpenFileLocation(string filePath)
+		{
+			try
+			{
+				if (PlatformInfo.platform == Platforms.Windows)
+				{
+					Process.Start("explorer.exe", string.Format("/select, {0}", filePath));
+				}
+				else
+				{
+					throw new Exception("Unsuported platform: " + PlatformInfo.platform);
+				}
+			}
+			catch (Exception ex)
+			{
+				DebugLog.LogError("Failed to open folder location: " + ex.Message, true);
 			}
 		}
 	}

@@ -1,9 +1,7 @@
-﻿using GitItGUI.Core;
-using System;
-using System.Windows.Forms;
-using System.Windows.Interop;
+﻿using System;
+using System.Diagnostics;
 
-namespace GitItGUI.UI.Utils
+namespace GitCommander.System
 {
 	public enum Platforms
 	{
@@ -12,12 +10,12 @@ namespace GitItGUI.UI.Utils
 		Linux
 	}
 
-	static class Platform
-    {
+	public static class PlatformInfo
+	{
 		public static readonly Platforms platform;
 		public static readonly string appDataPath;
 
-		static Platform()
+		static PlatformInfo()
 		{
 			var osPlatform = Environment.OSVersion.Platform;
 			switch (osPlatform)
@@ -46,7 +44,7 @@ namespace GitItGUI.UI.Utils
 		{
 			try
 			{
-				using (var process = new System.Diagnostics.Process())
+				using (var process = new Process())
 				{
 					process.StartInfo.UseShellExecute = false;
 					process.StartInfo.RedirectStandardOutput = true;
@@ -75,59 +73,6 @@ namespace GitItGUI.UI.Utils
 		{
 			if (platform == Platforms.Windows) return path.Replace('/', '\\');
 			else return path;
-		}
-
-		public static bool SelectFolder(out string folderPath)
-		{
-			var dlg = new FolderBrowserDialog();
-			var nativeWindow = new NativeWindow();
-			nativeWindow.AssignHandle(new WindowInteropHelper(MainWindow.singleton).Handle);
-			if (dlg.ShowDialog(nativeWindow) == DialogResult.OK)
-			{
-				folderPath = dlg.SelectedPath;
-				return true;
-			}
-
-			folderPath = null;
-			return false;
-		}
-
-		public static void OpenFile(string filePath)
-		{
-			try
-			{
-				if (platform == Platforms.Windows)
-				{
-					System.Diagnostics.Process.Start("explorer.exe", filePath);
-				}
-				else
-				{
-					throw new Exception("Unsuported platform: " + platform);
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.LogError("Failed to open file: " + ex.Message, true);
-			}
-		}
-
-		public static void OpenFileLocation(string filePath)
-		{
-			try
-			{
-				if (platform == Platforms.Windows)
-				{
-					System.Diagnostics.Process.Start("explorer.exe", string.Format("/select, {0}", filePath));
-				}
-				else
-				{
-					throw new Exception("Unsuported platform: " + platform);
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.LogError("Failed to open folder location: " + ex.Message, true);
-			}
 		}
 	}
 }
