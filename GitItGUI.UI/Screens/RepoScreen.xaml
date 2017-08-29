@@ -18,11 +18,11 @@
 			<TabItem Header="History">
 				<local:HistoryTab/>
 			</TabItem>
-			<TabItem Header="Settings">
-				<local:SettingsTab/>
-			</TabItem>
 			<TabItem Header="Terminal">
 				<local:TerminalTab/>
+			</TabItem>
+			<TabItem Header="Settings">
+				<local:SettingsTab/>
 			</TabItem>
 		</TabControl>
 	</Grid>

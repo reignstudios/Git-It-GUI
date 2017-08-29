@@ -14,7 +14,7 @@
 
 		<Border Grid.Column="0" BorderBrush="Gray" BorderThickness="2" Margin="10,10,5,10">
 			<Grid Background="#DDFFDD">
-				<Label Content="Active Branche" FontWeight="Bold" Margin="10,0,30,0" VerticalAlignment="Top"/>
+				<Label Content="Active Branch" FontWeight="Bold" Margin="10,0,30,0" VerticalAlignment="Top"/>
 				<Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,9,10,0">
 					<TextBlock Text="▼" Margin="0,-2,0,0"/>
 					<Button.ContextMenu>
