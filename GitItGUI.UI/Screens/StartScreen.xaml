@@ -21,7 +21,7 @@
 				</Grid.RowDefinitions>
 
 				<Grid Grid.Row="0" Background="#EEEEEE" Margin="0">
-					<Button HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Open an existing repo">
+					<Button Name="openButton" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Open an existing repo" Click="openButton_Click">
 						<Image Source="../Images/Open.png"/>
 					</Button>
 					<Button HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Clone an existing repo">

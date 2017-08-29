@@ -20,8 +20,11 @@ namespace GitItGUI.UI.Screens
     /// </summary>
     public partial class RepoScreen : UserControl
     {
+		public static RepoScreen singleton;
+
         public RepoScreen()
         {
+			singleton = this;
             InitializeComponent();
         }
     }

@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GitItGUI.UI.Utils;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace GitItGUI.UI.Screens
 {
@@ -20,9 +9,21 @@ namespace GitItGUI.UI.Screens
 	/// </summary>
 	public partial class StartScreen : UserControl
 	{
+		public static StartScreen singleton;
+
 		public StartScreen()
 		{
+			singleton = this;
 			InitializeComponent();
+		}
+
+		private void openButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (Platform.SelectFolder(out string folderPath))
+			{
+				// TODO: open repo first
+				MainWindow.singleton.Navigate(RepoScreen.singleton);
+			}
 		}
 	}
 }

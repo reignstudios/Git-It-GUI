@@ -20,9 +20,22 @@ namespace GitItGUI.UI
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		public static MainWindow singleton;
+
 		public MainWindow()
 		{
+			singleton = this;
 			InitializeComponent();
+		}
+
+		public void Navigate(UserControl screen)
+		{
+			startScreen.Visibility = Visibility.Hidden;
+			settingsScreen.Visibility = Visibility.Hidden;
+			repoScreen.Visibility = Visibility.Hidden;
+			if (screen == startScreen) startScreen.Visibility = Visibility.Visible;
+			else if (screen == settingsScreen) settingsScreen.Visibility = Visibility.Visible;
+			else if (screen == repoScreen) repoScreen.Visibility = Visibility.Visible;
 		}
 	}
 }

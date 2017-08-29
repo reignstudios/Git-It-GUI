@@ -8,8 +8,8 @@
         mc:Ignorable="d"
         Title="Git-It-GUI" Width="800" Height="500" WindowStartupLocation="CenterScreen">
 	<Grid>
-		<local:StartScreen x:Name="startScreen"/>
-		<!--<local:RepoScreen x:Name="repoScreen"/>-->
-		<!--<local:SettingsScreen x:Name="settingsScreen"/>-->
+		<local:StartScreen x:Name="startScreen" Visibility="Visible"/>
+		<local:RepoScreen x:Name="repoScreen" Visibility="Hidden"/>
+		<local:SettingsScreen x:Name="settingsScreen" Visibility="Hidden"/>
 	</Grid>
 </Window>
