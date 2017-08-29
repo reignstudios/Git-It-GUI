@@ -153,6 +153,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\Clone.png" />
+    <Resource Include="Images\Create.png" />
+    <Resource Include="Images\Open.png" />
     <Resource Include="Images\AppIcon.ico" />
     <Resource Include="Images\AppIcon.png" />
     <Content Include="Images\AppIcon.svg" />

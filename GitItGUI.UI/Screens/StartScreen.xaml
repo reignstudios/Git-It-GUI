@@ -6,24 +6,42 @@
              xmlns:local="clr-namespace:GitItGUI.UI"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
-	<Grid>
-		<Image Source="../Images/AppIcon.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="230" Height="230" Margin="-50,-50,0,0" Opacity=".25"/>
-		<Label Content="Git-It-GUI" FontWeight="Bold" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="32"/>
-		<Label Content="Select a repo below from the history list or open/clone/create one" Margin="0,60,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="12"/>
-		<Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32">
-			<Image Source="../Images/Settings.png"/>
-		</Button>
-		<Border Margin="10,91,10,10" BorderBrush="Gray" BorderThickness="2">
-			<Grid Background="LightGray">
-				<ListBox Margin="10,35,10,10">
-					<ListBoxItem HorizontalContentAlignment="Center" ToolTip="Path...">Repo Name</ListBoxItem>
-					<ListBoxItem HorizontalContentAlignment="Center">Hello</ListBoxItem>
-					<ListBoxItem HorizontalContentAlignment="Center">Hello</ListBoxItem>
-				</ListBox>
-				<Button Content="Open" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" ToolTip="Open an existing repo"/>
-				<Button Content="Clone" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" ToolTip="Clone an existing repo"/>
-				<Button Content="Create" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" ToolTip="Create a new repo"/>
+    <Grid>
+        <Image Source="../Images/AppIcon.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="230" Height="230" Margin="-50,-50,0,0" Opacity=".25"/>
+        <Label Content="Git-It-GUI" FontWeight="Bold" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="32"/>
+        <Label Content="Select a repo below from the history list or open/clone/create one" Margin="0,60,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="12"/>
+        <Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32" ToolTip="Settings">
+            <Image Source="../Images/Settings.png"/>
+        </Button>
+        <Border Margin="10,91,10,10" BorderBrush="Gray" BorderThickness="2">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="52" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
+
+				<Grid Grid.Row="0" Background="#EEEEEE" Margin="0">
+					<Button HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Open an existing repo">
+						<Image Source="../Images/Open.png"/>
+					</Button>
+					<Button HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Clone an existing repo">
+						<Image Source="../Images/Clone.png" Margin="2"/>
+					</Button>
+					<Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Create a new repo">
+						<Image Source="../Images/Create.png" Margin="2"/>
+					</Button>
+					<Separator VerticalAlignment="Top" Margin="0,51,0,0"/>
+				</Grid>
+
+				<Grid Grid.Row="1" Background="LightGray">
+					<Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" FontWeight="Bold" FontSize="18">History</Label>
+					<ListBox Margin="10,49,10,10">
+						<ListBoxItem HorizontalContentAlignment="Center" ToolTip="Path...">Repo Name</ListBoxItem>
+						<ListBoxItem HorizontalContentAlignment="Center">Hello</ListBoxItem>
+						<ListBoxItem HorizontalContentAlignment="Center">Hello</ListBoxItem>
+					</ListBox>
+				</Grid>
 			</Grid>
-		</Border>
-	</Grid>
+        </Border>
+    </Grid>
 </UserControl>
