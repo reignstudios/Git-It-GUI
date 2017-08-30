@@ -29,7 +29,13 @@ namespace GitItGUI.UI
 			singleton = this;
 			InitializeComponent();
 
-			AppManager.Init();
+			if (!AppManager.Init())
+			{
+				Close();
+				return;
+			}
+
+			repoScreen.Init();
 		}
 
 		protected override void OnClosing(CancelEventArgs e)

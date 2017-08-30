@@ -28,6 +28,10 @@ namespace GitItGUI.UI.Screens
         {
 			singleton = this;
             InitializeComponent();
+		}
+
+		public void Init()
+		{
 			repoManager = new RepoManager();
 		}
 
