@@ -29,8 +29,8 @@ namespace GitCommander
 		public static bool GetRemoteURL(string remote, out string url)
 		{
 			var result = Tools.RunExe("git", string.Format("config --get remote.{0}.url", remote));
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 
 			if (!string.IsNullOrEmpty(lastError) || string.IsNullOrEmpty(lastResult))
 			{
@@ -52,8 +52,8 @@ namespace GitCommander
 			}
 			
 			var result = Tools.RunExe("git", "remote show", stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{

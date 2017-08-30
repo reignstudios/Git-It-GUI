@@ -241,8 +241,8 @@ namespace GitCommander
 			}
 
 			var result = Tools.RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			if (!string.IsNullOrEmpty(lastError))
 			{
 				fileState = null;
@@ -278,8 +278,8 @@ namespace GitCommander
 			}
 			
 			var result = Tools.RunExe("git", "status -u", stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			if (!string.IsNullOrEmpty(lastError))
 			{
 				fileStates = null;
@@ -305,8 +305,8 @@ namespace GitCommander
 			}
 
 			var result = Tools.RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			
 			yes = conflictExist;
 			return string.IsNullOrEmpty(lastError);
@@ -316,8 +316,8 @@ namespace GitCommander
 		{
 			savedFilename = filename + ".orig";
 			var result = Tools.RunExe("git", string.Format("show HEAD:\"{0}\"", filename), stdOutToFilePath:savedFilename);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -327,8 +327,8 @@ namespace GitCommander
 			string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
 			savedFilename = filename + (source == FileConflictSources.Ours ? ".ours" : ".theirs");
 			var result = Tools.RunExe("git", string.Format("show {1}:\"{0}\"", filename, sourceName), stdOutToFilePath:savedFilename);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -353,8 +353,8 @@ namespace GitCommander
 			}
 
 			var result = Tools.RunExe("git", "status", null, stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			
 			yes = mergeCommitPending;
 			return string.IsNullOrEmpty(lastError);

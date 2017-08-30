@@ -30,8 +30,8 @@ namespace GitCommander
 		private static bool SimpleGitInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 		{
 			var result = Tools.RunExe("git", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -67,8 +67,8 @@ namespace GitCommander
 			}
 			
 			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			
 			repoClonedPath = repoClonedPathTemp;
 			return string.IsNullOrEmpty(lastError);
@@ -84,15 +84,15 @@ namespace GitCommander
 			}
 			
 			var result = Tools.RunExe("git", "rev-parse --git-dir", workingDirectory:path);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			if (!string.IsNullOrEmpty(lastError)) return false;
 			
 			// get repo url
 			repoURL = "";
 			result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback, workingDirectory:path);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			
 			repoPath = path;
 			return isOpen = true;

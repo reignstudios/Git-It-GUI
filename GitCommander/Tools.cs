@@ -34,7 +34,7 @@ namespace GitCommander
 			if (!errorPrefixes.Contains(errorCode)) errorPrefixes.Add(errorCode);
 		}
 		
-		public static Tuple<string, string> RunExe
+		public static (string output, string errors) RunExe
 		(
 			string exe, string arguments, string workingDirectory = null,
 			StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null,
@@ -159,7 +159,7 @@ namespace GitCommander
 				}
 			}
 
-			return new Tuple<string, string>(output, errors);
+			return (output, errors);
 		}
 	}
 }

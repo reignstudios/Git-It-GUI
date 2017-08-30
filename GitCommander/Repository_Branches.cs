@@ -80,8 +80,8 @@ namespace GitCommander
 			}
 			
 			var result = Tools.RunExe("git", "remote prune origin --dry-run", stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
@@ -242,8 +242,8 @@ namespace GitCommander
 			}
 			
 			var result = Tools.RunExe("git", "branch -a -vv", stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 
 			if (!string.IsNullOrEmpty(lastError))
 			{
@@ -267,8 +267,8 @@ namespace GitCommander
 		public static bool CheckoutBranch(string branch)
 		{
 			var result = Tools.RunExe("git", "checkout " + branch);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			
 			return string.IsNullOrEmpty(lastError);
 		}
@@ -298,8 +298,8 @@ namespace GitCommander
 			}
 
 			var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback: stdCallback_log);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			bool remoteDoesntHaveBranch = lastError.Contains("unknown revision or path not in the working tree");
 			yes = isUpToDate && !remoteDoesntHaveBranch;
 			if (!isUpToDate && !remoteDoesntHaveBranch) return string.IsNullOrEmpty(lastError);
@@ -313,8 +313,8 @@ namespace GitCommander
 			}
 
 			result = Tools.RunExe("git", string.Format("fetch {0} {1} --dry-run", remote, branch), stdCallback: stdCallback_fetch);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lastResult = result.output;
+			lastError = result.errors;
 			if (!isUpToDate) yes = false;
 
 			return string.IsNullOrEmpty(lastError);
