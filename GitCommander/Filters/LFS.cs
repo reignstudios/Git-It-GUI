@@ -22,29 +22,44 @@
 
 			public bool Install()
 			{
-				return SimpleLFSInvoke("install");
+				lock (repository)
+				{
+					return SimpleLFSInvoke("install");
+				}
 			}
 
 			public bool Uninstall()
 			{
-				return SimpleLFSInvoke("uninstall");
+				lock (repository)
+				{
+					return SimpleLFSInvoke("uninstall");
+				}
 			}
 
 			public bool Track(string ext)
 			{
-				return SimpleLFSInvoke(string.Format("track \"*{0}\"", ext));
+				lock (repository)
+				{
+					return SimpleLFSInvoke(string.Format("track \"*{0}\"", ext));
+				}
 			}
 
 			public bool Untrack(string ext)
 			{
-				return SimpleLFSInvoke(string.Format("untrack \"*{0}\"", ext));
+				lock (repository)
+				{
+					return SimpleLFSInvoke(string.Format("untrack \"*{0}\"", ext));
+				}
 			}
 
 			public bool GetVersion(out string version)
 			{
-				bool result = SimpleLFSInvoke("version");
-				version = repository.lastResult;
-				return result;
+				lock (repository)
+				{
+					bool result = SimpleLFSInvoke("version");
+					version = repository.lastResult;
+					return result;
+				}
 			}
 		}
 	}

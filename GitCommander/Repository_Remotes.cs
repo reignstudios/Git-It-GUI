@@ -24,18 +24,21 @@ namespace GitCommander
 	{
 		public bool GetRemoteURL(string remote, out string url)
 		{
-			var result = RunExe("git", string.Format("config --get remote.{0}.url", remote));
-			lastResult = result.output;
-			lastError = result.errors;
-
-			if (!string.IsNullOrEmpty(lastError) || string.IsNullOrEmpty(lastResult))
+			lock (this)
 			{
-				url = null;
-				return false;
-			}
+				var result = RunExe("git", string.Format("config --get remote.{0}.url", remote));
+				lastResult = result.output;
+				lastError = result.errors;
 
-			url = lastResult;
-			return true;
+				if (!string.IsNullOrEmpty(lastError) || string.IsNullOrEmpty(lastResult))
+				{
+					url = null;
+					return false;
+				}
+
+				url = lastResult;
+				return true;
+			}
 		}
 
 		public bool GetRemoteStates(out RemoteState[] remoteStates)
@@ -46,34 +49,37 @@ namespace GitCommander
 				var remote = new RemoteState() {name = line};
 				states.Add(remote);
 			}
-			
-			var result = RunExe("git", "remote show", stdCallback:stdCallback);
-			lastResult = result.output;
-			lastError = result.errors;
 
-			if (!string.IsNullOrEmpty(lastError))
+			lock (this)
 			{
-				remoteStates = null;
-				return false;
-			}
+				var result = RunExe("git", "remote show", stdCallback:stdCallback);
+				lastResult = result.output;
+				lastError = result.errors;
 
-			// get remote urls
-			foreach (var remote in states)
-			{
-				string url;
-				if (GetRemoteURL(remote.name, out url))
-				{
-					remote.url = url;
-				}
-				else
+				if (!string.IsNullOrEmpty(lastError))
 				{
 					remoteStates = null;
 					return false;
 				}
-			}
+
+				// get remote urls
+				foreach (var remote in states)
+				{
+					string url;
+					if (GetRemoteURL(remote.name, out url))
+					{
+						remote.url = url;
+					}
+					else
+					{
+						remoteStates = null;
+						return false;
+					}
+				}
 			
-			remoteStates = states.ToArray();
-			return true;
+				remoteStates = states.ToArray();
+				return true;
+			}
 		}
 	}
 }

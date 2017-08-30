@@ -111,32 +111,50 @@ namespace GitCommander
 	{
 		public bool Stage(string filename)
 		{
-			return SimpleGitInvoke(string.Format("add \"{0}\"", filename));
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("add \"{0}\"", filename));
+			}
 		}
 
 		public bool StageAll()
 		{
-			return SimpleGitInvoke("add -A");
+			lock (this)
+			{
+				return SimpleGitInvoke("add -A");
+			}
 		}
 
 		public bool Unstage(string filename)
 		{
-			return SimpleGitInvoke(string.Format("reset \"{0}\"", filename));
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("reset \"{0}\"", filename));
+			}
 		}
 
 		public bool UnstageAll()
 		{
-			return SimpleGitInvoke("reset");
+			lock (this)
+			{
+				return SimpleGitInvoke("reset");
+			}
 		}
 
 		public bool RevertFile(string activeBranch, string filename)
 		{
-			return SimpleGitInvoke(string.Format("checkout {0} -- \"{1}\"", activeBranch, filename));
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("checkout {0} -- \"{1}\"", activeBranch, filename));
+			}
 		}
 
 		public bool RevertAllChanges()
 		{
-			return SimpleGitInvoke("reset --hard");
+			lock (this)
+			{
+				return SimpleGitInvoke("reset --hard");
+			}
 		}
 		
 		private bool ParseFileState(string line, ref int mode, List<FileState> states)
@@ -179,52 +197,55 @@ namespace GitCommander
 				
 				return false;
 			}
-		
-			// gather normal files
-			switch (line)
+
+			lock (this)
 			{
-				case "Changes to be committed:": mode = 0; return true;
-				case "Changes not staged for commit:": mode = 1; return true;
-				case "Unmerged paths:": mode = 2; return true;
-				case "Untracked files:": mode = 3; return true;
-			}
+				// gather normal files
+				switch (line)
+				{
+					case "Changes to be committed:": mode = 0; return true;
+					case "Changes not staged for commit:": mode = 1; return true;
+					case "Unmerged paths:": mode = 2; return true;
+					case "Untracked files:": mode = 3; return true;
+				}
 			
-			bool pass = false;
-			if (mode == 0)
-			{
-				pass = addState("\tnew file:", FileStates.NewInIndex);
-				if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
-				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromIndex);
-				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInIndex);
-				if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInIndex);
-			}
-			else if (mode == 1)
-			{
-				pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
-				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromWorkdir);
-				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInWorkdir);
-				if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInWorkdir);
-				if (!pass) pass = addState("\tnew file:", FileStates.NewInWorkdir);// call this just in case (should be done in untracked)
-			}
-			else if (mode == 2)
-			{
-				pass = addState("\tboth modified:", FileStates.Conflicted, FileConflictTypes.Changes);
-				if (!pass) pass = addState("\tdeleted by us:", FileStates.Conflicted, FileConflictTypes.DeletedByUs);
-				if (!pass) pass = addState("\tdeleted by them:", FileStates.Conflicted, FileConflictTypes.DeletedByThem);
-				if (!pass) pass = addState("\tboth deleted:", FileStates.Conflicted, FileConflictTypes.DeletedByBoth);
-			}
-			else if (mode == 3)
-			{
-				pass = addState("\t", FileStates.NewInWorkdir);
-			}
+				bool pass = false;
+				if (mode == 0)
+				{
+					pass = addState("\tnew file:", FileStates.NewInIndex);
+					if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
+					if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromIndex);
+					if (!pass) pass = addState("\trenamed:", FileStates.RenamedInIndex);
+					if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInIndex);
+				}
+				else if (mode == 1)
+				{
+					pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
+					if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromWorkdir);
+					if (!pass) pass = addState("\trenamed:", FileStates.RenamedInWorkdir);
+					if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInWorkdir);
+					if (!pass) pass = addState("\tnew file:", FileStates.NewInWorkdir);// call this just in case (should be done in untracked)
+				}
+				else if (mode == 2)
+				{
+					pass = addState("\tboth modified:", FileStates.Conflicted, FileConflictTypes.Changes);
+					if (!pass) pass = addState("\tdeleted by us:", FileStates.Conflicted, FileConflictTypes.DeletedByUs);
+					if (!pass) pass = addState("\tdeleted by them:", FileStates.Conflicted, FileConflictTypes.DeletedByThem);
+					if (!pass) pass = addState("\tboth deleted:", FileStates.Conflicted, FileConflictTypes.DeletedByBoth);
+				}
+				else if (mode == 3)
+				{
+					pass = addState("\t", FileStates.NewInWorkdir);
+				}
 
-			if (!pass)
-			{
-				var match = Regex.Match(line, @"\t(.*):");
-				if (match.Success) return false;
-			}
+				if (!pass)
+				{
+					var match = Regex.Match(line, @"\t(.*):");
+					if (match.Success) return false;
+				}
 
-			return true;
+				return true;
+			}
 		}
 
 		public bool GetFileState(string filename, out FileState fileState)
@@ -237,30 +258,33 @@ namespace GitCommander
 				if (!ParseFileState(line, ref mode, states)) failedToParse = true;
 			}
 
-			var result = RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
-			lastResult = result.output;
-			lastError = result.errors;
-			if (!string.IsNullOrEmpty(lastError))
+			lock (this)
 			{
-				fileState = null;
-				return false;
-			}
+				var result = RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
+				lastResult = result.output;
+				lastError = result.errors;
+				if (!string.IsNullOrEmpty(lastError))
+				{
+					fileState = null;
+					return false;
+				}
 
-			if (failedToParse)
-			{
-				fileState = null;
-				return false;
-			}
+				if (failedToParse)
+				{
+					fileState = null;
+					return false;
+				}
 			
-			if (states.Count != 0)
-			{
-				fileState = states[0];
-				return true;
-			}
-			else
-			{
-				fileState = null;
-				return false;
+				if (states.Count != 0)
+				{
+					fileState = states[0];
+					return true;
+				}
+				else
+				{
+					fileState = null;
+					return false;
+				}
 			}
 		}
 
@@ -273,24 +297,27 @@ namespace GitCommander
 			{
 				if (!ParseFileState(line, ref mode, states))failedToParse = true;
 			}
-			
-			var result = RunExe("git", "status -u", stdCallback:stdCallback);
-			lastResult = result.output;
-			lastError = result.errors;
-			if (!string.IsNullOrEmpty(lastError))
-			{
-				fileStates = null;
-				return false;
-			}
 
-			if (failedToParse)
+			lock (this)
 			{
-				fileStates = null;
-				return false;
-			}
+				var result = RunExe("git", "status -u", stdCallback:stdCallback);
+				lastResult = result.output;
+				lastError = result.errors;
+				if (!string.IsNullOrEmpty(lastError))
+				{
+					fileStates = null;
+					return false;
+				}
 
-			fileStates = states.ToArray();
-			return true;
+				if (failedToParse)
+				{
+					fileStates = null;
+					return false;
+				}
+
+				fileStates = states.ToArray();
+				return true;
+			}
 		}
 
 		public bool ConflitedExist(out bool yes)
@@ -301,44 +328,59 @@ namespace GitCommander
 				conflictExist = true;
 			}
 
-			var result = RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback:stdCallback);
-			lastResult = result.output;
-			lastError = result.errors;
+			lock (this)
+			{
+				var result = RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback:stdCallback);
+				lastResult = result.output;
+				lastError = result.errors;
 			
-			yes = conflictExist;
-			return string.IsNullOrEmpty(lastError);
+				yes = conflictExist;
+				return string.IsNullOrEmpty(lastError);
+			}
 		}
 
 		public bool SaveOriginalFile(string filename, out string savedFilename)
 		{
-			savedFilename = filename + ".orig";
-			var result = RunExe("git", string.Format("show HEAD:\"{0}\"", filename), stdOutToFilePath:savedFilename);
-			lastResult = result.output;
-			lastError = result.errors;
+			lock (this)
+			{
+				savedFilename = filename + ".orig";
+				var result = RunExe("git", string.Format("show HEAD:\"{0}\"", filename), stdOutToFilePath:savedFilename);
+				lastResult = result.output;
+				lastError = result.errors;
 
-			return string.IsNullOrEmpty(lastError);
+				return string.IsNullOrEmpty(lastError);
+			}
 		}
 
 		public bool SaveConflictedFile(string filename, FileConflictSources source, out string savedFilename)
 		{
-			string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
-			savedFilename = filename + (source == FileConflictSources.Ours ? ".ours" : ".theirs");
-			var result = RunExe("git", string.Format("show {1}:\"{0}\"", filename, sourceName), stdOutToFilePath:savedFilename);
-			lastResult = result.output;
-			lastError = result.errors;
+			lock (this)
+			{
+				string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
+				savedFilename = filename + (source == FileConflictSources.Ours ? ".ours" : ".theirs");
+				var result = RunExe("git", string.Format("show {1}:\"{0}\"", filename, sourceName), stdOutToFilePath:savedFilename);
+				lastResult = result.output;
+				lastError = result.errors;
 
-			return string.IsNullOrEmpty(lastError);
+				return string.IsNullOrEmpty(lastError);
+			}
 		}
 
 		public bool CheckoutConflictedFile(string filename, FileConflictSources source)
 		{
-			string sourceName = source == FileConflictSources.Ours ? "--ours" : "--theirs";
-			return SimpleGitInvoke(string.Format("checkout {1} \"{0}\"", filename, sourceName));
+			lock (this)
+			{
+				string sourceName = source == FileConflictSources.Ours ? "--ours" : "--theirs";
+				return SimpleGitInvoke(string.Format("checkout {1} \"{0}\"", filename, sourceName));
+			}
 		}
 
 		public bool RemoveFile(string filename)
 		{
-			return SimpleGitInvoke(string.Format("rm \"{0}\"", filename));
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("rm \"{0}\"", filename));
+			}
 		}
 
 		public bool CompletedMergeCommitPending(out bool yes)
@@ -349,44 +391,65 @@ namespace GitCommander
 				if (line == "All conflicts fixed but you are still merging.") mergeCommitPending = true;
 			}
 
-			var result = RunExe("git", "status", null, stdCallback:stdCallback);
-			lastResult = result.output;
-			lastError = result.errors;
+			lock (this)
+			{
+				var result = RunExe("git", "status", null, stdCallback:stdCallback);
+				lastResult = result.output;
+				lastError = result.errors;
 			
-			yes = mergeCommitPending;
-			return string.IsNullOrEmpty(lastError);
+				yes = mergeCommitPending;
+				return string.IsNullOrEmpty(lastError);
+			}
 		}
 
 		public bool Fetch()
 		{
-			return SimpleGitInvoke("fetch");
+			lock (this)
+			{
+				return SimpleGitInvoke("fetch");
+			}
 		}
 
 		public bool Fetch(string remote, string branch)
 		{
-			return SimpleGitInvoke(string.Format("fetch {0} {1}", remote, branch));
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("fetch {0} {1}", remote, branch));
+			}
 		}
 
 		public bool Pull()
 		{
-			return SimpleGitInvoke("pull");
+			lock (this)
+			{
+				return SimpleGitInvoke("pull");
+			}
 		}
 
 		public bool Push()
 		{
-			return SimpleGitInvoke("push");
+			lock (this)
+			{
+				return SimpleGitInvoke("push");
+			}
 		}
 		
 		public bool Commit(string message)
 		{
-			return SimpleGitInvoke(string.Format("commit -m \"{0}\"", message));
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("commit -m \"{0}\"", message));
+			}
 		}
 
 		public bool GetDiff(string filename, out string diff)
 		{
-			bool result = SimpleGitInvoke(string.Format("diff HEAD \"{0}\"", filename));
-			diff = lastResult;
-			return result;
+			lock (this)
+			{
+				bool result = SimpleGitInvoke(string.Format("diff HEAD \"{0}\"", filename));
+				diff = lastResult;
+				return result;
+			}
 		}
 	}
 }
