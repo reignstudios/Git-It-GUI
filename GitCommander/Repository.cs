@@ -39,22 +39,22 @@ namespace GitCommander
 		public static bool Clone(string url, string path, out string repoClonedPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
 			StreamWriter stdInWriter = null;
-			var getStdInputStreamCallback = new GetStdInputStreamCallbackMethod(delegate(StreamWriter writer)
+			void getStdInputStreamCallback(StreamWriter writer)
 			{
 				stdInWriter = writer;
-			});
+			}
 			
 			string repoClonedPathTemp = null;
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				if (line.StartsWith("Cloning into"))
 				{
 					var match = Regex.Match(line, @"Cloning into '(.*)'\.\.\.");
 					if (match.Success) repoClonedPathTemp = match.Groups[1].Value;
 				}
-			});
+			}
 
-			var stdErrorCallback = new StdCallbackMethod(delegate(string line)
+			void stdErrorCallback(string line)
 			{
 				if (line.StartsWith("Username for"))
 				{
@@ -64,7 +64,7 @@ namespace GitCommander
 				{
 					if (writePasswordCallback == null || !writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
 				}
-			});
+			}
 			
 			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
 			lastResult = result.Item1;
@@ -78,10 +78,10 @@ namespace GitCommander
 		{
 			Close();
 
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				repoURL = line;
-			});
+			}
 			
 			var result = Tools.RunExe("git", "rev-parse --git-dir", workingDirectory:path);
 			lastResult = result.Item1;

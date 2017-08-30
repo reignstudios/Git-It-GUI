@@ -20,9 +20,6 @@ namespace GitItGUI.Core
 		public delegate void RepoRefreshedCallbackMethod();
 		public event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 
-		public delegate void RepoRefreshingCallbackMethod(bool start);
-		public event RepoRefreshingCallbackMethod RepoRefreshingCallback;
-
 		/// <summary>
 		/// True if this is a Git-LFS enabled repo
 		/// </summary>

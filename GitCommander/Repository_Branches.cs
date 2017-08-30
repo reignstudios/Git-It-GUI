@@ -74,10 +74,10 @@ namespace GitCommander
 		public static bool GetRemotePrunableBrancheNames(out string[] branchName)
 		{
 			var branchNameList = new List<string>();
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				branchNameList.Add(line);
-			});
+			}
 			
 			var result = Tools.RunExe("git", "remote prune origin --dry-run", stdCallback:stdCallback);
 			lastResult = result.Item1;
@@ -96,7 +96,7 @@ namespace GitCommander
 		public static bool GetBrancheStates(out BranchState[] brancheStates)
 		{
 			var states = new List<BranchState>();
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				line = line.TrimStart();
 
@@ -239,7 +239,7 @@ namespace GitCommander
 				}
 
 				states.Add(branch);
-			});
+			}
 			
 			var result = Tools.RunExe("git", "branch -a -vv", stdCallback:stdCallback);
 			lastResult = result.Item1;
@@ -291,11 +291,11 @@ namespace GitCommander
 		public static bool IsUpToDateWithRemote(string remote, string branch, out bool yes)
 		{
 			bool isUpToDate = true;
-			var stdCallback_log = new StdCallbackMethod(delegate (string line)
+			void stdCallback_log(string line)
 			{
 				var match = Regex.Match(line, @"commit (.*)");
 				if (match.Success) isUpToDate = false;
-			});
+			}
 
 			var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback: stdCallback_log);
 			lastResult = result.Item1;
@@ -306,11 +306,11 @@ namespace GitCommander
 			if (remoteDoesntHaveBranch) return true;
 
 			isUpToDate = true;
-			var stdCallback_fetch = new StdCallbackMethod(delegate (string line)
+			void stdCallback_fetch(string line)
 			{
 				var match = Regex.Match(line, string.Format(@"\s*(.*)\.\.(.*)\s*{1}\s*->\s*{0}/{1}", remote, branch));
 				if (match.Success && match.Groups[1].Value != match.Groups[2].Value) isUpToDate = false;
-			});
+			}
 
 			result = Tools.RunExe("git", string.Format("fetch {0} {1} --dry-run", remote, branch), stdCallback: stdCallback_fetch);
 			lastResult = result.Item1;

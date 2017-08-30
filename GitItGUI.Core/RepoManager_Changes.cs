@@ -556,8 +556,7 @@ namespace GitItGUI.Core
 				return true;
 			}
 		}
-
-		private delegate void DeleteTempMergeFilesMethod();
+		
 		public bool ResolveConflict(FileState fileState, bool refresh)
 		{
 			lock (this)
@@ -565,12 +564,12 @@ namespace GitItGUI.Core
 				bool success = true;
 				string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
 				string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
-				var DeleteTempMergeFiles = new DeleteTempMergeFilesMethod(delegate ()
+				void DeleteTempMergeFiles()
 				{
 					if (File.Exists(fullPathBase)) File.Delete(fullPathBase);
 					if (File.Exists(fullPathOurs)) File.Delete(fullPathOurs);
 					if (File.Exists(fullPathTheirs)) File.Delete(fullPathTheirs);
-				});
+				}
 
 				try
 				{
@@ -803,18 +802,17 @@ namespace GitItGUI.Core
 				return success;
 			}
 		}
-
-		private delegate void DeleteTempDiffFilesMethod();
+		
 		public bool OpenDiffTool(FileState fileState)
 		{
 			lock (this)
 			{
 				string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
 				string fullPathOrig = null;
-				var DeleteTempDiffFiles = new DeleteTempDiffFilesMethod(delegate ()
+				void DeleteTempDiffFiles()
 				{
 					if (File.Exists(fullPathOrig)) File.Delete(fullPathOrig);
-				});
+				}
 
 				try
 				{

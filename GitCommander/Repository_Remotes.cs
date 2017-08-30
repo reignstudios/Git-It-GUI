@@ -45,11 +45,11 @@ namespace GitCommander
 		public static bool GetRemoteStates(out RemoteState[] remoteStates)
 		{
 			var states = new List<RemoteState>();
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				var remote = new RemoteState() {name = line};
 				states.Add(remote);
-			});
+			}
 			
 			var result = Tools.RunExe("git", "remote show", stdCallback:stdCallback);
 			lastResult = result.Item1;

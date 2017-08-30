@@ -141,11 +141,10 @@ namespace GitCommander
 		{
 			return SimpleGitInvoke("reset --hard");
 		}
-
-		private delegate bool AddState(string type, FileStates stateType, FileConflictTypes conflictType = FileConflictTypes.None);
+		
 		private static bool ParseFileState(string line, ref int mode, List<FileState> states)
 		{
-			var addState = new AddState(delegate(string type, FileStates stateType, FileConflictTypes conflictType)
+			bool addState(string type, FileStates stateType, FileConflictTypes conflictType = FileConflictTypes.None)
 			{
 				if (line.Contains(type))
 				{
@@ -182,7 +181,7 @@ namespace GitCommander
 				}
 				
 				return false;
-			});
+			}
 		
 			// gather normal files
 			switch (line)
@@ -236,10 +235,10 @@ namespace GitCommander
 			var states = new List<FileState>();
 			int mode = -1;
 			bool failedToParse = false;
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				if (!ParseFileState(line, ref mode, states)) failedToParse = true;
-			});
+			}
 
 			var result = Tools.RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
 			lastResult = result.Item1;
@@ -273,10 +272,10 @@ namespace GitCommander
 			var states = new List<FileState>();
 			int mode = -1;
 			bool failedToParse = false;
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				if (!ParseFileState(line, ref mode, states))failedToParse = true;
-			});
+			}
 			
 			var result = Tools.RunExe("git", "status -u", stdCallback:stdCallback);
 			lastResult = result.Item1;
@@ -300,10 +299,10 @@ namespace GitCommander
 		public static bool ConflitedExist(out bool yes)
 		{
 			bool conflictExist = false;
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				conflictExist = true;
-			});
+			}
 
 			var result = Tools.RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback:stdCallback);
 			lastResult = result.Item1;
@@ -348,10 +347,10 @@ namespace GitCommander
 		public static bool CompletedMergeCommitPending(out bool yes)
 		{
 			bool mergeCommitPending = false;
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				if (line == "All conflicts fixed but you are still merging.") mergeCommitPending = true;
-			});
+			}
 
 			var result = Tools.RunExe("git", "status", null, stdCallback:stdCallback);
 			lastResult = result.Item1;
