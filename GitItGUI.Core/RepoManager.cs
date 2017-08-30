@@ -1,21 +1,16 @@
 ﻿using GitCommander;
 using GitCommander.System;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GitItGUI.Core
 {
 	/// <summary>
 	/// Primary git manager
 	/// </summary>
-	public partial class RepoManager
+	public partial class RepoManager : IDisposable
 	{
 		public delegate void RepoRefreshedCallbackMethod();
 		public event RepoRefreshedCallbackMethod RepoRefreshedCallback;
@@ -28,19 +23,73 @@ namespace GitItGUI.Core
 		public string signatureName {get; private set;}
 		public string signatureEmail {get; private set;}
 
+		internal Repository repository;
+		private bool pauseGitCommanderStdWrites;
+
+		public RepoManager()
+		{
+			repository = new Repository();
+
+			// add custom error codes to git commander
+			if (AppManager.settings.customErrorCodes != null)
+			{
+				foreach (var code in AppManager.settings.customErrorCodes.errorCodes)
+				{
+					repository.AddErrorCode(code);
+				}
+			}
+
+			// bind terminal callbacks
+			repository.RunExeDebugLineCallback += DebugLog_RunExeDebugLineCallback;
+			repository.StdCallback += DebugLog_StdCallback;
+			repository.StdWarningCallback += DebugLog_StdWarningCallback;
+			repository.StdErrorCallback += DebugLog_StdErrorCallback;
+		}
+
+		public void Dispose()
+		{
+			repository.Close();
+
+			// un-bind terminal callbacks
+			repository.RunExeDebugLineCallback -= DebugLog_RunExeDebugLineCallback;
+			repository.StdCallback -= DebugLog_StdCallback;
+			repository.StdWarningCallback -= DebugLog_StdWarningCallback;
+			repository.StdErrorCallback -= DebugLog_StdErrorCallback;
+		}
+
+		private void DebugLog_RunExeDebugLineCallback(string line)
+		{
+			DebugLog.Log(line);
+		}
+
+		private void DebugLog_StdCallback(string line)
+		{
+			if (!pauseGitCommanderStdWrites) DebugLog.Log(line);
+		}
+
+		private void DebugLog_StdWarningCallback(string line)
+		{
+			DebugLog.LogWarning(line);
+		}
+
+		private void DebugLog_StdErrorCallback(string line)
+		{
+			DebugLog.LogError(line);
+		}
+
 		/// <summary>
 		/// Use to open an existing repo
 		/// </summary>
-		/// <param name="path">Path to git repo</param>
+		/// <param name="repoPath">Path to git repo</param>
 		/// <returns>True if succeeded</returns>
-		public bool OpenRepo(string path, bool checkForSettingErros = false)
+		public bool OpenRepo(string repoPath, bool checkForSettingErros = false)
 		{
 			lock (this)
 			{
 				// unload repo
-				if (string.IsNullOrEmpty(path))
+				if (string.IsNullOrEmpty(repoPath))
 				{
-					Dispose();
+					repository.Close();
 					return true;
 				}
 
@@ -50,13 +99,13 @@ namespace GitItGUI.Core
 					return false;
 				}
 
-				bool isRefreshMode = path == Repository.repoPath;
+				bool isRefreshMode = repoPath == repository.repoPath;
 			
 				try
 				{
 					// load repo
-					if (isRefreshMode) Repository.Close();
-					if (!Repository.Open(path)) throw new Exception(Repository.lastError);
+					if (isRefreshMode) repository.Close();
+					if (!repository.Open(repoPath)) throw new Exception(repository.lastError);
 				
 					// check for git lfs
 					lfsEnabled = IsGitLFSRepo(false);
@@ -64,7 +113,7 @@ namespace GitItGUI.Core
 					// check for .gitignore file
 					if (!isRefreshMode)
 					{
-						string gitIgnorePath = path + Path.DirectorySeparatorChar + ".gitignore";
+						string gitIgnorePath = repoPath + Path.DirectorySeparatorChar + ".gitignore";
 						if (!File.Exists(gitIgnorePath))
 						{
 							DebugLog.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
@@ -73,13 +122,13 @@ namespace GitItGUI.Core
 					}
 				
 					// add repo to history
-					AppManager.AddActiveRepoToHistory();
+					AppManager.AddRepoToHistory(repoPath);
 
 					// get signature
 					if (!isRefreshMode)
 					{
 						string sigName, sigEmail;
-						Repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail);
+						repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail);
 						signatureName = sigName;
 						signatureEmail = sigEmail;
 						if (checkForSettingErros)
@@ -94,7 +143,7 @@ namespace GitItGUI.Core
 				catch (Exception e)
 				{
 					DebugLog.LogError("RepoManager.OpenRepo Failed: " + e.Message);
-					Dispose();
+					repository.Close();
 					return false;
 				}
 			
@@ -109,7 +158,7 @@ namespace GitItGUI.Core
 
 		public bool Refresh()
 		{
-			return OpenRepo(Repository.repoPath);
+			return OpenRepo(repository.repoPath);
 		}
 
 		private bool RefreshInternal(bool refreshMode)
@@ -127,7 +176,7 @@ namespace GitItGUI.Core
 				try
 				{
 					// clone
-					if (!Repository.Clone(url, destination, out repoPath, writeUsernameCallback, writePasswordCallback)) throw new Exception(Repository.lastError);
+					if (!repository.Clone(url, destination, out repoPath, writeUsernameCallback, writePasswordCallback)) throw new Exception(repository.lastError);
 					repoPath = destination + Path.DirectorySeparatorChar + repoPath;
 					lfsEnabled = IsGitLFSRepo(true);
 					return true;
@@ -140,11 +189,6 @@ namespace GitItGUI.Core
 				}
 			}
 		}
-		
-		private void Dispose()
-		{
-			Repository.Close();
-		}
 
 		public bool UpdateSignature(string name, string email)
 		{
@@ -152,7 +196,7 @@ namespace GitItGUI.Core
 			{
 				try
 				{
-					if (!Repository.SetSignature(SignatureLocations.Global, name, email)) throw new Exception(Repository.lastError);
+					if (!repository.SetSignature(SignatureLocations.Global, name, email)) throw new Exception(repository.lastError);
 					signatureName = name;
 					signatureEmail = email;
 					return true;
@@ -167,7 +211,7 @@ namespace GitItGUI.Core
 
 		private bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
 		{
-			string gitattributesPath = Repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+			string gitattributesPath = repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
 			bool attributesExist = File.Exists(gitattributesPath);
 			if (returnTrueIfValidAttributes && attributesExist)
 			{
@@ -175,9 +219,9 @@ namespace GitItGUI.Core
 				return lines.Contains("filter=lfs diff=lfs merge=lfs");
 			}
 
-			if (attributesExist && Directory.Exists(Repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)) && File.Exists(Repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar)))
+			if (attributesExist && Directory.Exists(repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)) && File.Exists(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar)))
 			{
-				string data = File.ReadAllText(Repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
+				string data = File.ReadAllText(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
 				bool isValid = data.Contains("git-lfs");
 				if (isValid)
 				{
@@ -207,10 +251,10 @@ namespace GitItGUI.Core
 				try
 				{
 					// init git lfs
-					string lfsFolder = Repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar);
+					string lfsFolder = repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar);
 					if (!Directory.Exists(lfsFolder))
 					{
-						if (!Repository.LFS.Install()) throw new Exception(Repository.lastError);
+						if (!repository.lfs.Install()) throw new Exception(repository.lastError);
 						if (!Directory.Exists(lfsFolder))
 						{
 							DebugLog.LogError("Git-LFS install failed! (Try manually)", true);
@@ -220,7 +264,7 @@ namespace GitItGUI.Core
 					}
 
 					// add attr file if it doesn't exist
-					string gitattributesPath = Repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+					string gitattributesPath = repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
 					if (!File.Exists(gitattributesPath))
 					{
 						using (var writer = File.CreateText(gitattributesPath))
@@ -234,7 +278,7 @@ namespace GitItGUI.Core
 					{
 						foreach (string ext in AppManager.settings.defaultGitLFS_Exts)
 						{
-							if (!Repository.LFS.Track(ext)) throw new Exception(Repository.lastError);
+							if (!repository.lfs.Track(ext)) throw new Exception(repository.lastError);
 						}
 					}
 				
@@ -267,7 +311,7 @@ namespace GitItGUI.Core
 				try
 				{
 					// untrack lfs filters
-					string gitattributesPath = Repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+					string gitattributesPath = repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
 					if (File.Exists(gitattributesPath))
 					{
 						string data = File.ReadAllText(gitattributesPath);
@@ -275,14 +319,14 @@ namespace GitItGUI.Core
 						foreach (Match value in values)
 						{
 							if (value.Groups.Count != 2) continue;
-							if (!Repository.LFS.Untrack(value.Groups[1].Value)) throw new Exception(Repository.lastError);
+							if (!repository.lfs.Untrack(value.Groups[1].Value)) throw new Exception(repository.lastError);
 						}
 					}
 
 					// remove lfs repo files
-					if (!Repository.LFS.Uninstall()) throw new Exception(Repository.lastError);
-					if (File.Exists(Repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar))) File.Delete(Repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
-					if (Directory.Exists(Repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar))) Directory.Delete(Repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar), true);
+					if (!repository.lfs.Uninstall()) throw new Exception(repository.lastError);
+					if (File.Exists(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar))) File.Delete(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
+					if (Directory.Exists(repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar))) Directory.Delete(repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar), true);
 					
 					// rebase repo
 					if (rebase)
@@ -324,7 +368,7 @@ namespace GitItGUI.Core
 							throw new Exception("Unsported platform: " + PlatformInfo.platform);
 						}
 
-						process.StartInfo.WorkingDirectory = Repository.repoPath;
+						process.StartInfo.WorkingDirectory = repository.repoPath;
 						process.StartInfo.Arguments = "";
 						process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 						if (!process.Start())
@@ -353,7 +397,7 @@ namespace GitItGUI.Core
 				try
 				{
 					int count;
-					if (!Repository.UnpackedObjectCount(out count, out size)) throw new Exception(Repository.lastError);
+					if (!repository.UnpackedObjectCount(out count, out size)) throw new Exception(repository.lastError);
 					return count;
 				}
 				catch (Exception e)
@@ -372,7 +416,7 @@ namespace GitItGUI.Core
 			{
 				try
 				{
-					if (!Repository.GarbageCollect()) throw new Exception(Repository.lastError);
+					if (!repository.GarbageCollect()) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -389,7 +433,7 @@ namespace GitItGUI.Core
 				{
 					if (PlatformInfo.platform == Platforms.Windows)
 					{
-						Process.Start("explorer.exe", string.Format("{0}\\{1}", Repository.repoPath, PlatformInfo.ConvertPathToPlatform(filePath)));
+						Process.Start("explorer.exe", string.Format("{0}\\{1}", repository.repoPath, PlatformInfo.ConvertPathToPlatform(filePath)));
 					}
 					else
 					{
@@ -411,7 +455,7 @@ namespace GitItGUI.Core
 				{
 					if (PlatformInfo.platform == Platforms.Windows)
 					{
-						Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", Repository.repoPath, PlatformInfo.ConvertPathToPlatform(filePath)));
+						Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", repository.repoPath, PlatformInfo.ConvertPathToPlatform(filePath)));
 					}
 					else
 					{

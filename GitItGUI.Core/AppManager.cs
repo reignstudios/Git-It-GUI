@@ -70,15 +70,6 @@ namespace GitItGUI.Core
 				char seperator = Path.DirectorySeparatorChar;
 				settings = Settings.Load<XML.AppSettings>(PlatformInfo.appDataPath + seperator + Settings.appSettingsFolderName + seperator + Settings.appSettingsFilename);
 
-				// add custom error codes to git commander
-				if (settings.customErrorCodes != null)
-				{
-					foreach (var code in settings.customErrorCodes.errorCodes)
-					{
-						GitCommander.Tools.AddErrorCode(code);
-					}
-				}
-
 				// apply default lfs ignore types
 				var lowerCase = new List<string>()
 				{
@@ -191,14 +182,14 @@ namespace GitItGUI.Core
 			}
 		}
 
-		internal static void AddActiveRepoToHistory()
+		internal static void AddRepoToHistory(string repoPath)
 		{
 			// add if doesn't exist
 			string found = null;
 			int index = 0;
 			foreach (var repo in settings.repositories)
 			{
-				if (repo == Repository.repoPath)
+				if (repo == repoPath)
 				{
 					found = repo;
 					break;
@@ -209,7 +200,7 @@ namespace GitItGUI.Core
 
 			if (found == null)
 			{
-				settings.repositories.Insert(0, Repository.repoPath);
+				settings.repositories.Insert(0, repoPath);
 			}
 			else if (index != 0) 
 			{
@@ -244,7 +235,7 @@ namespace GitItGUI.Core
 			DebugLog.Dispose();
 		}
 
-		public static bool CheckForUpdates(string url, string outOfDateURL, CheckForUpdatesCallbackMethod checkForUpdatesCallback)
+		/*public static bool CheckForUpdates(string url, string outOfDateURL, CheckForUpdatesCallbackMethod checkForUpdatesCallback)
 		{
 			try
 			{
@@ -493,6 +484,6 @@ namespace GitItGUI.Core
 
 			client.Dispose();
 			if (checkForUpdatesCallback != null) checkForUpdatesCallback(true, false);
-		}
+		}*/
 	}
 }

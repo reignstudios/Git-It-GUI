@@ -9,16 +9,23 @@ namespace GitCommander
 		Global
 	}
 
-    public static partial class Repository
+    public partial class Repository
     {
-		public static bool isOpen {get; private set;}
-		public static string lastResult {get; private set;}
-		public static string lastError {get; private set;}
+		public bool isOpen {get; private set;}
+		public string lastResult {get; private set;}
+		public string lastError {get; private set;}
 
-		public static string repoURL {get; private set;}
-		public static string repoPath {get; private set;}
+		public string repoURL {get; private set;}
+		public string repoPath {get; private set;}
+		public LFS lfs {get; private set;}
 
-		public static void Close()
+		public Repository()
+		{
+			lfs = new LFS(this);
+			InitTools();
+		}
+
+		public void Close()
 		{
 			isOpen = false;
 			lastResult = null;
@@ -27,16 +34,16 @@ namespace GitCommander
 			repoPath = null;
 		}
 
-		private static bool SimpleGitInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		private bool SimpleGitInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 		{
-			var result = Tools.RunExe("git", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+			var result = RunExe("git", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
 			lastResult = result.output;
 			lastError = result.errors;
 
 			return string.IsNullOrEmpty(lastError);
 		}
 		
-		public static bool Clone(string url, string path, out string repoClonedPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
+		public bool Clone(string url, string path, out string repoClonedPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
 			StreamWriter stdInWriter = null;
 			void getStdInputStreamCallback(StreamWriter writer)
@@ -66,7 +73,7 @@ namespace GitCommander
 				}
 			}
 			
-			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+			var result = RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
 			lastResult = result.output;
 			lastError = result.errors;
 			
@@ -74,7 +81,7 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool Open(string path)
+		public bool Open(string path)
 		{
 			Close();
 
@@ -83,14 +90,14 @@ namespace GitCommander
 				repoURL = line;
 			}
 			
-			var result = Tools.RunExe("git", "rev-parse --git-dir", workingDirectory:path);
+			var result = RunExe("git", "rev-parse --git-dir", workingDirectory:path);
 			lastResult = result.output;
 			lastError = result.errors;
 			if (!string.IsNullOrEmpty(lastError)) return false;
 			
 			// get repo url
 			repoURL = "";
-			result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback, workingDirectory:path);
+			result = RunExe("git", "ls-remote --get-url", stdCallback:stdCallback, workingDirectory:path);
 			lastResult = result.output;
 			lastError = result.errors;
 			
@@ -98,15 +105,7 @@ namespace GitCommander
 			return isOpen = true;
 		}
 
-		public static void ForceOpen(string repoPath, string repoURL)
-		{
-			Close();
-			Repository.repoPath = repoPath;
-			Repository.repoURL = repoURL;
-			isOpen = true;
-		}
-
-		public static bool GetSignature(SignatureLocations location, out string name, out string email)
+		public bool GetSignature(SignatureLocations location, out string name, out string email)
 		{
 			name = null;
 			email = null;
@@ -121,7 +120,7 @@ namespace GitCommander
 			return result;
 		}
 
-		public static bool SetSignature(SignatureLocations location, string name, string email)
+		public bool SetSignature(SignatureLocations location, string name, string email)
 		{
 			string globalValue = (location == SignatureLocations.Global) ? " --global" : "";
 			bool result = SimpleGitInvoke(string.Format("config{1} user.name \"{0}\"", name, globalValue));
@@ -133,7 +132,7 @@ namespace GitCommander
 			return result;
 		}
 
-		public static bool UnpackedObjectCount(out int count, out string size)
+		public bool UnpackedObjectCount(out int count, out string size)
 		{
 			bool result = SimpleGitInvoke("count-objects");
 			if (!string.IsNullOrEmpty(lastError) || string.IsNullOrEmpty(lastResult))
@@ -156,12 +155,12 @@ namespace GitCommander
 			return true;
 		}
 
-		public static bool GarbageCollect()
+		public bool GarbageCollect()
 		{
 			return SimpleGitInvoke("gc");
 		}
 
-		public static bool GetVersion(out string version)
+		public bool GetVersion(out string version)
 		{
 			bool result = SimpleGitInvoke("version");
 			version = lastResult;

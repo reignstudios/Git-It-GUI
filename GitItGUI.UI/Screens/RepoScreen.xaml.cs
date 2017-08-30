@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitItGUI.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,11 +22,23 @@ namespace GitItGUI.UI.Screens
     public partial class RepoScreen : UserControl
     {
 		public static RepoScreen singleton;
+		public RepoManager repoManager;
 
         public RepoScreen()
         {
 			singleton = this;
             InitializeComponent();
-        }
+			repoManager = new RepoManager();
+		}
+
+		public void Dispose()
+		{
+			repoManager.Dispose();
+		}
+
+		public bool OpenRepo(string folderPath)
+		{
+			return repoManager.OpenRepo(folderPath);
+		}
     }
 }

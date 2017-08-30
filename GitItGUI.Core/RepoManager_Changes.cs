@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -47,7 +46,7 @@ namespace GitItGUI.Core
 			try
 			{
 				FileState[] states;
-				if (!Repository.GetFileStates(out states)) throw new Exception(Repository.lastError);
+				if (!repository.GetFileStates(out states)) throw new Exception(repository.lastError);
 				fileStates = states;
 				return true;
 			}
@@ -99,7 +98,7 @@ namespace GitItGUI.Core
 				try
 				{
 					// check if file still exists
-					string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+					string fullPath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 					if (!File.Exists(fullPath))
 					{
 						return "<< File Doesn't Exist >>";
@@ -112,9 +111,9 @@ namespace GitItGUI.Core
 					if (fileState.HasState(FileStates.ModifiedInWorkdir) || fileState.HasState(FileStates.ModifiedInIndex))
 					{
 						string diff;
-						DebugLog.pauseGitCommanderStdWrites = true;
-						if (!Repository.GetDiff(fileState.filename, out diff)) throw new Exception(Repository.lastError);
-						DebugLog.pauseGitCommanderStdWrites = false;
+						pauseGitCommanderStdWrites = true;
+						if (!repository.GetDiff(fileState.filename, out diff)) throw new Exception(repository.lastError);
+						pauseGitCommanderStdWrites = false;
 
 						// remove meta data stage 1
 						var match = Regex.Match(diff, @"@@.*?(@@).*?\n(.*)", RegexOptions.Singleline);
@@ -155,7 +154,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.pauseGitCommanderStdWrites = false;
+					pauseGitCommanderStdWrites = false;
 					DebugLog.LogError("Failed to refresh quick view: " + e.Message, true);
 					return null;
 				}
@@ -170,7 +169,7 @@ namespace GitItGUI.Core
 				try
 				{
 					if (!fileState.HasState(FileStates.NewInWorkdir)) return false;
-					string filePath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+					string filePath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 					if (File.Exists(filePath)) File.Delete(filePath);
 				}
 				catch (Exception e)
@@ -194,7 +193,7 @@ namespace GitItGUI.Core
 					foreach (var fileState in fileStates)
 					{
 						if (!fileState.HasState(FileStates.NewInWorkdir)) continue;
-						string filePath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+						string filePath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 						if (File.Exists(filePath)) File.Delete(filePath);
 					}
 				}
@@ -216,7 +215,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+					if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -236,7 +235,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.StageAll()) throw new Exception(Repository.lastError);
+					if (!repository.StageAll()) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -256,7 +255,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.Unstage(fileState.filename)) throw new Exception(Repository.lastError);
+					if (!repository.Unstage(fileState.filename)) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -276,7 +275,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.UnstageAll()) throw new Exception(Repository.lastError);
+					if (!repository.UnstageAll()) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -296,7 +295,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.RevertAllChanges()) throw new Exception(Repository.lastError);
+					if (!repository.RevertAllChanges()) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -323,7 +322,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.RevertFile(activeBranch.fullname, fileState.filename)) throw new Exception(Repository.lastError);
+					if (!repository.RevertFile(activeBranch.fullname, fileState.filename)) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -343,7 +342,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.Commit(commitMessage)) throw new Exception(Repository.lastError);
+					if (!repository.Commit(commitMessage)) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -364,11 +363,11 @@ namespace GitItGUI.Core
 				{
 					if (activeBranch.isTracking)
 					{
-						if (!Repository.Fetch()) throw new Exception(Repository.lastError);
+						if (!repository.Fetch()) throw new Exception(repository.lastError);
 					}
 					else if (activeBranch.isRemote)
 					{
-						if (!Repository.Fetch(activeBranch.remoteState.name, activeBranch.name)) throw new Exception(Repository.lastError);
+						if (!repository.Fetch(activeBranch.remoteState.name, activeBranch.name)) throw new Exception(repository.lastError);
 					}
 					else
 					{
@@ -394,11 +393,11 @@ namespace GitItGUI.Core
 				{
 					if (branch.fullname == activeBranch.fullname)
 					{
-						if (!Repository.Fetch()) throw new Exception(Repository.lastError);
+						if (!repository.Fetch()) throw new Exception(repository.lastError);
 					}
 					else if (branch.isRemote)
 					{
-						if (!Repository.Fetch(branch.remoteState.name, branch.name)) throw new Exception(Repository.lastError);
+						if (!repository.Fetch(branch.remoteState.name, branch.name)) throw new Exception(repository.lastError);
 					}
 					else
 					{
@@ -431,7 +430,7 @@ namespace GitItGUI.Core
 					}
 				
 					// pull changes
-					result = Repository.Pull() ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
+					result = repository.Pull() ? SyncMergeResults.Succeeded : SyncMergeResults.Error;
 					result = ConflictsExist() ? SyncMergeResults.Conflicts : result;
 				
 					if (result == SyncMergeResults.Conflicts) DebugLog.LogWarning("Merge failed, conflicts exist (please resolve)", true);
@@ -462,8 +461,8 @@ namespace GitItGUI.Core
 						return false;
 					}
 				
-					if (Repository.Push()) DebugLog.Log("Push Succeeded!", !isSyncMode);
-					else throw new Exception(Repository.lastError);
+					if (repository.Push()) DebugLog.Log("Push Succeeded!", !isSyncMode);
+					else throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -501,7 +500,7 @@ namespace GitItGUI.Core
 				try
 				{
 					bool yes;
-					if (!Repository.ConflitedExist(out yes)) throw new Exception(Repository.lastError);
+					if (!repository.ConflitedExist(out yes)) throw new Exception(repository.lastError);
 					return yes;
 				}
 				catch (Exception e)
@@ -527,7 +526,7 @@ namespace GitItGUI.Core
 				try
 				{
 					bool yes;
-					if (!Repository.CompletedMergeCommitPending(out yes)) throw new Exception(Repository.lastError);
+					if (!repository.CompletedMergeCommitPending(out yes)) throw new Exception(repository.lastError);
 					return yes;
 				}
 				catch (Exception e)
@@ -562,7 +561,7 @@ namespace GitItGUI.Core
 			lock (this)
 			{
 				bool success = true;
-				string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
+				string fullPath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
 				string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
 				void DeleteTempMergeFiles()
 				{
@@ -587,26 +586,26 @@ namespace GitItGUI.Core
 					if (fileState.conflictType == FileConflictTypes.DeletedByBoth)
 					{
 						DebugLog.Log("Auto resolving file that was deleted by both branches: " + fileState.filename, true);
-						if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+						if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 						goto FINISH;
 					}
 					else
 					{
-						DebugLog.pauseGitCommanderStdWrites = true;
+						pauseGitCommanderStdWrites = true;
 						if (fileState.conflictType != FileConflictTypes.DeletedByUs)
 						{
-							bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
-							fullPathOurs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs.Replace('/', Path.DirectorySeparatorChar);
-							if (!fileCreated) throw new Exception(Repository.lastError);
+							bool fileCreated = repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
+							fullPathOurs = repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs.Replace('/', Path.DirectorySeparatorChar);
+							if (!fileCreated) throw new Exception(repository.lastError);
 						}
 
 						if (fileState.conflictType != FileConflictTypes.DeletedByThem)
 						{
-							bool fileCreated = Repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
-							fullPathTheirs = Repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs.Replace('/', Path.DirectorySeparatorChar);
-							if (!fileCreated) throw new Exception(Repository.lastError);
+							bool fileCreated = repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
+							fullPathTheirs = repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs.Replace('/', Path.DirectorySeparatorChar);
+							if (!fileCreated) throw new Exception(repository.lastError);
 						}
-						DebugLog.pauseGitCommanderStdWrites = false;
+						pauseGitCommanderStdWrites = false;
 					}
 
 					// check if files are binary (if so open select binary file tool) [if file conflict is because of deletion this method is also used]
@@ -628,34 +627,34 @@ namespace GitItGUI.Core
 								case MergeBinaryFileResults.KeepMine:
 									if (fileState.conflictType == FileConflictTypes.Changes)
 									{
-										if (!Repository.CheckoutConflictedFile(fileState.filename, FileConflictSources.Ours)) throw new Exception(Repository.lastError);
-										if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+										if (!repository.CheckoutConflictedFile(fileState.filename, FileConflictSources.Ours)) throw new Exception(repository.lastError);
+										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 									}
 									else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
 									{
 										File.Copy(fullPathOurs, fullPath, true);
-										if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 									}
 									else if (fileState.conflictType == FileConflictTypes.DeletedByUs)
 									{
-										if (!Repository.RemoveFile(fileState.filename)) throw new Exception(Repository.lastError);
+										if (!repository.RemoveFile(fileState.filename)) throw new Exception(repository.lastError);
 									}
 									break;
 
 								case MergeBinaryFileResults.UseTheirs:
 									if (fileState.conflictType == FileConflictTypes.Changes)
 									{
-										if (!Repository.CheckoutConflictedFile(fileState.filename, FileConflictSources.Theirs)) throw new Exception(Repository.lastError);
-										if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+										if (!repository.CheckoutConflictedFile(fileState.filename, FileConflictSources.Theirs)) throw new Exception(repository.lastError);
+										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 									}
 									else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
 									{
-										if (!Repository.RemoveFile(fileState.filename)) throw new Exception(Repository.lastError);
+										if (!repository.RemoveFile(fileState.filename)) throw new Exception(repository.lastError);
 									}
 									else if (fileState.conflictType == FileConflictTypes.DeletedByUs)
 									{
 										File.Copy(fullPathTheirs, fullPath, true);
-										if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 									}
 									break;
 
@@ -757,7 +756,7 @@ namespace GitItGUI.Core
 					{
 						wasModified = true;
 						File.Copy(fullPathBase, fullPath, true);
-						if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+						if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 					}
 
 					// check if user accepts the current state of the merge
@@ -770,7 +769,7 @@ namespace GitItGUI.Core
 							{
 								case MergeFileAcceptedResults.Yes:
 									File.Copy(fullPathBase, fullPath, true);
-									if (!Repository.Stage(fileState.filename)) throw new Exception(Repository.lastError);
+									if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 									wasModified = true;
 									break;
 
@@ -789,7 +788,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.pauseGitCommanderStdWrites = false;
+					pauseGitCommanderStdWrites = false;
 					DebugLog.LogError("Failed to resolve file: " + e.Message, true);
 					DeleteTempMergeFiles();
 					success = false;
@@ -807,7 +806,7 @@ namespace GitItGUI.Core
 		{
 			lock (this)
 			{
-				string fullPath = Repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
+				string fullPath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
 				string fullPathOrig = null;
 				void DeleteTempDiffFiles()
 				{
@@ -824,10 +823,10 @@ namespace GitItGUI.Core
 					}
 
 					// get info and save orig file
-					DebugLog.pauseGitCommanderStdWrites = true;
-					if (!Repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(Repository.lastError);
-					DebugLog.pauseGitCommanderStdWrites = false;
-					fullPathOrig = Repository.repoPath + Path.DirectorySeparatorChar + fullPathOrig;
+					pauseGitCommanderStdWrites = true;
+					if (!repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(repository.lastError);
+					pauseGitCommanderStdWrites = false;
+					fullPathOrig = repository.repoPath + Path.DirectorySeparatorChar + fullPathOrig;
 
 					// open diff tool
 					using (var process = new Process())
@@ -847,7 +846,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception ex)
 				{
-					DebugLog.pauseGitCommanderStdWrites = false;
+					pauseGitCommanderStdWrites = false;
 					DebugLog.LogError("Failed to start Diff tool: " + ex.Message, true);
 					DeleteTempDiffFiles();
 					return false;

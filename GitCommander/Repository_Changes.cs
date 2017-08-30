@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace GitCommander
 {
@@ -110,39 +107,39 @@ namespace GitCommander
 		}
 	}
 
-	public static partial class Repository
+	public partial class Repository
 	{
-		public static bool Stage(string filename)
+		public bool Stage(string filename)
 		{
 			return SimpleGitInvoke(string.Format("add \"{0}\"", filename));
 		}
 
-		public static bool StageAll()
+		public bool StageAll()
 		{
 			return SimpleGitInvoke("add -A");
 		}
 
-		public static bool Unstage(string filename)
+		public bool Unstage(string filename)
 		{
 			return SimpleGitInvoke(string.Format("reset \"{0}\"", filename));
 		}
 
-		public static bool UnstageAll()
+		public bool UnstageAll()
 		{
 			return SimpleGitInvoke("reset");
 		}
 
-		public static bool RevertFile(string activeBranch, string filename)
+		public bool RevertFile(string activeBranch, string filename)
 		{
 			return SimpleGitInvoke(string.Format("checkout {0} -- \"{1}\"", activeBranch, filename));
 		}
 
-		public static bool RevertAllChanges()
+		public bool RevertAllChanges()
 		{
 			return SimpleGitInvoke("reset --hard");
 		}
 		
-		private static bool ParseFileState(string line, ref int mode, List<FileState> states)
+		private bool ParseFileState(string line, ref int mode, List<FileState> states)
 		{
 			bool addState(string type, FileStates stateType, FileConflictTypes conflictType = FileConflictTypes.None)
 			{
@@ -230,7 +227,7 @@ namespace GitCommander
 			return true;
 		}
 
-		public static bool GetFileState(string filename, out FileState fileState)
+		public bool GetFileState(string filename, out FileState fileState)
 		{
 			var states = new List<FileState>();
 			int mode = -1;
@@ -240,7 +237,7 @@ namespace GitCommander
 				if (!ParseFileState(line, ref mode, states)) failedToParse = true;
 			}
 
-			var result = Tools.RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
+			var result = RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
 			lastResult = result.output;
 			lastError = result.errors;
 			if (!string.IsNullOrEmpty(lastError))
@@ -267,7 +264,7 @@ namespace GitCommander
 			}
 		}
 
-		public static bool GetFileStates(out FileState[] fileStates)
+		public bool GetFileStates(out FileState[] fileStates)
 		{
 			var states = new List<FileState>();
 			int mode = -1;
@@ -277,7 +274,7 @@ namespace GitCommander
 				if (!ParseFileState(line, ref mode, states))failedToParse = true;
 			}
 			
-			var result = Tools.RunExe("git", "status -u", stdCallback:stdCallback);
+			var result = RunExe("git", "status -u", stdCallback:stdCallback);
 			lastResult = result.output;
 			lastError = result.errors;
 			if (!string.IsNullOrEmpty(lastError))
@@ -296,7 +293,7 @@ namespace GitCommander
 			return true;
 		}
 
-		public static bool ConflitedExist(out bool yes)
+		public bool ConflitedExist(out bool yes)
 		{
 			bool conflictExist = false;
 			void stdCallback(string line)
@@ -304,7 +301,7 @@ namespace GitCommander
 				conflictExist = true;
 			}
 
-			var result = Tools.RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback:stdCallback);
+			var result = RunExe("git", "diff --name-only --diff-filter=U", null, stdCallback:stdCallback);
 			lastResult = result.output;
 			lastError = result.errors;
 			
@@ -312,39 +309,39 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool SaveOriginalFile(string filename, out string savedFilename)
+		public bool SaveOriginalFile(string filename, out string savedFilename)
 		{
 			savedFilename = filename + ".orig";
-			var result = Tools.RunExe("git", string.Format("show HEAD:\"{0}\"", filename), stdOutToFilePath:savedFilename);
+			var result = RunExe("git", string.Format("show HEAD:\"{0}\"", filename), stdOutToFilePath:savedFilename);
 			lastResult = result.output;
 			lastError = result.errors;
 
 			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool SaveConflictedFile(string filename, FileConflictSources source, out string savedFilename)
+		public bool SaveConflictedFile(string filename, FileConflictSources source, out string savedFilename)
 		{
 			string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
 			savedFilename = filename + (source == FileConflictSources.Ours ? ".ours" : ".theirs");
-			var result = Tools.RunExe("git", string.Format("show {1}:\"{0}\"", filename, sourceName), stdOutToFilePath:savedFilename);
+			var result = RunExe("git", string.Format("show {1}:\"{0}\"", filename, sourceName), stdOutToFilePath:savedFilename);
 			lastResult = result.output;
 			lastError = result.errors;
 
 			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool CheckoutConflictedFile(string filename, FileConflictSources source)
+		public bool CheckoutConflictedFile(string filename, FileConflictSources source)
 		{
 			string sourceName = source == FileConflictSources.Ours ? "--ours" : "--theirs";
 			return SimpleGitInvoke(string.Format("checkout {1} \"{0}\"", filename, sourceName));
 		}
 
-		public static bool RemoveFile(string filename)
+		public bool RemoveFile(string filename)
 		{
 			return SimpleGitInvoke(string.Format("rm \"{0}\"", filename));
 		}
 
-		public static bool CompletedMergeCommitPending(out bool yes)
+		public bool CompletedMergeCommitPending(out bool yes)
 		{
 			bool mergeCommitPending = false;
 			void stdCallback(string line)
@@ -352,7 +349,7 @@ namespace GitCommander
 				if (line == "All conflicts fixed but you are still merging.") mergeCommitPending = true;
 			}
 
-			var result = Tools.RunExe("git", "status", null, stdCallback:stdCallback);
+			var result = RunExe("git", "status", null, stdCallback:stdCallback);
 			lastResult = result.output;
 			lastError = result.errors;
 			
@@ -360,32 +357,32 @@ namespace GitCommander
 			return string.IsNullOrEmpty(lastError);
 		}
 
-		public static bool Fetch()
+		public bool Fetch()
 		{
 			return SimpleGitInvoke("fetch");
 		}
 
-		public static bool Fetch(string remote, string branch)
+		public bool Fetch(string remote, string branch)
 		{
 			return SimpleGitInvoke(string.Format("fetch {0} {1}", remote, branch));
 		}
 
-		public static bool Pull()
+		public bool Pull()
 		{
 			return SimpleGitInvoke("pull");
 		}
 
-		public static bool Push()
+		public bool Push()
 		{
 			return SimpleGitInvoke("push");
 		}
 		
-		public static bool Commit(string message)
+		public bool Commit(string message)
 		{
 			return SimpleGitInvoke(string.Format("commit -m \"{0}\"", message));
 		}
 
-		public static bool GetDiff(string filename, out string diff)
+		public bool GetDiff(string filename, out string diff)
 		{
 			bool result = SimpleGitInvoke(string.Format("diff HEAD \"{0}\"", filename));
 			diff = lastResult;

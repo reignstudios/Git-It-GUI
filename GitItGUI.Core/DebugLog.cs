@@ -20,7 +20,6 @@ namespace GitItGUI.Core
 
 		private static Stream stream;
 		private static StreamWriter writer;
-		public static bool pauseGitCommanderStdWrites;
 
 		static DebugLog()
 		{
@@ -31,12 +30,6 @@ namespace GitItGUI.Core
 				string logFileName = logDir + Path.DirectorySeparatorChar + "logs.txt";
 				stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.None);
 				writer = new StreamWriter(stream);
-
-				// bind events
-				GitCommander.Tools.RunExeDebugLineCallback += Tools_RunExeDebugLineCallback;
-				GitCommander.Tools.StdCallback += Tools_StdCallback;
-				GitCommander.Tools.StdWarningCallback += Tools_StdWarningCallback;
-				GitCommander.Tools.StdErrorCallback += Tools_StdErrorCallback;
 			}
 			catch (Exception e)
 			{
@@ -51,7 +44,7 @@ namespace GitItGUI.Core
 
 		private static void Tools_StdCallback(string line)
 		{
-			if (!pauseGitCommanderStdWrites) Log(line);
+			Log(line);
 		}
 
 		private static void Tools_StdWarningCallback(string line)

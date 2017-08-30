@@ -34,6 +34,7 @@ namespace GitItGUI.UI
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
+			repoScreen.Dispose();
 			AppManager.Dispose();
 			base.OnClosing(e);
 		}

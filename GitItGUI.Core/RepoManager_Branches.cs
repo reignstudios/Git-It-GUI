@@ -26,7 +26,7 @@ namespace GitItGUI.Core
 			{
 				// gather branches
 				BranchState[] bStates;
-				if (!Repository.GetBrancheStates(out bStates)) throw new Exception(Repository.lastError);
+				if (!repository.GetBrancheStates(out bStates)) throw new Exception(repository.lastError);
 				branchStates = bStates;
 
 				// check for new repo state
@@ -51,7 +51,7 @@ namespace GitItGUI.Core
 
 				// gather remotes
 				RemoteState[] rStates;
-				if (!Repository.GetRemoteStates(out rStates)) throw new Exception(Repository.lastError);
+				if (!repository.GetRemoteStates(out rStates)) throw new Exception(repository.lastError);
 				remoteStates = rStates;
 			}
 			catch (Exception e)
@@ -101,7 +101,7 @@ namespace GitItGUI.Core
 					string name = useFullname ? branch.fullname : branch.name;
 					if (activeBranch.name != name)
 					{
-						if (!Repository.CheckoutBranch(name)) throw new Exception(Repository.lastError);
+						if (!repository.CheckoutBranch(name)) throw new Exception(repository.lastError);
 					}
 					else
 					{
@@ -127,10 +127,10 @@ namespace GitItGUI.Core
 				MergeResults mergeResult;
 				try
 				{
-					if (!Repository.MergeBranchIntoActive(srcBranch.fullname)) throw new Exception(Repository.lastError);
+					if (!repository.MergeBranchIntoActive(srcBranch.fullname)) throw new Exception(repository.lastError);
 
 					bool yes;
-					if (!Repository.ConflitedExist(out yes)) throw new Exception(Repository.lastError);
+					if (!repository.ConflitedExist(out yes)) throw new Exception(repository.lastError);
 					mergeResult = yes ? MergeResults.Conflicts : MergeResults.Succeeded;
 				}
 				catch (Exception e)
@@ -152,17 +152,17 @@ namespace GitItGUI.Core
 				try
 				{
 					// create branch
-					if (!Repository.CheckoutNewBranch(branchName)) throw new Exception(Repository.lastError);
+					if (!repository.CheckoutNewBranch(branchName)) throw new Exception(repository.lastError);
 
 					// push branch to remote
 					if (!string.IsNullOrEmpty(remoteName))
 					{
-						if (!Repository.PushLocalBranchToRemote(branchName, remoteName))
+						if (!repository.PushLocalBranchToRemote(branchName, remoteName))
 						{
 							//NOTE: this ignores false positive noise/errors that come from GitLab
-							if (!string.IsNullOrEmpty(Repository.lastError) && !Repository.lastError.Contains("To create a merge request for"))
+							if (!string.IsNullOrEmpty(repository.lastError) && !repository.lastError.Contains("To create a merge request for"))
 							{
-								throw new Exception(Repository.lastError);
+								throw new Exception(repository.lastError);
 							}
 						}
 					}
@@ -185,7 +185,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.DeleteBranch(branch.fullname, branch.isRemote)) throw new Exception(Repository.lastError);
+					if (!repository.DeleteBranch(branch.fullname, branch.isRemote)) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -205,7 +205,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.RenameActiveBranch(newBranchName)) throw new Exception(Repository.lastError);
+					if (!repository.RenameActiveBranch(newBranchName)) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -225,7 +225,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.SetActiveBranchTracking(srcRemoteBranch.fullname)) throw new Exception(Repository.lastError);
+					if (!repository.SetActiveBranchTracking(srcRemoteBranch.fullname)) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -248,7 +248,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.RemoveActiveBranchTracking()) throw new Exception(Repository.lastError);
+					if (!repository.RemoveActiveBranchTracking()) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -279,7 +279,7 @@ namespace GitItGUI.Core
 
 				try
 				{
-					if (!Repository.IsUpToDateWithRemote(activeBranch.tracking.remoteState.name, activeBranch.tracking.name, out yes)) throw new Exception(Repository.lastError);
+					if (!repository.IsUpToDateWithRemote(activeBranch.tracking.remoteState.name, activeBranch.tracking.name, out yes)) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{
@@ -299,7 +299,7 @@ namespace GitItGUI.Core
 				bool success = true;
 				try
 				{
-					if (!Repository.PruneRemoteBranches()) throw new Exception(Repository.lastError);
+					if (!repository.PruneRemoteBranches()) throw new Exception(repository.lastError);
 				}
 				catch (Exception e)
 				{

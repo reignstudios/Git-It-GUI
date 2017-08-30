@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace GitCommander
 {
@@ -24,11 +20,11 @@ namespace GitCommander
 		}
 	}
 
-	public static partial class Repository
+	public partial class Repository
 	{
-		public static bool GetRemoteURL(string remote, out string url)
+		public bool GetRemoteURL(string remote, out string url)
 		{
-			var result = Tools.RunExe("git", string.Format("config --get remote.{0}.url", remote));
+			var result = RunExe("git", string.Format("config --get remote.{0}.url", remote));
 			lastResult = result.output;
 			lastError = result.errors;
 
@@ -42,7 +38,7 @@ namespace GitCommander
 			return true;
 		}
 
-		public static bool GetRemoteStates(out RemoteState[] remoteStates)
+		public bool GetRemoteStates(out RemoteState[] remoteStates)
 		{
 			var states = new List<RemoteState>();
 			void stdCallback(string line)
@@ -51,7 +47,7 @@ namespace GitCommander
 				states.Add(remote);
 			}
 			
-			var result = Tools.RunExe("git", "remote show", stdCallback:stdCallback);
+			var result = RunExe("git", "remote show", stdCallback:stdCallback);
 			lastResult = result.output;
 			lastError = result.errors;
 
