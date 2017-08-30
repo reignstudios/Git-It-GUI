@@ -18,7 +18,7 @@ namespace GitItGUI.Core
 		public BranchState[] branchStates {get; private set;}
 		public RemoteState[] remoteStates {get; private set;}
 
-		private bool RefreshBranches(bool refreshMode)
+		private bool RefreshBranches(bool isRefreshMode)
 		{
 			isEmpty = false;
 
@@ -45,7 +45,7 @@ namespace GitItGUI.Core
 				if (activeBranch.isRemote)
 				{
 					DebugLog.LogError("Active repo branch cannot be a remote: " + activeBranch.fullname, true);
-					if (refreshMode) Environment.Exit(0);
+					if (isRefreshMode) Environment.Exit(0);
 					else return false;
 				}
 
@@ -65,221 +65,251 @@ namespace GitItGUI.Core
 
 		public BranchState[] GetNonActiveBranches(bool getRemotes)
 		{
-			if (branchStates == null) return new BranchState[0];
-
-			var nonActiveBranches = new List<BranchState>();
-			foreach (var branch in branchStates)
+			lock(this)
 			{
-				if (activeBranch.fullname != branch.fullname)
+				if (branchStates == null) return new BranchState[0];
+
+				var nonActiveBranches = new List<BranchState>();
+				foreach (var branch in branchStates)
 				{
-					if (getRemotes)
+					if (activeBranch.fullname != branch.fullname)
 					{
-						nonActiveBranches.Add(branch);
-					}
-					else
-					{
-						if (!branch.isRemote) nonActiveBranches.Add(branch);
+						if (getRemotes)
+						{
+							nonActiveBranches.Add(branch);
+						}
+						else
+						{
+							if (!branch.isRemote) nonActiveBranches.Add(branch);
+						}
 					}
 				}
-			}
 
-			return nonActiveBranches.ToArray();
+				return nonActiveBranches.ToArray();
+			}
 		}
 
 		public bool Checkout(BranchState branch, bool useFullname = false)
 		{
-			if (activeBranch == null) return false;
-
-			bool success = true;
-			try
+			lock (this)
 			{
-				string name = useFullname ? branch.fullname : branch.name;
-				if (activeBranch.name != name)
+				if (activeBranch == null) return false;
+
+				bool success = true;
+				try
 				{
-					if (!Repository.CheckoutBranch(name)) throw new Exception(Repository.lastError);
+					string name = useFullname ? branch.fullname : branch.name;
+					if (activeBranch.name != name)
+					{
+						if (!Repository.CheckoutBranch(name)) throw new Exception(Repository.lastError);
+					}
+					else
+					{
+						DebugLog.LogError("Already on branch: " + name, true);
+						success = false;
+					}
 				}
-				else
+				catch (Exception e)
 				{
-					DebugLog.LogError("Already on branch: " + name, true);
+					DebugLog.LogError("BranchManager.Checkout Failed: " + e.Message, true);
 					success = false;
 				}
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("BranchManager.Checkout Failed: " + e.Message, true);
-				success = false;
-			}
 			
-			Refresh();
-			return success;
+				Refresh();
+				return success;
+			}
 		}
 
 		public MergeResults MergeBranchIntoActive(BranchState srcBranch)
 		{
-			MergeResults mergeResult;
-			try
+			lock (this)
 			{
-				if (!Repository.MergeBranchIntoActive(srcBranch.fullname)) throw new Exception(Repository.lastError);
+				MergeResults mergeResult;
+				try
+				{
+					if (!Repository.MergeBranchIntoActive(srcBranch.fullname)) throw new Exception(Repository.lastError);
 
-				bool yes;
-				if (!Repository.ConflitedExist(out yes)) throw new Exception(Repository.lastError);
-				mergeResult = yes ? MergeResults.Conflicts : MergeResults.Succeeded;
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("BranchManager.Merge Failed: " + e.Message, true);
-				mergeResult = MergeResults.Error;
-			}
+					bool yes;
+					if (!Repository.ConflitedExist(out yes)) throw new Exception(Repository.lastError);
+					mergeResult = yes ? MergeResults.Conflicts : MergeResults.Succeeded;
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("BranchManager.Merge Failed: " + e.Message, true);
+					mergeResult = MergeResults.Error;
+				}
 			
-			Refresh();
-			return mergeResult;
+				Refresh();
+				return mergeResult;
+			}
 		}
 
 		public bool CheckoutNewBranch(string branchName, string remoteName = null)
 		{
-			bool success = true;
-			try
+			lock (this)
 			{
-				// create branch
-				if (!Repository.CheckoutNewBranch(branchName)) throw new Exception(Repository.lastError);
-
-				// push branch to remote
-				if (!string.IsNullOrEmpty(remoteName))
+				bool success = true;
+				try
 				{
-					if (!Repository.PushLocalBranchToRemote(branchName, remoteName))
+					// create branch
+					if (!Repository.CheckoutNewBranch(branchName)) throw new Exception(Repository.lastError);
+
+					// push branch to remote
+					if (!string.IsNullOrEmpty(remoteName))
 					{
-						//NOTE: this ignores false positive noise/errors that come from GitLab
-						if (!string.IsNullOrEmpty(Repository.lastError) && !Repository.lastError.Contains("To create a merge request for"))
+						if (!Repository.PushLocalBranchToRemote(branchName, remoteName))
 						{
-							throw new Exception(Repository.lastError);
+							//NOTE: this ignores false positive noise/errors that come from GitLab
+							if (!string.IsNullOrEmpty(Repository.lastError) && !Repository.lastError.Contains("To create a merge request for"))
+							{
+								throw new Exception(Repository.lastError);
+							}
 						}
 					}
 				}
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("Add new Branch Error: " + e.Message, true);
-				success = false;
-			}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Add new Branch Error: " + e.Message, true);
+					success = false;
+				}
 			
-			Refresh();
-			return success;
+				Refresh();
+				return success;
+			}
 		}
 
 		public bool DeleteNonActiveBranch(BranchState branch)
 		{
-			bool success = true;
-			try
+			lock (this)
 			{
-				if (!Repository.DeleteBranch(branch.fullname, branch.isRemote)) throw new Exception(Repository.lastError);
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("Delete new Branch Error: " + e.Message, true);
-				success = false;
-			}
+				bool success = true;
+				try
+				{
+					if (!Repository.DeleteBranch(branch.fullname, branch.isRemote)) throw new Exception(Repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Delete new Branch Error: " + e.Message, true);
+					success = false;
+				}
 
-			Refresh();
-			return success;
+				Refresh();
+				return success;
+			}
 		}
 
 		public bool RenameActiveBranch(string newBranchName)
 		{
-			bool success = true;
-			try
+			lock (this)
 			{
-				if (!Repository.RenameActiveBranch(newBranchName)) throw new Exception(Repository.lastError);
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("Rename new Branch Error: " + e.Message, true);
-				success = false;
-			}
+				bool success = true;
+				try
+				{
+					if (!Repository.RenameActiveBranch(newBranchName)) throw new Exception(Repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Rename new Branch Error: " + e.Message, true);
+					success = false;
+				}
 
-			Refresh();
-			return success;
+				Refresh();
+				return success;
+			}
 		}
 		
 		public bool CopyTracking(BranchState srcRemoteBranch)
 		{
-			bool success = true;
-			try
+			lock (this)
 			{
-				if (!Repository.SetActiveBranchTracking(srcRemoteBranch.fullname)) throw new Exception(Repository.lastError);
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("Add/Update tracking Branch Error: " + e.Message, true);
-				success = false;
-			}
+				bool success = true;
+				try
+				{
+					if (!Repository.SetActiveBranchTracking(srcRemoteBranch.fullname)) throw new Exception(Repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Add/Update tracking Branch Error: " + e.Message, true);
+					success = false;
+				}
 
-			Refresh();
-			return success;
+				Refresh();
+				return success;
+			}
 		}
 
 		public bool RemoveTracking()
 		{
-			if (activeBranch == null) return false;
-			if (!activeBranch.isTracking) return true;
-
-			bool success = true;
-			try
+			lock (this)
 			{
-				if (!Repository.RemoveActiveBranchTracking()) throw new Exception(Repository.lastError);
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("Remove Branch Error: " + e.Message, true);
-				success = false;
-			}
+				if (activeBranch == null) return false;
+				if (!activeBranch.isTracking) return true;
 
-			Refresh();
-			return success;
+				bool success = true;
+				try
+				{
+					if (!Repository.RemoveActiveBranchTracking()) throw new Exception(Repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Remove Branch Error: " + e.Message, true);
+					success = false;
+				}
+
+				Refresh();
+				return success;
+			}
 		}
 
 		public bool IsUpToDateWithRemote(out bool yes)
 		{
-			if (activeBranch == null)
+			lock (this)
 			{
-				yes = false;
-				return false;
-			}
+				if (activeBranch == null)
+				{
+					yes = false;
+					return false;
+				}
 
-			if (!activeBranch.isTracking)
-			{
-				yes = true;
+				if (!activeBranch.isTracking)
+				{
+					yes = true;
+					return true;
+				}
+
+				try
+				{
+					if (!Repository.IsUpToDateWithRemote(activeBranch.tracking.remoteState.name, activeBranch.tracking.name, out yes)) throw new Exception(Repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Remove Branch Error: " + e.Message, true);
+					yes = false;
+					return false;
+				}
+			
 				return true;
 			}
-
-			try
-			{
-				if (!Repository.IsUpToDateWithRemote(activeBranch.tracking.remoteState.name, activeBranch.tracking.name, out yes)) throw new Exception(Repository.lastError);
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("Remove Branch Error: " + e.Message, true);
-				yes = false;
-				return false;
-			}
-			
-			return true;
 		}
 
 		public bool PruneRemoteBranches()
 		{
-			bool success = true;
-			try
+			lock (this)
 			{
-				if (!Repository.PruneRemoteBranches()) throw new Exception(Repository.lastError);
-			}
-			catch (Exception e)
-			{
-				DebugLog.LogError("Failed to prune branches: " + e.Message, true);
-				success = false;
-			}
+				bool success = true;
+				try
+				{
+					if (!Repository.PruneRemoteBranches()) throw new Exception(Repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to prune branches: " + e.Message, true);
+					success = false;
+				}
 
-			Refresh();
-			return success;
+				Refresh();
+				return success;
+			}
 		}
 	}
 }

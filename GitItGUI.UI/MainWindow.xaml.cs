@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitItGUI.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace GitItGUI.UI
 {
@@ -26,6 +28,14 @@ namespace GitItGUI.UI
 		{
 			singleton = this;
 			InitializeComponent();
+
+			AppManager.Init();
+		}
+
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			AppManager.Dispose();
+			base.OnClosing(e);
 		}
 
 		public void Navigate(UserControl screen)
