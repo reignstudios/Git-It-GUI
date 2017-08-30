@@ -97,6 +97,14 @@
 			<Border Grid.Row="0" BorderBrush="Gray" BorderThickness="2" Margin="5,10,10,5">
 				<Grid Background="#EEEEEE">
 					<Label Content="Changes preview" FontWeight="Bold" Margin="10,10,10,0" VerticalAlignment="Top"/>
+					<Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,10,0" Click="Button_Click">
+						<TextBlock Text="▼" Margin="0,-2,0,0"/>
+						<Button.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="Preview in diff tool"/>
+							</ContextMenu>
+						</Button.ContextMenu>
+					</Button>
 					<RichTextBox Name="previewTextBox" Margin="10,41,10,10" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
 				</Grid>
 			</Border>
