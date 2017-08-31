@@ -28,10 +28,11 @@ namespace GitItGUI.UI
 		{
 			singleton = this;
 			InitializeComponent();
-
+			
 			if (!AppManager.Init())
 			{
-				Close();
+				MessageBox.Show("Failed to start AppManager");
+				Environment.Exit(0);
 				return;
 			}
 

@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace GitItGUI.UI.Screens
 {
@@ -23,16 +24,24 @@ namespace GitItGUI.UI.Screens
     {
 		public static RepoScreen singleton;
 		public RepoManager repoManager;
+		public Dispatcher repoDispatcher;
 
-        public RepoScreen()
+		public RepoScreen()
         {
 			singleton = this;
             InitializeComponent();
+			grid.Visibility = Visibility.Hidden;
 		}
 
 		public void Init()
 		{
-			repoManager = new RepoManager();
+			repoManager = new RepoManager(MainWindow.singleton.Dispatcher, RepoReadyCallback);
+		}
+
+		private void RepoReadyCallback(Dispatcher dispatcher)
+		{
+			repoDispatcher = dispatcher;
+			grid.Visibility = Visibility.Visible;
 		}
 
 		public void Dispose()

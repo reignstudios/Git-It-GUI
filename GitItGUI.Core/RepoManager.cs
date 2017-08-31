@@ -4,6 +4,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace GitItGUI.Core
 {
@@ -12,6 +14,7 @@ namespace GitItGUI.Core
 	/// </summary>
 	public partial class RepoManager : IDisposable
 	{
+		public delegate void ReadyCallbackMethod(Dispatcher dispatcher);
 		public delegate void RepoRefreshedCallbackMethod();
 		public event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 
@@ -25,10 +28,16 @@ namespace GitItGUI.Core
 
 		internal Repository repository;
 		private bool pauseGitCommanderStdWrites;
+		private Thread thread;
+		private Dispatcher dispatcher, uiDispatcher;
 
-		public RepoManager()
+		public RepoManager(Dispatcher uiDispatcher, ReadyCallbackMethod readyCallback)
 		{
-			repository = new Repository();
+			this.uiDispatcher = uiDispatcher;
+
+			// create repo worker thread
+			thread = new Thread(WorkerThread);
+			thread.Start(readyCallback);
 
 			// add custom error codes to git commander
 			if (AppManager.settings.customErrorCodes != null)
@@ -38,23 +47,62 @@ namespace GitItGUI.Core
 					repository.AddErrorCode(code);
 				}
 			}
+		}
+
+		private void WorkerThread(object readyCallback)
+		{
+			// create thread specific objects
+			dispatcher = Dispatcher.CurrentDispatcher;
+			repository = new Repository(dispatcher);
 
 			// bind terminal callbacks
 			repository.RunExeDebugLineCallback += DebugLog_RunExeDebugLineCallback;
 			repository.StdCallback += DebugLog_StdCallback;
 			repository.StdWarningCallback += DebugLog_StdWarningCallback;
 			repository.StdErrorCallback += DebugLog_StdErrorCallback;
+
+			// fire finished callback
+			if (readyCallback != null && uiDispatcher != null)
+			{
+				uiDispatcher.InvokeAsync(delegate()
+				{
+					((ReadyCallbackMethod)readyCallback)(dispatcher);
+				});
+			}
+
+			// run dispatcher
+			Dispatcher.Run();
 		}
 
 		public void Dispose()
 		{
-			repository.Close();
+			lock (this)
+			{
+				if (dispatcher != null)
+				{
+					dispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
+				}
 
-			// un-bind terminal callbacks
-			repository.RunExeDebugLineCallback -= DebugLog_RunExeDebugLineCallback;
-			repository.StdCallback -= DebugLog_StdCallback;
-			repository.StdWarningCallback -= DebugLog_StdWarningCallback;
-			repository.StdErrorCallback -= DebugLog_StdErrorCallback;
+				if (thread != null)
+				{
+					if (thread.IsAlive) thread.Join();
+					thread = null;
+					dispatcher = null;
+				}
+
+				if (repository != null)
+				{
+					repository.Close();
+
+					// un-bind terminal callbacks
+					repository.RunExeDebugLineCallback -= DebugLog_RunExeDebugLineCallback;
+					repository.StdCallback -= DebugLog_StdCallback;
+					repository.StdWarningCallback -= DebugLog_StdWarningCallback;
+					repository.StdErrorCallback -= DebugLog_StdErrorCallback;
+
+					repository = null;
+				}
+			}
 		}
 
 		private void DebugLog_RunExeDebugLineCallback(string line)
@@ -165,7 +213,18 @@ namespace GitItGUI.Core
 		{
 			if (!RefreshBranches(refreshMode)) return false;
 			if (!RefreshChanges()) return false;
-			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
+			if (uiDispatcher != null && uiDispatcher.CheckAccess())
+			{
+				uiDispatcher.InvokeAsync(delegate ()
+				{
+					if (RepoRefreshedCallback != null) RepoRefreshedCallback();
+				});
+			}
+			else
+			{
+				if (RepoRefreshedCallback != null) RepoRefreshedCallback();
+			}
+
 			return true;
 		}
 

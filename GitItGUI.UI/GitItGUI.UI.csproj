@@ -59,6 +59,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Overlays\ProcessingOverlay.xaml.cs">
+      <DependentUpon>ProcessingOverlay.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Screens\RepoScreen.xaml.cs">
       <DependentUpon>RepoScreen.xaml</DependentUpon>
     </Compile>
@@ -96,6 +99,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Overlays\ProcessingOverlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Screens\RepoScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -172,6 +179,10 @@
     <Resource Include="Images\typeChanged.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GitCommander\GitCommander.csproj">
+      <Project>{b27247a7-fb34-41c9-ba20-22c758460d6e}</Project>
+      <Name>GitCommander</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitItGUI.Core\GitItGUI.Core.csproj">
       <Project>{0095000a-55af-4a89-8c5a-02e43caaf1f5}</Project>
       <Name>GitItGUI.Core</Name>

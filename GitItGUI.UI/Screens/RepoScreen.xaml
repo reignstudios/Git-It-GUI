@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:GitItGUI.UI.Screens.RepoTabs"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
-    <Grid>
+    <Grid Name="grid">
 		<Label HorizontalContentAlignment="Center" VerticalAlignment="Top" Height="32" FontSize="16">Current Repo (Branch) [State]</Label>
 		<TabControl Margin="0,32,0,0">
 			<TabItem Header="Changes">

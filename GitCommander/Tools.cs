@@ -31,7 +31,7 @@ namespace GitCommander
 			if (!errorPrefixes.Contains(errorCode)) errorPrefixes.Add(errorCode);
 		}
 		
-		public (string output, string errors) RunExe
+		private (string output, string errors) RunExe
 		(
 			string exe, string arguments, string workingDirectory = null,
 			StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null,
@@ -92,42 +92,47 @@ namespace GitCommander
 				{
 					string line = e.Data;
 					if (line == null) return;
-					outDataReceived(line);
+					dispatcher.InvokeAsync(delegate()
+					{
+						outDataReceived(line);
+					});
 				};
 
 				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
 					string line = e.Data;
 					if (line == null) return;
-
-					// valid true error
-					string lineLower = line.ToLower();
-					bool isError = false;
-					foreach (var prefix in errorPrefixes)
+					dispatcher.InvokeAsync(delegate ()
 					{
-						if (lineLower.StartsWith(prefix))
+						// valid true error
+						string lineLower = line.ToLower();
+						bool isError = false;
+						foreach (var prefix in errorPrefixes)
 						{
-							isError = true;
-							break;
+							if (lineLower.StartsWith(prefix))
+							{
+								isError = true;
+								break;
+							}
 						}
-					}
 
-					// if not error use normal stdout callbacks
-					if (!isError)
-					{
-						outDataReceived(line);
-						return;
-					}
+						// if not error use normal stdout callbacks
+						if (!isError)
+						{
+							outDataReceived(line);
+							return;
+						}
 
-					// invoke error callbacks
-					if (stdErrorCallback != null) stdErrorCallback(line);
-					if (stdErrorResultOn)
-					{
-						if (errors.Length != 0) errors += Environment.NewLine;
-						errors += line;
-					}
+						// invoke error callbacks
+						if (stdErrorCallback != null) stdErrorCallback(line);
+						if (stdErrorResultOn)
+						{
+							if (errors.Length != 0) errors += Environment.NewLine;
+							errors += line;
+						}
 
-					if (StdErrorCallback != null) StdErrorCallback(line);
+						if (StdErrorCallback != null) StdErrorCallback(line);
+					});
 				};
 
 				// start process
