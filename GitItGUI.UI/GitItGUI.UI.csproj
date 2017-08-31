@@ -59,6 +59,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Overlays\MessageOverlay.xaml.cs">
+      <DependentUpon>MessageOverlay.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Overlays\ProcessingOverlay.xaml.cs">
       <DependentUpon>ProcessingOverlay.xaml</DependentUpon>
     </Compile>
@@ -99,6 +102,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Overlays\MessageOverlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Overlays\ProcessingOverlay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -168,6 +175,7 @@
     <Resource Include="Images\Open.png" />
     <Resource Include="Images\AppIcon.ico" />
     <Resource Include="Images\AppIcon.png" />
+    <Resource Include="Images\Alert.png" />
     <Content Include="Images\AppIcon.svg" />
     <Resource Include="Images\conflicted.png" />
     <Resource Include="Images\deleted.png" />

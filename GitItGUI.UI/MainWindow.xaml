@@ -15,5 +15,6 @@
 
 		<!-- Overlays -->
 		<overlays:ProcessingOverlay Visibility="Hidden"/>
+		<overlays:MessageOverlay Visibility="Hidden"/>
 	</Grid>
 </Window>
