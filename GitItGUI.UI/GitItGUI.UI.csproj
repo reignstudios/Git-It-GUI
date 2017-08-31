@@ -170,6 +170,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\Processing.png" />
     <Resource Include="Images\Clone.png" />
     <Resource Include="Images\Create.png" />
     <Resource Include="Images\Open.png" />
