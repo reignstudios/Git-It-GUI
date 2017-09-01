@@ -245,108 +245,127 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			});
 		}
 
+		private void ProcessPreview(ListBoxItem item)
+		{
+			previewTextBox.Document.Blocks.Clear();
+			var fileState = (FileState)item.Tag;
+			var delta = RepoScreen.singleton.repoManager.GetQuickViewData(fileState);
+			if (delta == null)
+			{
+				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
+				range.Text = "<<< Unsuported Preview Type >>>";
+			}
+			else if (delta.GetType() == typeof(string))
+			{
+				using (var stream = new MemoryStream())
+				using (var writer = new StreamWriter(stream))
+				using (var reader = new StreamReader(stream))
+				{
+					// write all data into stream
+					writer.Write((string)delta);
+					writer.Flush();
+					writer.Flush();
+					stream.Position = 0;
+
+					// read lines and write formatted blocks
+					void WritePreviewText(string text, SolidColorBrush blockColor)
+					{
+						var end = previewTextBox.Document.ContentEnd;
+						var range = new TextRange(end, end);
+						range.Text = text;
+						range.ApplyPropertyValue(TextElement.ForegroundProperty, blockColor);
+					}
+						
+					int blockMode = 0;
+					string line = null, normalBlock = null, addBlock = null, subBlock = null, secBlock = null;
+					void CheckBlocks(bool isFinishMode)
+					{
+						if ((blockMode != 0 || (isFinishMode && blockMode == 0)) && !string.IsNullOrEmpty(normalBlock))
+						{
+							WritePreviewText(normalBlock, Brushes.Black);
+							normalBlock = "";
+						}
+						else if ((blockMode != 1 || (isFinishMode && blockMode == 1)) && !string.IsNullOrEmpty(addBlock))
+						{
+							WritePreviewText(addBlock, Brushes.Green);
+							addBlock = "";
+						}
+						else if ((blockMode != 2 || (isFinishMode && blockMode == 2)) && !string.IsNullOrEmpty(subBlock))
+						{
+							WritePreviewText(subBlock, Brushes.Red);
+							subBlock = "";
+						}
+						else if ((blockMode != 3 || (isFinishMode && blockMode == 3)) && !string.IsNullOrEmpty(secBlock))
+						{
+							WritePreviewText(secBlock, Brushes.DarkOrange);
+							secBlock = "";
+						}
+					}
+
+					do
+					{
+						line = reader.ReadLine();
+						if (string.IsNullOrEmpty(line))
+						{
+							CheckBlocks(true);
+							continue;
+						}
+
+						if (line[0] == '+')
+						{
+							CheckBlocks(false);
+							blockMode = 1;
+							addBlock += line + '\r';
+						}
+						else if (line[0] == '-')
+						{
+							CheckBlocks(false);
+							blockMode = 2;
+							subBlock += line + '\r';
+						}
+						else if (line[0] == '*')
+						{
+							CheckBlocks(false);
+							blockMode = 3;
+							secBlock += "\r\r" + line + '\r';
+						}
+						else
+						{
+							CheckBlocks(false);
+							blockMode = 0;
+							normalBlock += line + '\r';
+						}
+					}
+					while (line != null);
+				}
+			}
+		}
+
 		private void unstagedChangesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var item = unstagedChangesListBox.SelectedItem;
 			if (item != null)
 			{
-				previewTextBox.Document.Blocks.Clear();
-				var i = (ListBoxItem)item;
-				var fileState = (FileState)i.Tag;
-				var delta = RepoScreen.singleton.repoManager.GetQuickViewData(fileState);
-				if (delta == null)
-				{
-					var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
-					range.Text = "<<< Unsuported Preview Type >>>";
-				}
-				else if (delta.GetType() == typeof(string))
-				{
-					using (var stream = new MemoryStream())
-					using (var writer = new StreamWriter(stream))
-					using (var reader = new StreamReader(stream))
-					{
-						// write all data into stream
-						writer.Write((string)delta);
-						writer.Flush();
-						writer.Flush();
-						stream.Position = 0;
-
-						// read lines and write formatted blocks
-						void WritePreviewText(string text, SolidColorBrush blockColor)
-						{
-							var end = previewTextBox.Document.ContentEnd;
-							var range = new TextRange(end, end);
-							range.Text = text;
-							range.ApplyPropertyValue(TextElement.ForegroundProperty, blockColor);
-						}
-						
-						int blockMode = 0;
-						string line = null, normalBlock = null, addBlock = null, subBlock = null, secBlock = null;
-						void CheckBlocks()
-						{
-							if (blockMode != 0 && !string.IsNullOrEmpty(normalBlock))
-							{
-								WritePreviewText(normalBlock, Brushes.Black);
-								normalBlock = "";
-							}
-							else if (blockMode != 1 && !string.IsNullOrEmpty(addBlock))
-							{
-								WritePreviewText(addBlock, Brushes.Green);
-								addBlock = "";
-							}
-							else if (blockMode != 2 && !string.IsNullOrEmpty(subBlock))
-							{
-								WritePreviewText(subBlock, Brushes.Red);
-								subBlock = "";
-							}
-							else if (blockMode != 3 && !string.IsNullOrEmpty(secBlock))
-							{
-								WritePreviewText(secBlock, Brushes.DarkOrange);
-								secBlock = "";
-							}
-						}
-
-						do
-						{
-							line = reader.ReadLine();
-							if (string.IsNullOrEmpty(line))
-							{
-								CheckBlocks();
-								continue;
-							}
-
-							if (line[0] == '+')
-							{
-								CheckBlocks();
-								blockMode = 1;
-								addBlock += line + '\r';
-							}
-							else if (line[0] == '-')
-							{
-								CheckBlocks();
-								blockMode = 2;
-								subBlock += line + '\r';
-							}
-							else if (line[0] == '*')
-							{
-								CheckBlocks();
-								blockMode = 3;
-								secBlock += "\r\r" + line + '\r';
-							}
-							else
-							{
-								CheckBlocks();
-								blockMode = 0;
-								normalBlock += line + '\r';
-							}
-						}
-						while (line != null);
-					}
-				}
+				stagedChangesListBox.SelectedItem = null;
+				ProcessPreview((ListBoxItem)item);
 			}
 			else
 			{
 				if (stagedChangesListBox.SelectedItem == null) previewTextBox.Document.Blocks.Clear();
+			}
+		}
+
+		private void stagedChangesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var item = stagedChangesListBox.SelectedItem;
+			if (item != null)
+			{
+				unstagedChangesListBox.SelectedItem = null;
+				ProcessPreview((ListBoxItem)item);
+			}
+			else
+			{
+				if (unstagedChangesListBox.SelectedItem == null) previewTextBox.Document.Blocks.Clear();
 			}
 		}
 	}
