@@ -368,5 +368,56 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				if (unstagedChangesListBox.SelectedItem == null) previewTextBox.Document.Blocks.Clear();
 			}
 		}
+
+		private void simpleModeMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			syncButton.Visibility = Visibility.Visible;
+			commitButton.Visibility = Visibility.Hidden;
+			pullButton.Visibility = Visibility.Hidden;
+			pushButton.Visibility = Visibility.Hidden;
+		}
+
+		private void advancedModeMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			syncButton.Visibility = Visibility.Hidden;
+			commitButton.Visibility = Visibility.Visible;
+			pullButton.Visibility = Visibility.Visible;
+			pushButton.Visibility = Visibility.Visible;
+		}
+
+		private void syncButton_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void commitButton_Click(object sender, RoutedEventArgs e)
+		{
+			// prep commit message
+			string msg = commitMessageTextBox.Text;
+			if (string.IsNullOrEmpty(msg) || msg.Length != 3)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must enter a valid commit message!");
+			}
+
+			msg = msg.Replace(Environment.NewLine, "\n");
+
+			// process
+			MainWindow.singleton.ShowProcessingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.CommitStagedChanges(msg)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit files");
+				MainWindow.singleton.HideProcessingOverlay();
+			});
+		}
+
+		private void pullButton_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void pushButton_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
 	}
 }
