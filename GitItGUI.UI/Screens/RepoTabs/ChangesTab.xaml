@@ -35,7 +35,7 @@
 							</ContextMenu>
 						</Button.ContextMenu>
 					</Button>
-					<ListBox Name="unstagedChangesListBox" Margin="10,41,10,10" SelectionMode="Extended"/>
+					<ListBox Name="unstagedChangesListBox" Margin="10,41,10,10" SelectionMode="Extended" SelectionChanged="unstagedChangesListBox_SelectionChanged"/>
 				</Grid>
 			</Border>
 
