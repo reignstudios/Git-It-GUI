@@ -25,46 +25,17 @@
 						<TextBlock Text="▼" Margin="0,-2,0,0"/>
 						<Button.ContextMenu>
 							<ContextMenu>
-								<MenuItem Header="Stage Selected"/>
+								<MenuItem Name="stageAllMenuItem" Header="Stage All" Click="stageAllMenuItem_Click"/>
+								<MenuItem Name="stageSelectedMenuItem" Header="Stage Selected" Click="stageSelectedMenuItem_Click"/>
 								<Separator/>
-								<MenuItem Header="Revert Selected"/>
-								<MenuItem Header="CleanUp (Remove untracked files)"/>
+								<MenuItem Name="revertAllMenuItem" Header="Revert All" Click="revertAllMenuItem_Click"/>
+								<MenuItem Name="revertSelectedMenuItem" Header="Revert Selected" Click="revertSelectedMenuItem_Click"/>
+								<MenuItem Name="cleanupAllMenuItem" Header="CleanUp All (Remove untracked files)" Click="cleanupAllMenuItem_Click"/>
+								<MenuItem Name="cleanupSelectedMenuItem" Header="CleanUp Selected (Remove untracked files)" Click="cleanupSelectedMenuItem_Click"/>
 							</ContextMenu>
 						</Button.ContextMenu>
 					</Button>
-					<ListBox Name="unstagedChangesListBox" Margin="10,41,10,10" SelectionMode="Extended">
-						<ListBoxItem>
-							<Grid>
-								<Button Width="20" Height="20" HorizontalAlignment="Left" Background="Transparent" BorderThickness="1" BorderBrush="LightGray">
-									<Image Source="../../Images/deleted.png"/>
-								</Button>
-								<Label Margin="18,0,0,0" Content="file.txt">
-									<Label.ContextMenu>
-										<ContextMenu>
-											<MenuItem Header="Open file"/>
-											<MenuItem Header="Open file location"/>
-										</ContextMenu>
-									</Label.ContextMenu>
-								</Label>
-							</Grid>
-						</ListBoxItem>
-						<ListBoxItem>
-							<Grid>
-								<Button Width="20" Height="20" HorizontalAlignment="Left" Background="Transparent" BorderThickness="1" BorderBrush="LightGray">
-									<Image Source="../../Images/new.png"/>
-								</Button>
-								<Label Margin="18,0,0,0">file.txt</Label>
-							</Grid>
-						</ListBoxItem>
-						<ListBoxItem>
-							<Grid>
-								<Button Width="20" Height="20" HorizontalAlignment="Left" Background="Transparent" BorderThickness="1" BorderBrush="LightGray">
-									<Image Source="../../Images/modified.png"/>
-								</Button>
-								<Label Margin="18,0,0,0">file.txt</Label>
-							</Grid>
-						</ListBoxItem>
-					</ListBox>
+					<ListBox Name="unstagedChangesListBox" Margin="10,41,10,10" SelectionMode="Extended"/>
 				</Grid>
 			</Border>
 
@@ -75,15 +46,12 @@
 						<TextBlock Text="▼" Margin="0,-2,0,0"/>
 						<Button.ContextMenu>
 							<ContextMenu>
-								<MenuItem Header="Un-Stage Selected"/>
+								<MenuItem Name="unstageAllMenuItem" Header="Un-Stage All" Click="unstageAllMenuItem_Click"/>
+								<MenuItem Name="unstageSelectedMenuItem" Header="Un-Stage Selected" Click="unstageSelectedMenuItem_Click"/>
 							</ContextMenu>
 						</Button.ContextMenu>
 					</Button>
-					<ListBox Name="stagedChangesListBox" Margin="10,41,10,10" SelectionMode="Extended">
-						<ListBoxItem>file.txt</ListBoxItem>
-						<ListBoxItem>file.txt</ListBoxItem>
-						<ListBoxItem>file.txt</ListBoxItem>
-					</ListBox>
+					<ListBox Name="stagedChangesListBox" Margin="10,41,10,10" SelectionMode="Extended"/>
 				</Grid>
 			</Border>
 		</Grid>

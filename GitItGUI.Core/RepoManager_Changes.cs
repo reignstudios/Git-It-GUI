@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using GitCommander;
+using System.Collections.Generic;
 
 namespace GitItGUI.Core
 {
@@ -193,6 +194,31 @@ namespace GitItGUI.Core
 			}
 		}
 
+		public bool DeleteUntrackedUnstagedFiles(List<FileState> fileStates, bool refresh)
+		{
+			lock (this)
+			{
+				bool success = true;
+				try
+				{
+					foreach (var fileState in fileStates)
+					{
+						if (!fileState.HasState(FileStates.NewInWorkdir)) continue;
+						string filePath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+						if (File.Exists(filePath)) File.Delete(filePath);
+					}
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to delete item: " + e.Message, true);
+					success = false;
+				}
+
+				if (refresh) Refresh();
+				return success;
+			}
+		}
+
 		public bool DeleteUntrackedUnstagedFiles(bool refresh)
 		{
 			lock (this)
@@ -238,6 +264,29 @@ namespace GitItGUI.Core
 			}
 		}
 
+		public bool StageFileList(List<FileState> fileStates)
+		{
+			lock (this)
+			{
+				bool success = true;
+				try
+				{
+					foreach (var fileState in fileStates)
+					{
+						if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
+					}
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to stage items: " + e.Message, true);
+					success = false;
+				}
+
+				Refresh();
+				return success;
+			}
+		}
+
 		public bool StageAllFiles()
 		{
 			lock (this)
@@ -270,6 +319,29 @@ namespace GitItGUI.Core
 				catch (Exception e)
 				{
 					DebugLog.LogError("Failed to unstage item: " + e.Message, true);
+					success = false;
+				}
+
+				Refresh();
+				return success;
+			}
+		}
+
+		public bool UnstageFileList(List<FileState> fileStates)
+		{
+			lock (this)
+			{
+				bool success = true;
+				try
+				{
+					foreach (var fileState in fileStates)
+					{
+						if (!repository.Unstage(fileState.filename)) throw new Exception(repository.lastError);
+					}
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to unstage items: " + e.Message, true);
 					success = false;
 				}
 
@@ -325,7 +397,7 @@ namespace GitItGUI.Core
 				if (!fileState.HasState(FileStates.ModifiedInIndex) && !fileState.HasState(FileStates.ModifiedInWorkdir) &&
 				!fileState.HasState(FileStates.DeletedFromIndex) && !fileState.HasState(FileStates.DeletedFromWorkdir))
 				{
-					DebugLog.LogError("This file is not modified or deleted", true);
+					DebugLog.LogError("This file is not modified or deleted: " + fileState.filename, true);
 					return false;
 				}
 
@@ -333,6 +405,36 @@ namespace GitItGUI.Core
 				try
 				{
 					if (!repository.RevertFile(activeBranch.fullname, fileState.filename)) throw new Exception(repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to reset file: " + e.Message);
+					success = false;
+				}
+
+				Refresh();
+				return success;
+			}
+		}
+
+		public bool RevertFileList(List<FileState> fileStates)
+		{
+			lock (this)
+			{
+				bool success = true;
+				try
+				{
+					foreach (var fileState in fileStates)
+					{
+						if (!fileState.HasState(FileStates.ModifiedInIndex) && !fileState.HasState(FileStates.ModifiedInWorkdir) &&
+						!fileState.HasState(FileStates.DeletedFromIndex) && !fileState.HasState(FileStates.DeletedFromWorkdir))
+						{
+							DebugLog.LogWarning("This file is not modified or deleted (skipping): " + fileState.filename);
+							continue;
+						}
+
+						if (!repository.RevertFile(activeBranch.fullname, fileState.filename)) throw new Exception(repository.lastError);
+					}
 				}
 				catch (Exception e)
 				{
