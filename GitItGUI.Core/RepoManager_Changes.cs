@@ -203,7 +203,12 @@ namespace GitItGUI.Core
 				{
 					foreach (var fileState in fileStates)
 					{
-						if (!fileState.HasState(FileStates.NewInWorkdir)) continue;
+						if (!fileState.HasState(FileStates.NewInWorkdir))
+						{
+							DebugLog.LogWarning("This file is tracked (skipping): " + fileState.filename);
+							continue;
+						}
+
 						string filePath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
 						if (File.Exists(filePath)) File.Delete(filePath);
 					}
