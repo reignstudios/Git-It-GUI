@@ -14,7 +14,7 @@
 		<screens:SettingsScreen x:Name="settingsScreen" Visibility="Hidden"/>
 
 		<!-- Overlays -->
-		<overlays:ProcessingOverlay Visibility="Hidden"/>
-		<overlays:MessageOverlay Visibility="Hidden"/>
+		<overlays:ProcessingOverlay x:Name="processingOverlay" Visibility="Hidden"/>
+		<overlays:MessageOverlay x:Name="messageOverlay" Visibility="Hidden"/>
 	</Grid>
 </Window>

@@ -71,66 +71,67 @@ namespace GitCommander
 				{
 					if (stdOutToFilePath != null) stdOutStreamWriter.WriteLine(line);
 					
-					if (stdCallback != null) stdCallback(line);
 					if (stdResultOn)
 					{
 						if (output.Length != 0) output += Environment.NewLine;
 						output += line;
 					}
 
-					if (line.StartsWith("warning:"))
+					dispatcher.InvokeAsync(delegate ()
 					{
-						if (StdWarningCallback != null) StdWarningCallback(line);
-					}
-					else
-					{
-						if (StdCallback != null) StdCallback(line);
-					}
+						if (stdCallback != null) stdCallback(line);
+						if (line.StartsWith("warning:"))
+						{
+							if (StdWarningCallback != null) StdWarningCallback(line);
+						}
+						else
+						{
+							if (StdCallback != null) StdCallback(line);
+						}
+					});
 				});
 				
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
 					string line = e.Data;
 					if (line == null) return;
-					dispatcher.InvokeAsync(delegate()
-					{
-						outDataReceived(line);
-					});
+					outDataReceived(line);
 				};
 
 				process.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
 				{
 					string line = e.Data;
 					if (line == null) return;
+					
+					// valid true error
+					string lineLower = line.ToLower();
+					bool isError = false;
+					foreach (var prefix in errorPrefixes)
+					{
+						if (lineLower.StartsWith(prefix))
+						{
+							isError = true;
+							break;
+						}
+					}
+
+					// if not error use normal stdout callbacks
+					if (!isError)
+					{
+						outDataReceived(line);
+						return;
+					}
+
+					// invoke error callbacks
+					if (stdErrorResultOn)
+					{
+						if (errors.Length != 0) errors += Environment.NewLine;
+						errors += line;
+					}
+
 					dispatcher.InvokeAsync(delegate ()
 					{
-						// valid true error
-						string lineLower = line.ToLower();
-						bool isError = false;
-						foreach (var prefix in errorPrefixes)
-						{
-							if (lineLower.StartsWith(prefix))
-							{
-								isError = true;
-								break;
-							}
-						}
-
-						// if not error use normal stdout callbacks
-						if (!isError)
-						{
-							outDataReceived(line);
-							return;
-						}
-
-						// invoke error callbacks
 						if (stdErrorCallback != null) stdErrorCallback(line);
-						if (stdErrorResultOn)
-						{
-							if (errors.Length != 0) errors += Environment.NewLine;
-							errors += line;
-						}
-
 						if (StdErrorCallback != null) StdErrorCallback(line);
 					});
 				};

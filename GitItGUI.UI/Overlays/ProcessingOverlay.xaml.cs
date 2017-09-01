@@ -41,5 +41,10 @@ namespace GitItGUI.UI.Overlays
 				stopwatch.Restart();
 			}
 		}
+
+		public void SetStatusText(string text)
+		{
+			statusTextBox.Text = text;
+		}
 	}
 }

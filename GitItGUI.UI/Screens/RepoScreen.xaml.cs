@@ -49,9 +49,15 @@ namespace GitItGUI.UI.Screens
 			repoManager.Dispose();
 		}
 
-		public bool OpenRepo(string folderPath)
+		public void OpenRepo(string folderPath)
 		{
-			return repoManager.OpenRepo(folderPath);
+			MainWindow.singleton.ShowProcessingOverlay();
+			repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (repoManager.OpenRepo(folderPath)) MainWindow.singleton.Navigate(this);
+				else MainWindow.singleton.ShowMessageOverlay("Error", "Failed to open repo");
+				MainWindow.singleton.HideProcessingOverlay();
+			});
 		}
     }
 }

@@ -29,7 +29,8 @@ namespace GitItGUI.Core
 		internal Repository repository;
 		private bool pauseGitCommanderStdWrites;
 		private Thread thread;
-		private Dispatcher dispatcher, uiDispatcher;
+		public Dispatcher dispatcher { get; private set; }
+		private Dispatcher uiDispatcher;
 
 		public RepoManager(Dispatcher uiDispatcher, ReadyCallbackMethod readyCallback)
 		{

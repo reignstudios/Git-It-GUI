@@ -21,8 +21,7 @@ namespace GitItGUI.UI.Screens
 		{
 			if (PlatformUtils.SelectFolder(out string folderPath))
 			{
-				if (RepoScreen.singleton.OpenRepo(folderPath)) MainWindow.singleton.Navigate(RepoScreen.singleton);
-				else MessageBox.Show("Failed to open repo");
+				RepoScreen.singleton.OpenRepo(folderPath);
 			}
 		}
 	}
