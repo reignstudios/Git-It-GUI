@@ -54,10 +54,24 @@ namespace GitItGUI.UI.Screens
 			MainWindow.singleton.ShowProcessingOverlay();
 			repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (repoManager.OpenRepo(folderPath)) MainWindow.singleton.Navigate(this);
-				else MainWindow.singleton.ShowMessageOverlay("Error", "Failed to open repo");
+				if (repoManager.OpenRepo(folderPath))
+				{
+					MainWindow.singleton.Navigate(this);
+				}
+				else
+				{
+					AppManager.RemoveRepoFromHistory(folderPath);
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to open repo");
+				}
+
+				StartScreen.singleton.Refresh();
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
-    }
+
+		private void backButton_Click(object sender, RoutedEventArgs e)
+		{
+			MainWindow.singleton.Navigate(StartScreen.singleton);
+		}
+	}
 }

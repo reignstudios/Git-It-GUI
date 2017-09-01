@@ -37,12 +37,14 @@ namespace GitItGUI.UI
 				return;
 			}
 
+			startScreen.Init();
 			repoScreen.Init();
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			repoScreen.Dispose();
+			AppManager.SaveSettings();
 			AppManager.Dispose();
 			base.OnClosing(e);
 		}

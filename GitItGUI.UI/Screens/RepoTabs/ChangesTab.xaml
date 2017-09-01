@@ -71,7 +71,7 @@
 			<Border Grid.Row="1" BorderBrush="Gray" BorderThickness="2" Margin="10,5,5,10">
 				<Grid Background="#DDFFDD">
 					<Label Content="Staged Changes" Margin="10,10,10,0" FontWeight="Bold" VerticalAlignment="Top"/>
-					<Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,10,0">
+					<Button Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,10,0" Click="Button_Click">
 						<TextBlock Text="▼" Margin="0,-2,0,0"/>
 						<Button.ContextMenu>
 							<ContextMenu>

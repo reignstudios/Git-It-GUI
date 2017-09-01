@@ -1,13 +1,16 @@
-﻿using System.IO;
+﻿using GitCommander.System;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace GitItGUI.Core
 {
 	public delegate void RunExeCallbackMethod(string stdLine);
 
-	static class Tools
+	public static class Tools
 	{
-		public static bool IsBinaryFileData(Stream stream, bool disposeStream = false)
+		internal static bool IsBinaryFileData(Stream stream, bool disposeStream = false)
 		{
 			const int maxByteRead = 1024 * 1024 * 8;
 
@@ -35,7 +38,7 @@ namespace GitItGUI.Core
 			return false;
 		}
 
-		public static bool IsBinaryFileData(string filename)
+		internal static bool IsBinaryFileData(string filename)
 		{
 			using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None))
 			{
@@ -43,11 +46,35 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public static bool IsGitLFSPtr(string data)
+		internal static bool IsGitLFSPtr(string data)
 		{
 			if (data.Length >= 1024) return false;
 			var match = Regex.Match(data, @"version https://git-lfs.github.com/spec/v1.*oid sha256:.*size\s\n*", RegexOptions.Singleline);
 			return match.Success;
+		}
+
+		public static bool OpenFolderLocation(string folderPath)
+		{
+			try
+			{
+				if (!Directory.Exists(folderPath)) return false;
+
+				if (PlatformInfo.platform == Platforms.Windows)
+				{
+					Process.Start("explorer.exe", PlatformInfo.ConvertPathToPlatform(folderPath));
+					return true;
+				}
+				else
+				{
+					throw new Exception("Unsuported platform: " + PlatformInfo.platform);
+				}
+			}
+			catch (Exception ex)
+			{
+				DebugLog.LogError("Failed to open file: " + ex.Message, true);
+			}
+
+			return false;
 		}
 	}
 }

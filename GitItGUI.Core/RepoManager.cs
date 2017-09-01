@@ -485,15 +485,19 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public void OpenFile(string filePath)
+		public bool OpenFile(string filePath)
 		{
 			lock (this)
 			{
 				try
 				{
+					string path = PlatformInfo.ConvertPathToPlatform(string.Format("{0}\\{1}", repository.repoPath, filePath));
+					if (!File.Exists(path)) return false;
+
 					if (PlatformInfo.platform == Platforms.Windows)
 					{
-						Process.Start("explorer.exe", string.Format("{0}\\{1}", repository.repoPath, PlatformInfo.ConvertPathToPlatform(filePath)));
+						Process.Start("explorer.exe", path);
+						return true;
 					}
 					else
 					{
@@ -504,18 +508,24 @@ namespace GitItGUI.Core
 				{
 					DebugLog.LogError("Failed to open file: " + ex.Message, true);
 				}
+
+				return false;
 			}
 		}
 
-		public void OpenFileLocation(string filePath)
+		public bool OpenFileLocation(string filePath)
 		{
 			lock (this)
 			{
 				try
 				{
+					string path = PlatformInfo.ConvertPathToPlatform(string.Format("{0}\\{1}", repository.repoPath, filePath));
+					if (!File.Exists(path)) return false;
+
 					if (PlatformInfo.platform == Platforms.Windows)
 					{
-						Process.Start("explorer.exe", string.Format("/select, {0}\\{1}", repository.repoPath, PlatformInfo.ConvertPathToPlatform(filePath)));
+						Process.Start("explorer.exe", "/select, " + path);
+						return true;
 					}
 					else
 					{
@@ -525,7 +535,9 @@ namespace GitItGUI.Core
 				catch (Exception ex)
 				{
 					DebugLog.LogError("Failed to open folder location: " + ex.Message, true);
-				}	
+				}
+
+				return false;
 			}
 		}
 	}
