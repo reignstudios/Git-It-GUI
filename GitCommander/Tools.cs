@@ -77,9 +77,9 @@ namespace GitCommander
 						output += line;
 					}
 
+					if (stdCallback != null) stdCallback(line);
 					dispatcher.InvokeAsync(delegate ()
 					{
-						if (stdCallback != null) stdCallback(line);
 						if (line.StartsWith("warning:"))
 						{
 							if (StdWarningCallback != null) StdWarningCallback(line);
@@ -129,9 +129,9 @@ namespace GitCommander
 						errors += line;
 					}
 
+					if (stdErrorCallback != null) stdErrorCallback(line);
 					dispatcher.InvokeAsync(delegate ()
 					{
-						if (stdErrorCallback != null) stdErrorCallback(line);
 						if (StdErrorCallback != null) StdErrorCallback(line);
 					});
 				};

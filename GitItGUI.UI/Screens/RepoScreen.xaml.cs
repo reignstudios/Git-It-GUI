@@ -36,6 +36,7 @@ namespace GitItGUI.UI.Screens
 		public void Init()
 		{
 			repoManager = new RepoManager(MainWindow.singleton.Dispatcher, RepoReadyCallback);
+			repoManager.RepoRefreshedCallback += Refresh;
 		}
 
 		private void RepoReadyCallback(Dispatcher dispatcher)
@@ -68,10 +69,25 @@ namespace GitItGUI.UI.Screens
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
+		
+		public void Refresh()
+		{
+			changesTab.Refresh();
+		}
 
 		private void backButton_Click(object sender, RoutedEventArgs e)
 		{
 			MainWindow.singleton.Navigate(StartScreen.singleton);
+		}
+
+		private void refreshButton_Click(object sender, RoutedEventArgs e)
+		{
+			MainWindow.singleton.ShowProcessingOverlay();
+			repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				repoManager.Refresh();
+				MainWindow.singleton.HideProcessingOverlay();
+			});
 		}
 	}
 }

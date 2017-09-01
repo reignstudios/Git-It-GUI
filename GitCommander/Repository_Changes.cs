@@ -197,55 +197,52 @@ namespace GitCommander
 				
 				return false;
 			}
-
-			lock (this)
-			{
-				// gather normal files
-				switch (line)
-				{
-					case "Changes to be committed:": mode = 0; return true;
-					case "Changes not staged for commit:": mode = 1; return true;
-					case "Unmerged paths:": mode = 2; return true;
-					case "Untracked files:": mode = 3; return true;
-				}
 			
-				bool pass = false;
-				if (mode == 0)
-				{
-					pass = addState("\tnew file:", FileStates.NewInIndex);
-					if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
-					if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromIndex);
-					if (!pass) pass = addState("\trenamed:", FileStates.RenamedInIndex);
-					if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInIndex);
-				}
-				else if (mode == 1)
-				{
-					pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
-					if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromWorkdir);
-					if (!pass) pass = addState("\trenamed:", FileStates.RenamedInWorkdir);
-					if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInWorkdir);
-					if (!pass) pass = addState("\tnew file:", FileStates.NewInWorkdir);// call this just in case (should be done in untracked)
-				}
-				else if (mode == 2)
-				{
-					pass = addState("\tboth modified:", FileStates.Conflicted, FileConflictTypes.Changes);
-					if (!pass) pass = addState("\tdeleted by us:", FileStates.Conflicted, FileConflictTypes.DeletedByUs);
-					if (!pass) pass = addState("\tdeleted by them:", FileStates.Conflicted, FileConflictTypes.DeletedByThem);
-					if (!pass) pass = addState("\tboth deleted:", FileStates.Conflicted, FileConflictTypes.DeletedByBoth);
-				}
-				else if (mode == 3)
-				{
-					pass = addState("\t", FileStates.NewInWorkdir);
-				}
-
-				if (!pass)
-				{
-					var match = Regex.Match(line, @"\t(.*):");
-					if (match.Success) return false;
-				}
-
-				return true;
+			// gather normal files
+			switch (line)
+			{
+				case "Changes to be committed:": mode = 0; return true;
+				case "Changes not staged for commit:": mode = 1; return true;
+				case "Unmerged paths:": mode = 2; return true;
+				case "Untracked files:": mode = 3; return true;
 			}
+			
+			bool pass = false;
+			if (mode == 0)
+			{
+				pass = addState("\tnew file:", FileStates.NewInIndex);
+				if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
+				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromIndex);
+				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInIndex);
+				if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInIndex);
+			}
+			else if (mode == 1)
+			{
+				pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
+				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromWorkdir);
+				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInWorkdir);
+				if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInWorkdir);
+				if (!pass) pass = addState("\tnew file:", FileStates.NewInWorkdir);// call this just in case (should be done in untracked)
+			}
+			else if (mode == 2)
+			{
+				pass = addState("\tboth modified:", FileStates.Conflicted, FileConflictTypes.Changes);
+				if (!pass) pass = addState("\tdeleted by us:", FileStates.Conflicted, FileConflictTypes.DeletedByUs);
+				if (!pass) pass = addState("\tdeleted by them:", FileStates.Conflicted, FileConflictTypes.DeletedByThem);
+				if (!pass) pass = addState("\tboth deleted:", FileStates.Conflicted, FileConflictTypes.DeletedByBoth);
+			}
+			else if (mode == 3)
+			{
+				pass = addState("\t", FileStates.NewInWorkdir);
+			}
+
+			if (!pass)
+			{
+				var match = Regex.Match(line, @"\t(.*):");
+				if (match.Success) return false;
+			}
+
+			return true;
 		}
 
 		public bool GetFileState(string filename, out FileState fileState)
@@ -295,7 +292,7 @@ namespace GitCommander
 			bool failedToParse = false;
 			void stdCallback(string line)
 			{
-				if (!ParseFileState(line, ref mode, states))failedToParse = true;
+				if (!ParseFileState(line, ref mode, states)) failedToParse = true;
 			}
 
 			lock (this)

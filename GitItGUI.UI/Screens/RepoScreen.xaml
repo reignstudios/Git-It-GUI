@@ -8,22 +8,23 @@
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid Name="grid">
 		<Label HorizontalContentAlignment="Center" VerticalAlignment="Top" Height="32" FontSize="16">Current Repo (Branch) [State]</Label>
+		<Button Name="refreshButton" Content="↻" ToolTip="Refresh repo" FontWeight="Bold" Width="24" Height="24" Margin="48,10" HorizontalAlignment="Right" VerticalAlignment="Top" Click="refreshButton_Click"/>
 		<Button Name="backButton" Content="↷" ToolTip="Go back to start screen" FontWeight="Bold" Width="24" Height="24" Margin="14,10" HorizontalAlignment="Right" VerticalAlignment="Top" Click="backButton_Click"/>
 		<TabControl Margin="0,32,0,0">
 			<TabItem Header="Changes">
-				<local:ChangesTab/>
+				<local:ChangesTab x:Name="changesTab"/>
 			</TabItem>
 			<TabItem Header="Branches">
-				<local:BranchesTab/>
+				<local:BranchesTab x:Name="branchesTab"/>
 			</TabItem>
 			<TabItem Header="History">
-				<local:HistoryTab/>
+				<local:HistoryTab x:Name="historyTab"/>
 			</TabItem>
 			<TabItem Header="Terminal">
-				<local:TerminalTab/>
+				<local:TerminalTab x:Name="terminalTab"/>
 			</TabItem>
 			<TabItem Header="Settings">
-				<local:SettingsTab/>
+				<local:SettingsTab x:Name="settingsTab"/>
 			</TabItem>
 		</TabControl>
 	</Grid>

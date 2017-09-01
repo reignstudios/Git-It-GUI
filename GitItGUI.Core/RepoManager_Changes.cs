@@ -38,7 +38,7 @@ namespace GitItGUI.Core
 		public delegate bool AskUserIfTheyAcceptMergedFileCallbackMethod(FileState fileState, out MergeFileAcceptedResults result);
 		public event AskUserIfTheyAcceptMergedFileCallbackMethod AskUserIfTheyAcceptMergedFileCallback;
 
-		public FileState[] fileStates {get; private set;}
+		private FileState[] fileStates;
 		private bool isSyncMode;
 
 		private bool RefreshChanges()
@@ -54,6 +54,16 @@ namespace GitItGUI.Core
 			{
 				DebugLog.LogError("ChangesManager.Refresh Failed: " + e.Message, true);
 				return false;
+			}
+		}
+
+		public FileState[] GetFileStates()
+		{
+			lock (this)
+			{
+				var copy = new FileState[fileStates.Length];
+				Array.Copy(fileStates, copy, fileStates.Length);
+				return copy;
 			}
 		}
 

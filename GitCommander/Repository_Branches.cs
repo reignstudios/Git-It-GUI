@@ -119,6 +119,7 @@ namespace GitCommander
 			void stdCallback(string line)
 			{
 				line = line.TrimStart();
+				if (string.IsNullOrEmpty(line)) return;
 
 				// check if remote
 				bool isActive = false;

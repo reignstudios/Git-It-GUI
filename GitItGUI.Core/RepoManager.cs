@@ -214,16 +214,16 @@ namespace GitItGUI.Core
 		{
 			if (!RefreshBranches(refreshMode)) return false;
 			if (!RefreshChanges()) return false;
-			if (uiDispatcher != null && uiDispatcher.CheckAccess())
+			if (uiDispatcher.CheckAccess())
 			{
-				uiDispatcher.InvokeAsync(delegate ()
-				{
-					if (RepoRefreshedCallback != null) RepoRefreshedCallback();
-				});
+				if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 			}
 			else
 			{
-				if (RepoRefreshedCallback != null) RepoRefreshedCallback();
+				uiDispatcher.InvokeAsync(delegate()
+				{
+					if (RepoRefreshedCallback != null) RepoRefreshedCallback();
+				});
 			}
 
 			return true;

@@ -59,6 +59,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Images\ImagePool.cs" />
     <Compile Include="Overlays\MessageOverlay.xaml.cs">
       <DependentUpon>MessageOverlay.xaml</DependentUpon>
     </Compile>
@@ -170,6 +171,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\unknown.png" />
     <Resource Include="Images\Processing.png" />
     <Resource Include="Images\Clone.png" />
     <Resource Include="Images\Create.png" />
