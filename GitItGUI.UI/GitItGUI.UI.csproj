@@ -66,6 +66,9 @@
     <Compile Include="Overlays\ProcessingOverlay.xaml.cs">
       <DependentUpon>ProcessingOverlay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Overlays\WaitingOverlay.xaml.cs">
+      <DependentUpon>WaitingOverlay.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Screens\RepoScreen.xaml.cs">
       <DependentUpon>RepoScreen.xaml</DependentUpon>
     </Compile>
@@ -108,6 +111,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Overlays\ProcessingOverlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Overlays\WaitingOverlay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -397,6 +397,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			if (string.IsNullOrEmpty(msg) || msg.Length != 3)
 			{
 				MainWindow.singleton.ShowMessageOverlay("Alert", "You must enter a valid commit message!");
+				return;
 			}
 
 			msg = msg.Replace(Environment.NewLine, "\n");
@@ -418,6 +419,29 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void pushButton_Click(object sender, RoutedEventArgs e)
 		{
 
+		}
+
+		private void preivewDiffMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			// check for selection
+			var stagedItem = stagedChangesListBox.SelectedItem as ListBoxItem;
+			var unstagedItem = unstagedChangesListBox.SelectedItem as ListBoxItem;
+			if (stagedItem == null && unstagedItem == null)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "No file selected to preview");
+				return;
+			}
+
+			var fileState = (stagedItem != null) ? (FileState)stagedItem.Tag : null;
+			if (fileState == null) fileState = (unstagedItem != null) ? (FileState)unstagedItem.Tag : null;
+
+			// process
+			MainWindow.singleton.ShowWaitingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.OpenDiffTool(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to show diff");
+				MainWindow.singleton.HideWaitingOverlay();
+			});
 		}
 	}
 }

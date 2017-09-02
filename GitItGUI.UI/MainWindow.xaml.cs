@@ -135,5 +135,35 @@ namespace GitItGUI.UI
 				});
 			}
 		}
+
+		public void ShowWaitingOverlay()
+		{
+			if (Dispatcher.CheckAccess())
+			{
+				waitingOverlay.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate ()
+				{
+					waitingOverlay.Visibility = Visibility.Visible;
+				});
+			}
+		}
+
+		public void HideWaitingOverlay()
+		{
+			if (Dispatcher.CheckAccess())
+			{
+				waitingOverlay.Visibility = Visibility.Hidden;
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate ()
+				{
+					waitingOverlay.Visibility = Visibility.Hidden;
+				});
+			}
+		}
 	}
 }
