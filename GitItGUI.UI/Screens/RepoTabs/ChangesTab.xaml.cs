@@ -41,6 +41,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				var item = new ListBoxItem();
 				item.Tag = fileState;
 
+				// item button
 				var button = new Button();
 				button.Width = 20;
 				button.Height = 20;
@@ -53,6 +54,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				button.Content = image;
 				button.Tag = fileState;
 
+				// item label
 				var label = new Label();
 				label.Margin = new Thickness(20, 0, 0, 0);
 				label.Content = fileState.filename;
@@ -65,9 +67,18 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				openFileLocationMenu.Header = "Open file location";
 				openFileLocationMenu.ToolTip = fileState.filename;
 				openFileLocationMenu.Click += OpenFileLocationMenu_Click;
+				if (fileState.HasState(FileStates.Conflicted))
+				{
+					var resolveMenu = new MenuItem();
+					resolveMenu.Header = "Resolve file";
+					resolveMenu.ToolTip = fileState.filename;
+					resolveMenu.Click += ResolveFileMenu_Click;
+				}
 				label.ContextMenu.Items.Add(openFileMenu);
 				label.ContextMenu.Items.Add(openFileLocationMenu);
+				label.ContextMenu.Items.Add(openFileLocationMenu);
 
+				// item grid
 				var grid = new Grid();
 				grid.Children.Add(button);
 				grid.Children.Add(label);
@@ -101,6 +112,12 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		{
 			var item = (MenuItem)sender;
 			RepoScreen.singleton.repoManager.OpenFileLocation((string)item.ToolTip);
+		}
+
+		private void ResolveFileMenu_Click(object sender, RoutedEventArgs e)
+		{
+			var item = (MenuItem)sender;
+			MainWindow.singleton.ShowMergingOverlay((string)item.Tag);
 		}
 
 		private void UnstagedButton_Click(object sender, RoutedEventArgs e)
@@ -418,7 +435,12 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void pushButton_Click(object sender, RoutedEventArgs e)
 		{
-
+			MainWindow.singleton.ShowProcessingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.Push()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to push changes");
+				MainWindow.singleton.HideProcessingOverlay();
+			});
 		}
 
 		private void preivewDiffMenuItem_Click(object sender, RoutedEventArgs e)
@@ -442,6 +464,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				if (!RepoScreen.singleton.repoManager.OpenDiffTool(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to show diff");
 				MainWindow.singleton.HideWaitingOverlay();
 			});
+		}
+
+		private void resolveAllMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }

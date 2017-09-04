@@ -27,6 +27,7 @@
 							<ContextMenu>
 								<MenuItem Name="stageAllMenuItem" Header="Stage All" Click="stageAllMenuItem_Click"/>
 								<MenuItem Name="stageSelectedMenuItem" Header="Stage Selected" Click="stageSelectedMenuItem_Click"/>
+								<MenuItem Name="resolveAllMenuItem" Header="Stage Selected" Click="resolveAllMenuItem_Click" IsEnabled="False"/>
 								<Separator/>
 								<MenuItem Name="revertAllMenuItem" Header="Revert All" Click="revertAllMenuItem_Click"/>
 								<MenuItem Name="revertSelectedMenuItem" Header="Revert Selected" Click="revertSelectedMenuItem_Click"/>

@@ -60,6 +60,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Images\ImagePool.cs" />
+    <Compile Include="Overlays\MergeConflictOverlay.xaml.cs">
+      <DependentUpon>MergeConflictOverlay.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Overlays\MessageOverlay.xaml.cs">
       <DependentUpon>MessageOverlay.xaml</DependentUpon>
     </Compile>
@@ -106,6 +109,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Overlays\MergeConflictOverlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Overlays\MessageOverlay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -178,6 +185,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\UserTask.png" />
     <Resource Include="Images\unknown.png" />
     <Resource Include="Images\Processing.png" />
     <Resource Include="Images\Clone.png" />

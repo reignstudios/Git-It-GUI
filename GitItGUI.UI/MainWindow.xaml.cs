@@ -136,6 +136,38 @@ namespace GitItGUI.UI
 			}
 		}
 
+		public void ShowMergingOverlay(string filePath)
+		{
+			if (Dispatcher.CheckAccess())
+			{
+				mergingOverlay.SetFilePath(filePath);
+				mergingOverlay.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate ()
+				{
+					mergingOverlay.SetFilePath(filePath);
+					mergingOverlay.Visibility = Visibility.Visible;
+				});
+			}
+		}
+
+		public void HideMergingOverlay()
+		{
+			if (Dispatcher.CheckAccess())
+			{
+				mergingOverlay.Visibility = Visibility.Hidden;
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate ()
+				{
+					mergingOverlay.Visibility = Visibility.Hidden;
+				});
+			}
+		}
+
 		public void ShowWaitingOverlay()
 		{
 			if (Dispatcher.CheckAccess())
