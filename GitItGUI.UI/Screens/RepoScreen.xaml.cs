@@ -1,4 +1,5 @@
-﻿using GitItGUI.Core;
+﻿using GitCommander;
+using GitItGUI.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;

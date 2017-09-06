@@ -136,18 +136,18 @@ namespace GitItGUI.UI
 			}
 		}
 
-		public void ShowMergingOverlay(string filePath)
+		public void ShowMergingOverlay(string filePath, MergeConflictOverlay.DoneCallbackMethod doneCallback)
 		{
 			if (Dispatcher.CheckAccess())
 			{
-				mergingOverlay.SetFilePath(filePath);
+				mergingOverlay.Setup(filePath, doneCallback);
 				mergingOverlay.Visibility = Visibility.Visible;
 			}
 			else
 			{
 				Dispatcher.InvokeAsync(delegate ()
 				{
-					mergingOverlay.SetFilePath(filePath);
+					mergingOverlay.Setup(filePath, doneCallback);
 					mergingOverlay.Visibility = Visibility.Visible;
 				});
 			}

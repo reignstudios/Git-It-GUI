@@ -1,10 +1,13 @@
 ﻿using GitCommander;
+using GitItGUI.Core;
 using GitItGUI.UI.Images;
+using GitItGUI.UI.Overlays;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,9 +30,14 @@ namespace GitItGUI.UI.Screens.RepoTabs
         {
             InitializeComponent();
 
+			// setup rich text box layout
 			var p = previewTextBox.Document.Blocks.FirstBlock as Paragraph;
 			p.LineHeight = 1;
 			previewTextBox.Document.PageWidth = 1920;
+
+			// bind events
+			RepoScreen.singleton.repoManager.AskUserToResolveConflictedFileCallback += RepoManager_AskUserToResolveConflictedFileCallback;
+			RepoScreen.singleton.repoManager.AskUserIfTheyAcceptMergedFileCallback += RepoManager_AskUserIfTheyAcceptMergedFileCallback;
 		}
 
 		public void Refresh()
@@ -96,6 +104,39 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			}
 		}
 
+		private bool RepoManager_AskUserToResolveConflictedFileCallback(FileState fileState, bool isBinaryFile, out MergeBinaryFileResults result)
+		{
+			bool waiting = true, succeeded = true;
+			MergeBinaryFileResults binaryResult = MergeBinaryFileResults.Error;
+			MainWindow.singleton.ShowMergingOverlay(fileState.filename, delegate(MergeConflictOverlayResults mergeResult)
+			{
+				switch (mergeResult)
+				{
+					case MergeConflictOverlayResults.Cancel:
+						binaryResult = MergeBinaryFileResults.Cancel;
+						succeeded = false;
+						break;
+
+					default: throw new Exception("Unsuported merge result: " + mergeResult);
+				}
+
+				waiting = false;
+			});
+
+			// wait for ui
+			while (waiting) Thread.Sleep(1);
+
+			// return result
+			result = binaryResult;
+			return succeeded;
+		}
+
+		private bool RepoManager_AskUserIfTheyAcceptMergedFileCallback(FileState fileState, out MergeFileAcceptedResults result)
+		{
+			result = MergeFileAcceptedResults.No;
+			return false;
+		}
+
 		private void ToolButton_Click(object sender, RoutedEventArgs e)
 		{
 			var button = (Button)sender;
@@ -117,7 +158,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void ResolveFileMenu_Click(object sender, RoutedEventArgs e)
 		{
 			var item = (MenuItem)sender;
-			MainWindow.singleton.ShowMergingOverlay((string)item.Tag);
+			//MainWindow.singleton.ShowMergingOverlay((string)item.Tag);
 		}
 
 		private void UnstagedButton_Click(object sender, RoutedEventArgs e)
@@ -430,7 +471,32 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void pullButton_Click(object sender, RoutedEventArgs e)
 		{
+			MainWindow.singleton.ShowProcessingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				var result = RepoScreen.singleton.repoManager.Pull();
+				if (result == SyncMergeResults.Conflicts)
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Conflicts exist after pull, resolve them now?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgBoxresult)
+					{
+						if (msgBoxresult == MessageOverlayResults.Ok)
+						{
+							MainWindow.singleton.ShowMergingOverlay(null, null);
+							RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+							{
+								RepoScreen.singleton.repoManager.ResolveAllConflicts();
+								MainWindow.singleton.HideMergingOverlay();
+							});
+						}
+					});
+				}
+				else if (result == SyncMergeResults.Error)
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to pull changes");
+				}
 
+				MainWindow.singleton.HideProcessingOverlay();
+			});
 		}
 
 		private void pushButton_Click(object sender, RoutedEventArgs e)

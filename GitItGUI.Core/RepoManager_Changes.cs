@@ -728,9 +728,15 @@ namespace GitItGUI.Core
 					// check if files are binary (if so open select binary file tool) [if file conflict is because of deletion this method is also used]
 					if (fileState.conflictType != FileConflictTypes.Changes || Tools.IsBinaryFileData(fullPathOurs) || Tools.IsBinaryFileData(fullPathTheirs))
 					{
-						// open merge tool
-						MergeBinaryFileResults mergeBinaryResult;
-						if (AskUserToResolveConflictedFileCallback != null && AskUserToResolveConflictedFileCallback(fileState, true, out mergeBinaryResult))
+						// validate callback
+						if (AskUserToResolveConflictedFileCallback == null)
+						{
+							success = false;
+							goto FINISH;
+						}
+						
+						// process merge results
+						if (AskUserToResolveConflictedFileCallback(fileState, true, out var mergeBinaryResult))
 						{
 							switch (mergeBinaryResult)
 							{
@@ -810,9 +816,15 @@ namespace GitItGUI.Core
 						}
 					}
 
-					// start external merge tool
-					MergeBinaryFileResults mergeFileResult;
-					if (AskUserToResolveConflictedFileCallback != null && AskUserToResolveConflictedFileCallback(fileState, false, out mergeFileResult))
+					// validate callback
+					if (AskUserToResolveConflictedFileCallback == null)
+					{
+						success = false;
+						goto FINISH;
+					}
+					
+					// process merge results
+					if (AskUserToResolveConflictedFileCallback(fileState, true, out var mergeFileResult))
 					{
 						switch (mergeFileResult)
 						{
@@ -879,10 +891,17 @@ namespace GitItGUI.Core
 					// check if user accepts the current state of the merge
 					if (!wasModified)
 					{
-						MergeFileAcceptedResults result;
-						if (AskUserIfTheyAcceptMergedFileCallback != null && AskUserIfTheyAcceptMergedFileCallback(fileState, out result))
+						// validate callback
+						if (AskUserIfTheyAcceptMergedFileCallback == null)
 						{
-							switch (result)
+							success = false;
+							goto FINISH;
+						}
+
+						// process merge results
+						if (AskUserIfTheyAcceptMergedFileCallback(fileState, out var mergeAcceptedResult))
+						{
+							switch (mergeAcceptedResult)
 							{
 								case MergeFileAcceptedResults.Yes:
 									File.Copy(fullPathBase, fullPath, true);
@@ -894,7 +913,7 @@ namespace GitItGUI.Core
 									success = false;
 									break;
 
-								default: throw new Exception("Unsuported Response: " + result);
+								default: throw new Exception("Unsuported Response: " + mergeAcceptedResult);
 							}
 						}
 						else
