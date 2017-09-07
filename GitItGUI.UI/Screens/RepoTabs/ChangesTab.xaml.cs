@@ -112,6 +112,10 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				switch (mergeResult)
 				{
+					case MergeConflictOverlayResults.UseTheirs: binaryResult = MergeBinaryFileResults.UseTheirs; break;
+					case MergeConflictOverlayResults.UseOurs: binaryResult = MergeBinaryFileResults.KeepMine; break;
+					case MergeConflictOverlayResults.RunMergeTool: binaryResult = MergeBinaryFileResults.RunMergeTool; break;
+
 					case MergeConflictOverlayResults.Cancel:
 						binaryResult = MergeBinaryFileResults.Cancel;
 						succeeded = false;
@@ -133,8 +137,21 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private bool RepoManager_AskUserIfTheyAcceptMergedFileCallback(FileState fileState, out MergeFileAcceptedResults result)
 		{
-			result = MergeFileAcceptedResults.No;
-			return false;
+			bool waiting = true, succeeded = false;
+			MergeFileAcceptedResults mergeResult = MergeFileAcceptedResults.No;
+			MainWindow.singleton.ShowMessageOverlay("Accept Changes?", "Do you want to stage the file: " + fileState.filename, MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgResult)
+			{
+				succeeded = msgResult == MessageOverlayResults.Ok;
+				mergeResult = (msgResult == MessageOverlayResults.Ok) ? MergeFileAcceptedResults.Yes : MergeFileAcceptedResults.No;
+				waiting = false;
+			});
+
+			// wait for ui
+			while (waiting) Thread.Sleep(1);
+
+			// return result
+			result = mergeResult;
+			return succeeded;
 		}
 
 		private void ToolButton_Click(object sender, RoutedEventArgs e)
@@ -157,7 +174,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void ResolveFileMenu_Click(object sender, RoutedEventArgs e)
 		{
-			var item = (MenuItem)sender;
+			//var item = (MenuItem)sender;
 			//MainWindow.singleton.ShowMergingOverlay((string)item.Tag);
 		}
 
