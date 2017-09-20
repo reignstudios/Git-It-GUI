@@ -460,28 +460,91 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			pushButton.Visibility = Visibility.Visible;
 		}
 
-		private void syncButton_Click(object sender, RoutedEventArgs e)
-		{
-
-		}
-
-		private void commitButton_Click(object sender, RoutedEventArgs e)
+		private bool PrepCommitMessage(out string message)
 		{
 			// prep commit message
-			string msg = commitMessageTextBox.Text;
-			if (string.IsNullOrEmpty(msg) || msg.Length != 3)
+			message = commitMessageTextBox.Text;
+			if (string.IsNullOrEmpty(message) || message.Length != 3)
 			{
 				MainWindow.singleton.ShowMessageOverlay("Alert", "You must enter a valid commit message!");
+				return false;
+			}
+
+			message = message.Replace(Environment.NewLine, "\n");
+			return true;
+		}
+
+		private void HandleConflics()
+		{
+			MainWindow.singleton.ShowMessageOverlay("Error", "Conflicts exist after pull, resolve them now?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgBoxresult)
+			{
+				if (msgBoxresult == MessageOverlayResults.Ok)
+				{
+					MainWindow.singleton.ShowMergingOverlay(null, null);
+					RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+					{
+						RepoScreen.singleton.repoManager.ResolveAllConflicts();
+						MainWindow.singleton.HideMergingOverlay();
+					});
+				}
+			});
+		}
+
+		private void syncButton_Click(object sender, RoutedEventArgs e)
+		{
+			// make sure all changes are staged
+			if (unstagedChangesListBox.Items.Count != 0)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must stage all files first!\nOr use Advanced mode.");
 				return;
 			}
 
-			msg = msg.Replace(Environment.NewLine, "\n");
+			// prep commit message
+			if (!PrepCommitMessage(out string msg)) return;
 
 			// process
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.CommitStagedChanges(msg)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit files");
+				if (!RepoScreen.singleton.repoManager.CommitStagedChanges(msg)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
+				var result = RepoScreen.singleton.repoManager.Sync();
+				if (result != SyncMergeResults.Succeeded)
+				{
+					if (result == SyncMergeResults.Conflicts)
+					{
+						MainWindow.singleton.ShowMessageOverlay("Error", "Conflicts exist after pull, resolve them now?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgBoxresult)
+						{
+							if (msgBoxresult == MessageOverlayResults.Ok)
+							{
+								MainWindow.singleton.ShowMergingOverlay(null, null);
+								RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+								{
+									RepoScreen.singleton.repoManager.ResolveAllConflicts();
+									MainWindow.singleton.HideMergingOverlay();
+								});
+							}
+						});
+					}
+					else if (result == SyncMergeResults.Error)
+					{
+						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to sync changes");
+					}
+				}
+
+				MainWindow.singleton.HideProcessingOverlay();
+			});
+		}
+
+		private void commitButton_Click(object sender, RoutedEventArgs e)
+		{
+			// prep commit message
+			if (!PrepCommitMessage(out string msg)) return;
+
+			// process
+			MainWindow.singleton.ShowProcessingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.CommitStagedChanges(msg)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -551,7 +614,20 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void resolveAllMenuItem_Click(object sender, RoutedEventArgs e)
 		{
+			// check conflicts
+			if (!RepoScreen.singleton.repoManager.ConflictsExist())
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "No conflicts exist");
+				return;
+			}
 
+			// process
+			MainWindow.singleton.ShowWaitingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.ResolveAllConflicts()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve all conflicts");
+				MainWindow.singleton.HideWaitingOverlay();
+			});
 		}
 	}
 }

@@ -654,7 +654,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public bool ResolveAllConflicts(bool refresh = true)
+		public bool ResolveAllConflicts()
 		{
 			lock (this)
 			{
@@ -663,17 +663,17 @@ namespace GitItGUI.Core
 					if (fileState.HasState(FileStates.Conflicted) && !ResolveConflict(fileState, false))
 					{
 						DebugLog.LogError("Resolve conflict failed (aborting pending)", true);
-						if (refresh) Refresh();
+						Refresh();
 						return false;
 					}
 				}
 
-				if (refresh) Refresh();
+				Refresh();
 				return true;
 			}
 		}
 		
-		public bool ResolveConflict(FileState fileState, bool refresh)
+		public bool ResolveConflict(FileState fileState, bool refresh = true)
 		{
 			lock (this)
 			{
