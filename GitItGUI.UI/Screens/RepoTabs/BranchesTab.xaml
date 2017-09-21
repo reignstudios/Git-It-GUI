@@ -67,11 +67,7 @@
 					</Button.ContextMenu>
 				</Button>
 
-				<ListBox Name="nonActiveBranchesListBox" SelectionMode="Extended" Margin="10,30,10,10">
-					<!--<ListBoxItem Foreground="Green">Branch [LOCAL]</ListBoxItem>
-					<ListBoxItem Foreground="Green">Branch [LOCAL]</ListBoxItem>
-					<ListBoxItem Foreground="Red">Branch [REMOTE]</ListBoxItem>-->
-				</ListBox>
+				<ListBox Name="nonActiveBranchesListBox" SelectionMode="Extended" Margin="10,30,10,10"/>
 			</Grid>
 		</Border>
 	</Grid>

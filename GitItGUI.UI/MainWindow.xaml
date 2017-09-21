@@ -15,6 +15,7 @@
 
 		<!-- Overlays -->
 		<overlays:MergeConflictOverlay x:Name="mergingOverlay" Visibility="Hidden"/>
+		<overlays:NameEntryOverlay x:Name="nameEntryOverlay" Visibility="Hidden"/>
 		<overlays:ProcessingOverlay x:Name="processingOverlay" Visibility="Hidden"/>
 		<overlays:MessageOverlay x:Name="messageOverlay" Visibility="Hidden"/>
 		<overlays:WaitingOverlay x:Name="waitingOverlay" Visibility="Hidden"/>

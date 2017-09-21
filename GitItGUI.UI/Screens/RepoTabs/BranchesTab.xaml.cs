@@ -63,7 +63,16 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void renameMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-
+			MainWindow.singleton.ShowNameEntryOverlay(RepoScreen.singleton.repoManager.activeBranch.name, delegate(string name, bool succeeded)
+			{
+				if (!succeeded) return;
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!RepoScreen.singleton.repoManager.RenameActiveBranch(name)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage file");
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			});
 		}
 
 		private void newBranchMenuItem_Click(object sender, RoutedEventArgs e)

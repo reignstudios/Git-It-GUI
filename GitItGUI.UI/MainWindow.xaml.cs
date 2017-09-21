@@ -197,5 +197,37 @@ namespace GitItGUI.UI
 				});
 			}
 		}
+
+		public void ShowNameEntryOverlay(string currentName, NameEntryOverlay.DoneCallbackMethod doneCallback)
+		{
+			if (Dispatcher.CheckAccess())
+			{
+				nameEntryOverlay.Setup(currentName, doneCallback);
+				nameEntryOverlay.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate ()
+				{
+					nameEntryOverlay.Setup(currentName, doneCallback);
+					nameEntryOverlay.Visibility = Visibility.Visible;
+				});
+			}
+		}
+
+		public void HideNameEntryOverlay()
+		{
+			if (Dispatcher.CheckAccess())
+			{
+				nameEntryOverlay.Visibility = Visibility.Hidden;
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate ()
+				{
+					nameEntryOverlay.Visibility = Visibility.Hidden;
+				});
+			}
+		}
 	}
 }
