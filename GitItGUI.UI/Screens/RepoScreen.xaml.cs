@@ -38,6 +38,7 @@ namespace GitItGUI.UI.Screens
 		{
 			repoManager = new RepoManager(MainWindow.singleton.Dispatcher, RepoReadyCallback);
 			repoManager.RepoRefreshedCallback += Refresh;
+			changesTab.Init();
 		}
 
 		private void RepoReadyCallback(Dispatcher dispatcher)

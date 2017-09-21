@@ -34,7 +34,10 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			var p = previewTextBox.Document.Blocks.FirstBlock as Paragraph;
 			p.LineHeight = 1;
 			previewTextBox.Document.PageWidth = 1920;
+		}
 
+		public void Init()
+		{
 			// bind events
 			RepoScreen.singleton.repoManager.AskUserToResolveConflictedFileCallback += RepoManager_AskUserToResolveConflictedFileCallback;
 			RepoScreen.singleton.repoManager.AskUserIfTheyAcceptMergedFileCallback += RepoManager_AskUserIfTheyAcceptMergedFileCallback;
@@ -81,9 +84,9 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					resolveMenu.Header = "Resolve file";
 					resolveMenu.ToolTip = fileState.filename;
 					resolveMenu.Click += ResolveFileMenu_Click;
+					label.ContextMenu.Items.Add(openFileLocationMenu);
 				}
 				label.ContextMenu.Items.Add(openFileMenu);
-				label.ContextMenu.Items.Add(openFileLocationMenu);
 				label.ContextMenu.Items.Add(openFileLocationMenu);
 
 				// item grid
