@@ -174,8 +174,20 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void ResolveFileMenu_Click(object sender, RoutedEventArgs e)
 		{
-			//var item = (MenuItem)sender;
-			//MainWindow.singleton.ShowMergingOverlay((string)item.Tag);
+			var fileState = (FileState)((MenuItem)sender).Tag;
+
+			// check conflicts
+			if (!fileState.HasState(FileStates.Conflicted))
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "File not in conflicted state");
+				return;
+			}
+
+			// process
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.ResolveConflict(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve conflict");
+			});
 		}
 
 		private void UnstagedButton_Click(object sender, RoutedEventArgs e)
@@ -257,6 +269,24 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				if (!RepoScreen.singleton.repoManager.UnstageFileList(fileStates)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
 				MainWindow.singleton.HideProcessingOverlay();
+			});
+		}
+
+		private void resolveAllMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			// check conflicts
+			if (!RepoScreen.singleton.repoManager.ConflictsExist())
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "No conflicts exist");
+				return;
+			}
+
+			// process
+			MainWindow.singleton.ShowWaitingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.ResolveAllConflicts()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve all conflicts");
+				MainWindow.singleton.HideWaitingOverlay();
 			});
 		}
 
@@ -608,24 +638,6 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
 				if (!RepoScreen.singleton.repoManager.OpenDiffTool(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to show diff");
-				MainWindow.singleton.HideWaitingOverlay();
-			});
-		}
-
-		private void resolveAllMenuItem_Click(object sender, RoutedEventArgs e)
-		{
-			// check conflicts
-			if (!RepoScreen.singleton.repoManager.ConflictsExist())
-			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "No conflicts exist");
-				return;
-			}
-
-			// process
-			MainWindow.singleton.ShowWaitingOverlay();
-			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
-			{
-				if (!RepoScreen.singleton.repoManager.ResolveAllConflicts()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve all conflicts");
 				MainWindow.singleton.HideWaitingOverlay();
 			});
 		}
