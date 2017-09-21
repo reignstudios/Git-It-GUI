@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid Name="grid">
-		<Label HorizontalContentAlignment="Center" VerticalAlignment="Top" Height="32" FontSize="16" Margin="10,0">Current Repo (Branch) [State]</Label>
+		<Label Name="repoTitleLabel" HorizontalContentAlignment="Center" VerticalAlignment="Top" Height="32" FontSize="16" Margin="10,0">Current Repo (Branch) [State]</Label>
 		<Button Name="refreshButton" ToolTip="Refresh repo" Width="24" Height="24" Margin="48,10" HorizontalAlignment="Right" VerticalAlignment="Top" Click="refreshButton_Click">
 			<TextBlock Text="↻" FontWeight="Bold" FontSize="16" Margin="0,-2,0,0"/>
 		</Button>

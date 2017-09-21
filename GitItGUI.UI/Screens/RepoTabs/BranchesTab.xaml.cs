@@ -25,10 +25,80 @@ namespace GitItGUI.UI.Screens.RepoTabs
             InitializeComponent();
         }
 
+		public void Refresh()
+		{
+			var repoManager = RepoScreen.singleton.repoManager;
+
+			// update active branch
+			branchNameTextBox.Text = repoManager.activeBranch.fullname;
+			if (repoManager.activeBranch.isTracking)
+			{
+				trackedRemoteBranchTextBox.Text = repoManager.activeBranch.tracking.fullname;
+				trackedRemoteBranchTextBox.Text = repoManager.activeBranch.tracking.remoteState.url;
+			}
+			else if (repoManager.activeBranch.isRemote)
+			{
+				trackedRemoteBranchTextBox.Text = repoManager.activeBranch.remoteState.url;
+			}
+
+			// update non-active branch list
+			nonActiveBranchesListBox.Items.Clear();
+			foreach (var branch in repoManager.branchStates)
+			{
+				if (branch.isActive) continue;
+
+				var item = new ListBoxItem();
+				item.Tag = branch;
+				if (branch.isTracking) item.ToolTip = "Tracking: " + branch.tracking.fullname;
+				item.Content = string.Format("{0} [{1}]", branch.fullname, branch.isRemote ? "REMOTE" : "LOCAL");
+				nonActiveBranchesListBox.Items.Add(item);
+			}
+		}
+
 		private void ToolButton_Click(object sender, RoutedEventArgs e)
 		{
 			var button = (Button)sender;
 			button.ContextMenu.IsOpen = true;
+		}
+
+		private void renameMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void newBranchMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void copyTrackingMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void removeTrackingMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void switchBranchMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void mergeBranchMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void deleteBranchMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void cleanupMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }

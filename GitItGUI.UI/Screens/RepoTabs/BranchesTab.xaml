@@ -19,11 +19,11 @@
 					<TextBlock Text="▼" Margin="0,-2,0,0"/>
 					<Button.ContextMenu>
 						<ContextMenu>
-							<MenuItem Header="Rename"/>
-							<MenuItem Header="Create new branch forked from active"/>
+							<MenuItem Name="renameMenuItem" Header="Rename" Click="renameMenuItem_Click"/>
+							<MenuItem Name="newBranchMenuItem" Header="Create new branch forked from active" Click="newBranchMenuItem_Click"/>
 							<Separator/>
-							<MenuItem Header="Copy tracking from non-active branch"/>
-							<MenuItem Header="Remove tracking"/>
+							<MenuItem Name="copyTrackingMenuItem" Header="Copy tracking from non-active branch" Click="copyTrackingMenuItem_Click"/>
+							<MenuItem Name="removeTrackingMenuItem" Header="Remove tracking" Click="removeTrackingMenuItem_Click"/>
 						</ContextMenu>
 					</Button.ContextMenu>
 				</Button>
@@ -42,11 +42,11 @@
 					</Grid.RowDefinitions>
 
 					<Label Grid.Row="0" Content="Name" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-					<TextBox Grid.Row="1" Text="BranchName" IsReadOnly="True" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0"/>
+					<TextBox Grid.Row="1" Name="branchNameTextBox" Text="BranchName" IsReadOnly="True" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0"/>
 					<Label Grid.Row="2" Content="Tracked Remote Branch" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-					<TextBox Grid.Row="3" Text="origin/BranchName" IsReadOnly="True" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0"/>
+					<TextBox Grid.Row="3" Name="trackedRemoteBranchTextBox" Text="origin/BranchName" IsReadOnly="True" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0"/>
 					<Label Grid.Row="4" Content="Remote URL" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-					<TextBox Grid.Row="5" Text="https://github.com/repo.git" IsReadOnly="True" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0"/>
+					<TextBox Grid.Row="5" Name="remoteURLTextBox" Text="https://github.com/repo.git" IsReadOnly="True" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0"/>
 				</Grid>
 			</Grid>
 		</Border>
@@ -58,19 +58,19 @@
 					<TextBlock Text="▼" Margin="0,-2,0,0"/>
 					<Button.ContextMenu>
 						<ContextMenu>
-							<MenuItem Header="Switch to Selected"/>
-							<MenuItem Header="Merge to Selected into Active"/>
+							<MenuItem Name="switchBranchMenuItem" Header="Switch to Selected" Click="switchBranchMenuItem_Click"/>
+							<MenuItem Name="mergeBranchMenuItem" Header="Merge to Selected into Active" Click="mergeBranchMenuItem_Click"/>
 							<Separator/>
-							<MenuItem Header="Delete Selected"/>
-							<MenuItem Header="CleanUp (Remove untracked remote branches)"/>
+							<MenuItem Name="deleteBranchMenuItem" Header="Delete Selected" Click="deleteBranchMenuItem_Click"/>
+							<MenuItem Name="cleanupMenuItem" Header="CleanUp (Remove untracked remote branches)" Click="cleanupMenuItem_Click"/>
 						</ContextMenu>
 					</Button.ContextMenu>
 				</Button>
 
-				<ListBox SelectionMode="Extended" Margin="10,30,10,10">
+				<ListBox Name="nonActiveBranchesListBox" SelectionMode="Extended" Margin="10,30,10,10">
+					<!--<ListBoxItem Foreground="Green">Branch [LOCAL]</ListBoxItem>
 					<ListBoxItem Foreground="Green">Branch [LOCAL]</ListBoxItem>
-					<ListBoxItem Foreground="Green">Branch [LOCAL]</ListBoxItem>
-					<ListBoxItem Foreground="Red">Branch [REMOTE]</ListBoxItem>
+					<ListBoxItem Foreground="Red">Branch [REMOTE]</ListBoxItem>-->
 				</ListBox>
 			</Grid>
 		</Border>
