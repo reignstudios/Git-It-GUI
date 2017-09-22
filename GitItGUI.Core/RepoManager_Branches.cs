@@ -89,6 +89,30 @@ namespace GitItGUI.Core
 			}
 		}
 
+		public MergeResults MergeBranchIntoActive(BranchState srcBranch)
+		{
+			lock (this)
+			{
+				MergeResults mergeResult;
+				try
+				{
+					if (!repository.MergeBranchIntoActive(srcBranch.fullname)) throw new Exception(repository.lastError);
+
+					bool yes;
+					if (!repository.ConflitedExist(out yes)) throw new Exception(repository.lastError);
+					mergeResult = yes ? MergeResults.Conflicts : MergeResults.Succeeded;
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("BranchManager.Merge Failed: " + e.Message, true);
+					mergeResult = MergeResults.Error;
+				}
+			
+				Refresh();
+				return mergeResult;
+			}
+		}
+
 		public bool Checkout(BranchState branch, bool useFullname = false)
 		{
 			lock (this)
@@ -117,30 +141,6 @@ namespace GitItGUI.Core
 			
 				Refresh();
 				return success;
-			}
-		}
-
-		public MergeResults MergeBranchIntoActive(BranchState srcBranch)
-		{
-			lock (this)
-			{
-				MergeResults mergeResult;
-				try
-				{
-					if (!repository.MergeBranchIntoActive(srcBranch.fullname)) throw new Exception(repository.lastError);
-
-					bool yes;
-					if (!repository.ConflitedExist(out yes)) throw new Exception(repository.lastError);
-					mergeResult = yes ? MergeResults.Conflicts : MergeResults.Succeeded;
-				}
-				catch (Exception e)
-				{
-					DebugLog.LogError("BranchManager.Merge Failed: " + e.Message, true);
-					mergeResult = MergeResults.Error;
-				}
-			
-				Refresh();
-				return mergeResult;
 			}
 		}
 

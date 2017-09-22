@@ -63,13 +63,13 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void renameMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-			MainWindow.singleton.ShowNameEntryOverlay(RepoScreen.singleton.repoManager.activeBranch.name, delegate(string name, bool succeeded)
+			MainWindow.singleton.ShowNameEntryOverlay(RepoScreen.singleton.repoManager.activeBranch.name, false, delegate(string name, string remoteName, bool succeeded)
 			{
 				if (!succeeded) return;
 				MainWindow.singleton.ShowProcessingOverlay();
 				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 				{
-					if (!RepoScreen.singleton.repoManager.RenameActiveBranch(name)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage file");
+					if (!RepoScreen.singleton.repoManager.RenameActiveBranch(name)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to rename branch");
 					MainWindow.singleton.HideProcessingOverlay();
 				});
 			});
@@ -77,7 +77,16 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void newBranchMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-
+			MainWindow.singleton.ShowNameEntryOverlay(RepoScreen.singleton.repoManager.activeBranch.name, true, delegate(string name, string remoteName, bool succeeded)
+			{
+				if (!succeeded) return;
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!RepoScreen.singleton.repoManager.CheckoutNewBranch(name, remoteName)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to create new branch");
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			});
 		}
 
 		private void copyTrackingMenuItem_Click(object sender, RoutedEventArgs e)

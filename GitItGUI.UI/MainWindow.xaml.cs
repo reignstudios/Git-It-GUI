@@ -198,18 +198,18 @@ namespace GitItGUI.UI
 			}
 		}
 
-		public void ShowNameEntryOverlay(string currentName, NameEntryOverlay.DoneCallbackMethod doneCallback)
+		public void ShowNameEntryOverlay(string currentName, bool showRemotesOption, NameEntryOverlay.DoneCallbackMethod doneCallback)
 		{
 			if (Dispatcher.CheckAccess())
 			{
-				nameEntryOverlay.Setup(currentName, doneCallback);
+				nameEntryOverlay.Setup(currentName, showRemotesOption, doneCallback);
 				nameEntryOverlay.Visibility = Visibility.Visible;
 			}
 			else
 			{
 				Dispatcher.InvokeAsync(delegate ()
 				{
-					nameEntryOverlay.Setup(currentName, doneCallback);
+					nameEntryOverlay.Setup(currentName, showRemotesOption, doneCallback);
 					nameEntryOverlay.Visibility = Visibility.Visible;
 				});
 			}
