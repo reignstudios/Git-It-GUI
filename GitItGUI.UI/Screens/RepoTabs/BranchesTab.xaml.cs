@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitItGUI.UI.Overlays;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -116,7 +117,16 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void cleanupMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-
+			MainWindow.singleton.ShowMessageOverlay("Cleanup", "Would you like to remove remote branches untracked on your server?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+			{
+				if (result != MessageOverlayResults.Ok) return;
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!RepoScreen.singleton.repoManager.PruneRemoteBranches()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to prune remote branches");
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			});
 		}
 	}
 }
