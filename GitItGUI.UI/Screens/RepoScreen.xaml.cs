@@ -85,24 +85,27 @@ namespace GitItGUI.UI.Screens
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
+
+		private void RefreshInternal()
+		{
+			changesTab.Refresh();
+			branchesTab.Refresh();
+			settingsTab.Refresh();
+			terminalTab.Refresh();
+			CheckSync();
+		}
 		
 		public void Refresh()
 		{
 			if (Dispatcher.CheckAccess())
 			{
-				changesTab.Refresh();
-				branchesTab.Refresh();
-				settingsTab.Refresh();
-				CheckSync();
+				RefreshInternal();
 			}
 			else
 			{
 				Dispatcher.InvokeAsync(delegate()
 				{
-					changesTab.Refresh();
-					branchesTab.Refresh();
-					settingsTab.Refresh();
-					CheckSync();
+					RefreshInternal();
 				});
 			}
 		}

@@ -628,6 +628,26 @@ namespace GitItGUI.Core
 			}
 		}
 
+		public bool ConflictsExistQuick()
+		{
+			lock (this)
+			{
+				try
+				{
+					foreach (var state in fileStates)
+					{
+						if (state.HasState(FileStates.Conflicted)) return true;
+					}
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to get file conflicts: " + e.Message, true);
+				}
+
+				return false;
+			}
+		}
+
 		public bool ChangesExist()
 		{
 			lock (this)

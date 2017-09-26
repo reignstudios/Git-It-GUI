@@ -214,6 +214,14 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void StagedButton_Click(object sender, RoutedEventArgs e)
 		{
 			var fileState = (FileState)((Button)sender).Tag;
+
+			// check conflicts
+			if (fileState.HasState(FileStates.Conflicted))
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "File not is in a conflicted state!\nPlease resolve file instead.");
+				return;
+			}
+			
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
@@ -224,6 +232,13 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void stageAllMenuItem_Click(object sender, RoutedEventArgs e)
 		{
+			// check conflicts
+			if (RepoScreen.singleton.repoManager.ConflictsExistQuick())
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "Some files are in a conflicted state!\nPlease resolve files instead.");
+				return;
+			}
+
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
@@ -250,7 +265,16 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				var i = (ListBoxItem)item;
 				var fileState = (FileState)i.Tag;
-				if (i.IsSelected) fileStates.Add(fileState);
+				if (i.IsSelected)
+				{
+					if (fileState.HasState(FileStates.Conflicted))
+					{
+						MainWindow.singleton.ShowMessageOverlay("Alert", "Some files are in a conflicted state!\nPlease resolve files instead.");
+						return;
+					}
+
+					fileStates.Add(fileState);
+				}
 			}
 
 			// process selection

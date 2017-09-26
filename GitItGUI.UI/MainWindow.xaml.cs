@@ -51,6 +51,12 @@ namespace GitItGUI.UI
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
+			if (processingOverlay.Visibility == Visibility.Visible)
+			{
+				e.Cancel = true;
+				return;
+			}
+
 			AppManager.settings.winX = (int)Left;
 			AppManager.settings.winY = (int)Top;
 			AppManager.settings.winWidth = (int)Width;

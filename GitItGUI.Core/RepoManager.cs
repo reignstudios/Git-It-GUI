@@ -35,6 +35,13 @@ namespace GitItGUI.Core
 			// create repo worker thread
 			thread = new Thread(WorkerThread);
 			thread.Start(readyCallback);
+			
+			// create git commander object
+			repository = new Repository();
+			repository.RunExeDebugLineCallback += DebugLog_RunExeDebugLineCallback;
+			repository.StdCallback += DebugLog_StdCallback;
+			repository.StdWarningCallback += DebugLog_StdWarningCallback;
+			repository.StdErrorCallback += DebugLog_StdErrorCallback;
 
 			// add custom error codes to git commander
 			if (AppManager.settings.customErrorCodes != null)
@@ -48,20 +55,8 @@ namespace GitItGUI.Core
 
 		private void WorkerThread(object readyCallback)
 		{
-			// create thread specific objects
 			dispatcher = Dispatcher.CurrentDispatcher;
-			repository = new Repository();
-
-			// bind terminal callbacks
-			repository.RunExeDebugLineCallback += DebugLog_RunExeDebugLineCallback;
-			repository.StdCallback += DebugLog_StdCallback;
-			repository.StdWarningCallback += DebugLog_StdWarningCallback;
-			repository.StdErrorCallback += DebugLog_StdErrorCallback;
-
-			// fire finished callback
 			if (readyCallback != null) ((ReadyCallbackMethod)readyCallback)(dispatcher);
-
-			// run dispatcher
 			Dispatcher.Run();
 		}
 

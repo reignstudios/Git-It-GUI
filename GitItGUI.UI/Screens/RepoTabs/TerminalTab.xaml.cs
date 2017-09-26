@@ -33,6 +33,14 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			terminalTextBox.ScrollToEnd();
 		}
 
+		public void Refresh()
+		{
+			const int maxLength = 60000;
+			string text = terminalTextBox.Text;
+			if (text.Length > maxLength) terminalTextBox.Text = text.Remove(0, text.Length - maxLength);
+			ScrollToEnd();
+		}
+		
 		private void DebugLog_WriteCallback(string value, bool alert)
 		{
 			if (Dispatcher.CheckAccess())
@@ -62,7 +70,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				RepoScreen.singleton.repoManager.repository.RunGenericCmd(cmd);
 				Dispatcher.InvokeAsync(delegate()
 				{
-					terminalTextBox.ScrollToEnd();
+					ScrollToEnd();
 				});
 			});
 		}
