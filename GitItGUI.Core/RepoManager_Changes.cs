@@ -452,7 +452,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public bool CommitStagedChanges(string commitMessage)
+		public bool CommitStagedChanges(string commitMessage, bool refresh = true)
 		{
 			lock (this)
 			{
@@ -467,7 +467,7 @@ namespace GitItGUI.Core
 					success = false;
 				}
 
-				Refresh();
+				if (refresh) Refresh();
 				return success;
 			}
 		}

@@ -550,8 +550,9 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (changesExist && !RepoScreen.singleton.repoManager.CommitStagedChanges(msg))
+				if (changesExist && !RepoScreen.singleton.repoManager.CommitStagedChanges(msg, false))
 				{
+					RepoScreen.singleton.repoManager.Refresh();
 					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
 					return;
 				}
