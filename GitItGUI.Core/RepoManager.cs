@@ -197,8 +197,18 @@ namespace GitItGUI.Core
 					return false;
 				}
 			
-				return RefreshInternal(isRefreshMode);
+				// refesh partials
+				if (!RefreshBranches(isRefreshMode)) return false;
+				if (!RefreshChanges()) return false;
+
+				// check sync
+				if (IsUpToDateWithRemote(out bool yes)) isInSync = yes;
+				else isInSync = null;
 			}
+
+			// finish
+			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
+			return true;
 		}
 
 		public bool Close()
@@ -209,21 +219,6 @@ namespace GitItGUI.Core
 		public bool Refresh()
 		{
 			return OpenRepo(repository.repoPath);
-		}
-
-		private bool RefreshInternal(bool refreshMode)
-		{
-			// refesh partials
-			if (!RefreshBranches(refreshMode)) return false;
-			if (!RefreshChanges()) return false;
-
-			// check sync
-			if (IsUpToDateWithRemote(out bool yes)) isInSync = yes;
-			else isInSync = null;
-
-			// finish
-			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
-			return true;
 		}
 
 		public bool Clone(string url, string destination, out string repoPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
