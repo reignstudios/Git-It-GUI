@@ -81,8 +81,7 @@ namespace GitItGUI.UI.Screens
 					AppManager.RemoveRepoFromHistory(folderPath);
 					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to open repo");
 				}
-
-				StartScreen.singleton.Refresh();
+				
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
