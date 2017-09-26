@@ -1,166 +1,218 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace GitCommander
 {
 	public enum SignatureLocations
 	{
+		Any,
 		Local,
 		Global
 	}
 
-    public static partial class Repository
+    public partial class Repository
     {
-		public static bool isOpen {get; private set;}
-		public static string lastResult {get; private set;}
-		public static string lastError {get; private set;}
+		public bool isOpen {get; private set;}
+		public string lastResult {get; private set;}
+		public string lastError {get; private set;}
 
-		public static string repoURL {get; private set;}
-		public static string repoPath {get; private set;}
+		public string repoURL {get; private set;}
+		public string repoPath {get; private set;}
+		public LFS lfs {get; private set;}
 
-		public static void Dispose()
+		public Repository()
 		{
-			isOpen = false;
-			lastResult = null;
-			lastError = null;
-			repoURL = null;
-			repoPath = null;
+			lfs = new LFS(this);
+			InitTools();
 		}
 
-		private static bool SimpleGitInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		public void Close()
 		{
-			var result = Tools.RunExe("git", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lock (this)
+			{
+				isOpen = false;
+				lastResult = null;
+				lastError = null;
+				repoURL = null;
+				repoPath = null;
+			}
+		}
 
-			return string.IsNullOrEmpty(lastError);
+		private bool SimpleGitInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
+		{
+			lock (this)
+			{
+				var result = RunExe("git", args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+				lastResult = result.output;
+				lastError = result.errors;
+
+				return string.IsNullOrEmpty(lastError);
+			}
 		}
 		
-		public static bool Clone(string url, string path, out string repoClonedPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
+		public bool Clone(string url, string path, out string repoClonedPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
 		{
-			StreamWriter stdInWriter = null;
-			var getStdInputStreamCallback = new GetStdInputStreamCallbackMethod(delegate(StreamWriter writer)
+			lock (this)
 			{
-				stdInWriter = writer;
-			});
-			
-			string repoClonedPathTemp = null;
-			var stdCallback = new StdCallbackMethod(delegate(string line)
-			{
-				if (line.StartsWith("Cloning into"))
+				StreamWriter stdInWriter = null;
+				void getStdInputStreamCallback(StreamWriter writer)
 				{
-					var match = Regex.Match(line, @"Cloning into '(.*)'\.\.\.");
-					if (match.Success) repoClonedPathTemp = match.Groups[1].Value;
+					stdInWriter = writer;
 				}
-			});
-
-			var stdErrorCallback = new StdCallbackMethod(delegate(string line)
-			{
-				if (line.StartsWith("Username for"))
+			
+				string repoClonedPathTemp = null;
+				void stdCallback(string line)
 				{
-					if (writeUsernameCallback == null || !writeUsernameCallback(stdInWriter)) stdInWriter.WriteLine("");
+					if (line.StartsWith("Cloning into"))
+					{
+						var match = Regex.Match(line, @"Cloning into '(.*)'\.\.\.");
+						if (match.Success) repoClonedPathTemp = match.Groups[1].Value;
+					}
 				}
-				else if (line.StartsWith("Password for"))
+
+				void stdErrorCallback(string line)
 				{
-					if (writePasswordCallback == null || !writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
+					if (line.StartsWith("Username for"))
+					{
+						if (writeUsernameCallback == null || !writeUsernameCallback(stdInWriter)) stdInWriter.WriteLine("");
+					}
+					else if (line.StartsWith("Password for"))
+					{
+						if (writePasswordCallback == null || !writePasswordCallback(stdInWriter)) stdInWriter.WriteLine("");
+					}
 				}
-			});
 			
-			var result = Tools.RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+				var result = RunExe("git", string.Format("clone \"{0}\"", url), workingDirectory:path, getStdInputStreamCallback:getStdInputStreamCallback, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
+				lastResult = result.output;
+				lastError = result.errors;
 			
-			repoClonedPath = repoClonedPathTemp;
-			return string.IsNullOrEmpty(lastError);
-		}
-
-		public static bool Open(string path)
-		{
-			var stdCallback = new StdCallbackMethod(delegate(string line)
-			{
-				repoURL = line;
-			});
-			
-			var result = Tools.RunExe("git", "rev-parse --git-dir", workingDirectory:path);
-			lastResult = result.Item1;
-			lastError = result.Item2;
-			if (!string.IsNullOrEmpty(lastError)) return false;
-			
-			// get repo url
-			repoURL = "";
-			result = Tools.RunExe("git", "ls-remote --get-url", stdCallback:stdCallback, workingDirectory:path);
-			lastResult = result.Item1;
-			lastError = result.Item2;
-			
-			repoPath = path;
-			return isOpen = true;
-		}
-
-		public static bool GetSignature(SignatureLocations location, out string name, out string email)
-		{
-			name = null;
-			email = null;
-			string globalValue = (location == SignatureLocations.Global) ? " --global" : "";
-
-			bool result = SimpleGitInvoke(string.Format("config{0} user.name", globalValue));
-			name = lastResult;
-			if (!result) return false;
-
-			result = SimpleGitInvoke(string.Format("config{0} user.email", globalValue));
-			email = lastResult;
-			return result;
-		}
-
-		public static bool SetSignature(SignatureLocations location, string name, string email)
-		{
-			string globalValue = (location == SignatureLocations.Global) ? " --global" : "";
-			bool result = SimpleGitInvoke(string.Format("config{1} user.name \"{0}\"", name, globalValue));
-			name = lastResult;
-			if (!result) return false;
-
-			result = SimpleGitInvoke(string.Format("config{1} user.email \"{0}\"", email, globalValue));
-			email = lastResult;
-			return result;
-		}
-
-		public static bool UnpackedObjectCount(out int count, out string size)
-		{
-			bool result = SimpleGitInvoke("count-objects");
-			if (!string.IsNullOrEmpty(lastError) || string.IsNullOrEmpty(lastResult))
-			{
-				count = -1;
-				size = null;
-				return false;
+				repoClonedPath = repoClonedPathTemp;
+				return string.IsNullOrEmpty(lastError);
 			}
+		}
 
-			var match = Regex.Match(lastResult, @"(\d*) objects, (\d* kilobytes)");
-			if (match.Groups.Count != 3)
+		public bool Open(string path)
+		{
+			lock (this)
 			{
-				count = -1;
-				size = null;
-				return false;
-			}
+				Close();
+
+				void stdCallback(string line)
+				{
+					repoURL = line;
+				}
 			
-			count = int.Parse(match.Groups[1].Value);
-			size = match.Groups[2].Value;
-			return true;
+				var result = RunExe("git", "rev-parse --git-dir", workingDirectory:path);
+				lastResult = result.output;
+				lastError = result.errors;
+				if (!string.IsNullOrEmpty(lastError)) return false;
+			
+				// get repo url
+				repoURL = "";
+				result = RunExe("git", "ls-remote --get-url", stdCallback:stdCallback, workingDirectory:path);
+				lastResult = result.output;
+				lastError = result.errors;
+			
+				repoPath = path;
+				return isOpen = true;
+			}
 		}
 
-		public static bool GarbageCollect()
+		public bool GetSignature(SignatureLocations location, out string name, out string email)
 		{
-			return SimpleGitInvoke("gc");
+			lock (this)
+			{
+				name = null;
+				email = null;
+				string globalValue;
+				if (location == SignatureLocations.Global) globalValue = " --global";
+				else if (location == SignatureLocations.Local) globalValue = " --local";
+				else globalValue = string.Empty;
+
+				bool result = SimpleGitInvoke(string.Format("config{0} user.name", globalValue));
+				name = lastResult;
+				if (!result) return false;
+
+				result = SimpleGitInvoke(string.Format("config{0} user.email", globalValue));
+				email = lastResult;
+				return result;
+			}
 		}
 
-		public static bool GetVersion(out string version)
+		public bool SetSignature(SignatureLocations location, string name, string email)
 		{
-			bool result = SimpleGitInvoke("version");
-			version = lastResult;
-			return result;
+			lock (this)
+			{
+				string globalValue;
+				if (location == SignatureLocations.Global) globalValue = " --global";
+				else if (location == SignatureLocations.Local) globalValue = " --local";
+				else globalValue = string.Empty;
+
+				bool result = SimpleGitInvoke(string.Format("config{1} user.name \"{0}\"", name, globalValue));
+				name = lastResult;
+				if (!result) return false;
+
+				result = SimpleGitInvoke(string.Format("config{1} user.email \"{0}\"", email, globalValue));
+				email = lastResult;
+				return result;
+			}
+		}
+
+		public bool RemoveSettings(SignatureLocations location, string section)
+		{
+			lock (this)
+			{
+				string globalValue;
+				if (location == SignatureLocations.Global) globalValue = " --global";
+				else if (location == SignatureLocations.Local) globalValue = " --local";
+				else globalValue = string.Empty;
+
+				return SimpleGitInvoke(string.Format("config{1} --remove-section {0}", section, globalValue));
+			}
+		}
+
+		public bool UnpackedObjectCount(out int count, out string size)
+		{
+			lock (this)
+			{
+				bool result = SimpleGitInvoke("count-objects");
+				if (!string.IsNullOrEmpty(lastError) || string.IsNullOrEmpty(lastResult))
+				{
+					count = -1;
+					size = null;
+					return false;
+				}
+
+				var match = Regex.Match(lastResult, @"(\d*) objects, (\d* kilobytes)");
+				if (match.Groups.Count != 3)
+				{
+					count = -1;
+					size = null;
+					return false;
+				}
+			
+				count = int.Parse(match.Groups[1].Value);
+				size = match.Groups[2].Value;
+				return true;
+			}
+		}
+
+		public bool GarbageCollect()
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke("gc");
+			}
+		}
+
+		public bool GetVersion(out string version)
+		{
+			lock (this)
+			{
+				bool result = SimpleGitInvoke("version");
+				version = lastResult;
+				return result;
+			}
 		}
     }
 }

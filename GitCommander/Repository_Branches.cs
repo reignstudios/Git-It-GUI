@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace GitCommander
 {
@@ -34,71 +30,96 @@ namespace GitCommander
 		}
 	}
 
-	public static partial class Repository
+	public partial class Repository
 	{
-		public static bool DeleteBranch(string branch, bool isRemote)
+		public bool DeleteBranch(string branch, bool isRemote)
 		{
-			return SimpleGitInvoke(string.Format("branch {1} {0}", branch, isRemote ? "-dr" : "-d"));
-		}
-
-		public static bool DeleteRemoteBranch(string branch, string remote)
-		{
-			return SimpleGitInvoke(string.Format("push {1} --delete {0}", branch, remote));
-		}
-
-		public static bool RenameActiveBranch(string newBranchName)
-		{
-			return SimpleGitInvoke("branch -m " + newBranchName);
-		}
-
-		public static bool RenameNonActiveBranch(string currentBranchName, string newBranchName)
-		{
-			return SimpleGitInvoke(string.Format("branch -m {0} {1}", currentBranchName, newBranchName));
-		}
-
-		public static bool SetActiveBranchTracking(string fullBranchName)
-		{
-			return SimpleGitInvoke("branch -u " + fullBranchName);
-		}
-
-		public static bool RemoveActiveBranchTracking()
-		{
-			return SimpleGitInvoke("branch --unset-upstream");
-		}
-
-		public static bool PruneRemoteBranches()
-		{
-			return SimpleGitInvoke("remote prune origin");
-		}
-
-		public static bool GetRemotePrunableBrancheNames(out string[] branchName)
-		{
-			var branchNameList = new List<string>();
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			lock (this)
 			{
-				branchNameList.Add(line);
-			});
-			
-			var result = Tools.RunExe("git", "remote prune origin --dry-run", stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
-
-			if (!string.IsNullOrEmpty(lastError))
-			{
-				branchName = null;
-				return false;
+				return SimpleGitInvoke(string.Format("branch {1} {0}", branch, isRemote ? "-dr" : "-d"));
 			}
+		}
+
+		public bool DeleteRemoteBranch(string branch, string remote)
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("push {1} --delete {0}", branch, remote));
+			}
+		}
+
+		public bool RenameActiveBranch(string newBranchName)
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke("branch -m " + newBranchName);
+			}
+		}
+
+		public bool RenameNonActiveBranch(string currentBranchName, string newBranchName)
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("branch -m {0} {1}", currentBranchName, newBranchName));
+			}
+		}
+
+		public bool SetActiveBranchTracking(string fullBranchName)
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke("branch -u " + fullBranchName);
+			}
+		}
+
+		public bool RemoveActiveBranchTracking()
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke("branch --unset-upstream");
+			}
+		}
+
+		public bool PruneRemoteBranches()
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke("remote prune origin");
+			}
+		}
+
+		public bool GetRemotePrunableBrancheNames(out string[] branchName)
+		{
+			lock (this)
+			{
+				var branchNameList = new List<string>();
+				void stdCallback(string line)
+				{
+					branchNameList.Add(line);
+				}
 			
-			branchName = branchNameList.ToArray();
-			return true;
+				var result = RunExe("git", "remote prune origin --dry-run", stdCallback:stdCallback);
+				lastResult = result.output;
+				lastError = result.errors;
+
+				if (!string.IsNullOrEmpty(lastError))
+				{
+					branchName = null;
+					return false;
+				}
+			
+				branchName = branchNameList.ToArray();
+				return true;
+			}
 		}
 		
-		public static bool GetBrancheStates(out BranchState[] brancheStates)
+		public bool GetBrancheStates(out BranchState[] brancheStates)
 		{
 			var states = new List<BranchState>();
-			var stdCallback = new StdCallbackMethod(delegate(string line)
+			void stdCallback(string line)
 			{
 				line = line.TrimStart();
+				if (string.IsNullOrEmpty(line)) return;
 
 				// check if remote
 				bool isActive = false;
@@ -239,85 +260,103 @@ namespace GitCommander
 				}
 
 				states.Add(branch);
-			});
-			
-			var result = Tools.RunExe("git", "branch -a -vv", stdCallback:stdCallback);
-			lastResult = result.Item1;
-			lastError = result.Item2;
-
-			if (!string.IsNullOrEmpty(lastError))
-			{
-				brancheStates = null;
-				return false;
 			}
 
-			// get remote urls
-			foreach (var state in states)
+			lock (this)
 			{
-				string url;
-				if (state.remoteState != null && GetRemoteURL(state.remoteState.name, out url)) state.remoteState.url = url;
-				if (state.headPtr != null && state.headPtr.remoteState != null && GetRemoteURL(state.headPtr.remoteState.name, out url)) state.headPtr.remoteState.url = url;
-				if (state.tracking != null && state.tracking.remoteState != null && GetRemoteURL(state.tracking.remoteState.name, out url)) state.tracking.remoteState.url = url;
+				var result = RunExe("git", "branch -a -vv", stdCallback:stdCallback);
+				lastResult = result.output;
+				lastError = result.errors;
+
+				if (!string.IsNullOrEmpty(lastError))
+				{
+					brancheStates = null;
+					return false;
+				}
+
+				// get remote urls
+				foreach (var state in states)
+				{
+					string url;
+					if (state.remoteState != null && GetRemoteURL(state.remoteState.name, out url)) state.remoteState.url = url;
+					if (state.headPtr != null && state.headPtr.remoteState != null && GetRemoteURL(state.headPtr.remoteState.name, out url)) state.headPtr.remoteState.url = url;
+					if (state.tracking != null && state.tracking.remoteState != null && GetRemoteURL(state.tracking.remoteState.name, out url)) state.tracking.remoteState.url = url;
+				}
+
+				brancheStates = states.ToArray();
+				return true;
 			}
-
-			brancheStates = states.ToArray();
-			return true;
 		}
 
-		public static bool CheckoutBranch(string branch)
+		public bool CheckoutBranch(string branch)
 		{
-			var result = Tools.RunExe("git", "checkout " + branch);
-			lastResult = result.Item1;
-			lastError = result.Item2;
+			lock (this)
+			{
+				var result = RunExe("git", "checkout " + branch);
+				lastResult = result.output;
+				lastError = result.errors;
 			
-			return string.IsNullOrEmpty(lastError);
+				return string.IsNullOrEmpty(lastError);
+			}
 		}
 
-		public static bool CheckoutNewBranch(string branch)
+		public bool CheckoutNewBranch(string branch)
 		{
-			return SimpleGitInvoke("checkout -b " + branch);
+			lock (this)
+			{
+				return SimpleGitInvoke("checkout -b " + branch);
+			}
 		}
 
-		public static bool PushLocalBranchToRemote(string branch, string remote)
+		public bool PushLocalBranchToRemote(string branch, string remote)
 		{
-			return SimpleGitInvoke(string.Format("push -u {1} {0}", branch, remote));
+			lock (this)
+			{
+				return SimpleGitInvoke(string.Format("push -u {1} {0}", branch, remote));
+			}
 		}
 
-		public static bool MergeBranchIntoActive(string branch)
+		public bool MergeBranchIntoActive(string branch)
 		{
-			return SimpleGitInvoke("merge " + branch);
+			lock (this)
+			{
+				return SimpleGitInvoke("merge " + branch);
+			}
 		}
 
-		public static bool IsUpToDateWithRemote(string remote, string branch, out bool yes)
+		public bool IsUpToDateWithRemote(string remote, string branch, out bool yes)
 		{
 			bool isUpToDate = true;
-			var stdCallback_log = new StdCallbackMethod(delegate (string line)
+			void stdCallback_log(string line)
 			{
 				var match = Regex.Match(line, @"commit (.*)");
 				if (match.Success) isUpToDate = false;
-			});
+			}
 
-			var result = Tools.RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback: stdCallback_log);
-			lastResult = result.Item1;
-			lastError = result.Item2;
-			bool remoteDoesntHaveBranch = lastError.Contains("unknown revision or path not in the working tree");
-			yes = isUpToDate && !remoteDoesntHaveBranch;
-			if (!isUpToDate && !remoteDoesntHaveBranch) return string.IsNullOrEmpty(lastError);
-			if (remoteDoesntHaveBranch) return true;
-
-			isUpToDate = true;
-			var stdCallback_fetch = new StdCallbackMethod(delegate (string line)
+			void stdCallback_fetch(string line)
 			{
 				var match = Regex.Match(line, string.Format(@"\s*(.*)\.\.(.*)\s*{1}\s*->\s*{0}/{1}", remote, branch));
 				if (match.Success && match.Groups[1].Value != match.Groups[2].Value) isUpToDate = false;
-			});
+			}
 
-			result = Tools.RunExe("git", string.Format("fetch {0} {1} --dry-run", remote, branch), stdCallback: stdCallback_fetch);
-			lastResult = result.Item1;
-			lastError = result.Item2;
-			if (!isUpToDate) yes = false;
+			lock (this)
+			{
+				var result = RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback: stdCallback_log);
+				lastResult = result.output;
+				lastError = result.errors;
+				bool remoteDoesntHaveBranch = lastError.Contains("unknown revision or path not in the working tree");
+				yes = isUpToDate && !remoteDoesntHaveBranch;
+				if (!isUpToDate && !remoteDoesntHaveBranch) return string.IsNullOrEmpty(lastError);
+				if (remoteDoesntHaveBranch) return true;
 
-			return string.IsNullOrEmpty(lastError);
+				isUpToDate = true;
+				result = RunExe("git", string.Format("fetch {0} {1} --dry-run", remote, branch), stdCallback: stdCallback_fetch);
+				lastResult = result.output;
+				lastError = result.errors;
+				if (!isUpToDate) yes = false;
+
+				return string.IsNullOrEmpty(lastError);
+			}
 		}
 	}
 }

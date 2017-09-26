@@ -16,11 +16,15 @@ namespace GitItGUI.Core
 		[XmlRoot("AppSettings")]
 		public class AppSettings
 		{
-			[XmlAttribute("MergeDiffTool")] public string mergeDiffTool = "P4Merge";
-			[XmlAttribute("AutoRefreshChanges")] public bool autoRefreshChanges = true;
+			[XmlAttribute("WinX")] public int winX = -1;
+			[XmlAttribute("WinY")] public int winY = -1;
+			[XmlAttribute("WinWidth")] public int winWidth = -1;
+			[XmlAttribute("WinHeight")] public int winHeight = -1;
+			[XmlElement("MergeDiffTool")] public string mergeDiffTool = "P4Merge";
+			[XmlElement("AutoRefreshChanges")] public bool autoRefreshChanges = true;
+			[XmlElement("SimpleMode")] public bool simpleMode = true;
 			[XmlElement("CustomErrorCodes")] public CustomErrorCodes customErrorCodes = new CustomErrorCodes();
 			[XmlElement("Repository")] public List<string> repositories = new List<string>();
-			[XmlElement("DefaultGitLFS-Ext")] public List<string> defaultGitLFS_Exts = new List<string>();
 		}
 	}
 	
@@ -50,7 +54,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Load Settings Error: " + e.Message, true);
+				DebugLog.LogError("Load Settings Error: " + e.Message, true);
 				return new T();
 			}
 		}
@@ -70,7 +74,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Save Settings Error: " + e.Message, true);
+				DebugLog.LogError("Save Settings Error: " + e.Message, true);
 				return false;
 			}
 

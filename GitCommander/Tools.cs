@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using GitCommander.System;
 
 namespace GitCommander
 {
@@ -14,12 +11,12 @@ namespace GitCommander
 	public delegate bool StdInputStreamCallbackMethod(StreamWriter writer);
 	public delegate void GetStdInputStreamCallbackMethod(StreamWriter writer);
 
-	public static class Tools
+	public partial class Repository
 	{
-		public static event StdCallbackMethod RunExeDebugLineCallback, StdCallback, StdErrorCallback, StdWarningCallback;
-		private static List<string> errorPrefixes;
+		public event StdCallbackMethod RunExeDebugLineCallback, StdCallback, StdErrorCallback, StdWarningCallback;
+		private List<string> errorPrefixes;
 
-		static Tools()
+		private void InitTools()
 		{
 			errorPrefixes = new List<string>()
 			{
@@ -28,13 +25,13 @@ namespace GitCommander
 			};
 		}
 
-		public static void AddErrorCode(string errorCode)
+		public void AddErrorCode(string errorCode)
 		{
 			errorCode = errorCode.ToLower();
 			if (!errorPrefixes.Contains(errorCode)) errorPrefixes.Add(errorCode);
 		}
 		
-		public static Tuple<string, string> RunExe
+		private (string output, string errors) RunExe
 		(
 			string exe, string arguments, string workingDirectory = null,
 			StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null,
@@ -52,7 +49,7 @@ namespace GitCommander
 				// setup start info
 				process.StartInfo.FileName = exe;
 				process.StartInfo.Arguments = arguments;
-				process.StartInfo.WorkingDirectory = workingDirectory == null ? Repository.repoPath : workingDirectory;
+				process.StartInfo.WorkingDirectory = workingDirectory == null ? repoPath : workingDirectory;
 				process.StartInfo.RedirectStandardInput = stdInputStreamCallback != null || getStdInputStreamCallback != null;
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
@@ -65,7 +62,7 @@ namespace GitCommander
 				StreamWriter stdOutStreamWriter = null;
 				if (stdOutToFilePath != null)
 				{
-					stdOutToFilePath = Repository.repoPath + Path.DirectorySeparatorChar + stdOutToFilePath.Replace('/', Path.DirectorySeparatorChar);
+					stdOutToFilePath = repoPath + Path.DirectorySeparatorChar + stdOutToFilePath.Replace('/', Path.DirectorySeparatorChar);
 					stdOutStream = new FileStream(stdOutToFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
 					stdOutStreamWriter = new StreamWriter(stdOutStream);
 				}
@@ -74,13 +71,13 @@ namespace GitCommander
 				{
 					if (stdOutToFilePath != null) stdOutStreamWriter.WriteLine(line);
 					
-					if (stdCallback != null) stdCallback(line);
 					if (stdResultOn)
 					{
 						if (output.Length != 0) output += Environment.NewLine;
 						output += line;
 					}
 
+					if (stdCallback != null) stdCallback(line);
 					if (line.StartsWith("warning:"))
 					{
 						if (StdWarningCallback != null) StdWarningCallback(line);
@@ -102,7 +99,7 @@ namespace GitCommander
 				{
 					string line = e.Data;
 					if (line == null) return;
-
+					
 					// valid true error
 					string lineLower = line.ToLower();
 					bool isError = false;
@@ -123,13 +120,13 @@ namespace GitCommander
 					}
 
 					// invoke error callbacks
-					if (stdErrorCallback != null) stdErrorCallback(line);
 					if (stdErrorResultOn)
 					{
 						if (errors.Length != 0) errors += Environment.NewLine;
 						errors += line;
 					}
 
+					if (stdErrorCallback != null) stdErrorCallback(line);
 					if (StdErrorCallback != null) StdErrorCallback(line);
 				};
 
@@ -159,7 +156,20 @@ namespace GitCommander
 				}
 			}
 
-			return new Tuple<string, string>(output, errors);
+			return (output, errors);
+		}
+
+		public void RunGenericCmd(string cmd)
+		{
+			const string prefix = "git ";
+			if (!cmd.StartsWith(prefix))
+			{
+				if (RunExeDebugLineCallback != null) RunExeDebugLineCallback("Only git commands permitted");
+				return;
+			}
+
+			cmd = cmd.Remove(0, prefix.Length);
+			RunExe("git", cmd);
 		}
 	}
 }

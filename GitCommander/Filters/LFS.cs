@@ -1,43 +1,65 @@
 ﻿namespace GitCommander
 {
-	public static partial class Repository
+	public partial class Repository
 	{
-		public static class LFS
+		public class LFS
 		{
-			private static bool SimpleLFSInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
-			{
-				var result = Tools.RunExe("git", "lfs " + args, stdCallback: stdCallback, stdErrorCallback: stdErrorCallback);
-				lastResult = result.Item1;
-				lastError = result.Item2;
+			private Repository repository;
 
-				return string.IsNullOrEmpty(lastError);
+			public LFS(Repository repository)
+			{
+				this.repository = repository;
 			}
 
-			public static bool Install()
+			private bool SimpleLFSInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 			{
-				return SimpleLFSInvoke("install");
+				var result = repository.RunExe("git", "lfs " + args, stdCallback: stdCallback, stdErrorCallback: stdErrorCallback);
+				repository.lastResult = result.output;
+				repository.lastError = result.errors;
+
+				return string.IsNullOrEmpty(repository.lastError);
 			}
 
-			public static bool Uninstall()
+			public bool Install()
 			{
-				return SimpleLFSInvoke("uninstall");
+				lock (repository)
+				{
+					return SimpleLFSInvoke("install");
+				}
 			}
 
-			public static bool Track(string ext)
+			public bool Uninstall()
 			{
-				return SimpleLFSInvoke(string.Format("track \"*{0}\"", ext));
+				lock (repository)
+				{
+					return SimpleLFSInvoke("uninstall");
+				}
 			}
 
-			public static bool Untrack(string ext)
+			public bool Track(string ext)
 			{
-				return SimpleLFSInvoke(string.Format("untrack \"*{0}\"", ext));
+				lock (repository)
+				{
+					return SimpleLFSInvoke(string.Format("track \"*{0}\"", ext));
+				}
 			}
 
-			public static bool GetVersion(out string version)
+			public bool Untrack(string ext)
 			{
-				bool result = SimpleLFSInvoke("version");
-				version = lastResult;
-				return result;
+				lock (repository)
+				{
+					return SimpleLFSInvoke(string.Format("untrack \"*{0}\"", ext));
+				}
+			}
+
+			public bool GetVersion(out string version)
+			{
+				lock (repository)
+				{
+					bool result = SimpleLFSInvoke("version");
+					version = repository.lastResult;
+					return result;
+				}
 			}
 		}
 	}

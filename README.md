@@ -6,7 +6,7 @@ Download: https://github.com/reignstudios/Git-It-GUI/releases
 
 - Invokes git commands directly allowing any filters to work (including git-lfs).
 
-- Is writen in C# / AvaloniaUI (should support macOS and Linux/UNIX in the future).
+- Writen in C# / WPF (will support macOS and Linux/BSD in the future with Xamarin.Forms 3.0).
 
 - Auto check for .gitignore file.
 
@@ -19,8 +19,6 @@ Download: https://github.com/reignstudios/Git-It-GUI/releases
 - Auto checks for Git and Git-LFS min-version requirements.
 
 - gitk for history (maybe something built in later).
-
-Note: This is built using the nightly builds of Avalonia: https://github.com/AvaloniaUI/Avalonia/wiki/Using-nightly-build-feed
 
 LOGS: These will be stored in "C:\ProgramData\GitItGUI\logs.txt" on windows
 

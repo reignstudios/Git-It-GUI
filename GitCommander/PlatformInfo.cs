@@ -10,12 +10,12 @@ namespace GitCommander.System
 		Linux
 	}
 
-	public static class PlatformSettings
+	public static class PlatformInfo
 	{
 		public static readonly Platforms platform;
 		public static readonly string appDataPath;
 
-		static PlatformSettings()
+		static PlatformInfo()
 		{
 			var osPlatform = Environment.OSVersion.Platform;
 			switch (osPlatform)

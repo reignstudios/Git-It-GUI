@@ -35,6 +35,7 @@ namespace GitItGUI
 
 		static void Main(string[] args)
 		{
+			if (AvaloniaPV.SimplePreviewer.Init(true)) return;
 			InitializeLogging();
 			AppBuilder.Configure<App>().UsePlatformDetect().Start<MainWindow>();
 		}

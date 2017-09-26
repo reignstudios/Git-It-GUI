@@ -35,7 +35,8 @@ namespace GitItGUI.Core
 	{
 		private static CheckForUpdatesCallbackMethod checkForUpdatesCallback;
 		private static string checkForUpdatesOutOfDateURL;
-		internal static XML.AppSettings settings;
+		public static XML.AppSettings settings {get; private set;}
+		internal static List<string> defaultGitLFS_Exts;
 
 		public static string mergeToolPath {get; private set;}
 		public static MergeDiffTools mergeDiffTool {get; private set;}
@@ -49,12 +50,12 @@ namespace GitItGUI.Core
 
 		static AppManager()
 		{
-			switch (PlatformSettings.platform)
+			switch (PlatformInfo.platform)
 			{
 				case Platforms.Windows: platformName = "Windows"; break;
 				case Platforms.Mac: platformName = "Mac"; break;
 				case Platforms.Linux: platformName = "Linux"; break;
-				default: throw new Exception("Unsupported platform: " + PlatformSettings.platform);
+				default: throw new Exception("Unsupported platform: " + PlatformInfo.platform);
 			}
 		}
 
@@ -68,16 +69,7 @@ namespace GitItGUI.Core
 			{
 				// load settings
 				char seperator = Path.DirectorySeparatorChar;
-				settings = Settings.Load<XML.AppSettings>(PlatformSettings.appDataPath + seperator + Settings.appSettingsFolderName + seperator + Settings.appSettingsFilename);
-
-				// add custom error codes to git commander
-				if (settings.customErrorCodes != null)
-				{
-					foreach (var code in settings.customErrorCodes.errorCodes)
-					{
-						GitCommander.Tools.AddErrorCode(code);
-					}
-				}
+				settings = Settings.Load<XML.AppSettings>(PlatformInfo.appDataPath + seperator + Settings.appSettingsFolderName + seperator + Settings.appSettingsFilename);
 
 				// apply default lfs ignore types
 				var lowerCase = new List<string>()
@@ -95,18 +87,9 @@ namespace GitItGUI.Core
 					".bin", ".data", ".raw", ".hex",// unknown binary types
 				};
 
-				var upperCase = new List<string>();
-				for (int i = 0; i != lowerCase.Count; ++i) upperCase.Add(lowerCase[i].ToUpper());
-
-				foreach (var item in lowerCase)
-				{
-					if (!settings.defaultGitLFS_Exts.Contains(item)) settings.defaultGitLFS_Exts.Add(item);
-				}
-
-				foreach (var item in upperCase)
-				{
-					if (!settings.defaultGitLFS_Exts.Contains(item)) settings.defaultGitLFS_Exts.Add(item);
-				}
+				defaultGitLFS_Exts = new List<string>();
+				defaultGitLFS_Exts.AddRange(lowerCase);
+				for (int i = 0; i != lowerCase.Count; ++i) defaultGitLFS_Exts.Add(lowerCase[i].ToUpper());
 
 				// load
 				LoadMergeDiffTool();
@@ -114,7 +97,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("AppManager.Init Failed: " + e.Message);
+				DebugLog.LogError("AppManager.Init Failed: " + e.Message);
 				Dispose();
 				return false;
 			}
@@ -136,10 +119,10 @@ namespace GitItGUI.Core
 
 		private static void LoadMergeDiffTool()
 		{
-			if (PlatformSettings.platform == Platforms.Windows)
+			if (PlatformInfo.platform == Platforms.Windows)
 			{
 				string programFilesx86, programFilesx64;
-				PlatformSettings.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
+				PlatformInfo.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
 				switch (settings.mergeDiffTool)
 				{
 					case "Meld":
@@ -163,19 +146,19 @@ namespace GitItGUI.Core
 						break;
 				}
 			}
-			else if (PlatformSettings.platform == Platforms.Mac)
+			else if (PlatformInfo.platform == Platforms.Mac)
 			{
 				mergeDiffTool = MergeDiffTools.Meld;
 				mergeToolPath = "";
 			}
-			else if (PlatformSettings.platform == Platforms.Linux)
+			else if (PlatformInfo.platform == Platforms.Linux)
 			{
 				mergeDiffTool = MergeDiffTools.Meld;
 				mergeToolPath = "";
 			}
 			else
 			{
-				throw new Exception("Unsported platform: " + PlatformSettings.platform);
+				throw new Exception("Unsported platform: " + PlatformInfo.platform);
 			}
 		}
 
@@ -191,14 +174,14 @@ namespace GitItGUI.Core
 			}
 		}
 
-		internal static void AddActiveRepoToHistory()
+		internal static void AddRepoToHistory(string repoPath)
 		{
 			// add if doesn't exist
 			string found = null;
 			int index = 0;
 			foreach (var repo in settings.repositories)
 			{
-				if (repo == Repository.repoPath)
+				if (repo == repoPath)
 				{
 					found = repo;
 					break;
@@ -209,7 +192,7 @@ namespace GitItGUI.Core
 
 			if (found == null)
 			{
-				settings.repositories.Insert(0, Repository.repoPath);
+				settings.repositories.Insert(0, repoPath);
 			}
 			else if (index != 0) 
 			{
@@ -233,19 +216,18 @@ namespace GitItGUI.Core
 		public static void SaveSettings()
 		{
 			settings.autoRefreshChanges = autoRefreshChanges;
-			Settings.Save<XML.AppSettings>(PlatformSettings.appDataPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + Settings.appSettingsFilename, settings);
+			Settings.Save<XML.AppSettings>(PlatformInfo.appDataPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + Settings.appSettingsFilename, settings);
 		}
 
 		/// <summary>
-		/// Disposes all manager objects (Call before app exit)
+		/// Call before app exit after everything else
 		/// </summary>
 		public static void Dispose()
 		{
-			RepoManager.Dispose();
-			Debug.Dispose();
+			DebugLog.Dispose();
 		}
 
-		public static bool CheckForUpdates(string url, string outOfDateURL, CheckForUpdatesCallbackMethod checkForUpdatesCallback)
+		/*public static bool CheckForUpdates(string url, string outOfDateURL, CheckForUpdatesCallbackMethod checkForUpdatesCallback)
 		{
 			try
 			{
@@ -258,7 +240,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				Debug.LogError("Failed to check for updates: " + e.Message, true);
+				DebugLog.LogError("Failed to check for updates: " + e.Message, true);
 				if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, false);
 			}
 
@@ -351,7 +333,7 @@ namespace GitItGUI.Core
 		{
 			if (e.Error != null)
 			{
-				Debug.LogError("Failed to check for updates: " + e.Error.Message, true);
+				DebugLog.LogError("Failed to check for updates: " + e.Error.Message, true);
 				client.Dispose();
 				if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, false);
 				return;
@@ -359,7 +341,7 @@ namespace GitItGUI.Core
 
 			if (e.Cancelled)
 			{
-				Debug.LogError("Update check canceled!", true);
+				DebugLog.LogError("Update check canceled!", true);
 				client.Dispose();
 				if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, false);
 				return;
@@ -379,7 +361,7 @@ namespace GitItGUI.Core
 				}
 				catch
 				{
-					Debug.LogError("git is not installed correctly. (Make sure git is usable in the cmd/terminal)", true);
+					DebugLog.LogError("git is not installed correctly. (Make sure git is usable in the cmd/terminal)", true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
 					DownloadGit();
@@ -393,7 +375,7 @@ namespace GitItGUI.Core
 				}
 				catch
 				{
-					Debug.LogError("git-lfs is not installed correctly. (Make sure git-lfs is usable in the cmd/terminal)", true);
+					DebugLog.LogError("git-lfs is not installed correctly. (Make sure git-lfs is usable in the cmd/terminal)", true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
 					DownloadGitLFS();
@@ -402,12 +384,12 @@ namespace GitItGUI.Core
 
 				// grab git version value
 				string appendix = "";
-				if (PlatformSettings.platform == Platforms.Windows) appendix = @"\.windows";
+				if (PlatformInfo.platform == Platforms.Windows) appendix = @"\.windows";
 				var match = Regex.Match(gitVersion, @"git version (.*)" + appendix);
 				if (match.Success && match.Groups.Count == 2) gitVersion = match.Groups[1].Value;
 				else
 				{
-					Debug.LogError("Failed to grab git version!", true);
+					DebugLog.LogError("Failed to grab git version!", true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
 					DownloadGit();
@@ -415,7 +397,7 @@ namespace GitItGUI.Core
 				}
 				
 				// grab lfs and required git version value
-				if (PlatformSettings.platform == Platforms.Windows) appendix = @"; git .*\)";
+				if (PlatformInfo.platform == Platforms.Windows) appendix = @"; git .*\)";
 				else appendix = @"\)";
 				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; (\w*) (\w*); go (.*)" + appendix);
 				if (match.Success && match.Groups.Count == 5)
@@ -425,7 +407,7 @@ namespace GitItGUI.Core
 				}
 				else
 				{
-					Debug.LogError("Failed to grab git-lfs version!", true);
+					DebugLog.LogError("Failed to grab git-lfs version!", true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
 					DownloadGitLFS();
@@ -435,7 +417,7 @@ namespace GitItGUI.Core
 				// make sure the git version installed is supporeted by lfs
 				if (!IsValidVersion(gitVersion, gitlfsRequiredGitVersion))
 				{
-					Debug.LogError(string.Format("'git-lfs' version is not compatible with 'git' version installed!"), true);
+					DebugLog.LogError(string.Format("'git-lfs' version is not compatible with 'git' version installed!"), true);
 					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
 					DownloadGit();
@@ -447,13 +429,13 @@ namespace GitItGUI.Core
 				bool gitValid = true, gitlfsValid = true;
 				if (!IsValidVersion(gitVersion, minGitVersion))
 				{
-					Debug.LogError("Your 'git' version is out of date.\nDownload and install with defaults!", true);
+					DebugLog.LogError("Your 'git' version is out of date.\nDownload and install with defaults!", true);
 					gitValid = false;
 				}
 
 				if (!IsValidVersion(gitlfsVersion, minGitLFSVersion))
 				{
-					Debug.LogError("Your 'git-lfs' version is out of date.\nDownload and install with defaults!", true);
+					DebugLog.LogError("Your 'git-lfs' version is out of date.\nDownload and install with defaults!", true);
 					gitlfsValid = false;
 				}
 
@@ -477,7 +459,7 @@ namespace GitItGUI.Core
 							canCheckAppVersion = false;
 							if (!IsValidVersion(VersionInfo.version, xmlReader.ReadInnerXml()))
 							{
-								Debug.LogError("Your 'Git-It-GUI' version is out of date.", true);
+								DebugLog.LogError("Your 'Git-It-GUI' version is out of date.", true);
 								using (var process = Process.Start(checkForUpdatesOutOfDateURL))
 								{
 									process.WaitForExit();
@@ -489,11 +471,11 @@ namespace GitItGUI.Core
 			}
 			catch (Exception ex)
 			{
-				Debug.LogError("Failed to get version info!\nMake sure git and git-lfs are installed\nAlso make sure you're connected to the internet: \n\n" + ex.Message, true);
+				DebugLog.LogError("Failed to get version info!\nMake sure git and git-lfs are installed\nAlso make sure you're connected to the internet: \n\n" + ex.Message, true);
 			}
 
 			client.Dispose();
 			if (checkForUpdatesCallback != null) checkForUpdatesCallback(true, false);
-		}
+		}*/
 	}
 }

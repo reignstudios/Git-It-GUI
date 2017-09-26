@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="GitItGUI.UI.Overlays.MergeConflictOverlay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitItGUI.UI.Overlays"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+	<Border BorderBrush="Orange" BorderThickness="4">
+		<Grid Background="#EE000000">
+			<Image Source="../Images/UserTask.png" Width="64" Height="64" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+			<Border BorderBrush="Gray" BorderThickness="2" Margin="75" MaxWidth="400" MaxHeight="200">
+				<Grid Background="White">
+					<Label Name="titleLabel" Content="Resolve File" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" FontSize="32" FontWeight="Bold"/>
+					<Separator Margin="10,70,10,0" VerticalAlignment="Top"/>
+					<TextBox Name="filePathLabel" Margin="10,86,10,0" Height="21" IsReadOnly="True" VerticalAlignment="Top" Text="Repo/Assets/file.txt">
+						<TextBox.ContextMenu>
+							<ContextMenu>
+								<MenuItem Name="openFileMenuItem" Header="Open file" Click="openFileMenuItem_Click"/>
+								<MenuItem Name="openFileLocationMenuItem" Header="Open file location" Click="openFileLocationMenuItem_Click"/>
+							</ContextMenu>
+						</TextBox.ContextMenu>
+					</TextBox>
+					<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75" Click="cancelButton_Click"/>
+					<Button Name="userTheirsButton" Content="Use Theirs" HorizontalAlignment="Right" Margin="0,0,169,10" VerticalAlignment="Bottom" Width="74" Click="userTheirsButton_Click" ToolTip="Accept their changes only for this file (discard yours)"/>
+					<Button Name="useOursButton" Content="Use Yours" HorizontalAlignment="Right" Margin="0,0,90,10" VerticalAlignment="Bottom" Width="74" Click="useOursButton_Click" ToolTip="Accepts your changes only for this file (discard theirs)"/>
+					<Button Name="mergeToolButton" Content="Merge Tool" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75" Click="mergeToolButton_Click" ToolTip="Open the external merge tool"/>
+				</Grid>
+			</Border>
+		</Grid>
+	</Border>
+</UserControl>
