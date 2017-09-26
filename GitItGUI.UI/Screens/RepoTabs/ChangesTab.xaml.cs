@@ -540,13 +540,20 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			}
 
 			// prep commit message
-			if (!PrepCommitMessage(out string msg)) return;
+			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
+			string msg = null;
+			if (changesExist && !PrepCommitMessage(out msg)) return;
 
 			// process
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.CommitStagedChanges(msg)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
+				if (changesExist && !RepoScreen.singleton.repoManager.CommitStagedChanges(msg))
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
+					return;
+				}
+
 				var result = RepoScreen.singleton.repoManager.Sync();
 				if (result != SyncMergeResults.Succeeded)
 				{
@@ -567,6 +574,13 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void commitButton_Click(object sender, RoutedEventArgs e)
 		{
+			// validate changes exist
+			if (stagedChangesListBox.Items.Count == 0)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Error", "There are not staged file to commit");
+				return;
+			}
+
 			// prep commit message
 			if (!PrepCommitMessage(out string msg)) return;
 
