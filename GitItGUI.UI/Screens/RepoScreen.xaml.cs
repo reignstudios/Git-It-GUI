@@ -88,13 +88,23 @@ namespace GitItGUI.UI.Screens
 		
 		public void Refresh()
 		{
-			Dispatcher.InvokeAsync(delegate()
+			if (Dispatcher.CheckAccess())
 			{
 				changesTab.Refresh();
 				branchesTab.Refresh();
 				settingsTab.Refresh();
 				CheckSync();
-			});
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate()
+				{
+					changesTab.Refresh();
+					branchesTab.Refresh();
+					settingsTab.Refresh();
+					CheckSync();
+				});
+			}
 		}
 
 		private void backButton_Click(object sender, RoutedEventArgs e)
