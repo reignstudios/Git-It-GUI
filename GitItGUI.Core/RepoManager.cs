@@ -218,7 +218,10 @@ namespace GitItGUI.Core
 
 		public bool Refresh()
 		{
-			return OpenRepo(repository.repoPath);
+			lock (this)
+			{
+				return OpenRepo(repository.repoPath);
+			}
 		}
 
 		public bool Clone(string url, string destination, out string repoPath, StdInputStreamCallbackMethod writeUsernameCallback, StdInputStreamCallbackMethod writePasswordCallback)
