@@ -48,6 +48,10 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		public void Refresh()
 		{
+			// update settings
+			if (AppManager.settings.simpleMode) simpleModeMenuItem_Click(null, null);
+
+			// update changes
 			stagedChangesListBox.Items.Clear();
 			unstagedChangesListBox.Items.Clear();
 			foreach (var fileState in RepoScreen.singleton.repoManager.GetFileStates())

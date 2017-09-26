@@ -36,6 +36,7 @@ namespace GitItGUI.Core
 		private static CheckForUpdatesCallbackMethod checkForUpdatesCallback;
 		private static string checkForUpdatesOutOfDateURL;
 		public static XML.AppSettings settings {get; private set;}
+		internal static List<string> defaultGitLFS_Exts;
 
 		public static string mergeToolPath {get; private set;}
 		public static MergeDiffTools mergeDiffTool {get; private set;}
@@ -86,18 +87,9 @@ namespace GitItGUI.Core
 					".bin", ".data", ".raw", ".hex",// unknown binary types
 				};
 
-				var upperCase = new List<string>();
-				for (int i = 0; i != lowerCase.Count; ++i) upperCase.Add(lowerCase[i].ToUpper());
-
-				foreach (var item in lowerCase)
-				{
-					if (!settings.defaultGitLFS_Exts.Contains(item)) settings.defaultGitLFS_Exts.Add(item);
-				}
-
-				foreach (var item in upperCase)
-				{
-					if (!settings.defaultGitLFS_Exts.Contains(item)) settings.defaultGitLFS_Exts.Add(item);
-				}
+				defaultGitLFS_Exts = new List<string>();
+				defaultGitLFS_Exts.AddRange(lowerCase);
+				for (int i = 0; i != lowerCase.Count; ++i) defaultGitLFS_Exts.Add(lowerCase[i].ToUpper());
 
 				// load
 				LoadMergeDiffTool();

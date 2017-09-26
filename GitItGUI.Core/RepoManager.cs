@@ -353,7 +353,7 @@ namespace GitItGUI.Core
 					// add default ext to git lfs
 					if (addDefaultIgnoreExts)
 					{
-						foreach (string ext in AppManager.settings.defaultGitLFS_Exts)
+						foreach (string ext in AppManager.defaultGitLFS_Exts)
 						{
 							if (!repository.lfs.Track(ext)) throw new Exception(repository.lastError);
 						}

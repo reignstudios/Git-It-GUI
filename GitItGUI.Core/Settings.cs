@@ -20,11 +20,11 @@ namespace GitItGUI.Core
 			[XmlAttribute("WinY")] public int winY = -1;
 			[XmlAttribute("WinWidth")] public int winWidth = -1;
 			[XmlAttribute("WinHeight")] public int winHeight = -1;
-			[XmlAttribute("MergeDiffTool")] public string mergeDiffTool = "P4Merge";
-			[XmlAttribute("AutoRefreshChanges")] public bool autoRefreshChanges = true;
+			[XmlElement("MergeDiffTool")] public string mergeDiffTool = "P4Merge";
+			[XmlElement("AutoRefreshChanges")] public bool autoRefreshChanges = true;
+			[XmlElement("SimpleMode")] public bool simpleMode = true;
 			[XmlElement("CustomErrorCodes")] public CustomErrorCodes customErrorCodes = new CustomErrorCodes();
 			[XmlElement("Repository")] public List<string> repositories = new List<string>();
-			[XmlElement("DefaultGitLFS-Ext")] public List<string> defaultGitLFS_Exts = new List<string>();
 		}
 	}
 	
