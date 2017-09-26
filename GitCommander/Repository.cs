@@ -6,6 +6,7 @@ namespace GitCommander
 {
 	public enum SignatureLocations
 	{
+		Any,
 		Local,
 		Global
 	}
@@ -127,7 +128,10 @@ namespace GitCommander
 			{
 				name = null;
 				email = null;
-				string globalValue = (location == SignatureLocations.Global) ? " --global" : "";
+				string globalValue;
+				if (location == SignatureLocations.Global) globalValue = " --global";
+				else if (location == SignatureLocations.Local) globalValue = " --local";
+				else globalValue = string.Empty;
 
 				bool result = SimpleGitInvoke(string.Format("config{0} user.name", globalValue));
 				name = lastResult;
@@ -143,7 +147,11 @@ namespace GitCommander
 		{
 			lock (this)
 			{
-				string globalValue = (location == SignatureLocations.Global) ? " --global" : "";
+				string globalValue;
+				if (location == SignatureLocations.Global) globalValue = " --global";
+				else if (location == SignatureLocations.Local) globalValue = " --local";
+				else globalValue = string.Empty;
+
 				bool result = SimpleGitInvoke(string.Format("config{1} user.name \"{0}\"", name, globalValue));
 				name = lastResult;
 				if (!result) return false;
@@ -151,6 +159,19 @@ namespace GitCommander
 				result = SimpleGitInvoke(string.Format("config{1} user.email \"{0}\"", email, globalValue));
 				email = lastResult;
 				return result;
+			}
+		}
+
+		public bool RemoveSettings(SignatureLocations location, string section)
+		{
+			lock (this)
+			{
+				string globalValue;
+				if (location == SignatureLocations.Global) globalValue = " --global";
+				else if (location == SignatureLocations.Local) globalValue = " --local";
+				else globalValue = string.Empty;
+
+				return SimpleGitInvoke(string.Format("config{1} --remove-section {0}", section, globalValue));
 			}
 		}
 

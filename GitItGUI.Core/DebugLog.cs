@@ -4,19 +4,10 @@ using GitCommander.System;
 
 namespace GitItGUI.Core
 {
-	/// <summary>
-	/// Use to hook internal logging methods
-	/// </summary>
-	/// <param name="value">Log value (usally a string)</param>
-	/// <param name="alert">Whether or not the UI should alert the user. (Normally a MessageBox)</param>
-	public delegate void DebugLogCallbackMethod(object value, bool alert);
-
 	public static class DebugLog
 	{
-		/// <summary>
-		/// Use to hook internal logging methods
-		/// </summary>
-		public static event DebugLogCallbackMethod debugLogCallback, debugLogWarningCallback, debugLogErrorCallback;
+		public delegate void WriteCallbackMethod(string value, bool alert);
+		public static event WriteCallbackMethod WriteCallback;
 
 		private static Stream stream;
 		private static StreamWriter writer;
@@ -35,26 +26,6 @@ namespace GitItGUI.Core
 			{
 				LogError("Failed to init debug log file: " + e.Message);
 			}
-		}
-
-		private static void Tools_RunExeDebugLineCallback(string line)
-		{
-			Log(line);
-		}
-
-		private static void Tools_StdCallback(string line)
-		{
-			Log(line);
-		}
-
-		private static void Tools_StdWarningCallback(string line)
-		{
-			LogWarning(line);
-		}
-
-		private static void Tools_StdErrorCallback(string line)
-		{
-			LogError(line);
 		}
 		
 		public static void Dispose()
@@ -83,7 +54,7 @@ namespace GitItGUI.Core
 				#endif
 
 				if (writer != null) writer.WriteLine(value);
-				if (debugLogCallback != null) debugLogCallback(value, alert);
+				if (WriteCallback != null) WriteCallback(value, alert);
 			}
 		}
 

@@ -23,10 +23,11 @@ namespace GitItGUI.Core
 		/// </summary>
 		public bool lfsEnabled {get; private set;}
 
+		public bool signatureIsLocal {get; private set;}
 		public string signatureName {get; private set;}
 		public string signatureEmail {get; private set;}
 
-		internal Repository repository;
+		public Repository repository {get; private set;}
 		private bool pauseGitCommanderStdWrites;
 		private Thread thread;
 		public Dispatcher dispatcher { get; private set; }
@@ -177,9 +178,20 @@ namespace GitItGUI.Core
 					if (!isRefreshMode)
 					{
 						string sigName, sigEmail;
-						repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail);
-						signatureName = sigName;
-						signatureEmail = sigEmail;
+						if (repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail))
+						{
+							signatureName = sigName;
+							signatureEmail = sigEmail;
+							signatureIsLocal = true;
+							if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
+							{
+								repository.GetSignature(SignatureLocations.Any, out sigName, out sigEmail);
+								signatureName = sigName;
+								signatureEmail = sigEmail;
+								signatureIsLocal = false;
+							}
+						}
+
 						if (checkForSettingErros)
 						{
 							if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
@@ -250,15 +262,20 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public bool UpdateSignature(string name, string email)
+		public bool UpdateSignature(string name, string email, SignatureLocations location)
 		{
 			lock (this)
 			{
 				try
 				{
-					if (!repository.SetSignature(SignatureLocations.Global, name, email)) throw new Exception(repository.lastError);
+					// remove local sig
+					if (signatureIsLocal && location == SignatureLocations.Global) repository.RemoveSettings(SignatureLocations.Local, "user");
+
+					// update sig
+					if (!repository.SetSignature(location, name, email)) throw new Exception(repository.lastError);
 					signatureName = name;
 					signatureEmail = email;
+					signatureIsLocal = location == SignatureLocations.Local;
 					return true;
 				}
 				catch (Exception e)

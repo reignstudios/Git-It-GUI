@@ -164,5 +164,18 @@ namespace GitCommander
 
 			return (output, errors);
 		}
+
+		public void RunGenericCmd(string cmd)
+		{
+			const string prefix = "git ";
+			if (!cmd.StartsWith(prefix))
+			{
+				if (RunExeDebugLineCallback != null) RunExeDebugLineCallback("Only git commands permitted");
+				return;
+			}
+
+			cmd = cmd.Remove(0, prefix.Length);
+			RunExe("git", cmd);
+		}
 	}
 }

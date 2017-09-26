@@ -24,5 +24,15 @@ namespace GitItGUI.UI.Screens.RepoTabs
         {
             InitializeComponent();
         }
-    }
+
+		private void historyButton_Click(object sender, RoutedEventArgs e)
+		{
+			MainWindow.singleton.ShowWaitingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				RepoScreen.singleton.repoManager.OpenGitk();
+				MainWindow.singleton.HideWaitingOverlay();
+			});
+		}
+	}
 }

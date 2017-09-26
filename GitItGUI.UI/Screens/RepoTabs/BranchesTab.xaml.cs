@@ -1,4 +1,5 @@
 ﻿using GitCommander;
+using GitItGUI.Core;
 using GitItGUI.UI.Overlays;
 using System;
 using System.Collections.Generic;
@@ -171,8 +172,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 				{
 					var mergeResult = RepoScreen.singleton.repoManager.MergeBranchIntoActive(branch);
-					if (mergeResult == Core.MergeResults.Conflicts) ChangesTab.singleton.HandleConflics();
-					else if (mergeResult == Core.MergeResults.Error) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to copy tracking");
+					if (mergeResult == MergeResults.Conflicts) ChangesTab.singleton.HandleConflics();
+					else if (mergeResult == MergeResults.Error) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to copy tracking");
 
 					MainWindow.singleton.HideProcessingOverlay();
 				});

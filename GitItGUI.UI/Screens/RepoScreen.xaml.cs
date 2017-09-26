@@ -91,10 +91,12 @@ namespace GitItGUI.UI.Screens
 		{
 			changesTab.Refresh();
 			branchesTab.Refresh();
+			settingsTab.Refresh();
 		}
 
 		private void backButton_Click(object sender, RoutedEventArgs e)
 		{
+			repoManager.Close();
 			MainWindow.singleton.Navigate(StartScreen.singleton);
 		}
 
@@ -106,6 +108,11 @@ namespace GitItGUI.UI.Screens
 				repoManager.Refresh();
 				MainWindow.singleton.HideProcessingOverlay();
 			});
+		}
+
+		private void tabControl_Selected(object sender, RoutedEventArgs e)
+		{
+			if (tabControl.SelectedItem == terminalTabItem) terminalTab.ScrollToEnd();
 		}
 	}
 }

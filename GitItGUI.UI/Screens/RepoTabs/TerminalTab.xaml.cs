@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitItGUI.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,47 @@ namespace GitItGUI.UI.Screens.RepoTabs
         public TerminalTab()
         {
             InitializeComponent();
+			DebugLog.WriteCallback += DebugLog_WriteCallback;
+			cmdTextBox.KeyDown += CmdTextBox_KeyDown;
         }
-    }
+
+		public void ScrollToEnd()
+		{
+			terminalTextBox.ScrollToEnd();
+		}
+
+		private void DebugLog_WriteCallback(string value, bool alert)
+		{
+			if (Dispatcher.CheckAccess())
+			{
+				terminalTextBox.AppendText(value + Environment.NewLine);
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate()
+				{
+					terminalTextBox.AppendText(value + Environment.NewLine);
+				});
+			}
+		}
+
+		private void CmdTextBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Return) runCmdButton_Click(null, null);
+		}
+
+		private void runCmdButton_Click(object sender, RoutedEventArgs e)
+		{
+			string cmd = cmdTextBox.Text;
+			cmdTextBox.Text = string.Empty;
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				RepoScreen.singleton.repoManager.repository.RunGenericCmd(cmd);
+				Dispatcher.InvokeAsync(delegate()
+				{
+					terminalTextBox.ScrollToEnd();
+				});
+			});
+		}
+	}
 }

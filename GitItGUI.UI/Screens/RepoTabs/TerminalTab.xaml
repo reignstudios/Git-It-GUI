@@ -7,8 +7,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
 	<Grid>
-		<RichTextBox Name="terminalTextBox" Margin="10,10,10,38" IsReadOnly="True"/>
-		<Button Content="Run Cmd >" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75"/>
-		<TextBox Height="20" Margin="90,0,10,10" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+		<TextBox Name="terminalTextBox" Margin="10,10,10,38" IsReadOnly="True" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+		<Button Name="runCmdButton" Content="Run Cmd >" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75" Click="runCmdButton_Click"/>
+		<TextBox Name="cmdTextBox" Height="20" Margin="90,0,10,10" VerticalAlignment="Bottom"/>
 	</Grid>
 </UserControl>

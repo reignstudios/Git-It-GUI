@@ -500,7 +500,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		{
 			// prep commit message
 			message = commitMessageTextBox.Text;
-			if (string.IsNullOrEmpty(message) || message.Length != 3)
+			if (string.IsNullOrEmpty(message) || message.Length < 3)
 			{
 				MainWindow.singleton.ShowMessageOverlay("Alert", "You must enter a valid commit message!");
 				return false;
