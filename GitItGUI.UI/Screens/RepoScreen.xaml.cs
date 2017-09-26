@@ -36,7 +36,7 @@ namespace GitItGUI.UI.Screens
 
 		public void Init()
 		{
-			repoManager = new RepoManager(MainWindow.singleton.Dispatcher, RepoReadyCallback);
+			repoManager = new RepoManager(RepoReadyCallback);
 			repoManager.RepoRefreshedCallback += Refresh;
 			changesTab.Init();
 		}
@@ -44,7 +44,10 @@ namespace GitItGUI.UI.Screens
 		private void RepoReadyCallback(Dispatcher dispatcher)
 		{
 			repoDispatcher = dispatcher;
-			grid.Visibility = Visibility.Visible;
+			Dispatcher.InvokeAsync(delegate()
+			{
+				grid.Visibility = Visibility.Visible;
+			});
 		}
 
 		public void Dispose()
@@ -55,16 +58,8 @@ namespace GitItGUI.UI.Screens
 		private void CheckSync()
 		{
 			string upToDateMsg = "ERROR";
-			if (repoManager.ChangesExist())
-			{
-				upToDateMsg = "Out of date";
-			}
-			else
-			{
-				bool upToDatePass = repoManager.IsUpToDateWithRemote(out bool isUpToDate);
-				upToDateMsg = upToDatePass ? (isUpToDate ? "Up to date" : "Out of date") : "In sync check error";
-			}
-
+			if (repoManager.ChangesExist()) upToDateMsg = "Out of date";
+			else upToDateMsg = repoManager.isInSync != null ? (repoManager.isInSync.Value ? "Up to date" : "Out of date") : "In sync check error";
 			repoTitleLabel.Content = string.Format("Current Repo ({0}) [{1}]", repoManager.activeBranch.fullname, upToDateMsg);
 		}
 
@@ -94,10 +89,13 @@ namespace GitItGUI.UI.Screens
 		
 		public void Refresh()
 		{
-			changesTab.Refresh();
-			branchesTab.Refresh();
-			settingsTab.Refresh();
-			CheckSync();
+			Dispatcher.InvokeAsync(delegate()
+			{
+				changesTab.Refresh();
+				branchesTab.Refresh();
+				settingsTab.Refresh();
+				CheckSync();
+			});
 		}
 
 		private void backButton_Click(object sender, RoutedEventArgs e)

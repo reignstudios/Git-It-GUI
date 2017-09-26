@@ -17,11 +17,9 @@ namespace GitItGUI.Core
 		public delegate void ReadyCallbackMethod(Dispatcher dispatcher);
 		public delegate void RepoRefreshedCallbackMethod();
 		public event RepoRefreshedCallbackMethod RepoRefreshedCallback;
-
-		/// <summary>
-		/// True if this is a Git-LFS enabled repo
-		/// </summary>
+		
 		public bool lfsEnabled {get; private set;}
+		public bool? isInSync {get; private set;}
 
 		public bool signatureIsLocal {get; private set;}
 		public string signatureName {get; private set;}
@@ -31,12 +29,9 @@ namespace GitItGUI.Core
 		private bool pauseGitCommanderStdWrites;
 		private Thread thread;
 		public Dispatcher dispatcher { get; private set; }
-		private Dispatcher uiDispatcher;
 
-		public RepoManager(Dispatcher uiDispatcher, ReadyCallbackMethod readyCallback)
+		public RepoManager(ReadyCallbackMethod readyCallback)
 		{
-			this.uiDispatcher = uiDispatcher;
-
 			// create repo worker thread
 			thread = new Thread(WorkerThread);
 			thread.Start(readyCallback);
@@ -64,13 +59,7 @@ namespace GitItGUI.Core
 			repository.StdErrorCallback += DebugLog_StdErrorCallback;
 
 			// fire finished callback
-			if (readyCallback != null && uiDispatcher != null)
-			{
-				uiDispatcher.InvokeAsync(delegate()
-				{
-					((ReadyCallbackMethod)readyCallback)(dispatcher);
-				});
-			}
+			if (readyCallback != null) ((ReadyCallbackMethod)readyCallback)(dispatcher);
 
 			// run dispatcher
 			Dispatcher.Run();
@@ -200,6 +189,11 @@ namespace GitItGUI.Core
 							}
 						}
 					}
+
+					// check sync
+					if (IsUpToDateWithRemote(out bool yes)) isInSync = yes;
+					else isInSync = null;
+					
 				}
 				catch (Exception e)
 				{
@@ -226,17 +220,7 @@ namespace GitItGUI.Core
 		{
 			if (!RefreshBranches(refreshMode)) return false;
 			if (!RefreshChanges()) return false;
-			if (uiDispatcher.CheckAccess())
-			{
-				if (RepoRefreshedCallback != null) RepoRefreshedCallback();
-			}
-			else
-			{
-				uiDispatcher.InvokeAsync(delegate()
-				{
-					if (RepoRefreshedCallback != null) RepoRefreshedCallback();
-				});
-			}
+			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 
 			return true;
 		}
