@@ -60,7 +60,7 @@ namespace GitItGUI.UI.Screens
 			string upToDateMsg = "ERROR";
 			if (repoManager.ChangesExist()) upToDateMsg = "Out of date";
 			else upToDateMsg = repoManager.isInSync != null ? (repoManager.isInSync.Value ? "Up to date" : "Out of date") : "In sync check error";
-			repoTitleLabel.Content = string.Format("Current Repo ({0}) [{1}]", repoManager.activeBranch.fullname, upToDateMsg);
+			repoTitleLabel.Content = string.Format("Current Repo '{0}' ({1}) [{2}]", System.IO.Path.GetFileName(repoManager.repository.repoPath), repoManager.activeBranch.fullname, upToDateMsg);
 		}
 
 		public void OpenRepo(string folderPath)
