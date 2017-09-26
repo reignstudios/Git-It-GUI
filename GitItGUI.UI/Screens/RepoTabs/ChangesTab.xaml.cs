@@ -26,8 +26,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
     /// </summary>
     public partial class ChangesTab : UserControl
     {
+		public static ChangesTab singleton;
+
         public ChangesTab()
         {
+			singleton = this;
             InitializeComponent();
 
 			// setup rich text box layout
@@ -506,12 +509,12 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			message = message.Replace(Environment.NewLine, "\n");
 			return true;
 		}
-
-		private void HandleConflics()
+		
+		public void HandleConflics()
 		{
-			MainWindow.singleton.ShowMessageOverlay("Error", "Conflicts exist after pull, resolve them now?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgBoxresult)
+			MainWindow.singleton.ShowMessageOverlay("Error", "Conflicts exist, resolve them now?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgBoxResult)
 			{
-				if (msgBoxresult == MessageOverlayResults.Ok)
+				if (msgBoxResult == MessageOverlayResults.Ok)
 				{
 					MainWindow.singleton.ShowMergingOverlay(null, null);
 					RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
@@ -543,25 +546,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				var result = RepoScreen.singleton.repoManager.Sync();
 				if (result != SyncMergeResults.Succeeded)
 				{
-					if (result == SyncMergeResults.Conflicts)
-					{
-						MainWindow.singleton.ShowMessageOverlay("Error", "Conflicts exist after pull, resolve them now?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgBoxresult)
-						{
-							if (msgBoxresult == MessageOverlayResults.Ok)
-							{
-								MainWindow.singleton.ShowMergingOverlay(null, null);
-								RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
-								{
-									RepoScreen.singleton.repoManager.ResolveAllConflicts();
-									MainWindow.singleton.HideMergingOverlay();
-								});
-							}
-						});
-					}
-					else if (result == SyncMergeResults.Error)
-					{
-						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to sync changes");
-					}
+					if (result == SyncMergeResults.Conflicts) HandleConflics();
+					else if (result == SyncMergeResults.Error) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to sync changes");
 				}
 
 				MainWindow.singleton.HideProcessingOverlay();

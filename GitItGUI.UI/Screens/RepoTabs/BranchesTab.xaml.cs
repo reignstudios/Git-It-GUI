@@ -1,4 +1,5 @@
-﻿using GitItGUI.UI.Overlays;
+﻿using GitCommander;
+using GitItGUI.UI.Overlays;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,27 +93,117 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void copyTrackingMenuItem_Click(object sender, RoutedEventArgs e)
 		{
+			if (nonActiveBranchesListBox.SelectedIndex == -1)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active branch");
+				return;
+			}
 
+			var branch = ((BranchState)((ListBoxItem)nonActiveBranchesListBox.SelectedItem).Tag);
+			if (!branch.isRemote)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active 'REMOTE' branch");
+				return;
+			}
+
+			MainWindow.singleton.ShowMessageOverlay("Copy Tracking", string.Format("Are you sure you want to copy tracking from branch '{1}' into '{0}'", RepoScreen.singleton.repoManager.activeBranch.fullname, branch.fullname), MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+			{
+				if (result != MessageOverlayResults.Ok) return;
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!RepoScreen.singleton.repoManager.CopyTracking(branch)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to copy tracking");
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			});
 		}
 
 		private void removeTrackingMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-
+			MainWindow.singleton.ShowMessageOverlay("Remove Tracking", string.Format("Are you sure you want to copy tracking from branch '{0}'", RepoScreen.singleton.repoManager.activeBranch.fullname), MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+			{
+				if (result != MessageOverlayResults.Ok) return;
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!RepoScreen.singleton.repoManager.RemoveTracking()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to remove tracking");
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			});
 		}
 
 		private void switchBranchMenuItem_Click(object sender, RoutedEventArgs e)
 		{
+			if (nonActiveBranchesListBox.SelectedIndex == -1)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active branch");
+				return;
+			}
 
+			var branch = ((BranchState)((ListBoxItem)nonActiveBranchesListBox.SelectedItem).Tag);
+			MainWindow.singleton.ShowProcessingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.Checkout(branch)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to checkout branch");
+				MainWindow.singleton.HideProcessingOverlay();
+			});
 		}
 
 		private void mergeBranchMenuItem_Click(object sender, RoutedEventArgs e)
 		{
+			if (nonActiveBranchesListBox.SelectedIndex == -1)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active branch");
+				return;
+			}
 
+			var branch = ((BranchState)((ListBoxItem)nonActiveBranchesListBox.SelectedItem).Tag);
+			if (!branch.isRemote)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active 'REMOTE' branch");
+				return;
+			}
+
+			MainWindow.singleton.ShowMessageOverlay("Copy Tracking", string.Format("Are you sure you want to copy tracking from branch '{1}' into '{0}'", RepoScreen.singleton.repoManager.activeBranch.fullname, branch.fullname), MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+			{
+				if (result != MessageOverlayResults.Ok) return;
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					var mergeResult = RepoScreen.singleton.repoManager.MergeBranchIntoActive(branch);
+					if (mergeResult == Core.MergeResults.Conflicts) ChangesTab.singleton.HandleConflics();
+					else if (mergeResult == Core.MergeResults.Error) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to copy tracking");
+
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			});
 		}
 
 		private void deleteBranchMenuItem_Click(object sender, RoutedEventArgs e)
 		{
+			if (nonActiveBranchesListBox.SelectedIndex == -1)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active branch");
+				return;
+			}
 
+			var branch = ((BranchState)((ListBoxItem)nonActiveBranchesListBox.SelectedItem).Tag);
+			if (branch.isRemote)
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active 'LOCAL' branch\nOr run cleanup to remove invalid remotes.");
+				return;
+			}
+
+			MainWindow.singleton.ShowMessageOverlay("Delete", string.Format("Are you sure you want to delete branch '{0}'", branch.fullname), MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+			{
+				if (result != MessageOverlayResults.Ok) return;
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!RepoScreen.singleton.repoManager.DeleteNonActiveBranch(branch)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to delete branch");
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			});
 		}
 
 		private void cleanupMenuItem_Click(object sender, RoutedEventArgs e)
