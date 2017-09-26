@@ -52,6 +52,22 @@ namespace GitItGUI.UI.Screens
 			repoManager.Dispose();
 		}
 
+		private void CheckSync()
+		{
+			string upToDateMsg = "ERROR";
+			if (repoManager.ChangesExist())
+			{
+				upToDateMsg = "Out of date";
+			}
+			else
+			{
+				bool upToDatePass = repoManager.IsUpToDateWithRemote(out bool isUpToDate);
+				upToDateMsg = upToDatePass ? (isUpToDate ? "Up to date" : "Out of date") : "In sync check error";
+			}
+
+			repoTitleLabel.Content = string.Format("Current Repo ({0}) [{1}]", repoManager.activeBranch.fullname, upToDateMsg);
+		}
+
 		public void OpenRepo(string folderPath)
 		{
 			MainWindow.singleton.ShowProcessingOverlay();
@@ -61,18 +77,7 @@ namespace GitItGUI.UI.Screens
 				{
 					MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
 					{
-						string upToDateMsg = "ERROR";
-						if (repoManager.ChangesExist())
-						{
-							upToDateMsg = "Out of date";
-						}
-						else
-						{
-							bool upToDatePass = repoManager.IsUpToDateWithRemote(out bool isUpToDate);
-							upToDateMsg = upToDatePass ? (isUpToDate ? "Up to date" : "Out of date") : "In sync check error";
-						}
-
-						repoTitleLabel.Content = string.Format("Current Repo ({0}) [{1}]", repoManager.activeBranch.fullname, upToDateMsg);
+						CheckSync();
 						MainWindow.singleton.Navigate(this);
 					});
 				}
@@ -92,6 +97,7 @@ namespace GitItGUI.UI.Screens
 			changesTab.Refresh();
 			branchesTab.Refresh();
 			settingsTab.Refresh();
+			CheckSync();
 		}
 
 		private void backButton_Click(object sender, RoutedEventArgs e)
