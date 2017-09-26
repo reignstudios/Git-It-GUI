@@ -567,7 +567,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				{
 					Dispatcher.InvokeAsync(delegate()
 					{
-						commitMessageTextBox.Text = string.Empty; 
+						commitMessageTextBox.Text = string.Empty;
 					});
 				}
 
