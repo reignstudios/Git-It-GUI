@@ -204,25 +204,35 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void UnstagedButton_Click(object sender, RoutedEventArgs e)
 		{
 			var fileState = (FileState)((Button)sender).Tag;
-			MainWindow.singleton.ShowProcessingOverlay();
-			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+
+			void stageFile()
 			{
-				if (!RepoScreen.singleton.repoManager.StageFile(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage file");
-				MainWindow.singleton.HideProcessingOverlay();
-			});
+				// stage
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!RepoScreen.singleton.repoManager.StageFile(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage file");
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			}
+
+			// check conflicts
+			if (fileState.HasState(FileStates.Conflicted))
+			{
+				MainWindow.singleton.ShowMessageOverlay("Alert", "File not is in a conflicted state!\nAre you sure you want to accept as resolved and stage?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+				{
+					if (result == MessageOverlayResults.Ok) stageFile();
+				});
+
+				return;
+			}
+
+			stageFile();
 		}
 
 		private void StagedButton_Click(object sender, RoutedEventArgs e)
 		{
 			var fileState = (FileState)((Button)sender).Tag;
-
-			// check conflicts
-			if (fileState.HasState(FileStates.Conflicted))
-			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "File not is in a conflicted state!\nPlease resolve file instead.");
-				return;
-			}
-			
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
