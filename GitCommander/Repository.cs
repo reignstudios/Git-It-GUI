@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Windows.Threading;
 
 namespace GitCommander
 {
@@ -21,11 +20,8 @@ namespace GitCommander
 		public string repoPath {get; private set;}
 		public LFS lfs {get; private set;}
 
-		private Dispatcher dispatcher;
-
-		public Repository(Dispatcher dispatcher)
+		public Repository()
 		{
-			this.dispatcher = dispatcher;
 			lfs = new LFS(this);
 			InitTools();
 		}

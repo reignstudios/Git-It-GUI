@@ -55,7 +55,7 @@ namespace GitItGUI.Core
 		{
 			// create thread specific objects
 			dispatcher = Dispatcher.CurrentDispatcher;
-			repository = new Repository(dispatcher);
+			repository = new Repository();
 
 			// bind terminal callbacks
 			repository.RunExeDebugLineCallback += DebugLog_RunExeDebugLineCallback;

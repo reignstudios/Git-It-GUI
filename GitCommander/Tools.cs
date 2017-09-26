@@ -78,17 +78,14 @@ namespace GitCommander
 					}
 
 					if (stdCallback != null) stdCallback(line);
-					dispatcher.InvokeAsync(delegate ()
+					if (line.StartsWith("warning:"))
 					{
-						if (line.StartsWith("warning:"))
-						{
-							if (StdWarningCallback != null) StdWarningCallback(line);
-						}
-						else
-						{
-							if (StdCallback != null) StdCallback(line);
-						}
-					});
+						if (StdWarningCallback != null) StdWarningCallback(line);
+					}
+					else
+					{
+						if (StdCallback != null) StdCallback(line);
+					}
 				});
 				
 				process.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
@@ -130,10 +127,7 @@ namespace GitCommander
 					}
 
 					if (stdErrorCallback != null) stdErrorCallback(line);
-					dispatcher.InvokeAsync(delegate ()
-					{
-						if (StdErrorCallback != null) StdErrorCallback(line);
-					});
+					if (StdErrorCallback != null) StdErrorCallback(line);
 				};
 
 				// start process
