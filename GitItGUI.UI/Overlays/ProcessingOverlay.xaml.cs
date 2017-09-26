@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitItGUI.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -27,8 +28,24 @@ namespace GitItGUI.UI.Overlays
 		public ProcessingOverlay()
 		{
 			InitializeComponent();
+			DebugLog.WriteCallback += DebugLog_WriteCallback;
 			stopwatch = new Stopwatch();
 			CompositionTarget.Rendering += CompositionTarget_Rendering;
+		}
+
+		private void DebugLog_WriteCallback(string value, bool alert)
+		{
+			if (Dispatcher.CheckAccess())
+			{
+				statusTextBox.Text = value;
+			}
+			else
+			{
+				Dispatcher.InvokeAsync(delegate()
+				{
+					statusTextBox.Text = value;
+				});
+			}
 		}
 
 		private void CompositionTarget_Rendering(object sender, EventArgs e)
