@@ -486,6 +486,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void simpleModeMenuItem_Click(object sender, RoutedEventArgs e)
 		{
+			AppManager.settings.simpleMode = true;
 			syncButton.Visibility = Visibility.Visible;
 			commitButton.Visibility = Visibility.Hidden;
 			pullButton.Visibility = Visibility.Hidden;
@@ -494,6 +495,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void advancedModeMenuItem_Click(object sender, RoutedEventArgs e)
 		{
+			AppManager.settings.simpleMode = false;
 			syncButton.Visibility = Visibility.Hidden;
 			commitButton.Visibility = Visibility.Visible;
 			pullButton.Visibility = Visibility.Visible;
