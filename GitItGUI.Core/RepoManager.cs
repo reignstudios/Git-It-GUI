@@ -189,11 +189,6 @@ namespace GitItGUI.Core
 							}
 						}
 					}
-
-					// check sync
-					if (IsUpToDateWithRemote(out bool yes)) isInSync = yes;
-					else isInSync = null;
-					
 				}
 				catch (Exception e)
 				{
@@ -218,10 +213,16 @@ namespace GitItGUI.Core
 
 		private bool RefreshInternal(bool refreshMode)
 		{
+			// refesh partials
 			if (!RefreshBranches(refreshMode)) return false;
 			if (!RefreshChanges()) return false;
-			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 
+			// check sync
+			if (IsUpToDateWithRemote(out bool yes)) isInSync = yes;
+			else isInSync = null;
+
+			// finish
+			if (RepoRefreshedCallback != null) RepoRefreshedCallback();
 			return true;
 		}
 
