@@ -35,7 +35,7 @@ namespace GitItGUI.Core
 	{
 		private static CheckForUpdatesCallbackMethod checkForUpdatesCallback;
 		private static string checkForUpdatesOutOfDateURL;
-		internal static XML.AppSettings settings;
+		public static XML.AppSettings settings {get; private set;}
 
 		public static string mergeToolPath {get; private set;}
 		public static MergeDiffTools mergeDiffTool {get; private set;}

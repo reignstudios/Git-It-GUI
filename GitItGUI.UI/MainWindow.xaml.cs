@@ -39,10 +39,23 @@ namespace GitItGUI.UI
 
 			startScreen.Init();
 			repoScreen.Init();
+
+			if (AppManager.settings.winX != -1)
+			{
+				Left = AppManager.settings.winX;
+				Top = AppManager.settings.winY;
+				Width = AppManager.settings.winWidth;
+				Height = AppManager.settings.winHeight;
+			}
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
+			AppManager.settings.winX = (int)Left;
+			AppManager.settings.winY = (int)Top;
+			AppManager.settings.winWidth = (int)Width;
+			AppManager.settings.winHeight = (int)Height;
+
 			repoScreen.Dispose();
 			AppManager.SaveSettings();
 			AppManager.Dispose();

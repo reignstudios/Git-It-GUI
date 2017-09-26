@@ -16,6 +16,10 @@ namespace GitItGUI.Core
 		[XmlRoot("AppSettings")]
 		public class AppSettings
 		{
+			[XmlAttribute("WinX")] public int winX = -1;
+			[XmlAttribute("WinY")] public int winY = -1;
+			[XmlAttribute("WinWidth")] public int winWidth = -1;
+			[XmlAttribute("WinHeight")] public int winHeight = -1;
 			[XmlAttribute("MergeDiffTool")] public string mergeDiffTool = "P4Merge";
 			[XmlAttribute("AutoRefreshChanges")] public bool autoRefreshChanges = true;
 			[XmlElement("CustomErrorCodes")] public CustomErrorCodes customErrorCodes = new CustomErrorCodes();
