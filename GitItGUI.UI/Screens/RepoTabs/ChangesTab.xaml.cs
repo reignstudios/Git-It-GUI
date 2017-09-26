@@ -549,6 +549,13 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					if (result == SyncMergeResults.Conflicts) HandleConflics();
 					else if (result == SyncMergeResults.Error) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to sync changes");
 				}
+				else
+				{
+					Dispatcher.InvokeAsync(delegate()
+					{
+						commitMessageTextBox.Text = string.Empty;
+					});
+				}
 
 				MainWindow.singleton.HideProcessingOverlay();
 			});
@@ -563,7 +570,18 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.CommitStagedChanges(msg)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
+				if (!RepoScreen.singleton.repoManager.CommitStagedChanges(msg))
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
+				}
+				else
+				{
+					Dispatcher.InvokeAsync(delegate()
+					{
+						commitMessageTextBox.Text = string.Empty;
+					});
+				}
+
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
