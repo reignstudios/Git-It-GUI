@@ -113,6 +113,7 @@ namespace GitItGUI.UI.Screens
 		{
 			void RefreshInternal()
 			{
+				if (!repoManager.isOpen) return;
 				changesTab.Refresh();
 				branchesTab.Refresh();
 				settingsTab.Refresh();

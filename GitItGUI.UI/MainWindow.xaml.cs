@@ -51,7 +51,14 @@ namespace GitItGUI.UI
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			if (processingOverlay.Visibility == Visibility.Visible)
+			if
+			(
+				processingOverlay.Visibility == Visibility.Visible ||
+				waitingOverlay.Visibility == Visibility.Visible ||
+				messageOverlay.Visibility == Visibility.Visible ||
+				nameEntryOverlay.Visibility == Visibility.Visible ||
+				mergingOverlay.Visibility == Visibility.Visible
+			)
 			{
 				e.Cancel = true;
 				return;
