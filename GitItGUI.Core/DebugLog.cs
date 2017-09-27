@@ -6,7 +6,7 @@ namespace GitItGUI.Core
 {
 	public static class DebugLog
 	{
-		public delegate void WriteCallbackMethod(string value, bool alert);
+		public delegate void WriteCallbackMethod(string value);
 		public static event WriteCallbackMethod WriteCallback;
 
 		private static Stream stream;
@@ -43,7 +43,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		private static void Write(string value, bool alert)
+		private static void Write(string value)
 		{
 			if (stream == null) return;
 			lock (stream)
@@ -55,23 +55,23 @@ namespace GitItGUI.Core
 				#endif
 
 				if (writer != null) writer.WriteLine(value);
-				if (WriteCallback != null) WriteCallback(value, alert);
+				if (WriteCallback != null) WriteCallback(value);
 			}
 		}
 
-		public static void Log(object value, bool alert = false)
+		public static void Log(object value)
 		{
-			Write(value.ToString(), alert);
+			Write(value.ToString());
 		}
 
-		public static void LogWarning(object value, bool alert = false)
+		public static void LogWarning(object value)
 		{
-			Write("WARNING: " + value.ToString(), alert);
+			Write("WARNING: " + value.ToString());
 		}
 
-		public static void LogError(object value, bool alert = false)
+		public static void LogError(object value)
 		{
-			Write("ERROR: " + value.ToString(), alert);
+			Write("ERROR: " + value.ToString());
 		}
 	}
 }

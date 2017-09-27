@@ -33,7 +33,7 @@ namespace GitItGUI.UI.Overlays
 			CompositionTarget.Rendering += CompositionTarget_Rendering;
 		}
 
-		private void DebugLog_WriteCallback(string value, bool alert)
+		private void DebugLog_WriteCallback(string value)
 		{
 			if (Dispatcher.CheckAccess())
 			{

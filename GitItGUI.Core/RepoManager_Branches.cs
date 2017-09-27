@@ -44,7 +44,7 @@ namespace GitItGUI.Core
 				activeBranch = Array.Find<BranchState>(branchStates, x => x.isActive);
 				if (activeBranch.isRemote)
 				{
-					DebugLog.LogError("Active repo branch cannot be a remote: " + activeBranch.fullname, true);
+					DebugLog.LogError("Active repo branch cannot be a remote: " + activeBranch.fullname);
 					if (isRefreshMode) Environment.Exit(0);
 					else return false;
 				}
@@ -56,7 +56,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				DebugLog.LogError("BranchManager.Refresh Failed: " + e.Message, true);
+				DebugLog.LogError("BranchManager.Refresh Failed: " + e.Message);
 				return false;
 			}
 
@@ -104,7 +104,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("BranchManager.Merge Failed: " + e.Message, true);
+					DebugLog.LogError("BranchManager.Merge Failed: " + e.Message);
 					mergeResult = MergeResults.Error;
 				}
 			
@@ -129,13 +129,13 @@ namespace GitItGUI.Core
 					}
 					else
 					{
-						DebugLog.LogError("Already on branch: " + name, true);
+						DebugLog.LogError("Already on branch: " + name);
 						success = false;
 					}
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("BranchManager.Checkout Failed: " + e.Message, true);
+					DebugLog.LogError("BranchManager.Checkout Failed: " + e.Message);
 					success = false;
 				}
 			
@@ -169,7 +169,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Add new Branch Error: " + e.Message, true);
+					DebugLog.LogError("Add new Branch Error: " + e.Message);
 					success = false;
 				}
 			
@@ -189,7 +189,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Delete new Branch Error: " + e.Message, true);
+					DebugLog.LogError("Delete new Branch Error: " + e.Message);
 					success = false;
 				}
 
@@ -209,7 +209,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Rename new Branch Error: " + e.Message, true);
+					DebugLog.LogError("Rename new Branch Error: " + e.Message);
 					success = false;
 				}
 
@@ -229,7 +229,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Add/Update tracking Branch Error: " + e.Message, true);
+					DebugLog.LogError("Add/Update tracking Branch Error: " + e.Message);
 					success = false;
 				}
 
@@ -252,7 +252,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Remove Branch Error: " + e.Message, true);
+					DebugLog.LogError("Remove Branch Error: " + e.Message);
 					success = false;
 				}
 
@@ -283,7 +283,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Remove Branch Error: " + e.Message, true);
+					DebugLog.LogError("Remove Branch Error: " + e.Message);
 					yes = false;
 					return false;
 				}
@@ -303,7 +303,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Failed to prune branches: " + e.Message, true);
+					DebugLog.LogError("Failed to prune branches: " + e.Message);
 					success = false;
 				}
 

@@ -56,7 +56,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			ScrollToEnd();
 		}
 		
-		private void DebugLog_WriteCallback(string value, bool alert)
+		private void DebugLog_WriteCallback(string value)
 		{
 			if (Dispatcher.CheckAccess())
 			{

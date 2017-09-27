@@ -133,7 +133,7 @@ namespace GitItGUI.Core
 
 				if (!AppManager.MergeDiffToolInstalled())
 				{
-					DebugLog.LogError("Merge/Diff tool is not installed!\nGo to app settings and make sure your selected diff tool is installed.", true);
+					DebugLog.LogError("Merge/Diff tool is not installed!\nGo to app settings and make sure your selected diff tool is installed.");
 					return false;
 				}
 
@@ -154,7 +154,7 @@ namespace GitItGUI.Core
 						string gitIgnorePath = repoPath + Path.DirectorySeparatorChar + ".gitignore";
 						if (!File.Exists(gitIgnorePath))
 						{
-							DebugLog.LogWarning("No '.gitignore' file exists.\nAuto creating one!", true);
+							DebugLog.LogWarning("No '.gitignore' file exists.\nAuto creating one!");
 							File.WriteAllText(gitIgnorePath, "");
 						}
 					}
@@ -184,7 +184,7 @@ namespace GitItGUI.Core
 						{
 							if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
 							{
-								DebugLog.LogWarning("Credentials not set, please go to the settings tab!", true);
+								DebugLog.LogWarning("Credentials not set, please go to the settings tab!");
 							}
 						}
 					}
@@ -239,7 +239,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Clone error: " + e.Message, true);
+					DebugLog.LogError("Clone error: " + e.Message);
 					repoPath = null;
 					return false;
 				}
@@ -264,7 +264,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Update Signature: " + e.Message, true);
+					DebugLog.LogError("Update Signature: " + e.Message);
 					return false;
 				}
 			}
@@ -277,7 +277,7 @@ namespace GitItGUI.Core
 				// check if already init
 				if (lfsEnabled)
 				{
-					DebugLog.LogWarning("Git LFS already enabled on repo", true);
+					DebugLog.LogWarning("Git LFS already enabled on repo");
 					return false;
 				}
 
@@ -290,7 +290,7 @@ namespace GitItGUI.Core
 						if (!repository.lfs.Install()) throw new Exception(repository.lastError);
 						if (!Directory.Exists(lfsFolder))
 						{
-							DebugLog.LogError("Git-LFS install failed! (Try manually)", true);
+							DebugLog.LogError("Git-LFS install failed! (Try manually)");
 							lfsEnabled = false;
 							return false;
 						}
@@ -321,7 +321,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Add Git-LFS Error: " + e.Message, true);
+					DebugLog.LogError("Add Git-LFS Error: " + e.Message);
 					Environment.Exit(0);// quit for safety as application should restart
 					return false;
 				}
@@ -337,7 +337,7 @@ namespace GitItGUI.Core
 				// check if not init
 				if (!lfsEnabled)
 				{
-					DebugLog.LogWarning("Git LFS is not enabled on repo", true);
+					DebugLog.LogWarning("Git LFS is not enabled on repo");
 					return false;
 				}
 
@@ -372,7 +372,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Remove Git-LFS Error: " + e.Message, true);
+					DebugLog.LogError("Remove Git-LFS Error: " + e.Message);
 					Environment.Exit(0);// quit for safety as application should restart
 					return false;
 				}
@@ -406,7 +406,7 @@ namespace GitItGUI.Core
 						process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 						if (!process.Start())
 						{
-							DebugLog.LogError("Failed to start history tool (is it installed?)", true);
+							DebugLog.LogError("Failed to start history tool (is it installed?)");
 							return;
 						}
 
@@ -415,7 +415,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Failed to start history tool: " + e.Message, true);
+					DebugLog.LogError("Failed to start history tool: " + e.Message);
 					return;
 				}
 
@@ -435,7 +435,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Failed to optamize: " + e.Message, true);
+					DebugLog.LogError("Failed to optamize: " + e.Message);
 				}
 
 				size = null;
@@ -453,7 +453,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Failed to optamize: " + e.Message, true);
+					DebugLog.LogError("Failed to optamize: " + e.Message);
 				}
 			}
 		}
@@ -479,7 +479,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception ex)
 				{
-					DebugLog.LogError("Failed to open file: " + ex.Message, true);
+					DebugLog.LogError("Failed to open file: " + ex.Message);
 				}
 
 				return false;
@@ -507,7 +507,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception ex)
 				{
-					DebugLog.LogError("Failed to open folder location: " + ex.Message, true);
+					DebugLog.LogError("Failed to open folder location: " + ex.Message);
 				}
 
 				return false;

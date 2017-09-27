@@ -54,7 +54,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				DebugLog.LogError("Load Settings Error: " + e.Message, true);
+				DebugLog.LogError("Load Settings Error: " + e.Message);
 				return new T();
 			}
 		}
@@ -74,7 +74,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception e)
 			{
-				DebugLog.LogError("Save Settings Error: " + e.Message, true);
+				DebugLog.LogError("Save Settings Error: " + e.Message);
 				return false;
 			}
 

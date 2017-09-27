@@ -71,7 +71,7 @@ namespace GitItGUI.Core
 			}
 			catch (Exception ex)
 			{
-				DebugLog.LogError("Failed to open file: " + ex.Message, true);
+				DebugLog.LogError("Failed to open file: " + ex.Message);
 			}
 
 			return false;
