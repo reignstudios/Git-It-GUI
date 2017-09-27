@@ -28,6 +28,8 @@ namespace GitItGUI.UI.Screens
 		public RepoManager repoManager;
 		public Dispatcher repoDispatcher;
 
+		private TabItem lastTabItem;
+
 		public RepoScreen()
         {
 			singleton = this;
@@ -38,7 +40,7 @@ namespace GitItGUI.UI.Screens
 		public void Init()
 		{
 			repoManager = new RepoManager(RepoReadyCallback);
-			repoManager.RepoRefreshedCallback += Refresh;
+			repoManager.RepoRefreshedCallback += repoManager_RefreshedCallback;
 			changesTab.Init();
 		}
 
@@ -106,18 +108,18 @@ namespace GitItGUI.UI.Screens
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
-
-		private void RefreshInternal()
-		{
-			changesTab.Refresh();
-			branchesTab.Refresh();
-			settingsTab.Refresh();
-			terminalTab.Refresh();
-			CheckSync();
-		}
 		
-		public void Refresh()
+		private void repoManager_RefreshedCallback()
 		{
+			void RefreshInternal()
+			{
+				changesTab.Refresh();
+				branchesTab.Refresh();
+				settingsTab.Refresh();
+				terminalTab.Refresh();
+				CheckSync();
+			}
+
 			if (Dispatcher.CheckAccess())
 			{
 				RefreshInternal();
@@ -127,6 +129,24 @@ namespace GitItGUI.UI.Screens
 				Dispatcher.InvokeAsync(delegate()
 				{
 					RefreshInternal();
+				});
+			}
+		}
+
+		public void Refresh()
+		{
+			if (repoManager != null && repoManager.isOpen)
+			{
+				MainWindow.singleton.ShowProcessingOverlay();
+				repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!repoManager.Refresh())
+					{
+						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to refresh repo");
+						MainWindow.singleton.Navigate(StartScreen.singleton);
+					}
+
+					MainWindow.singleton.HideProcessingOverlay();
 				});
 			}
 		}
@@ -147,9 +167,12 @@ namespace GitItGUI.UI.Screens
 			});
 		}
 
-		private void tabControl_Selected(object sender, RoutedEventArgs e)
+		private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (tabControl.SelectedItem == terminalTabItem) terminalTab.ScrollToEnd();
+			var selected = (TabItem)tabControl.SelectedItem;
+			if (selected == terminalTabItem) terminalTab.ScrollToEnd();
+			else if (lastTabItem == terminalTabItem) terminalTab.CheckRefreshPending();
+			lastTabItem = selected;
 		}
 	}
 }

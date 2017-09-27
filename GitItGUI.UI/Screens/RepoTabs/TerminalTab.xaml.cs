@@ -21,6 +21,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
     /// </summary>
     public partial class TerminalTab : UserControl
     {
+		private bool refreshPending;
+
         public TerminalTab()
         {
             InitializeComponent();
@@ -31,6 +33,19 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		public void ScrollToEnd()
 		{
 			terminalTextBox.ScrollToEnd();
+		}
+
+		public void CheckRefreshPending()
+		{
+			if (!refreshPending) return;
+			refreshPending = false;
+
+			MainWindow.singleton.ShowProcessingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				RepoScreen.singleton.repoManager.Refresh();
+				MainWindow.singleton.HideProcessingOverlay();
+			});
 		}
 
 		public void Refresh()
@@ -63,6 +78,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void runCmdButton_Click(object sender, RoutedEventArgs e)
 		{
+			refreshPending = true;
 			string cmd = cmdTextBox.Text;
 			cmdTextBox.Text = string.Empty;
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()

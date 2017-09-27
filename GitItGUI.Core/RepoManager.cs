@@ -18,6 +18,8 @@ namespace GitItGUI.Core
 		public delegate void RepoRefreshedCallbackMethod();
 		public event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 		
+		public bool isOpen {get; private set;}
+
 		public bool lfsEnabled {get; private set;}
 		public bool? isInSync {get; private set;}
 
@@ -120,6 +122,8 @@ namespace GitItGUI.Core
 		{
 			lock (this)
 			{
+				isOpen = false;
+
 				// unload repo
 				if (string.IsNullOrEmpty(repoPath))
 				{
@@ -199,6 +203,8 @@ namespace GitItGUI.Core
 				// check sync
 				if (IsUpToDateWithRemote(out bool yes)) isInSync = yes;
 				else isInSync = null;
+
+				isOpen = true;
 			}
 
 			// finish

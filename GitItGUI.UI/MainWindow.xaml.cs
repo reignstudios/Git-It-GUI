@@ -68,6 +68,15 @@ namespace GitItGUI.UI
 			base.OnClosing(e);
 		}
 
+		protected override void OnActivated(EventArgs e)
+		{
+			base.OnActivated(e);
+
+			//#if !DEBUG
+			if (repoScreen != null) repoScreen.Refresh();
+			//#endif
+		}
+
 		public void Navigate(UserControl screen)
 		{
 			void UpdateVisibility()
