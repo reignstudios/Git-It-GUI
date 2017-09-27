@@ -76,7 +76,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				// item label
 				var label = new Label();
 				label.Margin = new Thickness(20, 0, 0, 0);
-				label.Content = fileState.filename;
+				label.Content = (fileState.isLFS ? "[LFS] " : string.Empty) + fileState.filename;
 				label.ContextMenu = new ContextMenu();
 				var openFileMenu = new MenuItem();
 				openFileMenu.Header = "Open file";
@@ -341,9 +341,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				if (result == MessageOverlayResults.Ok)
 				{
+					MainWindow.singleton.ShowProcessingOverlay();
 					RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 					{
 						if (!RepoScreen.singleton.repoManager.RevertAll()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to revert files");
+						MainWindow.singleton.HideProcessingOverlay();
 					});
 				}
 			});
@@ -365,9 +367,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				if (result == MessageOverlayResults.Ok)
 				{
+					MainWindow.singleton.ShowProcessingOverlay();
 					RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 					{
 						if (!RepoScreen.singleton.repoManager.RevertFileList(fileStates)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to revert files");
+						MainWindow.singleton.HideProcessingOverlay();
 					});
 				}
 			});
@@ -379,9 +383,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				if (result == MessageOverlayResults.Ok)
 				{
+					MainWindow.singleton.ShowProcessingOverlay();
 					RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 					{
 						if (!RepoScreen.singleton.repoManager.DeleteUntrackedUnstagedFiles(true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to cleanup files");
+						MainWindow.singleton.HideProcessingOverlay();
 					});
 				}
 			});
@@ -403,9 +409,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				if (result == MessageOverlayResults.Ok)
 				{
+					MainWindow.singleton.ShowProcessingOverlay();
 					RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 					{
 						if (!RepoScreen.singleton.repoManager.DeleteUntrackedUnstagedFiles(fileStates, true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to cleanup files");
+						MainWindow.singleton.HideProcessingOverlay();
 					});
 				}
 			});

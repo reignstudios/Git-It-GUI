@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace GitCommander
@@ -44,6 +45,7 @@ namespace GitCommander
 		public string filename {get; internal set;}
 		public FileStates state {get; internal set;}
 		public FileConflictTypes conflictType {get; internal set;}
+		public bool isLFS {get; internal set;}
 
 		public static bool IsAllStates(FileStates stateFlag, FileStates[] states)
 		{
@@ -157,7 +159,7 @@ namespace GitCommander
 			}
 		}
 		
-		private bool ParseFileState(string line, ref int mode, List<FileState> states)
+		private bool ParseFileState(string line, ref int mode, List<FileState> states, List<string> lfsExts)
 		{
 			bool addState(string type, FileStates stateType, FileConflictTypes conflictType = FileConflictTypes.None)
 			{
@@ -186,7 +188,8 @@ namespace GitCommander
 							{
 								filename = filePath,
 								state = stateType,
-								conflictType = conflictType
+								conflictType = conflictType,
+								isLFS = lfsExts.Contains(Path.GetExtension(filePath))
 							};
 							
 							states.Add(state);
@@ -245,18 +248,28 @@ namespace GitCommander
 			return true;
 		}
 
-		public bool GetFileState(string filename, out FileState fileState)
+		public bool GetFileState(string filename, out FileState fileState, bool getLFSState)
 		{
 			var states = new List<FileState>();
+			var lfsExts = new List<string>();
 			int mode = -1;
 			bool failedToParse = false;
 			void stdCallback(string line)
 			{
-				if (!ParseFileState(line, ref mode, states)) failedToParse = true;
+				if (!ParseFileState(line, ref mode, states, lfsExts)) failedToParse = true;
 			}
 
 			lock (this)
 			{
+				if (getLFSState && lfs.isEnabled)
+				{
+					if (!lfs.GetTrackedExts(out lfsExts))
+					{
+						fileState = null;
+						return false;
+					}
+				}
+
 				var result = RunExe("git", string.Format("status -u \"{0}\"", filename), stdCallback:stdCallback);
 				lastResult = result.output;
 				lastError = result.errors;
@@ -285,18 +298,28 @@ namespace GitCommander
 			}
 		}
 
-		public bool GetFileStates(out FileState[] fileStates)
+		public bool GetFileStates(out FileState[] fileStates, bool getLFSState)
 		{
 			var states = new List<FileState>();
+			var lfsExts = new List<string>();
 			int mode = -1;
 			bool failedToParse = false;
 			void stdCallback(string line)
 			{
-				if (!ParseFileState(line, ref mode, states)) failedToParse = true;
+				if (!ParseFileState(line, ref mode, states, lfsExts)) failedToParse = true;
 			}
 
 			lock (this)
 			{
+				if (getLFSState && lfs.isEnabled)
+				{
+					if (!lfs.GetTrackedExts(out lfsExts))
+					{
+						fileStates = null;
+						return false;
+					}
+				}
+
 				var result = RunExe("git", "status -u", stdCallback:stdCallback);
 				lastResult = result.output;
 				lastError = result.errors;

@@ -47,7 +47,7 @@ namespace GitItGUI.Core
 			try
 			{
 				FileState[] states;
-				if (!repository.GetFileStates(out states)) throw new Exception(repository.lastError);
+				if (!repository.GetFileStates(out states, true)) throw new Exception(repository.lastError);
 				fileStates = states;
 				return true;
 			}

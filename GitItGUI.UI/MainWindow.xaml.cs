@@ -72,9 +72,9 @@ namespace GitItGUI.UI
 		{
 			base.OnActivated(e);
 
-			//#if !DEBUG
+			#if !DEBUG
 			if (repoScreen != null) repoScreen.Refresh();
-			//#endif
+			#endif
 		}
 
 		public void Navigate(UserControl screen)

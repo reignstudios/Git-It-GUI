@@ -114,6 +114,7 @@ namespace GitCommander
 				lastError = result.errors;
 			
 				repoPath = path;
+				lfs.Open();
 				return isOpen = true;
 			}
 		}

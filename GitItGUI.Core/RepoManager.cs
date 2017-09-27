@@ -146,7 +146,7 @@ namespace GitItGUI.Core
 					if (!repository.Open(repoPath)) throw new Exception(repository.lastError);
 				
 					// check for git lfs
-					lfsEnabled = IsGitLFSRepo(false);
+					lfsEnabled = repository.lfs.isEnabled;
 
 					// check for .gitignore file
 					if (!isRefreshMode)
@@ -234,7 +234,7 @@ namespace GitItGUI.Core
 					// clone
 					if (!repository.Clone(url, destination, out repoPath, writeUsernameCallback, writePasswordCallback)) throw new Exception(repository.lastError);
 					repoPath = destination + Path.DirectorySeparatorChar + repoPath;
-					lfsEnabled = IsGitLFSRepo(true);
+					lfsEnabled = repository.lfs.isEnabled;
 					return true;
 				}
 				catch (Exception e)
@@ -268,34 +268,6 @@ namespace GitItGUI.Core
 					return false;
 				}
 			}
-		}
-
-		private bool IsGitLFSRepo(bool returnTrueIfValidAttributes)
-		{
-			string gitattributesPath = repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
-			bool attributesExist = File.Exists(gitattributesPath);
-			if (returnTrueIfValidAttributes && attributesExist)
-			{
-				string lines = File.ReadAllText(gitattributesPath);
-				return lines.Contains("filter=lfs diff=lfs merge=lfs");
-			}
-
-			if (attributesExist && Directory.Exists(repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar)) && File.Exists(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar)))
-			{
-				string data = File.ReadAllText(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
-				bool isValid = data.Contains("git-lfs");
-				if (isValid)
-				{
-					lfsEnabled = true;
-					return true;
-				}
-				else
-				{
-					lfsEnabled = false;
-				}
-			}
-
-			return false;
 		}
 		
 		public bool AddGitLFSSupport(bool addDefaultIgnoreExts)
