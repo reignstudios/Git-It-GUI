@@ -658,7 +658,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			});
 		}
 
-		private void pullButton_Click(object sender, RoutedEventArgs e)
+		internal void pullButton_Click(object sender, RoutedEventArgs e)
 		{
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
@@ -688,7 +688,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			});
 		}
 
-		private void pushButton_Click(object sender, RoutedEventArgs e)
+		internal void pushButton_Click(object sender, RoutedEventArgs e)
 		{
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()

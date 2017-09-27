@@ -19,6 +19,9 @@
 					<TextBlock Text="▼" Margin="0,-2,0,0"/>
 					<Button.ContextMenu>
 						<ContextMenu>
+							<MenuItem Name="pullMenuItem" Header="Pull" Click="pullMenuItem_Click"/>
+							<MenuItem Name="pushMenuItem" Header="Push" Click="pushMenuItem_Click"/>
+							<Separator/>
 							<MenuItem Name="renameMenuItem" Header="Rename" Click="renameMenuItem_Click"/>
 							<MenuItem Name="newBranchMenuItem" Header="Create new branch forked from active" Click="newBranchMenuItem_Click"/>
 							<Separator/>

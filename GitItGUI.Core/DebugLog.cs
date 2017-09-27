@@ -36,6 +36,7 @@ namespace GitItGUI.Core
 				{
 					writer.Flush();
 					stream.Flush();
+					writer.Dispose();
 					stream.Dispose();
 					stream = null;
 				}

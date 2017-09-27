@@ -220,5 +220,15 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				});
 			});
 		}
+
+		private void pullMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			ChangesTab.singleton.pullButton_Click(null, null);
+		}
+
+		private void pushMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			ChangesTab.singleton.pushButton_Click(null, null);
+		}
 	}
 }
