@@ -104,12 +104,12 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				item.Content = grid;
 				if (fileState.IsStaged())
 				{
-					button.Click += StagedButton_Click;
+					button.Click += StagedFileButton_Click;
 					stagedChangesListBox.Items.Add(item);
 				}
 				else
 				{
-					button.Click += UnstagedButton_Click;
+					button.Click += UnstagedFileButton_Click;
 					unstagedChangesListBox.Items.Add(item);
 				}
 			}
@@ -201,7 +201,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			});
 		}
 
-		private void UnstagedButton_Click(object sender, RoutedEventArgs e)
+		private void UnstagedFileButton_Click(object sender, RoutedEventArgs e)
 		{
 			var button = (Button)sender;
 			var fileState = (FileState)button.Tag;
@@ -214,7 +214,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				{
 					if (!RepoScreen.singleton.repoManager.StageFile(fileState, false))
 					{
-						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage file");
+						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to stage file");
 					}
 					else
 					{
@@ -223,6 +223,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 							var item = (ListBoxItem)((Grid)button.Parent).Parent;
 							unstagedChangesListBox.Items.Remove(item);
 							stagedChangesListBox.Items.Add(item);
+							button.Click -= UnstagedFileButton_Click;
+							button.Click += StagedFileButton_Click;
 						});
 					}
 
@@ -244,13 +246,29 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			stageFile();
 		}
 
-		private void StagedButton_Click(object sender, RoutedEventArgs e)
+		private void StagedFileButton_Click(object sender, RoutedEventArgs e)
 		{
-			var fileState = (FileState)((Button)sender).Tag;
+			var button = (Button)sender;
+			var fileState = (FileState)button.Tag;
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.UnstageFile(fileState, true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to stage file");
+				if (!RepoScreen.singleton.repoManager.UnstageFile(fileState, false))
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage file");
+				}
+				else
+				{
+					Dispatcher.InvokeAsync(delegate()
+					{
+						var item = (ListBoxItem)((Grid)button.Parent).Parent;
+						stagedChangesListBox.Items.Remove(item);
+						unstagedChangesListBox.Items.Add(item);
+						button.Click -= StagedFileButton_Click;
+						button.Click += UnstagedFileButton_Click;
+					});
+				}
+
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -267,7 +285,22 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.StageAllFiles(true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to stage files");
+				if (!RepoScreen.singleton.repoManager.StageAllFiles(false))
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to stage files");
+				}
+				else
+				{
+					Dispatcher.InvokeAsync(delegate()
+					{
+						var items = new ListBoxItem[unstagedChangesListBox.Items.Count];
+						unstagedChangesListBox.Items.CopyTo(items, 0);
+						unstagedChangesListBox.Items.Clear();
+						foreach (var item in items) stagedChangesListBox.Items.Add(item);
+						unstagedChangesListBox.Items.Clear();
+					});
+				}
+
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -277,7 +310,22 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.UnstageAllFiles(true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				if (!RepoScreen.singleton.repoManager.UnstageAllFiles(false))
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				}
+				else
+				{
+					Dispatcher.InvokeAsync(delegate()
+					{
+						var items = new ListBoxItem[stagedChangesListBox.Items.Count];
+						stagedChangesListBox.Items.CopyTo(items, 0);
+						stagedChangesListBox.Items.Clear();
+						foreach (var item in items) unstagedChangesListBox.Items.Add(item);
+						stagedChangesListBox.Items.Clear();
+					});
+				}
+
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -286,11 +334,12 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		{
 			// create list of selected files
 			var fileStates = new List<FileState>();
-			foreach (var item in unstagedChangesListBox.Items)
+			var items = new List<ListBoxItem>();
+			var fileButtons = new List<Button>();
+			foreach (ListBoxItem item in unstagedChangesListBox.Items)
 			{
-				var i = (ListBoxItem)item;
-				var fileState = (FileState)i.Tag;
-				if (i.IsSelected)
+				var fileState = (FileState)item.Tag;
+				if (item.IsSelected)
 				{
 					if (fileState.HasState(FileStates.Conflicted))
 					{
@@ -299,6 +348,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					}
 
 					fileStates.Add(fileState);
+					items.Add(item);
+					fileButtons.Add((Button)((Grid)item.Content).Children[0]);
 				}
 			}
 
@@ -306,7 +357,28 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.StageFileList(fileStates, true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				if (!RepoScreen.singleton.repoManager.StageFileList(fileStates, false))
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				}
+				else
+				{
+					Dispatcher.InvokeAsync(delegate()
+					{
+						foreach (var item in items)
+						{
+							unstagedChangesListBox.Items.Remove(item);
+							stagedChangesListBox.Items.Add(item);
+						}
+
+						foreach (var button in fileButtons)
+						{
+							button.Click -= UnstagedFileButton_Click;
+							button.Click += StagedFileButton_Click;
+						}
+					});
+				}
+
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -315,18 +387,45 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		{
 			// create list of selected files
 			var fileStates = new List<FileState>();
-			foreach (var item in stagedChangesListBox.Items)
+			var items = new List<ListBoxItem>();
+			var fileButtons = new List<Button>();
+			foreach (ListBoxItem item in stagedChangesListBox.Items)
 			{
-				var i = (ListBoxItem)item;
-				var fileState = (FileState)i.Tag;
-				if (i.IsSelected) fileStates.Add(fileState);
+				var fileState = (FileState)item.Tag;
+				if (item.IsSelected)
+				{
+					fileStates.Add(fileState);
+					items.Add(item);
+					fileButtons.Add((Button)((Grid)item.Content).Children[0]);
+				}
 			}
 
 			// process selection
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.UnstageFileList(fileStates, true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				if (!RepoScreen.singleton.repoManager.UnstageFileList(fileStates, false))
+				{
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				}
+				else
+				{
+					Dispatcher.InvokeAsync(delegate()
+					{
+						foreach (var item in items)
+						{
+							stagedChangesListBox.Items.Remove(item);
+							unstagedChangesListBox.Items.Add(item);
+						}
+
+						foreach (var button in fileButtons)
+						{
+							button.Click -= StagedFileButton_Click;
+							button.Click += UnstagedFileButton_Click;
+						}
+					});
+				}
+
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
