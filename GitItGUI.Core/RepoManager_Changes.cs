@@ -249,7 +249,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public bool StageFile(FileState fileState)
+		public bool StageFile(FileState fileState, bool refresh)
 		{
 			lock (this)
 			{
@@ -264,12 +264,12 @@ namespace GitItGUI.Core
 					success = false;
 				}
 
-				Refresh();
+				if (refresh) Refresh();
 				return success;
 			}
 		}
 
-		public bool StageFileList(List<FileState> fileStates)
+		public bool StageFileList(List<FileState> fileStates, bool refresh)
 		{
 			lock (this)
 			{
@@ -287,12 +287,12 @@ namespace GitItGUI.Core
 					success = false;
 				}
 
-				Refresh();
+				if (refresh) Refresh();
 				return success;
 			}
 		}
 
-		public bool StageAllFiles()
+		public bool StageAllFiles(bool refresh)
 		{
 			lock (this)
 			{
@@ -307,12 +307,12 @@ namespace GitItGUI.Core
 					success = false;
 				}
 
-				Refresh();
+				if (refresh) Refresh();
 				return success;
 			}
 		}
 
-		public bool UnstageFile(FileState fileState)
+		public bool UnstageFile(FileState fileState, bool refresh)
 		{
 			lock (this)
 			{
@@ -327,12 +327,12 @@ namespace GitItGUI.Core
 					success = false;
 				}
 
-				Refresh();
+				if (refresh) Refresh();
 				return success;
 			}
 		}
 
-		public bool UnstageFileList(List<FileState> fileStates)
+		public bool UnstageFileList(List<FileState> fileStates, bool refresh)
 		{
 			lock (this)
 			{
@@ -350,12 +350,12 @@ namespace GitItGUI.Core
 					success = false;
 				}
 
-				Refresh();
+				if (refresh) Refresh();
 				return success;
 			}
 		}
 
-		public bool UnstageAllFiles()
+		public bool UnstageAllFiles(bool refresh)
 		{
 			lock (this)
 			{
@@ -370,7 +370,7 @@ namespace GitItGUI.Core
 					success = false;
 				}
 
-				Refresh();
+				if (refresh) Refresh();
 				return success;
 			}
 		}

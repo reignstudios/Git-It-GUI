@@ -38,34 +38,13 @@ namespace GitItGUI.UI.Images
 
 		public static BitmapImage GetImage(FileStates state)
 		{
-			switch (state)
-			{
-				case FileStates.NewInIndex:
-				case FileStates.NewInWorkdir:
-					return newImage;
-
-				case FileStates.DeletedFromIndex:
-				case FileStates.DeletedFromWorkdir:
-					return deletedImage;
-
-				case FileStates.ModifiedInIndex:
-				case FileStates.ModifiedInWorkdir:
-					return modifiedImage;
-
-				case FileStates.RenamedInIndex:
-				case FileStates.RenamedInWorkdir:
-					return renamedImage;
-
-				case FileStates.TypeChangeInIndex:
-				case FileStates.TypeChangeInWorkdir:
-					return typeChangedImage;
-
-				case FileStates.Conflicted:
-					return conflictedImage;
-
-				default:
-					return unknownImage;
-			}
+			if ((state & FileStates.Conflicted) != 0) return conflictedImage;
+			else if ((state & FileStates.NewInIndex) != 0 || (state & FileStates.NewInWorkdir) != 0) return newImage;
+			else if ((state & FileStates.DeletedFromIndex) != 0 || (state & FileStates.DeletedFromWorkdir) != 0) return deletedImage;
+			else if ((state & FileStates.ModifiedInIndex) != 0 || (state & FileStates.ModifiedInWorkdir) != 0) return modifiedImage;
+			else if ((state & FileStates.RenamedInIndex) != 0 || (state & FileStates.RenamedInWorkdir) != 0) return renamedImage;
+			else if ((state & FileStates.TypeChangeInIndex) != 0 || (state & FileStates.TypeChangeInWorkdir) != 0) return typeChangedImage;
+			else return unknownImage;
 		}
     }
 }

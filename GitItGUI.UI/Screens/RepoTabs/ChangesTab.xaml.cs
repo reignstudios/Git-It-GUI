@@ -203,7 +203,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void UnstagedButton_Click(object sender, RoutedEventArgs e)
 		{
-			var fileState = (FileState)((Button)sender).Tag;
+			var button = (Button)sender;
+			var fileState = (FileState)button.Tag;
 
 			void stageFile()
 			{
@@ -211,7 +212,20 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				MainWindow.singleton.ShowProcessingOverlay();
 				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 				{
-					if (!RepoScreen.singleton.repoManager.StageFile(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage file");
+					if (!RepoScreen.singleton.repoManager.StageFile(fileState, false))
+					{
+						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage file");
+					}
+					else
+					{
+						Dispatcher.InvokeAsync(delegate()
+						{
+							var item = (ListBoxItem)((Grid)button.Parent).Parent;
+							unstagedChangesListBox.Items.Remove(item);
+							stagedChangesListBox.Items.Add(item);
+						});
+					}
+
 					MainWindow.singleton.HideProcessingOverlay();
 				});
 			}
@@ -236,7 +250,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.UnstageFile(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to stage file");
+				if (!RepoScreen.singleton.repoManager.UnstageFile(fileState, true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to stage file");
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -253,7 +267,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.StageAllFiles()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to stage files");
+				if (!RepoScreen.singleton.repoManager.StageAllFiles(true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to stage files");
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -263,7 +277,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.UnstageAllFiles()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				if (!RepoScreen.singleton.repoManager.UnstageAllFiles(true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -292,7 +306,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.StageFileList(fileStates)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				if (!RepoScreen.singleton.repoManager.StageFileList(fileStates, true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -312,7 +326,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.UnstageFileList(fileStates)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
+				if (!RepoScreen.singleton.repoManager.UnstageFileList(fileStates, true)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to un-stage files");
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
