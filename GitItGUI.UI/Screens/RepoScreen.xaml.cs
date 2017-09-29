@@ -81,21 +81,24 @@ namespace GitItGUI.UI.Screens
 						MainWindow.singleton.Navigate(this);
 
 						// check repo fragmentation
-						int count = repoManager.UnpackedObjectCount(out string size);
-						if (count >= 1000)
+						if (!repoManager.ChangesExist())
 						{
-							MainWindow.singleton.ShowMessageOverlay("Optamize", string.Format("Your repo is fragmented, would you like to optamize?\nThere are '{0}' loose objects totalling '{1}' in size", count, size), MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
+							int count = repoManager.UnpackedObjectCount(out string size);
+							if (count >= 1000)
 							{
-								if (result == MessageOverlayResults.Ok)
+								MainWindow.singleton.ShowMessageOverlay("Optamize", string.Format("Your repo is fragmented, would you like to optamize?\nThere are '{0}' loose objects totalling '{1}' in size", count, size), MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
 								{
-									MainWindow.singleton.ShowProcessingOverlay();
-									repoManager.dispatcher.InvokeAsync(delegate()
+									if (result == MessageOverlayResults.Ok)
 									{
-										repoManager.Optimize();
-										MainWindow.singleton.HideProcessingOverlay();
-									});
-								}
-							});
+										MainWindow.singleton.ShowProcessingOverlay();
+										repoManager.dispatcher.InvokeAsync(delegate()
+										{
+											repoManager.Optimize();
+											MainWindow.singleton.HideProcessingOverlay();
+										});
+									}
+								});
+							}
 						}
 					});
 				}

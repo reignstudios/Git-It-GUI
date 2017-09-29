@@ -80,7 +80,18 @@ namespace GitItGUI.UI
 			base.OnActivated(e);
 
 			#if !DEBUG
-			if (repoScreen != null) repoScreen.Refresh();
+			if
+			(
+				repoScreen != null &&
+				processingOverlay.Visibility != Visibility.Visible &&
+				waitingOverlay.Visibility != Visibility.Visible &&
+				messageOverlay.Visibility != Visibility.Visible &&
+				nameEntryOverlay.Visibility != Visibility.Visible &&
+				mergingOverlay.Visibility != Visibility.Visible
+			)
+			{
+				repoScreen.Refresh();
+			}
 			#endif
 		}
 

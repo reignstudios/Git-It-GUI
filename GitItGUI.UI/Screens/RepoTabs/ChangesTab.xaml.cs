@@ -76,7 +76,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				// item label
 				var label = new Label();
 				label.Margin = new Thickness(20, 0, 0, 0);
-				label.Content = (fileState.isLFS ? "[LFS] " : string.Empty) + fileState.filename;
+				label.Content = fileState.filename + (fileState.isLFS ? " [LFS]" : string.Empty);
 				label.ContextMenu = new ContextMenu();
 				var openFileMenu = new MenuItem();
 				openFileMenu.Header = "Open file";
