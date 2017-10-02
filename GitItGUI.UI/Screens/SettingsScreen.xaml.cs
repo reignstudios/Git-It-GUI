@@ -20,12 +20,11 @@ namespace GitItGUI.UI.Screens
     /// </summary>
     public partial class SettingsScreen : UserControl
     {
-		public static SettingsScreen singleton;
-
 		public SettingsScreen()
         {
-			singleton = this;
 			InitializeComponent();
         }
+
+
     }
 }

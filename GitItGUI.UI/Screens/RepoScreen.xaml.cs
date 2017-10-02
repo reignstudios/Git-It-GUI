@@ -139,7 +139,7 @@ namespace GitItGUI.UI.Screens
 
 		public void Refresh()
 		{
-			if (repoManager != null && repoManager.isOpen)
+			void Invoke()
 			{
 				MainWindow.singleton.ShowProcessingOverlay();
 				repoManager.dispatcher.InvokeAsync(delegate()
@@ -153,6 +153,21 @@ namespace GitItGUI.UI.Screens
 					MainWindow.singleton.HideProcessingOverlay();
 				});
 			}
+
+			if (repoManager != null && repoManager.isOpen)
+			{
+				if (repoManager.dispatcher.CheckAccess())
+				{
+					Invoke();
+				}
+				else
+				{
+					repoManager.dispatcher.InvokeAsync(delegate()
+					{
+						
+					});
+				}
+			}
 		}
 
 		private void backButton_Click(object sender, RoutedEventArgs e)
@@ -163,12 +178,7 @@ namespace GitItGUI.UI.Screens
 
 		private void refreshButton_Click(object sender, RoutedEventArgs e)
 		{
-			MainWindow.singleton.ShowProcessingOverlay();
-			repoManager.dispatcher.InvokeAsync(delegate()
-			{
-				repoManager.Refresh();
-				MainWindow.singleton.HideProcessingOverlay();
-			});
+			Refresh();
 		}
 
 		private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)

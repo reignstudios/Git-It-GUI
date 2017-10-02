@@ -39,13 +39,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		{
 			if (!refreshPending) return;
 			refreshPending = false;
-
-			MainWindow.singleton.ShowProcessingOverlay();
-			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
-			{
-				RepoScreen.singleton.repoManager.Refresh();
-				MainWindow.singleton.HideProcessingOverlay();
-			});
+			RepoScreen.singleton.Refresh();
 		}
 
 		public void Refresh()

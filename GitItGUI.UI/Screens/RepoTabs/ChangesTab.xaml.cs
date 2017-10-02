@@ -724,7 +724,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				if (changesExist && !RepoScreen.singleton.repoManager.CommitStagedChanges(msg, false))
 				{
-					RepoScreen.singleton.repoManager.Refresh();
+					RepoScreen.singleton.Refresh();
 					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
 					return;
 				}
