@@ -34,13 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion(VersionInfo.version)]
 [assembly: AssemblyFileVersion(VersionInfo.version)]
-
-public static class VersionInfo
-{
-	public const string version = "0.3.0";
-	#if DEBUG
-	public const string versionType = version + "b";
-	#else
-	public const string versionType = version + "r";
-	#endif
-}

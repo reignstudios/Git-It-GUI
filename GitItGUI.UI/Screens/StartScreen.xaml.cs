@@ -1,5 +1,6 @@
 ﻿using GitItGUI.Core;
 using GitItGUI.UI.Utils;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,11 +18,19 @@ namespace GitItGUI.UI.Screens
 		{
 			singleton = this;
 			InitializeComponent();
+
+			updateImage.Visibility = Visibility.Hidden;
+			updateImage.MouseUp += UpdateImage_MouseUp;
 		}
 
 		public void Init()
 		{
 			RefreshHistory();
+		}
+
+		public void EnabledOutOfDate()
+		{
+			updateImage.Visibility = Visibility.Visible;
 		}
 
 		private void RefreshHistory()
@@ -92,6 +101,14 @@ namespace GitItGUI.UI.Screens
 		{
 			SettingsScreen.singleton.Setup();
 			MainWindow.singleton.Navigate(SettingsScreen.singleton);
+		}
+
+		private void UpdateImage_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			using (var process = Process.Start("https://github.com/reignstudios/Git-It-GUI/releases"))
+			{
+				process.WaitForExit();
+			}
 		}
 	}
 }

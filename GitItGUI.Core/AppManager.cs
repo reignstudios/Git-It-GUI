@@ -18,15 +18,27 @@ namespace GitItGUI.Core
 		public int major, minor, patch, build;
 	}
 
-	public delegate void CheckForUpdatesCallbackMethod(bool succeeded, bool invalidFeatures);
+	public enum UpdateCheckResult
+	{
+		CommonError,
+		Success,
+		AppVersionOutOfDate,
+		AppVersionParseError,
+		GitNotInstalledError,
+		GitLFSNotInstalledError,
+		BadVersionError,
+		GitVersionCheckError,
+		GitLFSVersionCheckError,
+		GitVersionToLowForLFS
+	}
+
+	public delegate void CheckForUpdatesCallbackMethod(UpdateCheckResult result);
 
 	/// <summary>
 	/// Handles preliminary features
 	/// </summary>
 	public static class AppManager
 	{
-		private static CheckForUpdatesCallbackMethod checkForUpdatesCallback;
-		private static string checkForUpdatesOutOfDateURL;
 		public static XML.AppSettings settings {get; private set;}
 		internal static List<string> defaultGitLFS_Exts;
 
@@ -197,24 +209,121 @@ namespace GitItGUI.Core
 			DebugLog.Dispose();
 		}
 
-		/*public static bool CheckForUpdates(string url, string outOfDateURL, CheckForUpdatesCallbackMethod checkForUpdatesCallback)
+		public static void CheckForUpdates(string url, CheckForUpdatesCallbackMethod checkForUpdatesCallback)
 		{
 			try
 			{
-				AppManager.checkForUpdatesCallback = checkForUpdatesCallback;
-				checkForUpdatesOutOfDateURL = outOfDateURL;
+				// validate git install
+				var repository = new Repository();
 
+				// git and git-lfs versions
+				string gitVersion = null, gitlfsVersion = null;
+				string gitlfsRequiredGitVersion = "0.0.0.0";
+				const string minGitVersion = "2.13.0", minGitLFSVersion = "2.2.1";
+				
+				// get git version string
+				try
+				{
+					if (!repository.GetVersion(out gitVersion)) throw new Exception(repository.lastError);
+				}
+				catch
+				{
+					DebugLog.LogError("git is not installed correctly. (Make sure git is usable in the cmd/terminal)");
+					client.Dispose();
+					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitNotInstalledError);
+					DownloadGit();
+					return;
+				}
+
+				// get git-lfs version string
+				try
+				{
+					if (!repository.lfs.GetVersion(out gitlfsVersion)) throw new Exception(repository.lastError);
+				}
+				catch
+				{
+					DebugLog.LogError("git-lfs is not installed correctly. (Make sure git-lfs is usable in the cmd/terminal)");
+					client.Dispose();
+					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitLFSNotInstalledError);
+					DownloadGitLFS();
+					return;
+				}
+
+				// grab git version value
+				string appendix = "";
+				if (PlatformInfo.platform == Platforms.Windows) appendix = @"\.windows";
+				var match = Regex.Match(gitVersion, @"git version (.*)" + appendix);
+				if (match.Success && match.Groups.Count == 2) gitVersion = match.Groups[1].Value;
+				else
+				{
+					DebugLog.LogError("Failed to grab git version!");
+					client.Dispose();
+					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitVersionCheckError);
+					DownloadGit();
+					return;
+				}
+				
+				// grab lfs and required git version value
+				if (PlatformInfo.platform == Platforms.Windows) appendix = @"; git .*\)";
+				else appendix = @"\)";
+				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; (\w*) (\w*); go (.*)" + appendix);
+				if (match.Success && match.Groups.Count == 5)
+				{
+					gitlfsVersion = match.Groups[1].Value;
+					gitlfsRequiredGitVersion = match.Groups[4].Value;
+				}
+				else
+				{
+					DebugLog.LogError("Failed to grab git-lfs version!");
+					client.Dispose();
+					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitLFSVersionCheckError);
+					DownloadGitLFS();
+					return;
+				}
+
+				// make sure the git version installed is supporeted by lfs
+				if (!IsValidVersion(gitVersion, gitlfsRequiredGitVersion))
+				{
+					DebugLog.LogError(string.Format("'git-lfs' version is not compatible with 'git' version installed!"));
+					client.Dispose();
+					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitVersionToLowForLFS);
+					DownloadGit();
+					DownloadGitLFS();
+					return;
+				}
+
+				// check min git versions
+				bool gitValid = true, gitlfsValid = true;
+				if (!IsValidVersion(gitVersion, minGitVersion))
+				{
+					DebugLog.LogError("Your 'git' version is out of date.\nDownload and install with defaults!");
+					gitValid = false;
+				}
+
+				if (!IsValidVersion(gitlfsVersion, minGitLFSVersion))
+				{
+					DebugLog.LogError("Your 'git-lfs' version is out of date.\nDownload and install with defaults!");
+					gitlfsValid = false;
+				}
+
+				if (!gitValid || !gitlfsValid)
+				{
+					if (!gitValid) DownloadGit();
+					if (!gitlfsValid) DownloadGitLFS();
+					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.BadVersionError);
+					return;
+				}
+
+				// check app version
 				client = new WebClient();
 				client.DownloadStringCompleted += Client_DownloadStringCompleted;
-				client.DownloadStringAsync(new Uri(url));
+				client.DownloadStringAsync(new Uri(url), checkForUpdatesCallback);
 			}
 			catch (Exception e)
 			{
-				DebugLog.LogError("Failed to check for updates: " + e.Message, true);
-				if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, false);
+				DebugLog.LogError("Failed to check for updates: " + e.Message);
+				if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.CommonError);
 			}
-
-			return true;
 		}
 
 		private static VersionNumber GetVersionNumber(string version)
@@ -301,122 +410,26 @@ namespace GitItGUI.Core
 
 		private static void Client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
 		{
+			var checkForUpdatesCallback = (CheckForUpdatesCallbackMethod)e.UserState;
+
 			if (e.Error != null)
 			{
-				DebugLog.LogError("Failed to check for updates: " + e.Error.Message, true);
+				DebugLog.LogError("Failed to check for updates: " + e.Error.Message);
 				client.Dispose();
-				if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, false);
+				if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.CommonError);
 				return;
 			}
 
 			if (e.Cancelled)
 			{
-				DebugLog.LogError("Update check canceled!", true);
+				DebugLog.LogError("Update check canceled!");
 				client.Dispose();
-				if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, false);
+				if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.CommonError);
 				return;
 			}
 
 			try
 			{
-				// git and git-lfs versions
-				string gitVersion = null, gitlfsVersion = null;
-				string gitlfsRequiredGitVersion = "0.0.0.0";
-				const string minGitVersion = "2.11.0", minGitLFSVersion = "1.5.5";
-
-				// get git version string
-				try
-				{
-					if (!Repository.GetVersion(out gitVersion)) throw new Exception(Repository.lastError);
-				}
-				catch
-				{
-					DebugLog.LogError("git is not installed correctly. (Make sure git is usable in the cmd/terminal)", true);
-					client.Dispose();
-					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
-					DownloadGit();
-					return;
-				}
-
-				// get git-lfs version string
-				try
-				{
-					if (!Repository.LFS.GetVersion(out gitlfsVersion)) throw new Exception(Repository.lastError);
-				}
-				catch
-				{
-					DebugLog.LogError("git-lfs is not installed correctly. (Make sure git-lfs is usable in the cmd/terminal)", true);
-					client.Dispose();
-					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
-					DownloadGitLFS();
-					return;
-				}
-
-				// grab git version value
-				string appendix = "";
-				if (PlatformInfo.platform == Platforms.Windows) appendix = @"\.windows";
-				var match = Regex.Match(gitVersion, @"git version (.*)" + appendix);
-				if (match.Success && match.Groups.Count == 2) gitVersion = match.Groups[1].Value;
-				else
-				{
-					DebugLog.LogError("Failed to grab git version!", true);
-					client.Dispose();
-					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
-					DownloadGit();
-					return;
-				}
-				
-				// grab lfs and required git version value
-				if (PlatformInfo.platform == Platforms.Windows) appendix = @"; git .*\)";
-				else appendix = @"\)";
-				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; (\w*) (\w*); go (.*)" + appendix);
-				if (match.Success && match.Groups.Count == 5)
-				{
-					gitlfsVersion = match.Groups[1].Value;
-					gitlfsRequiredGitVersion = match.Groups[4].Value;
-				}
-				else
-				{
-					DebugLog.LogError("Failed to grab git-lfs version!", true);
-					client.Dispose();
-					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
-					DownloadGitLFS();
-					return;
-				}
-
-				// make sure the git version installed is supporeted by lfs
-				if (!IsValidVersion(gitVersion, gitlfsRequiredGitVersion))
-				{
-					DebugLog.LogError(string.Format("'git-lfs' version is not compatible with 'git' version installed!"), true);
-					client.Dispose();
-					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
-					DownloadGit();
-					DownloadGitLFS();
-					return;
-				}
-
-				// check min git versions
-				bool gitValid = true, gitlfsValid = true;
-				if (!IsValidVersion(gitVersion, minGitVersion))
-				{
-					DebugLog.LogError("Your 'git' version is out of date.\nDownload and install with defaults!", true);
-					gitValid = false;
-				}
-
-				if (!IsValidVersion(gitlfsVersion, minGitLFSVersion))
-				{
-					DebugLog.LogError("Your 'git-lfs' version is out of date.\nDownload and install with defaults!", true);
-					gitlfsValid = false;
-				}
-
-				if (!gitValid || !gitlfsValid)
-				{
-					if (!gitValid) DownloadGit();
-					if (!gitlfsValid) DownloadGitLFS();
-					if (checkForUpdatesCallback != null) checkForUpdatesCallback(false, true);
-					return;
-				}
-
 				// check app version
 				bool canCheckAppVersion = true;
 				using (var reader = new StringReader(e.Result))
@@ -429,23 +442,22 @@ namespace GitItGUI.Core
 							canCheckAppVersion = false;
 							if (!IsValidVersion(VersionInfo.version, xmlReader.ReadInnerXml()))
 							{
-								DebugLog.LogError("Your 'Git-It-GUI' version is out of date.", true);
-								using (var process = Process.Start(checkForUpdatesOutOfDateURL))
-								{
-									process.WaitForExit();
-								}
+								DebugLog.LogError("Your 'Git-It-GUI' version is out of date.");
+								if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.AppVersionOutOfDate);
 							}
 						}
 					}
 				}
+
+				if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.Success);
 			}
 			catch (Exception ex)
 			{
-				DebugLog.LogError("Failed to get version info!\nMake sure git and git-lfs are installed\nAlso make sure you're connected to the internet: \n\n" + ex.Message, true);
+				DebugLog.LogError("Failed to get version info!\nMake sure git and git-lfs are installed\nAlso make sure you're connected to the internet: \n\n" + ex.Message);
+				if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.AppVersionParseError);
 			}
-
+			
 			client.Dispose();
-			if (checkForUpdatesCallback != null) checkForUpdatesCallback(true, false);
-		}*/
+		}
 	}
 }

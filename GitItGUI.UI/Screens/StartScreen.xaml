@@ -39,5 +39,8 @@
 				</Grid>
 			</Grid>
         </Border>
+
+		<!-- Update Button -->
+		<Image Name="updateImage" Source="../Images/Update.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="64" Height="64" Margin="10" ToolTip="Update avaliable!"/>
     </Grid>
 </UserControl>

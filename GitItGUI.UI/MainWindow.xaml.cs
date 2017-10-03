@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using GitItGUI.UI.Overlays;
+using System.Diagnostics;
 
 namespace GitItGUI.UI
 {
@@ -30,6 +31,7 @@ namespace GitItGUI.UI
 			singleton = this;
 			InitializeComponent();
 			
+			// init app manager
 			if (!AppManager.Init())
 			{
 				MessageBox.Show(this, "Failed to start AppManager");
@@ -37,9 +39,11 @@ namespace GitItGUI.UI
 				return;
 			}
 
+			// init screens
 			startScreen.Init();
 			repoScreen.Init();
 
+			// position/size window from settings
 			if (AppManager.settings.winX != -1)
 			{
 				Left = AppManager.settings.winX;
@@ -47,6 +51,39 @@ namespace GitItGUI.UI
 				Width = AppManager.settings.winWidth;
 				Height = AppManager.settings.winHeight;
 			}
+
+			// version check
+			Title += " v" + VersionInfo.versionType;
+			AppManager.CheckForUpdates("http://reign-studios-services.com/GitItGUI/VersionInfo.xml", CheckForUpdatesCallback);
+		}
+
+		private void CheckForUpdatesCallback(UpdateCheckResult result)
+		{
+			bool shouldExit = true;
+			switch (result)
+			{
+				case UpdateCheckResult.BadVersionError: ShowMessageOverlay("Error", "Git or (git-lfs) versions are incompatible with this app"); break;
+				case UpdateCheckResult.GitVersionToLowForLFS: ShowMessageOverlay("Error", "The git version installed is incompatible with the lfs version isntalled"); break;
+
+				case UpdateCheckResult.GitNotInstalledError: ShowMessageOverlay("Error", "Git is not installed or installed incorrectly.\nMake sure you're able to use it in cmd/term prompt"); break;
+				case UpdateCheckResult.GitLFSNotInstalledError: ShowMessageOverlay("Error", "Git-LFS is not installed or installed incorrectly.\nMake sure you're able to use it in cmd/term prompt"); break;
+			
+				case UpdateCheckResult.GitVersionCheckError: ShowMessageOverlay("Error", "Git version parse failed.\nIts possible the git version you're using isn't supported"); break;
+				case UpdateCheckResult.GitLFSVersionCheckError: ShowMessageOverlay("Error", "Git-LFS version parse failed.\nIts possible the git-lfs version you're using isn't supported"); break;
+
+				case UpdateCheckResult.AppVersionOutOfDate:
+					shouldExit = false;
+					startScreen.EnabledOutOfDate();
+					break;
+
+				case UpdateCheckResult.AppVersionParseError:
+				case UpdateCheckResult.Success:
+				case UpdateCheckResult.CommonError:
+					shouldExit = false;
+					break;
+			}
+
+			if (shouldExit) Environment.Exit(0);
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
