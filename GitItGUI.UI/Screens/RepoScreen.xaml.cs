@@ -164,7 +164,7 @@ namespace GitItGUI.UI.Screens
 				{
 					repoManager.dispatcher.InvokeAsync(delegate()
 					{
-						
+						Invoke();
 					});
 				}
 			}
