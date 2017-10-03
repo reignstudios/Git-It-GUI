@@ -87,5 +87,11 @@ namespace GitItGUI.UI.Screens
 				RepoScreen.singleton.OpenRepo(folderPath);
 			}
 		}
+
+		private void settingsButton_Click(object sender, RoutedEventArgs e)
+		{
+			SettingsScreen.singleton.Setup();
+			MainWindow.singleton.Navigate(SettingsScreen.singleton);
+		}
 	}
 }

@@ -6,6 +6,14 @@ using System.Xml.Serialization;
 
 namespace GitItGUI.Core
 {
+	public enum MergeDiffTools
+	{
+		Meld,
+		kDiff3,
+		P4Merge,
+		DiffMerge
+	}
+
 	namespace XML
 	{
 		public class CustomErrorCodes
@@ -20,7 +28,7 @@ namespace GitItGUI.Core
 			[XmlAttribute("WinY")] public int winY = -1;
 			[XmlAttribute("WinWidth")] public int winWidth = -1;
 			[XmlAttribute("WinHeight")] public int winHeight = -1;
-			[XmlElement("MergeDiffTool")] public string mergeDiffTool = "P4Merge";
+			[XmlElement("MergeDiffTool")] public MergeDiffTools mergeDiffTool = MergeDiffTools.P4Merge;
 			[XmlElement("AutoRefreshChanges")] public bool autoRefreshChanges = true;
 			[XmlElement("SimpleMode")] public bool simpleMode = true;
 			[XmlElement("CustomErrorCodes")] public CustomErrorCodes customErrorCodes = new CustomErrorCodes();

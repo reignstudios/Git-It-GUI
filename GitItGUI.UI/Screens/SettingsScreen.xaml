@@ -24,18 +24,17 @@
 				</Grid.RowDefinitions>
 
 				<Label Grid.Row="0" Content="Merge / Diff tool" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-				<ComboBox Grid.Row="1" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0">
+				<ComboBox Name="mergeDiffToolComboBox" Grid.Row="1" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0">
 					<ComboBoxItem>Meld</ComboBoxItem>
 					<ComboBoxItem>kDiff3</ComboBoxItem>
 					<ComboBoxItem>P4Merge</ComboBoxItem>
 					<ComboBoxItem>DiffMerge</ComboBoxItem>
 				</ComboBox>
 
-				<!--<Label Grid.Row="2" Content="" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>-->
-				<CheckBox Grid.Row="3" Content="Auto Refresh Changes" VerticalAlignment="Center" Margin="20,0" ToolTip="Refresh changes when app window comes into focus"/>
+				<ToggleButton Name="autoRefreshCheckBox" Grid.Row="3" Content="Auto Refresh Changes" VerticalAlignment="Center" Margin="20,0" ToolTip="Refresh changes when app window comes into focus"/>
 			</Grid>
 		</Border>
 
-		<Button Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75"/>
+		<Button Name="doneButton" Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="doneButton_Click"/>
 	</Grid>
 </UserControl>

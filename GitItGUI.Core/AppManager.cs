@@ -13,14 +13,6 @@ using System.Xml;
 
 namespace GitItGUI.Core
 {
-	public enum MergeDiffTools
-	{
-		Meld,
-		kDiff3,
-		P4Merge,
-		DiffMerge
-	}
-
 	class VersionNumber
 	{
 		public int major, minor, patch, build;
@@ -39,8 +31,6 @@ namespace GitItGUI.Core
 		internal static List<string> defaultGitLFS_Exts;
 
 		public static string mergeToolPath {get; private set;}
-		public static MergeDiffTools mergeDiffTool {get; private set;}
-		public static bool autoRefreshChanges;
 		public static IReadOnlyList<string> repositories {get{return settings.repositories;}}
 
 		public static int MaxRepoHistoryCount = 20;
@@ -93,7 +83,6 @@ namespace GitItGUI.Core
 
 				// load
 				LoadMergeDiffTool();
-				autoRefreshChanges = settings.autoRefreshChanges;
 			}
 			catch (Exception e)
 			{
@@ -112,8 +101,7 @@ namespace GitItGUI.Core
 
 		public static void SetMergeDiffTool(MergeDiffTools tool)
 		{
-			mergeDiffTool = tool;
-			settings.mergeDiffTool = tool.ToString();
+			settings.mergeDiffTool = tool;
 			LoadMergeDiffTool();
 		}
 
@@ -125,35 +113,18 @@ namespace GitItGUI.Core
 				PlatformInfo.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
 				switch (settings.mergeDiffTool)
 				{
-					case "Meld":
-						mergeDiffTool = MergeDiffTools.Meld;
-						mergeToolPath = programFilesx86 + "\\Meld\\Meld.exe";
-						break;
-
-					case "kDiff3":
-						mergeDiffTool = MergeDiffTools.kDiff3;
-						mergeToolPath = programFilesx64 + "\\KDiff3\\kdiff3.exe";
-						break;
-
-					case "P4Merge":
-						mergeDiffTool = MergeDiffTools.P4Merge;
-						mergeToolPath = programFilesx64 + "\\Perforce\\p4merge.exe"; 
-						break;
-
-					case "DiffMerge":
-						mergeDiffTool = MergeDiffTools.DiffMerge;
-						mergeToolPath = programFilesx64 + "\\SourceGear\\Common\\\\DiffMerge\\sgdm.exe";
-						break;
+					case MergeDiffTools.Meld: mergeToolPath = programFilesx86 + "\\Meld\\Meld.exe"; break;
+					case MergeDiffTools.kDiff3: mergeToolPath = programFilesx64 + "\\KDiff3\\kdiff3.exe"; break;
+					case MergeDiffTools.P4Merge: mergeToolPath = programFilesx64 + "\\Perforce\\p4merge.exe"; break;
+					case MergeDiffTools.DiffMerge: mergeToolPath = programFilesx64 + "\\SourceGear\\Common\\\\DiffMerge\\sgdm.exe"; break;
 				}
 			}
 			else if (PlatformInfo.platform == Platforms.Mac)
 			{
-				mergeDiffTool = MergeDiffTools.Meld;
 				mergeToolPath = "";
 			}
 			else if (PlatformInfo.platform == Platforms.Linux)
 			{
-				mergeDiffTool = MergeDiffTools.Meld;
 				mergeToolPath = "";
 			}
 			else
@@ -215,7 +186,6 @@ namespace GitItGUI.Core
 		/// </summary>
 		public static void SaveSettings()
 		{
-			settings.autoRefreshChanges = autoRefreshChanges;
 			Settings.Save<XML.AppSettings>(PlatformInfo.appDataPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + Settings.appSettingsFilename, settings);
 		}
 

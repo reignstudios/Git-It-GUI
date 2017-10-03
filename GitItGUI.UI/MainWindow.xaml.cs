@@ -51,6 +51,7 @@ namespace GitItGUI.UI
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
+			// validate we are in a quitable state
 			if
 			(
 				processingOverlay.Visibility == Visibility.Visible ||
@@ -64,11 +65,16 @@ namespace GitItGUI.UI
 				return;
 			}
 
+			// apply screen state
 			AppManager.settings.winX = (int)Left;
 			AppManager.settings.winY = (int)Top;
 			AppManager.settings.winWidth = (int)Width;
 			AppManager.settings.winHeight = (int)Height;
 
+			// apply setting if UI open
+			if (settingsScreen.Visibility == Visibility.Visible) settingsScreen.Apply();
+
+			// finish
 			repoScreen.Dispose();
 			AppManager.SaveSettings();
 			AppManager.Dispose();
@@ -78,7 +84,7 @@ namespace GitItGUI.UI
 		protected override void OnActivated(EventArgs e)
 		{
 			base.OnActivated(e);
-
+			
 			#if !DEBUG
 			if
 			(
@@ -90,7 +96,7 @@ namespace GitItGUI.UI
 				mergingOverlay.Visibility != Visibility.Visible
 			)
 			{
-				repoScreen.Refresh();
+				if (AppManager.settings.autoRefreshChanges) repoScreen.Refresh();
 			}
 			#endif
 		}
