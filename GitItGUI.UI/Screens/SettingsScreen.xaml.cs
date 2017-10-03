@@ -51,6 +51,15 @@ namespace GitItGUI.UI.Screens
 				case 2: AppManager.settings.mergeDiffTool = MergeDiffTools.P4Merge; break;
 				case 3: AppManager.settings.mergeDiffTool = MergeDiffTools.DiffMerge; break;
 			}
+
+			AppManager.SetMergeDiffTool(MergeDiffTools.DiffMerge);
+			ValidateDiffMergeTool();
+		}
+
+		public void ValidateDiffMergeTool()
+		{
+			if (AppManager.isMergeToolInstalled) return;
+			MainWindow.singleton.ShowMessageOverlay("Warning", "Diff/Merge tool not installed!\nSome app functions will fail.");
 		}
 
 		private void doneButton_Click(object sender, RoutedEventArgs e)

@@ -43,6 +43,9 @@ namespace GitItGUI.UI
 			startScreen.Init();
 			repoScreen.Init();
 
+			// validate diff/merge tool exists
+			settingsScreen.ValidateDiffMergeTool();
+
 			// position/size window from settings
 			if (AppManager.settings.winX != -1)
 			{

@@ -42,6 +42,7 @@ namespace GitItGUI.Core
 		public static XML.AppSettings settings {get; private set;}
 		internal static List<string> defaultGitLFS_Exts;
 
+		public static bool isMergeToolInstalled {get; private set;}
 		public static string mergeToolPath {get; private set;}
 		public static IReadOnlyList<string> repositories {get{return settings.repositories;}}
 
@@ -143,6 +144,9 @@ namespace GitItGUI.Core
 			{
 				throw new Exception("Unsported platform: " + PlatformInfo.platform);
 			}
+
+			isMergeToolInstalled = File.Exists(mergeToolPath);
+			if (!isMergeToolInstalled) DebugLog.LogWarning("Diff/Merge tool not installed: " + mergeToolPath);
 		}
 
 		public static void RemoveRepoFromHistory(string repoPath)
