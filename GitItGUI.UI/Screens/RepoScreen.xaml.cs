@@ -3,6 +3,7 @@ using GitItGUI.Core;
 using GitItGUI.UI.Overlays;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,7 +72,7 @@ namespace GitItGUI.UI.Screens
 			MainWindow.singleton.ShowProcessingOverlay();
 			repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (repoManager.OpenRepo(folderPath))
+				if (repoManager.Open(folderPath))
 				{
 					MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
 					{
@@ -106,6 +107,43 @@ namespace GitItGUI.UI.Screens
 				{
 					AppManager.RemoveRepoFromHistory(folderPath);
 					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to open repo");
+				}
+				
+				MainWindow.singleton.HideProcessingOverlay();
+			});
+		}
+
+		private bool WriteUserNameCallback(StreamWriter writer)
+		{
+			
+			return true;
+		}
+
+		private bool WritePasswordCallback(StreamWriter writer)
+		{
+			
+			return true;
+		}
+
+		public void CloneRepo(string clonePath, string repoURL)
+		{
+			MainWindow.singleton.ShowProcessingOverlay();
+			repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (repoManager.Clone(repoURL, clonePath, out string repoPath, WriteUserNameCallback, WritePasswordCallback))
+				{
+					MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
+					{
+						// prep
+						CheckSync();
+						tabControl.SelectedIndex = 0;
+						MainWindow.singleton.Navigate(this);
+					});
+				}
+				else
+				{
+					AppManager.RemoveRepoFromHistory(clonePath);
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to clone repo");
 				}
 				
 				MainWindow.singleton.HideProcessingOverlay();

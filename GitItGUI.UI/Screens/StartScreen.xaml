@@ -24,10 +24,10 @@
 					<Button Name="openButton" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Open an existing repo" Click="openButton_Click">
 						<Image Source="../Images/Open.png"/>
 					</Button>
-					<Button HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Clone an existing repo">
+					<Button Name="cloneButton" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Clone an existing repo" Click="cloneButton_Click">
 						<Image Source="../Images/Clone.png" Margin="2"/>
 					</Button>
-					<Button HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Create a new repo">
+					<Button Name="createButton" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Create a new repo" Click="createButton_Click">
 						<Image Source="../Images/Create.png" Margin="2"/>
 					</Button>
 					<Separator VerticalAlignment="Top" Margin="0,51,0,0"/>

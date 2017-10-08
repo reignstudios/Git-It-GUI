@@ -97,6 +97,16 @@ namespace GitItGUI.UI.Screens
 			}
 		}
 
+		private void cloneButton_Click(object sender, RoutedEventArgs e)
+		{
+			
+		}
+
+		private void createButton_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
 		private void settingsButton_Click(object sender, RoutedEventArgs e)
 		{
 			SettingsScreen.singleton.Setup();

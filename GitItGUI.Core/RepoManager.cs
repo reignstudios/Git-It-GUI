@@ -118,7 +118,7 @@ namespace GitItGUI.Core
 		/// </summary>
 		/// <param name="repoPath">Path to git repo</param>
 		/// <returns>True if succeeded</returns>
-		public bool OpenRepo(string repoPath, bool checkForSettingErros = false)
+		public bool Open(string repoPath, bool checkForSettingErros = false)
 		{
 			lock (this)
 			{
@@ -214,14 +214,14 @@ namespace GitItGUI.Core
 
 		public bool Close()
 		{
-			return OpenRepo(null);
+			return Open(null);
 		}
 
 		public bool Refresh()
 		{
 			lock (this)
 			{
-				return OpenRepo(repository.repoPath);
+				return Open(repository.repoPath);
 			}
 		}
 
