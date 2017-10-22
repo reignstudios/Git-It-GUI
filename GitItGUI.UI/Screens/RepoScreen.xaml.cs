@@ -77,6 +77,7 @@ namespace GitItGUI.UI.Screens
 					MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
 					{
 						// prep
+						StartScreen.singleton.Refresh();
 						CheckSync();
 						tabControl.SelectedIndex = 0;
 						MainWindow.singleton.Navigate(this);
@@ -115,14 +116,14 @@ namespace GitItGUI.UI.Screens
 
 		private bool WriteUserNameCallback(StreamWriter writer)
 		{
-			
-			return true;
+			DebugLog.LogError("WriteUserNameCallback Failed: Not implemented!");
+			return false;
 		}
 
 		private bool WritePasswordCallback(StreamWriter writer)
 		{
-			
-			return true;
+			DebugLog.LogError("WriteUserNameCallback Failed: Not implemented!");
+			return false;
 		}
 
 		public void CloneRepo(string clonePath, string repoURL)
@@ -132,13 +133,21 @@ namespace GitItGUI.UI.Screens
 			{
 				if (repoManager.Clone(repoURL, clonePath, out string repoPath, WriteUserNameCallback, WritePasswordCallback))
 				{
-					MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
+					if (repoManager.Open(repoPath))
 					{
-						// prep
-						CheckSync();
-						tabControl.SelectedIndex = 0;
-						MainWindow.singleton.Navigate(this);
-					});
+						MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
+						{
+							StartScreen.singleton.Refresh();
+							CheckSync();
+							tabControl.SelectedIndex = 0;
+							MainWindow.singleton.Navigate(this);
+						});
+					}
+					else
+					{
+						AppManager.RemoveRepoFromHistory(clonePath);
+						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to open cloned repo");
+					}
 				}
 				else
 				{

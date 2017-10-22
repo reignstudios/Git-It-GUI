@@ -145,12 +145,14 @@ namespace GitItGUI.UI
 		{
 			void UpdateVisibility()
 			{
+				// disable all screens
 				startScreen.Visibility = Visibility.Hidden;
 				settingsScreen.Visibility = Visibility.Hidden;
 				repoScreen.Visibility = Visibility.Hidden;
-				if (screen == startScreen) startScreen.Visibility = Visibility.Visible;
-				else if (screen == settingsScreen) settingsScreen.Visibility = Visibility.Visible;
-				else if (screen == repoScreen) repoScreen.Visibility = Visibility.Visible;
+				cloneScreen.Visibility = Visibility.Hidden;
+
+				// enable current
+				screen.Visibility = Visibility.Visible;
 			}
 
 			if (Dispatcher.CheckAccess())

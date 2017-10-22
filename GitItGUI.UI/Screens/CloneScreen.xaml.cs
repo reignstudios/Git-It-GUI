@@ -22,16 +22,23 @@ namespace GitItGUI.UI.Screens
 	/// </summary>
 	public partial class CloneScreen : UserControl
 	{
-		private string clonePath;
+		public static CloneScreen singleton;
 
 		public CloneScreen()
 		{
+			singleton = this;
 			InitializeComponent();
+		}
+
+		public void Setup()
+		{
+			repoUrlTextBox.Text = string.Empty;
+			clonePathTextBox.Text = string.Empty;
 		}
 
 		private void selectPathButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (!PlatformUtils.SelectFolder(out clonePath)) clonePath = null;
+			if (PlatformUtils.SelectFolder(out string clonePath)) clonePathTextBox.Text = clonePath;
 		}
 
 		private void cloneButton_Click(object sender, RoutedEventArgs e)
@@ -42,13 +49,18 @@ namespace GitItGUI.UI.Screens
 				return;
 			}
 
-			if (string.IsNullOrEmpty(clonePath))
+			if (string.IsNullOrEmpty(clonePathTextBox.Text))
 			{
 				DebugLog.LogWarning("Clone path cannot be empty");
 				return;
 			}
 
-			RepoScreen.singleton.CloneRepo(clonePath, repoUrlTextBox.Text);
+			RepoScreen.singleton.CloneRepo(clonePathTextBox.Text, repoUrlTextBox.Text);
+		}
+
+		private void cancelButton_Click(object sender, RoutedEventArgs e)
+		{
+			MainWindow.singleton.Navigate(StartScreen.singleton);
 		}
 	}
 }

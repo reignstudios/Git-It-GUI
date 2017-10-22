@@ -99,7 +99,8 @@ namespace GitItGUI.UI.Screens
 
 		private void cloneButton_Click(object sender, RoutedEventArgs e)
 		{
-			
+			CloneScreen.singleton.Setup();
+			MainWindow.singleton.Navigate(CloneScreen.singleton);
 		}
 
 		private void createButton_Click(object sender, RoutedEventArgs e)

@@ -12,6 +12,7 @@
 		<screens:StartScreen x:Name="startScreen" Visibility="Visible"/>
 		<screens:RepoScreen x:Name="repoScreen" Visibility="Hidden"/>
 		<screens:SettingsScreen x:Name="settingsScreen" Visibility="Hidden"/>
+		<screens:CloneScreen x:Name="cloneScreen" Visibility="Hidden"/>
 
 		<!-- Overlays -->
 		<overlays:MergeConflictOverlay x:Name="mergingOverlay" Visibility="Hidden"/>
