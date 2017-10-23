@@ -54,6 +54,7 @@ namespace GitItGUI.UI.Screens
 
 		public void Dispose()
 		{
+			changesTab.ClosingRepo();
 			repoManager.Dispose();
 		}
 
@@ -66,6 +67,15 @@ namespace GitItGUI.UI.Screens
 			repoTitleLabel.Content = string.Format("Current Repo '{0}' ({1}) [{2}]", System.IO.Path.GetFileName(repoManager.repository.repoPath), branchName, upToDateMsg);
 		}
 
+		private void PrepOpen()
+		{
+			changesTab.LoadCommitMessage();
+			StartScreen.singleton.Refresh();
+			CheckSync();
+			tabControl.SelectedIndex = 0;
+			MainWindow.singleton.Navigate(this);
+		}
+
 		public void OpenRepo(string folderPath)
 		{
 			MainWindow.singleton.ShowProcessingOverlay();
@@ -76,10 +86,7 @@ namespace GitItGUI.UI.Screens
 					MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
 					{
 						// prep
-						StartScreen.singleton.Refresh();
-						CheckSync();
-						tabControl.SelectedIndex = 0;
-						MainWindow.singleton.Navigate(this);
+						PrepOpen();
 
 						// check repo fragmentation
 						if (!repoManager.ChangesExist())
@@ -136,10 +143,7 @@ namespace GitItGUI.UI.Screens
 					{
 						MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
 						{
-							StartScreen.singleton.Refresh();
-							CheckSync();
-							tabControl.SelectedIndex = 0;
-							MainWindow.singleton.Navigate(this);
+							PrepOpen();
 						});
 					}
 					else
@@ -183,10 +187,7 @@ namespace GitItGUI.UI.Screens
 						{
 							MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
 							{
-								StartScreen.singleton.Refresh();
-								CheckSync();
-								tabControl.SelectedIndex = 0;
-								MainWindow.singleton.Navigate(this);
+								PrepOpen();
 							});
 						}
 					}
@@ -297,6 +298,7 @@ namespace GitItGUI.UI.Screens
 
 		private void backButton_Click(object sender, RoutedEventArgs e)
 		{
+			changesTab.ClosingRepo();
 			repoManager.Close();
 			MainWindow.singleton.Navigate(StartScreen.singleton);
 		}

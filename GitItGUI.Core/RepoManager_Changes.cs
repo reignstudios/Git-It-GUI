@@ -1000,10 +1000,10 @@ namespace GitItGUI.Core
 						process.WaitForExit();
 					}
 				}
-				catch (Exception ex)
+				catch (Exception e)
 				{
 					pauseGitCommanderStdWrites = false;
-					DebugLog.LogError("Failed to start Diff tool: " + ex.Message);
+					DebugLog.LogError("Failed to start Diff tool: " + e.Message);
 					DeleteTempDiffFiles();
 					return false;
 				}
@@ -1011,6 +1011,41 @@ namespace GitItGUI.Core
 				// finish
 				DeleteTempDiffFiles();
 				return true;
+			}
+		}
+
+		public bool SaveCommitMessage(string message)
+		{
+			lock (this)
+			{
+				try
+				{
+					File.WriteAllText(Path.Combine(repository.repoPath, ".git", "GITGUI_MSG"), message);
+					return true;
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to start Diff tool: " + e.Message);
+					return false;
+				}
+			}
+		}
+
+		public bool LoadCommitMessage(out string message)
+		{
+			lock (this)
+			{
+				try
+				{
+					message = File.ReadAllText(Path.Combine(repository.repoPath, ".git", "GITGUI_MSG"));
+					return true;
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to start Diff tool: " + e.Message);
+					message = null;
+					return false;
+				}
 			}
 		}
 	}
