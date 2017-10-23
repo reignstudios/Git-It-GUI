@@ -22,7 +22,7 @@ Download: https://github.com/reignstudios/Git-It-GUI/releases
 
 LOGS: These will be stored in "C:\ProgramData\GitItGUI\logs.txt" on windows
 
-# NOTE: If you can use 'git / git lfs' in the terminal/cmd this tool wont work.
+## NOTE: If you can use 'git / git lfs' in the terminal/cmd this tool wont work.
  - Win32: https://git-scm.com/
 <!-- - macOS (recommend homebrew):
     - Install git via homebrew: "brew install git" and "brew install git-lfs"
