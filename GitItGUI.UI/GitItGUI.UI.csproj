@@ -78,6 +78,9 @@
     <Compile Include="Screens\CloneScreen.xaml.cs">
       <DependentUpon>CloneScreen.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Screens\CreateScreen.xaml.cs">
+      <DependentUpon>CreateScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Screens\RepoScreen.xaml.cs">
       <DependentUpon>RepoScreen.xaml</DependentUpon>
     </Compile>
@@ -136,6 +139,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Screens\CloneScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Screens\CreateScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

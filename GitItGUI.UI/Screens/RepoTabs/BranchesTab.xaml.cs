@@ -31,7 +31,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		public void Refresh()
 		{
 			var repoManager = RepoScreen.singleton.repoManager;
-
+			
 			// update active branch
 			branchNameTextBox.Text = repoManager.activeBranch.fullname;
 			if (repoManager.activeBranch.isTracking)

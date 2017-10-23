@@ -105,7 +105,8 @@ namespace GitItGUI.UI.Screens
 
 		private void createButton_Click(object sender, RoutedEventArgs e)
 		{
-
+			CreateScreen.singleton.Setup();
+			MainWindow.singleton.Navigate(CreateScreen.singleton);
 		}
 
 		private void settingsButton_Click(object sender, RoutedEventArgs e)

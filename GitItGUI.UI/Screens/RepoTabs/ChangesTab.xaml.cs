@@ -610,7 +610,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 							blockMode = 2;
 							subBlock += line + '\r';
 						}
-						else if (line[0] == '*')
+						else if (line[0] == '#')
 						{
 							CheckBlocks(false);
 							blockMode = 3;

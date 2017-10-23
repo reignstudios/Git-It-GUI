@@ -119,6 +119,19 @@ namespace GitCommander
 			}
 		}
 
+		public bool Init(string path)
+		{
+			lock (this)
+			{
+				var result = RunExe("git", "init", workingDirectory:path);
+				lastResult = result.output;
+				lastError = result.errors;
+				if (!string.IsNullOrEmpty(lastError)) return false;
+			
+				return true;
+			}
+		}
+
 		public bool GetSignature(SignatureLocations location, out string name, out string email)
 		{
 			lock (this)

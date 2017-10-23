@@ -141,7 +141,7 @@ namespace GitItGUI.Core
 							match = Regex.Match(diff, @"(@@.*?(@@).*?\n)", RegexOptions.Singleline);
 							if (match.Success && match.Groups.Count == 3)
 							{
-								diff = diff.Replace(match.Groups[1].Value, Environment.NewLine + "*<<< ----------- SECTION ----------- >>>" + Environment.NewLine);
+								diff = diff.Replace(match.Groups[1].Value, Environment.NewLine + "#<<< ----------- SECTION ----------- >>>" + Environment.NewLine);
 							}
 							else
 							{

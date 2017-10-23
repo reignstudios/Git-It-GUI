@@ -150,6 +150,7 @@ namespace GitItGUI.UI
 				settingsScreen.Visibility = Visibility.Hidden;
 				repoScreen.Visibility = Visibility.Hidden;
 				cloneScreen.Visibility = Visibility.Hidden;
+				createScreen.Visibility = Visibility.Hidden;
 
 				// enable current
 				screen.Visibility = Visibility.Visible;

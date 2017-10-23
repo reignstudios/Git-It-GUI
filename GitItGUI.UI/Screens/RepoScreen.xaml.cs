@@ -27,7 +27,6 @@ namespace GitItGUI.UI.Screens
     {
 		public static RepoScreen singleton;
 		public RepoManager repoManager;
-		public Dispatcher repoDispatcher;
 
 		private TabItem lastTabItem;
 
@@ -47,7 +46,6 @@ namespace GitItGUI.UI.Screens
 
 		private void RepoReadyCallback(Dispatcher dispatcher)
 		{
-			repoDispatcher = dispatcher;
 			Dispatcher.InvokeAsync(delegate()
 			{
 				grid.Visibility = Visibility.Visible;
@@ -64,7 +62,8 @@ namespace GitItGUI.UI.Screens
 			string upToDateMsg = "ERROR";
 			if (repoManager.ChangesExist()) upToDateMsg = "Out of date";
 			else upToDateMsg = repoManager.isInSync != null ? (repoManager.isInSync.Value ? "Up to date" : "Out of date") : "In sync check error";
-			repoTitleLabel.Content = string.Format("Current Repo '{0}' ({1}) [{2}]", System.IO.Path.GetFileName(repoManager.repository.repoPath), repoManager.activeBranch.fullname, upToDateMsg);
+			string branchName = repoManager.activeBranch != null ? repoManager.activeBranch.fullname : "N/A";
+			repoTitleLabel.Content = string.Format("Current Repo '{0}' ({1}) [{2}]", System.IO.Path.GetFileName(repoManager.repository.repoPath), branchName, upToDateMsg);
 		}
 
 		public void OpenRepo(string folderPath)
@@ -158,12 +157,91 @@ namespace GitItGUI.UI.Screens
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
+
+		public void CreateRepo(string createPath, bool isLFSEnabled, bool addLFSDefaultExts)
+		{
+			MainWindow.singleton.ShowProcessingOverlay();
+			repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (repoManager.Create(createPath))
+				{
+					repoManager.disableRepoRefreshedCallback = true;
+					bool lfsPassed = true;
+					if (repoManager.Open(createPath))
+					{
+						if (isLFSEnabled)
+						{
+							if (!repoManager.AddGitLFSSupport(addLFSDefaultExts))
+							{
+								MainWindow.singleton.ShowMessageOverlay("Error", "Failed to add LFS support");
+								MainWindow.singleton.Navigate(StartScreen.singleton);
+								lfsPassed = false;
+							}
+						}
+
+						if (lfsPassed)
+						{
+							MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
+							{
+								StartScreen.singleton.Refresh();
+								CheckSync();
+								tabControl.SelectedIndex = 0;
+								MainWindow.singleton.Navigate(this);
+							});
+						}
+					}
+					else
+					{
+						AppManager.RemoveRepoFromHistory(createPath);
+						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to open created repo");
+					}
+
+					repoManager.disableRepoRefreshedCallback = false;
+					if (lfsPassed) repoManager_RefreshedCallback();
+				}
+				else
+				{
+					AppManager.RemoveRepoFromHistory(createPath);
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to create repo");
+				}
+				
+				MainWindow.singleton.HideProcessingOverlay();
+			});
+		}
 		
 		private void repoManager_RefreshedCallback()
 		{
 			void RefreshInternal()
 			{
 				if (!repoManager.isOpen) return;
+
+				if (repoManager.isEmpty)
+				{
+					MainWindow.singleton.ShowMessageOverlay("Empty Repo", "Nothing has been commit to this repo, a first commit much be made to open it.", MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
+					{
+						if (result == MessageOverlayResults.Ok)
+						{
+							MainWindow.singleton.ShowProcessingOverlay();
+							repoManager.dispatcher.InvokeAsync(delegate()
+							{
+								if (!repoManager.AddFirstAutoCommit())
+								{
+									MainWindow.singleton.ShowMessageOverlay("Error", "Failed to auto generate a 'first commit'");
+									MainWindow.singleton.Navigate(StartScreen.singleton);
+								}
+
+								MainWindow.singleton.HideProcessingOverlay();
+							});
+						}
+						else
+						{
+							MainWindow.singleton.Navigate(StartScreen.singleton);
+						}
+					});
+
+					return;
+				}
+
 				changesTab.Refresh();
 				branchesTab.Refresh();
 				settingsTab.Refresh();

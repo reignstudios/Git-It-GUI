@@ -28,7 +28,7 @@
 				<TextBox Name="repoUrlTextBox" Grid.Row="1" VerticalAlignment="Center" Margin="20,0"/>
 
 				<Label Grid.Row="2" Content="Clone Path" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-				<TextBox Name="clonePathTextBox" Grid.Row="3" VerticalAlignment="Center" Margin="20,0" ToolTip="Refresh changes when app window comes into focus"/>
+				<TextBox Name="clonePathTextBox" Grid.Row="3" VerticalAlignment="Center" Margin="20,0"/>
 				<Button Name="selectPathButton" Grid.Row="4" Width="100" Margin="20,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="selectPathButton_Click">Select Path</Button>
 			</Grid>
 		</Border>

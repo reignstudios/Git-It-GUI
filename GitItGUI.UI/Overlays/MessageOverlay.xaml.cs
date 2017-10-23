@@ -44,7 +44,7 @@ namespace GitItGUI.UI.Overlays
 		public void Setup(string title, string message, MessageOverlayTypes type, DoneCallbackMethod doneCallback)
 		{
 			// cancel pending message
-			if (doneCallback != null) doneCallback(MessageOverlayResults.Cancel);
+			if (this.doneCallback != null) doneCallback(MessageOverlayResults.Cancel);
 			this.doneCallback = doneCallback;
 
 			// setup
@@ -72,15 +72,17 @@ namespace GitItGUI.UI.Overlays
 		private void okButton_Click(object sender, RoutedEventArgs e)
 		{
 			Visibility = Visibility.Hidden;
-			if (doneCallback != null) doneCallback(MessageOverlayResults.Ok);
+			var callback = doneCallback;
 			doneCallback = null;
+			if (callback != null) callback(MessageOverlayResults.Ok);
 		}
 
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
 			Visibility = Visibility.Hidden;
-			if (doneCallback != null) doneCallback(MessageOverlayResults.Cancel);
+			var callback = doneCallback;
 			doneCallback = null;
+			if (callback != null) callback(MessageOverlayResults.Cancel);
 		}
 	}
 }
