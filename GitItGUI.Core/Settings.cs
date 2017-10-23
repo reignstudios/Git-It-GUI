@@ -30,6 +30,7 @@ namespace GitItGUI.Core
 			[XmlAttribute("WinHeight")] public int winHeight = -1;
 			[XmlElement("MergeDiffTool")] public MergeDiffTools mergeDiffTool = MergeDiffTools.P4Merge;
 			[XmlElement("AutoRefreshChanges")] public bool autoRefreshChanges = true;
+			[XmlElement("ShowLFSTag")] public bool showLFSTags = false;
 			[XmlElement("SimpleMode")] public bool simpleMode = true;
 			[XmlElement("CustomErrorCodes")] public CustomErrorCodes customErrorCodes = new CustomErrorCodes();
 			[XmlElement("Repository")] public List<string> repositories = new List<string>();

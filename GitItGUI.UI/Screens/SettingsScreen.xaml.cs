@@ -32,6 +32,7 @@ namespace GitItGUI.UI.Screens
 		public void Setup()
 		{
 			autoRefreshCheckBox.IsChecked = AppManager.settings.autoRefreshChanges;
+			showLSFTagsCheckBox.IsChecked = AppManager.settings.showLFSTags;
 			switch (AppManager.settings.mergeDiffTool)
 			{
 				case MergeDiffTools.Meld: mergeDiffToolComboBox.SelectedIndex = 0; break;
@@ -44,6 +45,7 @@ namespace GitItGUI.UI.Screens
 		public void Apply()
 		{
 			AppManager.settings.autoRefreshChanges = autoRefreshCheckBox.IsChecked == true;
+			AppManager.settings.showLFSTags = showLSFTagsCheckBox.IsChecked == true;
 			switch (mergeDiffToolComboBox.SelectedIndex)
 			{
 				case 0: AppManager.settings.mergeDiffTool = MergeDiffTools.Meld; break;
