@@ -52,6 +52,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			if (AppManager.settings.simpleMode) simpleModeMenuItem_Click(null, null);
 			resolveAllMenuItem.IsEnabled = RepoScreen.singleton.repoManager.ConflictsExistQuick();
 
+			// clear preview
+			previewTextBox.Document.Blocks.Clear();
+			previewTextBox.Visibility = Visibility.Visible;
+			previewGrid.Visibility = Visibility.Hidden;
+
 			// update changes
 			stagedChangesListBox.Items.Clear();
 			unstagedChangesListBox.Items.Clear();
@@ -74,10 +79,10 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				button.Tag = fileState;
 
 				// item label
-				var label = new Label();
-				label.Margin = new Thickness(20, 0, 0, 0);
-				label.Content = fileState.filename + (fileState.isLFS ? " [LFS]" : string.Empty);
-				label.ContextMenu = new ContextMenu();
+				var textBlock = new TextBlock();
+				textBlock.Margin = new Thickness(20, 0, 0, 0);
+				textBlock.Text = fileState.filename + (fileState.isLFS ? " [LFS]" : string.Empty);
+				textBlock.ContextMenu = new ContextMenu();
 				var openFileMenu = new MenuItem();
 				openFileMenu.Header = "Open file";
 				openFileMenu.ToolTip = fileState.filename;
@@ -92,15 +97,15 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					resolveMenu.Header = "Resolve file";
 					resolveMenu.ToolTip = fileState.filename;
 					resolveMenu.Click += ResolveFileMenu_Click;
-					label.ContextMenu.Items.Add(openFileLocationMenu);
+					textBlock.ContextMenu.Items.Add(openFileLocationMenu);
 				}
-				label.ContextMenu.Items.Add(openFileMenu);
-				label.ContextMenu.Items.Add(openFileLocationMenu);
+				textBlock.ContextMenu.Items.Add(openFileMenu);
+				textBlock.ContextMenu.Items.Add(openFileLocationMenu);
 
 				// item grid
 				var grid = new Grid();
 				grid.Children.Add(button);
-				grid.Children.Add(label);
+				grid.Children.Add(textBlock);
 				item.Content = grid;
 				if (fileState.IsStaged())
 				{
@@ -127,6 +132,9 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			unstagedChangesListBox.Items.Clear();
 			previewTextBox.Document.Blocks.Clear();
 			commitMessageTextBox.Text = string.Empty;
+
+			previewTextBox.Visibility = Visibility.Visible;
+			previewGrid.Visibility = Visibility.Hidden;
 		}
 
 		private bool RepoManager_AskUserToResolveConflictedFileCallback(FileState fileState, bool isBinaryFile, out MergeBinaryFileResults result)
@@ -548,16 +556,21 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void ProcessPreview(ListBoxItem item)
 		{
-			previewTextBox.Document.Blocks.Clear();
 			var fileState = (FileState)item.Tag;
 			var delta = RepoScreen.singleton.repoManager.GetQuickViewData(fileState);
 			if (delta == null)
 			{
+				previewTextBox.Visibility = Visibility.Visible;
+				previewGrid.Visibility = Visibility.Hidden;
 				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
-				range.Text = "<<< Unsuported Preview Type >>>";
+				range.Text = "<<< Invalide Preview Type >>>";
 			}
-			else if (delta.GetType() == typeof(string))
+			else if (delta is string)
 			{
+				previewTextBox.Visibility = Visibility.Visible;
+				previewGrid.Visibility = Visibility.Hidden;
+				previewTextBox.Document.Blocks.Clear();
+
 				using (var stream = new MemoryStream())
 				using (var writer = new StreamWriter(stream))
 				using (var reader = new StreamReader(stream))
@@ -639,6 +652,42 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					}
 					while (line != null);
 				}
+			}
+			else if (delta is PreviewImageData)
+			{
+				previewTextBox.Visibility = Visibility.Hidden;
+				previewGrid.Visibility = Visibility.Visible;
+
+				var imageDelta = (PreviewImageData)delta;
+				BitmapImage LoadImage(byte[] data)
+				{
+					var bitmap = new BitmapImage();
+					if (data == null) return bitmap;
+
+					using (var stream = new MemoryStream(data))
+					{
+						stream.Position = 0;
+						bitmap.BeginInit();
+						bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+						bitmap.CacheOption = BitmapCacheOption.OnLoad;
+						bitmap.UriSource = null;
+						bitmap.StreamSource = stream;
+						bitmap.EndInit();
+					}
+
+					bitmap.Freeze();
+					return bitmap;
+				}
+				
+				newImage.Source = LoadImage(imageDelta.newImage);
+				oldImage.Source = LoadImage(imageDelta.oldImage);
+			}
+			else
+			{
+				previewTextBox.Visibility = Visibility.Visible;
+				previewGrid.Visibility = Visibility.Hidden;
+				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
+				range.Text = "<<< Unsuported Preview Type >>>";
 			}
 		}
 

@@ -40,10 +40,28 @@ namespace GitItGUI.Core
 
 		internal static bool IsBinaryFileData(string filename)
 		{
+			string ext = Path.GetExtension(filename);
+			if (AppManager.defaultGitLFS_Exts.Exists(x => x == ext)) return true;
+
 			using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None))
 			{
 				return IsBinaryFileData(stream);
 			}
+		}
+
+		internal static bool IsSupportedImageFile(string filename)
+		{
+			string ext = Path.GetExtension(filename);
+			switch (ext)
+			{
+				case ".png":
+				case ".jpg":
+				case ".jpeg":
+				case ".bmp":
+					return true;
+			}
+
+			return false;
 		}
 
 		internal static bool IsGitLFSPtr(string data)

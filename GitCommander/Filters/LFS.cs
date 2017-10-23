@@ -19,7 +19,7 @@ namespace GitCommander
 			internal void Open()
 			{
 				isEnabled = false;
-				string gitattributesPath = repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+				string gitattributesPath = Path.Combine(repository.repoPath, ".gitattributes");
 				string lfsFolder = repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar);
 				string lfsHook = repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar);
 				if (File.Exists(gitattributesPath) && Directory.Exists(lfsFolder) && File.Exists(lfsHook))
@@ -36,7 +36,7 @@ namespace GitCommander
 
 			private bool SimpleLFSInvoke(string args, StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null)
 			{
-				var result = repository.RunExe("git", "lfs " + args, stdCallback: stdCallback, stdErrorCallback: stdErrorCallback);
+				var result = repository.RunExe("git", "lfs " + args, stdCallback:stdCallback, stdErrorCallback:stdErrorCallback);
 				repository.lastResult = result.output;
 				repository.lastError = result.errors;
 
@@ -110,6 +110,40 @@ namespace GitCommander
 					bool result = SimpleLFSInvoke("track", stdCallback:stdCallback);
 					exts = extList;
 					return result;
+				}
+			}
+
+			public bool SmudgeFile(string ptr, string dstFileName)
+			{
+				Stream stdoutStream = null;
+				void getStdOutputStreamCallback(StreamReader reader)
+				{
+					stdoutStream = reader.BaseStream;
+				}
+
+				bool stdInputStreamCallback(StreamWriter writer)
+				{
+					writer.Write(ptr);
+					writer.Flush();
+					writer.BaseStream.Flush();
+
+					using (var stream = new FileStream(dstFileName, FileMode.Create, FileAccess.Write, FileShare.None))
+					{
+						stdoutStream.CopyTo(stream);
+						stdoutStream.Flush();
+						stream.Flush();
+					}
+
+					return true;
+				}
+
+				lock (repository)
+				{
+					var result = repository.RunExe("git", "lfs smudge", stdInputStreamCallback:stdInputStreamCallback, getStdOutputStreamCallback:getStdOutputStreamCallback);//stdOutToFilePath:dstFileName);
+					repository.lastResult = result.output;
+					repository.lastError = result.errors;
+
+					return string.IsNullOrEmpty(repository.lastError);
 				}
 			}
 		}

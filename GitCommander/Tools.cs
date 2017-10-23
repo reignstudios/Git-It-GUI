@@ -10,6 +10,7 @@ namespace GitCommander
 	public delegate void StdCallbackMethod(string line);
 	public delegate bool StdInputStreamCallbackMethod(StreamWriter writer);
 	public delegate void GetStdInputStreamCallbackMethod(StreamWriter writer);
+	public delegate void GetStdOutputStreamCallbackMethod(StreamReader reader);
 
 	public partial class Repository
 	{
@@ -35,6 +36,7 @@ namespace GitCommander
 		(
 			string exe, string arguments, string workingDirectory = null,
 			StdInputStreamCallbackMethod stdInputStreamCallback = null, GetStdInputStreamCallbackMethod getStdInputStreamCallback = null,
+			GetStdOutputStreamCallbackMethod getStdOutputStreamCallback = null,
 			StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null,
 			bool stdResultOn = true, bool stdErrorResultOn = true,
 			string stdOutToFilePath = null
@@ -60,11 +62,11 @@ namespace GitCommander
 				
 				FileStream stdOutStream = null;
 				StreamWriter stdOutStreamWriter = null;
-				if (stdOutToFilePath != null)
+				if (stdOutToFilePath != null && getStdOutputStreamCallback == null)
 				{
 					stdOutToFilePath = repoPath + Path.DirectorySeparatorChar + stdOutToFilePath.Replace('/', Path.DirectorySeparatorChar);
 					stdOutStream = new FileStream(stdOutToFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
-					stdOutStreamWriter = new StreamWriter(stdOutStream);
+					stdOutStreamWriter = new StreamWriter(stdOutStream, Encoding.UTF8);
 				}
 
 				var outDataReceived = new StdCallbackMethod(delegate(string line)
@@ -133,7 +135,8 @@ namespace GitCommander
 				// start process
 				process.Start();
 				if (getStdInputStreamCallback != null) getStdInputStreamCallback(process.StandardInput);
-				process.BeginOutputReadLine();
+				if (getStdOutputStreamCallback == null) process.BeginOutputReadLine();
+				else getStdOutputStreamCallback(process.StandardOutput);
 				process.BeginErrorReadLine();
 
 				// write input

@@ -48,7 +48,7 @@ namespace GitItGUI.UI.Overlays
 			this.doneCallback = doneCallback;
 
 			// setup
-			titleLabel.Content = title;
+			titleTextBox.Text = title;
 			messageLabel.Text = message;
 			if (type == MessageOverlayTypes.Ok)
 			{

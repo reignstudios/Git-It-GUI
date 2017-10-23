@@ -64,7 +64,7 @@ namespace GitItGUI.UI.Screens
 			if (repoManager.ChangesExist()) upToDateMsg = "Out of date";
 			else upToDateMsg = repoManager.isInSync != null ? (repoManager.isInSync.Value ? "Up to date" : "Out of date") : "In sync check error";
 			string branchName = repoManager.activeBranch != null ? repoManager.activeBranch.fullname : "N/A";
-			repoTitleLabel.Content = string.Format("Current Repo '{0}' ({1}) [{2}]", System.IO.Path.GetFileName(repoManager.repository.repoPath), branchName, upToDateMsg);
+			repoTitleTextBlock.Text = string.Format("Current Repo '{0}' ({1}) [{2}]", System.IO.Path.GetFileName(repoManager.repository.repoPath), branchName, upToDateMsg);
 		}
 
 		private void PrepOpen()

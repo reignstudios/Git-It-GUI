@@ -31,6 +31,11 @@ namespace GitItGUI.Core
 		Error
 	}
 
+	public class PreviewImageData
+	{
+		public byte[] oldImage, newImage;
+	}
+
 	public partial class RepoManager
 	{
 		public delegate bool AskUserToResolveConflictedFileCallbackMethod(FileState fileState, bool isBinaryFile, out MergeBinaryFileResults result);
@@ -109,14 +114,51 @@ namespace GitItGUI.Core
 				try
 				{
 					// check if file still exists
-					string fullPath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+					string fullPath = Path.Combine(repository.repoPath, fileState.filename);
 					if (!File.Exists(fullPath))
 					{
 						return "<< File Doesn't Exist >>";
 					}
 
 					// check if binary file
-					if (Tools.IsBinaryFileData(fullPath)) return "<< Binary File >>";
+					if (Tools.IsBinaryFileData(fullPath)) 
+					{
+						// validate is supported image
+						if (!Tools.IsSupportedImageFile(fullPath)) return "<< Binary File >>";
+
+						// load new image data
+						var image = new PreviewImageData();
+						image.newImage = File.ReadAllBytes(fullPath);
+						if (!repository.SaveOriginalFile(fileState.filename, out string savedFilename)) return image;
+
+						string origFullPath = Path.Combine(repository.repoPath, savedFilename);
+						if (new FileInfo(origFullPath).Length == 0) return image;
+
+						// check if image is lfs ptr
+						bool isLFSPtr = false;
+						string ptr = null;
+						using (var stream = new FileStream(origFullPath, FileMode.Open, FileAccess.Read, FileShare.None))
+						using (var reader = new StreamReader(stream))
+						{
+							var data = new char[1024];
+							int read = reader.ReadBlock(data, 0, data.Length);
+							ptr = new string(data).Remove(read);
+							isLFSPtr = Tools.IsGitLFSPtr(ptr);
+						}
+
+						// smudge lfs ptr (aka convert ptr to data)
+						if (isLFSPtr && !repository.lfs.SmudgeFile(ptr, origFullPath))
+						{
+							DebugLog.LogError("Failed to smudge file: " + savedFilename);
+							return image;
+						}
+
+						// load old image data
+						image.oldImage = File.ReadAllBytes(origFullPath);
+						File.Delete(origFullPath);
+
+						return image;
+					}
 
 					// check for text types diffs
 					if (fileState.HasState(FileStates.ModifiedInWorkdir) || fileState.HasState(FileStates.ModifiedInIndex))

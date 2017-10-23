@@ -76,6 +76,26 @@
 						</Button.ContextMenu>
 					</Button>
 					<RichTextBox Name="previewTextBox" Margin="10,41,10,10" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+					<Grid Name="previewGrid" Margin="10,41,10,10" Visibility="Visible" Background="White">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="50*"/>
+							<RowDefinition Height="50*"/>
+						</Grid.RowDefinitions>
+
+						<Border Grid.Row="0" Margin="10,10,10,5" BorderThickness="1" BorderBrush="Gray" SnapsToDevicePixels="True">
+							<Grid>
+								<Image Name="oldImage" Source="../../Images/AppIcon.png"/>
+								<Label Width="40" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" FontWeight="Bold" Foreground="Red">Old</Label>
+							</Grid>
+						</Border>
+
+						<Border Grid.Row="2" Margin="10,5,10,10" BorderThickness="1" BorderBrush="Gray" SnapsToDevicePixels="True">
+							<Grid>
+								<Image Name="newImage" Source="../../Images/AppIcon.png"/>
+								<Label Width="40" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" FontWeight="Bold" Foreground="Green">New</Label>
+							</Grid>
+						</Border>
+					</Grid>
 				</Grid>
 			</Border>
 
