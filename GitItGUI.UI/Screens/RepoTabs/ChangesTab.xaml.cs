@@ -122,12 +122,19 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		public void LoadCommitMessage()
 		{
-			if (RepoScreen.singleton.repoManager.isOpen && RepoScreen.singleton.repoManager.LoadCommitMessage(out string msg)) commitMessageTextBox.Text = msg;
+			if (RepoScreen.singleton.repoManager.isOpen && RepoScreen.singleton.repoManager.ChangesExist() && RepoScreen.singleton.repoManager.LoadCommitMessage(out string msg))
+			{
+				commitMessageTextBox.Text = msg;
+			}
 		}
 
 		public void ClosingRepo()
 		{
-			if (RepoScreen.singleton.repoManager.isOpen && RepoScreen.singleton.repoManager.ChangesExist()) RepoScreen.singleton.repoManager.SaveCommitMessage(commitMessageTextBox.Text);
+			if (RepoScreen.singleton.repoManager.isOpen && RepoScreen.singleton.repoManager.ChangesExist())
+			{
+				RepoScreen.singleton.repoManager.SaveCommitMessage(commitMessageTextBox.Text);
+			}
+
 			stagedChangesListBox.Items.Clear();
 			unstagedChangesListBox.Items.Clear();
 			previewTextBox.Document.Blocks.Clear();

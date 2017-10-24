@@ -71,8 +71,7 @@ namespace GitItGUI.Core
 			try
 			{
 				// load settings
-				char seperator = Path.DirectorySeparatorChar;
-				settings = Settings.Load<XML.AppSettings>(PlatformInfo.appDataPath + seperator + Settings.appSettingsFolderName + seperator + Settings.appSettingsFilename);
+				settings = Settings.Load<XML.AppSettings>(Path.Combine(PlatformInfo.appDataPath, Settings.appSettingsFolderName, Settings.appSettingsFilename));
 
 				// apply default lfs ignore types
 				var lowerCase = new List<string>()
@@ -202,7 +201,7 @@ namespace GitItGUI.Core
 		/// </summary>
 		public static void SaveSettings()
 		{
-			Settings.Save<XML.AppSettings>(PlatformInfo.appDataPath + Path.DirectorySeparatorChar + Settings.appSettingsFolderName + Path.DirectorySeparatorChar + Settings.appSettingsFilename, settings);
+			Settings.Save<XML.AppSettings>(Path.Combine(PlatformInfo.appDataPath, Settings.appSettingsFolderName, Settings.appSettingsFilename), settings);
 		}
 
 		/// <summary>

@@ -20,8 +20,8 @@ namespace GitCommander
 			{
 				isEnabled = false;
 				string gitattributesPath = Path.Combine(repository.repoPath, ".gitattributes");
-				string lfsFolder = repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar);
-				string lfsHook = repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar);
+				string lfsFolder = Path.Combine(repository.repoPath, ".git", "lfs");
+				string lfsHook = Path.Combine(repository.repoPath, ".git", "hooks", "pre-push");
 				if (File.Exists(gitattributesPath) && Directory.Exists(lfsFolder) && File.Exists(lfsHook))
 				{
 					// check attributes
@@ -29,7 +29,7 @@ namespace GitCommander
 					if (!lines.Contains("filter=lfs diff=lfs merge=lfs")) return;
 
 					// check hook
-					string data = File.ReadAllText(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
+					string data = File.ReadAllText(lfsHook);
 					isEnabled = data.Contains("git-lfs");
 				}
 			}

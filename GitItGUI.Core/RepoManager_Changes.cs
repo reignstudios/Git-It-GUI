@@ -223,7 +223,7 @@ namespace GitItGUI.Core
 				try
 				{
 					if (!fileState.HasState(FileStates.NewInWorkdir)) return false;
-					string filePath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+					string filePath = Path.Combine(repository.repoPath, fileState.filename);
 					if (File.Exists(filePath)) File.Delete(filePath);
 				}
 				catch (Exception e)
@@ -252,7 +252,7 @@ namespace GitItGUI.Core
 							continue;
 						}
 
-						string filePath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+						string filePath = Path.Combine(repository.repoPath, fileState.filename);
 						if (File.Exists(filePath)) File.Delete(filePath);
 					}
 				}
@@ -277,7 +277,7 @@ namespace GitItGUI.Core
 					foreach (var fileState in fileStates)
 					{
 						if (!fileState.HasState(FileStates.NewInWorkdir)) continue;
-						string filePath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename;
+						string filePath = Path.Combine(repository.repoPath, fileState.filename);
 						if (File.Exists(filePath)) File.Delete(filePath);
 					}
 				}
@@ -741,7 +741,7 @@ namespace GitItGUI.Core
 			lock (this)
 			{
 				bool success = true;
-				string fullPath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
+				string fullPath = Path.Combine(repository.repoPath, fileState.filename);
 				string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
 				void DeleteTempMergeFiles()
 				{
@@ -775,14 +775,14 @@ namespace GitItGUI.Core
 						if (fileState.conflictType != FileConflictTypes.DeletedByUs)
 						{
 							bool fileCreated = repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
-							fullPathOurs = repository.repoPath + Path.DirectorySeparatorChar + fullPathOurs.Replace('/', Path.DirectorySeparatorChar);
+							fullPathOurs = Path.Combine(repository.repoPath, fullPathOurs);
 							if (!fileCreated) throw new Exception(repository.lastError);
 						}
 
 						if (fileState.conflictType != FileConflictTypes.DeletedByThem)
 						{
 							bool fileCreated = repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
-							fullPathTheirs = repository.repoPath + Path.DirectorySeparatorChar + fullPathTheirs.Replace('/', Path.DirectorySeparatorChar);
+							fullPathTheirs = Path.Combine(repository.repoPath, fullPathTheirs);
 							if (!fileCreated) throw new Exception(repository.lastError);
 						}
 						pauseGitCommanderStdWrites = false;
@@ -1005,7 +1005,7 @@ namespace GitItGUI.Core
 		{
 			lock (this)
 			{
-				string fullPath = repository.repoPath + Path.DirectorySeparatorChar + fileState.filename.Replace('/', Path.DirectorySeparatorChar);
+				string fullPath = Path.Combine(repository.repoPath, fileState.filename);
 				string fullPathOrig = null;
 				void DeleteTempDiffFiles()
 				{
@@ -1025,7 +1025,7 @@ namespace GitItGUI.Core
 					pauseGitCommanderStdWrites = true;
 					if (!repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(repository.lastError);
 					pauseGitCommanderStdWrites = false;
-					fullPathOrig = repository.repoPath + Path.DirectorySeparatorChar + fullPathOrig;
+					fullPathOrig = Path.Combine(repository.repoPath, fullPathOrig);
 
 					// open diff tool
 					using (var process = new Process())

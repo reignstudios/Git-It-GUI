@@ -152,7 +152,7 @@ namespace GitItGUI.Core
 					// check for .gitignore file
 					if (!isRefreshMode)
 					{
-						string gitIgnorePath = repoPath + Path.DirectorySeparatorChar + ".gitignore";
+						string gitIgnorePath = Path.Combine(repoPath, ".gitignore");
 						if (!File.Exists(gitIgnorePath))
 						{
 							DebugLog.LogWarning("No '.gitignore' file exists.\nAuto creating one!");
@@ -255,7 +255,7 @@ namespace GitItGUI.Core
 				{
 					// clone
 					if (!repository.Clone(url, destination, out repoPath, writeUsernameCallback, writePasswordCallback)) throw new Exception(repository.lastError);
-					repoPath = destination + Path.DirectorySeparatorChar + repoPath;
+					repoPath = Path.Combine(destination, repoPath);
 					return true;
 				}
 				catch (Exception e)
@@ -324,7 +324,7 @@ namespace GitItGUI.Core
 				try
 				{
 					// init git lfs
-					string lfsFolder = repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar);
+					string lfsFolder = Path.Combine(repository.repoPath, ".git", "lfs");
 					if (!Directory.Exists(lfsFolder))
 					{
 						if (!repository.lfs.Install()) throw new Exception(repository.lastError);
@@ -337,7 +337,7 @@ namespace GitItGUI.Core
 					}
 
 					// add attr file if it doesn't exist
-					string gitattributesPath = repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+					string gitattributesPath = Path.Combine(repository.repoPath, ".gitattributes");
 					if (!File.Exists(gitattributesPath))
 					{
 						using (var writer = File.CreateText(gitattributesPath))
@@ -383,7 +383,7 @@ namespace GitItGUI.Core
 				try
 				{
 					// untrack lfs filters
-					string gitattributesPath = repository.repoPath + Path.DirectorySeparatorChar + ".gitattributes";
+					string gitattributesPath = Path.Combine(repository.repoPath, ".gitattributes");
 					if (File.Exists(gitattributesPath))
 					{
 						string data = File.ReadAllText(gitattributesPath);
@@ -397,8 +397,12 @@ namespace GitItGUI.Core
 
 					// remove lfs repo files
 					if (!repository.lfs.Uninstall()) throw new Exception(repository.lastError);
-					if (File.Exists(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar))) File.Delete(repository.repoPath + string.Format("{0}.git{0}hooks{0}pre-push", Path.DirectorySeparatorChar));
-					if (Directory.Exists(repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar))) Directory.Delete(repository.repoPath + string.Format("{0}.git{0}lfs", Path.DirectorySeparatorChar), true);
+
+					string lfsHookFile = Path.Combine(repository.repoPath, ".git", "hooks", "pre-push");
+					if (File.Exists(lfsHookFile)) File.Delete(lfsHookFile);
+
+					string lfsFolder = Path.Combine(repository.repoPath, ".git", "lfs");
+					if (Directory.Exists(lfsFolder)) Directory.Delete(lfsFolder, true);
 					
 					// rebase repo
 					if (rebase)
@@ -433,7 +437,7 @@ namespace GitItGUI.Core
 						{
 							string programFilesx86, programFilesx64;
 							PlatformInfo.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
-							process.StartInfo.FileName = programFilesx64 + string.Format("{0}Git{0}cmd{0}gitk.exe", Path.DirectorySeparatorChar);
+							process.StartInfo.FileName = Path.Combine(programFilesx64, "Git", "cmd", "gitk.exe");
 						}
 						else
 						{
