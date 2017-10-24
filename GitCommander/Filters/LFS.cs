@@ -115,31 +115,39 @@ namespace GitCommander
 
 			public bool SmudgeFile(string ptr, string dstFileName)
 			{
-				Stream stdoutStream = null;
-				void getStdOutputStreamCallback(StreamReader reader)
-				{
-					stdoutStream = reader.BaseStream;
-				}
-
 				bool stdInputStreamCallback(StreamWriter writer)
 				{
 					writer.Write(ptr);
 					writer.Flush();
 					writer.BaseStream.Flush();
-
-					using (var stream = new FileStream(dstFileName, FileMode.Create, FileAccess.Write, FileShare.None))
-					{
-						stdoutStream.CopyTo(stream);
-						stdoutStream.Flush();
-						stream.Flush();
-					}
-
+					
 					return true;
 				}
 
 				lock (repository)
 				{
-					var result = repository.RunExe("git", "lfs smudge", stdInputStreamCallback:stdInputStreamCallback, getStdOutputStreamCallback:getStdOutputStreamCallback);//stdOutToFilePath:dstFileName);
+					var result = repository.RunExe("git", "lfs smudge", stdInputStreamCallback:stdInputStreamCallback, stdOutToFilePath:dstFileName);
+					repository.lastResult = result.output;
+					repository.lastError = result.errors;
+
+					return string.IsNullOrEmpty(repository.lastError);
+				}
+			}
+
+			public bool SmudgeFile(string ptr, Stream stream)
+			{
+				bool stdInputStreamCallback(StreamWriter writer)
+				{
+					writer.Write(ptr);
+					writer.Flush();
+					writer.BaseStream.Flush();
+					
+					return true;
+				}
+
+				lock (repository)
+				{
+					var result = repository.RunExe("git", "lfs smudge", stdInputStreamCallback:stdInputStreamCallback, stdOutToStream:stream);
 					repository.lastResult = result.output;
 					repository.lastError = result.errors;
 

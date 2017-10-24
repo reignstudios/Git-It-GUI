@@ -71,6 +71,15 @@ namespace GitItGUI.Core
 			return match.Success;
 		}
 
+		internal static bool IsGitLFSPtr(StreamReader reader, out string ptr)
+		{
+			var data = new char[1024];
+			int read = reader.ReadBlock(data, 0, data.Length);
+			ptr = new string(data);
+			if (read != data.Length) ptr = ptr.Remove(read);
+			return IsGitLFSPtr(ptr);
+		}
+
 		public static bool OpenFolderLocation(string folderPath)
 		{
 			try

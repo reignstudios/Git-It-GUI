@@ -39,7 +39,7 @@ namespace GitCommander
 			GetStdOutputStreamCallbackMethod getStdOutputStreamCallback = null,
 			StdCallbackMethod stdCallback = null, StdCallbackMethod stdErrorCallback = null,
 			bool stdResultOn = true, bool stdErrorResultOn = true,
-			string stdOutToFilePath = null
+			string stdOutToFilePath = null, Stream stdOutToStream = null
 		)
 		{
 			if (RunExeDebugLineCallback != null) RunExeDebugLineCallback(string.Format("GitCommander: {0} {1}", exe, arguments));
@@ -60,19 +60,8 @@ namespace GitCommander
 				process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
 				process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
 				
-				FileStream stdOutStream = null;
-				StreamWriter stdOutStreamWriter = null;
-				if (stdOutToFilePath != null && getStdOutputStreamCallback == null)
-				{
-					stdOutToFilePath = repoPath + Path.DirectorySeparatorChar + stdOutToFilePath.Replace('/', Path.DirectorySeparatorChar);
-					stdOutStream = new FileStream(stdOutToFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
-					stdOutStreamWriter = new StreamWriter(stdOutStream, Encoding.UTF8);
-				}
-
 				var outDataReceived = new StdCallbackMethod(delegate(string line)
 				{
-					if (stdOutToFilePath != null) stdOutStreamWriter.WriteLine(line);
-					
 					if (stdResultOn)
 					{
 						if (output.Length != 0) output += Environment.NewLine;
@@ -134,10 +123,12 @@ namespace GitCommander
 
 				// start process
 				process.Start();
-				if (getStdInputStreamCallback != null) getStdInputStreamCallback(process.StandardInput);
-				if (getStdOutputStreamCallback == null) process.BeginOutputReadLine();
-				else getStdOutputStreamCallback(process.StandardOutput);
 				process.BeginErrorReadLine();
+				if (stdOutToFilePath == null && stdOutToStream == null && getStdOutputStreamCallback == null) process.BeginOutputReadLine();
+
+				// return streams
+				if (getStdInputStreamCallback != null) getStdInputStreamCallback(process.StandardInput);
+				if (getStdOutputStreamCallback != null) getStdOutputStreamCallback(process.StandardOutput);
 
 				// write input
 				if (stdInputStreamCallback != null)
@@ -147,16 +138,29 @@ namespace GitCommander
 					process.StandardInput.Close();
 				}
 
+				// write output
+				if (getStdOutputStreamCallback == null)
+				{
+					if (stdOutToFilePath != null)
+					{
+						stdOutToFilePath = Path.Combine(repoPath, stdOutToFilePath);
+						using (var stdOutStream = new FileStream(stdOutToFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+						{
+							process.StandardOutput.BaseStream.CopyTo(stdOutStream);
+							process.StandardOutput.BaseStream.Flush();
+							stdOutStream.Flush();
+						}
+					}
+					else if (stdOutToStream != null)
+					{
+						process.StandardOutput.BaseStream.CopyTo(stdOutToStream);
+						process.StandardOutput.BaseStream.Flush();
+						stdOutToStream.Flush();
+					}
+				}
+
 				// wait for process to finish
 				process.WaitForExit();
-
-				// close stdOut file
-				if (stdOutStreamWriter != null) stdOutStreamWriter.Flush();
-				if (stdOutStream != null)
-				{
-					stdOutStream.Flush();
-					stdOutStream.Dispose();
-				}
 			}
 
 			return (output, errors);

@@ -372,6 +372,18 @@ namespace GitCommander
 			}
 		}
 
+		public bool SaveOriginalFile(string filename, Stream stream)
+		{
+			lock (this)
+			{
+				var result = RunExe("git", string.Format("show HEAD:\"{0}\"", filename), stdOutToStream:stream);
+				lastResult = result.output;
+				lastError = result.errors;
+
+				return string.IsNullOrEmpty(lastError);
+			}
+		}
+
 		public bool SaveConflictedFile(string filename, FileConflictSources source, out string savedFilename)
 		{
 			lock (this)

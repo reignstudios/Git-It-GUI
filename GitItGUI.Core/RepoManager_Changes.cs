@@ -129,35 +129,36 @@ namespace GitItGUI.Core
 						// load new image data
 						var image = new PreviewImageData();
 						image.newImage = File.ReadAllBytes(fullPath);
-						if (!repository.SaveOriginalFile(fileState.filename, out string savedFilename)) return image;
-
-						string origFullPath = Path.Combine(repository.repoPath, savedFilename);
-						if (new FileInfo(origFullPath).Length == 0) return image;
-
-						// check if image is lfs ptr
-						bool isLFSPtr = false;
-						string ptr = null;
-						using (var stream = new FileStream(origFullPath, FileMode.Open, FileAccess.Read, FileShare.None))
-						using (var reader = new StreamReader(stream))
-						{
-							var data = new char[1024];
-							int read = reader.ReadBlock(data, 0, data.Length);
-							ptr = new string(data).Remove(read);
-							isLFSPtr = Tools.IsGitLFSPtr(ptr);
-						}
-
-						// smudge lfs ptr (aka convert ptr to data)
-						if (isLFSPtr && !repository.lfs.SmudgeFile(ptr, origFullPath))
-						{
-							DebugLog.LogError("Failed to smudge file: " + savedFilename);
-							return image;
-						}
 
 						// load old image data
-						image.oldImage = File.ReadAllBytes(origFullPath);
-						File.Delete(origFullPath);
+						using (var stream = new MemoryStream())
+						{
+							if (!repository.SaveOriginalFile(fileState.filename, stream)) return image;
+							if (stream.Length == 0) return image;
+							stream.Position = 0;
 
-						return image;
+							// check if image is lfs ptr
+							using (var reader = new StreamReader(stream))
+							{
+								// smudge lfs ptr (aka convert ptr to data)
+								if (Tools.IsGitLFSPtr(reader, out string ptr))
+								{
+									stream.SetLength(0);
+									if (!repository.lfs.SmudgeFile(ptr, stream))
+									{
+										DebugLog.LogError("Failed to smudge file: " + fileState.filename);
+										return image;
+									}
+								}
+
+								// load old image data
+								stream.Position = 0;
+								image.oldImage = new byte[stream.Length];
+								stream.Read(image.oldImage, 0, image.oldImage.Length);
+						
+								return image;
+							}
+						}
 					}
 
 					// check for text types diffs
