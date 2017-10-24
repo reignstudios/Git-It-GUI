@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
 	<Grid>
-		<Button Name="historyButton" Width="128" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center" Click="historyButton_Click" ToolTip="Open 'gitk' tool">Open History Tool</Button>
+		<Button Name="historyButton" Width="128" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center" Click="historyButton_Click">Open History Tool</Button>
 	</Grid>
 </UserControl>

@@ -27,6 +27,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
         {
             InitializeComponent();
 			applyButton.Visibility = Visibility.Hidden;
+			cancelButton.Visibility = Visibility.Hidden;
         }
 
 		public void Refresh()
@@ -36,6 +37,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			sigEmail.Text = RepoScreen.singleton.repoManager.signatureEmail;
 			isLocalToggleButton.IsChecked = RepoScreen.singleton.repoManager.signatureIsLocal;
 			applyButton.Visibility = Visibility.Hidden;
+			cancelButton.Visibility = Visibility.Hidden;
 			refreshMode = false;
 		}
 
@@ -58,6 +60,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 			// apply
 			applyButton.Visibility = Visibility.Hidden;
+			cancelButton.Visibility = Visibility.Hidden;
 			string name = sigName.Text, email = sigEmail.Text;
 			bool isLocal = isLocalToggleButton.IsChecked == true;
 			MainWindow.singleton.ShowProcessingOverlay();
@@ -68,19 +71,36 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			});
 		}
 
+		private void cancelButton_Click(object sender, RoutedEventArgs e)
+		{
+			Refresh();
+		}
+
 		private void sigName_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			if (applyButton != null && !refreshMode) applyButton.Visibility = Visibility.Visible;
+			if (applyButton != null && !refreshMode)
+			{
+				applyButton.Visibility = Visibility.Visible;
+				cancelButton.Visibility = Visibility.Visible;
+			}
 		}
 
 		private void sigEmail_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			if (applyButton != null && !refreshMode) applyButton.Visibility = Visibility.Visible;
+			if (applyButton != null && !refreshMode)
+			{
+				applyButton.Visibility = Visibility.Visible;
+				cancelButton.Visibility = Visibility.Visible;
+			}
 		}
 
 		private void isLocalToggleButton_Checked(object sender, RoutedEventArgs e)
 		{
-			if (applyButton != null && !refreshMode) applyButton.Visibility = Visibility.Visible;
+			if (applyButton != null && !refreshMode)
+			{
+				applyButton.Visibility = Visibility.Visible;
+				cancelButton.Visibility = Visibility.Visible;
+			}
 		}
 	}
 }

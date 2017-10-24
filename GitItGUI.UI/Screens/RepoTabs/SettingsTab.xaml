@@ -31,5 +31,6 @@
 			</Grid>
 		</Border>
 		<Button Name="applyButton" Content="Apply" Background="LightGreen" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="applyButton_Click"/>
+		<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,90,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="cancelButton_Click"/>
 	</Grid>
 </UserControl>
