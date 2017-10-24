@@ -84,6 +84,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				textBlock.Text = fileState.filename + (fileState.isLFS ? " [LFS]" : string.Empty);
 				textBlock.ContextMenu = new ContextMenu();
 				var openFileMenu = new MenuItem();
+				openFileMenu.Tag = fileState;
 				openFileMenu.Header = "Open file";
 				openFileMenu.ToolTip = fileState.filename;
 				openFileMenu.Click += OpenFileMenu_Click;
@@ -94,10 +95,20 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				if (fileState.HasState(FileStates.Conflicted))
 				{
 					var resolveMenu = new MenuItem();
+					resolveMenu.Tag = fileState;
 					resolveMenu.Header = "Resolve file";
 					resolveMenu.ToolTip = fileState.filename;
 					resolveMenu.Click += ResolveFileMenu_Click;
-					textBlock.ContextMenu.Items.Add(openFileLocationMenu);
+					textBlock.ContextMenu.Items.Add(resolveMenu);
+				}
+				if (!fileState.HasState(FileStates.NewInWorkdir) && !fileState.HasState(FileStates.NewInIndex))
+				{
+					var historyMenu = new MenuItem();
+					historyMenu.Tag = fileState;
+					historyMenu.Header = "History";
+					historyMenu.ToolTip = fileState.filename;
+					historyMenu.Click += HistoryFileMenu_Click;
+					textBlock.ContextMenu.Items.Add(historyMenu);
 				}
 				textBlock.ContextMenu.Items.Add(openFileMenu);
 				textBlock.ContextMenu.Items.Add(openFileLocationMenu);
@@ -228,6 +239,12 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				if (!RepoScreen.singleton.repoManager.ResolveConflict(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve conflict");
 			});
+		}
+
+		private void HistoryFileMenu_Click(object sender, RoutedEventArgs e)
+		{
+			var fileState = (FileState)((MenuItem)sender).Tag;
+			HistoryTab.singleton.OpenHistory(fileState.filename);
 		}
 
 		private void UnstagedFileButton_Click(object sender, RoutedEventArgs e)

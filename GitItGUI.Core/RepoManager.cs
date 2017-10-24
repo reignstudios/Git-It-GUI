@@ -424,7 +424,7 @@ namespace GitItGUI.Core
 			}
 		}
 
-		public void OpenGitk()
+		public void OpenGitk(string filename = null)
 		{
 			lock (this)
 			{
@@ -445,7 +445,7 @@ namespace GitItGUI.Core
 						}
 
 						process.StartInfo.WorkingDirectory = repository.repoPath;
-						process.StartInfo.Arguments = "";
+						if (filename != null) process.StartInfo.Arguments = string.Format("\"{0}\"", filename);
 						process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 						if (!process.Start())
 						{

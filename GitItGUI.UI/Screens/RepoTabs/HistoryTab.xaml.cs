@@ -20,19 +20,27 @@ namespace GitItGUI.UI.Screens.RepoTabs
     /// </summary>
     public partial class HistoryTab : UserControl
     {
+		public static HistoryTab singleton;
+
         public HistoryTab()
         {
+			singleton = this;
             InitializeComponent();
         }
 
-		private void historyButton_Click(object sender, RoutedEventArgs e)
+		public void OpenHistory(string filename)
 		{
 			MainWindow.singleton.ShowWaitingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				RepoScreen.singleton.repoManager.OpenGitk();
+				RepoScreen.singleton.repoManager.OpenGitk(filename);
 				MainWindow.singleton.HideWaitingOverlay();
 			});
+		}
+
+		private void historyButton_Click(object sender, RoutedEventArgs e)
+		{
+			OpenHistory(null);
 		}
 	}
 }
