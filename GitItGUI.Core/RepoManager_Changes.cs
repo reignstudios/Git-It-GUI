@@ -1062,12 +1062,17 @@ namespace GitItGUI.Core
 			{
 				try
 				{
-					File.WriteAllText(Path.Combine(repository.repoPath, ".git", "GITGUI_MSG"), message);
+					using (var stream = new FileStream(Path.Combine(repository.repoPath, ".git", "GITGUI_MSG"), FileMode.Create, FileAccess.Write, FileShare.None))
+					using (var writer = new StreamWriter(stream))
+					{
+						writer.Write(message);
+					}
+					
 					return true;
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Failed to start Diff tool: " + e.Message);
+					DebugLog.LogError("Failed to save commit msg history: " + e.Message);
 					return false;
 				}
 			}
@@ -1079,7 +1084,14 @@ namespace GitItGUI.Core
 			{
 				try
 				{
-					message = File.ReadAllText(Path.Combine(repository.repoPath, ".git", "GITGUI_MSG"));
+					string filename = Path.Combine(repository.repoPath, ".git", "GITGUI_MSG");
+					if (!File.Exists(filename))
+					{
+						message = null;
+						return false;
+					}
+
+					message = File.ReadAllText(filename);
 					return true;
 				}
 				catch (Exception e)
