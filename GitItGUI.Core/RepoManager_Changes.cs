@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using GitCommander;
 using System.Collections.Generic;
+using System.Text;
 
 namespace GitItGUI.Core
 {
@@ -107,6 +108,53 @@ namespace GitItGUI.Core
 			}
 		}
 
+		private bool SaveOriginalFile(string filename, out string savedFilename)
+		{
+			// save data to file
+			if (!repository.SaveOriginalFile(filename, out savedFilename)) return false;
+			string fullPathOrig = Path.Combine(repository.repoPath, savedFilename);
+			
+			// check for lfs ptr
+			string ptr = null;
+			using (var stream = new FileStream(fullPathOrig, FileMode.Open, FileAccess.Read, FileShare.None))
+			using (var reader = new StreamReader(stream))
+			{
+				if (!Tools.IsGitLFSPtr(reader, out ptr)) ptr = null;
+			}
+
+			// smudge lfs ptr (aka convert ptr to data)
+			if (ptr != null && !repository.lfs.SmudgeFile(ptr, savedFilename))
+			{
+				DebugLog.LogError("Failed to smudge file: " + filename);
+				return false;
+			}
+					
+			return true;
+		}
+
+		private bool SaveOriginalFile(string filename, StreamReader reader)
+		{
+			var stream = reader.BaseStream;
+
+			// save data to stream
+			if (!repository.SaveOriginalFile(filename, stream)) return false;
+			if (stream.Length == 0) return false;
+			stream.Position = 0;
+			
+			// smudge lfs ptr (aka convert ptr to data)
+			if (Tools.IsGitLFSPtr(reader, out string ptr))
+			{
+				stream.SetLength(0);
+				if (!repository.lfs.SmudgeFile(ptr, stream))
+				{
+					DebugLog.LogError("Failed to smudge file: " + filename);
+					return false;
+				}
+			}
+					
+			return true;
+		}
+
 		public object GetQuickViewData(FileState fileState)
 		{
 			lock (this)
@@ -132,32 +180,16 @@ namespace GitItGUI.Core
 
 						// load old image data
 						using (var stream = new MemoryStream())
+						using (var reader = new StreamReader(stream))
 						{
-							if (!repository.SaveOriginalFile(fileState.filename, stream)) return image;
-							if (stream.Length == 0) return image;
+							if (!SaveOriginalFile(fileState.filename, reader)) return image;
+
+							// load old image data
 							stream.Position = 0;
-
-							// check if image is lfs ptr
-							using (var reader = new StreamReader(stream))
-							{
-								// smudge lfs ptr (aka convert ptr to data)
-								if (Tools.IsGitLFSPtr(reader, out string ptr))
-								{
-									stream.SetLength(0);
-									if (!repository.lfs.SmudgeFile(ptr, stream))
-									{
-										DebugLog.LogError("Failed to smudge file: " + fileState.filename);
-										return image;
-									}
-								}
-
-								// load old image data
-								stream.Position = 0;
-								image.oldImage = new byte[stream.Length];
-								stream.Read(image.oldImage, 0, image.oldImage.Length);
+							image.oldImage = new byte[stream.Length];
+							stream.Read(image.oldImage, 0, image.oldImage.Length);
 						
-								return image;
-							}
+							return image;
 						}
 					}
 
@@ -1023,7 +1055,7 @@ namespace GitItGUI.Core
 
 					// get info and save orig file
 					pauseGitCommanderStdWrites = true;
-					if (!repository.SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(repository.lastError);
+					if (!SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(repository.lastError);
 					pauseGitCommanderStdWrites = false;
 					fullPathOrig = Path.Combine(repository.repoPath, fullPathOrig);
 

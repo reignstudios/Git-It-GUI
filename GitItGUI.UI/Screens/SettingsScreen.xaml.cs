@@ -46,15 +46,16 @@ namespace GitItGUI.UI.Screens
 		{
 			AppManager.settings.autoRefreshChanges = autoRefreshCheckBox.IsChecked == true;
 			AppManager.settings.showLFSTags = showLSFTagsCheckBox.IsChecked == true;
+			var mergeTool = MergeDiffTools.kDiff3;
 			switch (mergeDiffToolComboBox.SelectedIndex)
 			{
-				case 0: AppManager.settings.mergeDiffTool = MergeDiffTools.Meld; break;
-				case 1: AppManager.settings.mergeDiffTool = MergeDiffTools.kDiff3; break;
-				case 2: AppManager.settings.mergeDiffTool = MergeDiffTools.P4Merge; break;
-				case 3: AppManager.settings.mergeDiffTool = MergeDiffTools.DiffMerge; break;
+				case 0: mergeTool = MergeDiffTools.Meld; break;
+				case 1: mergeTool = MergeDiffTools.kDiff3; break;
+				case 2: mergeTool = MergeDiffTools.P4Merge; break;
+				case 3: mergeTool = MergeDiffTools.DiffMerge; break;
 			}
 
-			AppManager.SetMergeDiffTool(MergeDiffTools.DiffMerge);
+			AppManager.SetMergeDiffTool(mergeTool);
 			ValidateDiffMergeTool();
 		}
 
