@@ -606,72 +606,132 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					stream.Position = 0;
 
 					// read lines and write formatted blocks
-					void WritePreviewText(string text, SolidColorBrush blockColor)
+					void WritePreviewText(string text, SolidColorBrush fBlockColor, SolidColorBrush bBlockColor)
 					{
 						var end = previewTextBox.Document.ContentEnd;
 						var range = new TextRange(end, end);
 						range.Text = text;
-						range.ApplyPropertyValue(TextElement.ForegroundProperty, blockColor);
+						range.ApplyPropertyValue(TextElement.ForegroundProperty, fBlockColor);
+						if (bBlockColor != null) range.ApplyPropertyValue(TextElement.BackgroundProperty, bBlockColor);
 					}
 						
 					int blockMode = 0;
-					string line = null, normalBlock = null, addBlock = null, subBlock = null, secBlock = null;
-					void CheckBlocks(bool isFinishMode)
+					SolidColorBrush fBlockBrush = Brushes.Black, bBlockBrush = null;
+					string blockText = string.Empty;
+					string line = null;
+					void CheckBlocks(bool isFinishMode, int currentBlockMode)
 					{
-						if ((blockMode != 0 || (isFinishMode && blockMode == 0)) && !string.IsNullOrEmpty(normalBlock))
+						bool switched = currentBlockMode != blockMode;
+						if ((switched || isFinishMode) && !string.IsNullOrEmpty(blockText))
 						{
-							WritePreviewText(normalBlock, Brushes.Black);
-							normalBlock = "";
-						}
-						else if ((blockMode != 1 || (isFinishMode && blockMode == 1)) && !string.IsNullOrEmpty(addBlock))
-						{
-							WritePreviewText(addBlock, Brushes.Green);
-							addBlock = "";
-						}
-						else if ((blockMode != 2 || (isFinishMode && blockMode == 2)) && !string.IsNullOrEmpty(subBlock))
-						{
-							WritePreviewText(subBlock, Brushes.Red);
-							subBlock = "";
-						}
-						else if ((blockMode != 3 || (isFinishMode && blockMode == 3)) && !string.IsNullOrEmpty(secBlock))
-						{
-							WritePreviewText(secBlock, Brushes.DarkOrange);
-							secBlock = "";
+							WritePreviewText(blockText, fBlockBrush, bBlockBrush);
+							blockText = string.Empty;
 						}
 					}
 
-					do
+					bool ScanBlockPattern(ref string text, int length, char character)
 					{
-						line = reader.ReadLine();
-						if (string.IsNullOrEmpty(line))
+						if (text == null || text.Length < length) return false;
+						for (int i = 0; i != length; ++i)
 						{
-							CheckBlocks(true);
-							continue;
+							char c = text[i];
+							if (c != character) return false;
 						}
 
+						return true;
+					}
+
+					bool inConflictDiffMode = false;
+					do
+					{
+						long streamPos = stream.Position;
+						line = reader.ReadLine();
+
+						// check for end of file
+						if (string.IsNullOrEmpty(line))
+						{
+							CheckBlocks(true, blockMode);
+							continue;
+						}
+						
+						// check for conflicted file changes
+						if (inConflictDiffMode || fileState.HasState(FileStates.Conflicted))
+						{
+							if (ScanBlockPattern(ref line, 7, '<'))
+							{
+								CheckBlocks(false, 5);
+								blockMode = 5;
+								fBlockBrush = Brushes.DeepPink;
+								bBlockBrush = Brushes.Transparent;
+								if (streamPos == 0) blockText += line + '\r';
+								else blockText += "\r\r" + line + '\r';
+
+								CheckBlocks(false, 0);
+								blockMode = 0;
+								fBlockBrush = Brushes.Black;
+								bBlockBrush = Brushes.DarkGray;
+								inConflictDiffMode = true;
+								continue;
+							}
+							else if (ScanBlockPattern(ref line, 7, '='))
+							{
+								CheckBlocks(false, 6);
+								blockMode = 6;
+								fBlockBrush = Brushes.DeepPink;
+								bBlockBrush = Brushes.Transparent;
+								blockText += line + '\r';
+
+								CheckBlocks(false, 0);
+								blockMode = 0;
+								fBlockBrush = Brushes.Black;
+								bBlockBrush = Brushes.DarkGray;
+								continue;
+							}
+							else if (ScanBlockPattern(ref line, 7, '>'))
+							{
+								CheckBlocks(false, 7);
+								blockMode = 7;
+								fBlockBrush = Brushes.DeepPink;
+								bBlockBrush = Brushes.Transparent;
+								blockText += line + "\r\r";
+								inConflictDiffMode = false;
+								continue;
+							}
+							else
+							{
+								blockText += line + '\r';
+								continue;
+							}
+						}
+
+						// standard changes
 						if (line[0] == '+')
 						{
-							CheckBlocks(false);
+							CheckBlocks(false, 1);
 							blockMode = 1;
-							addBlock += line + '\r';
+							fBlockBrush = Brushes.Green;
+							blockText += line + '\r';
 						}
 						else if (line[0] == '-')
 						{
-							CheckBlocks(false);
+							CheckBlocks(false, 2);
 							blockMode = 2;
-							subBlock += line + '\r';
+							fBlockBrush = Brushes.Red;
+							blockText += line + '\r';
 						}
 						else if (line[0] == '#')
 						{
-							CheckBlocks(false);
+							CheckBlocks(false, 3);
 							blockMode = 3;
-							secBlock += "\r\r" + line + '\r';
+							fBlockBrush = Brushes.DarkOrange;
+							blockText += "\r\r" + line + '\r';
 						}
 						else
 						{
-							CheckBlocks(false);
+							CheckBlocks(false, 4);
 							blockMode = 0;
-							normalBlock += line + '\r';
+							fBlockBrush = Brushes.Black;
+							blockText += line + '\r';
 						}
 					}
 					while (line != null);
