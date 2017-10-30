@@ -209,7 +209,27 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Rename new Branch Error: " + e.Message);
+					DebugLog.LogError("Rename active Branch Error: " + e.Message);
+					success = false;
+				}
+
+				Refresh();
+				return success;
+			}
+		}
+
+		public bool RenameNonActiveBranch(BranchState currentBranch, string newBranchName)
+		{
+			lock (this)
+			{
+				bool success = true;
+				try
+				{
+					if (!repository.RenameNonActiveBranch(currentBranch.fullname, newBranchName)) throw new Exception(repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Rename non-active Branch Error: " + e.Message);
 					success = false;
 				}
 

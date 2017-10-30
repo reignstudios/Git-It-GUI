@@ -61,10 +61,6 @@
 					<TextBlock Text="▼" Margin="0,-2,0,0"/>
 					<Button.ContextMenu>
 						<ContextMenu>
-							<MenuItem Name="switchBranchMenuItem" Header="Switch to Selected" Click="switchBranchMenuItem_Click"/>
-							<MenuItem Name="mergeBranchMenuItem" Header="Merge to Selected into Active" Click="mergeBranchMenuItem_Click"/>
-							<Separator/>
-							<MenuItem Name="deleteBranchMenuItem" Header="Delete Selected" Click="deleteBranchMenuItem_Click"/>
 							<MenuItem Name="cleanupMenuItem" Header="CleanUp (Remove untracked remote branches)" Click="cleanupMenuItem_Click"/>
 						</ContextMenu>
 					</Button.ContextMenu>

@@ -37,11 +37,17 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			if (repoManager.activeBranch.isTracking)
 			{
 				trackedRemoteBranchTextBox.Text = repoManager.activeBranch.tracking.fullname;
-				trackedRemoteBranchTextBox.Text = repoManager.activeBranch.tracking.remoteState.url;
+				remoteURLTextBox.Text = repoManager.activeBranch.tracking.remoteState.url;
 			}
 			else if (repoManager.activeBranch.isRemote)
 			{
-				trackedRemoteBranchTextBox.Text = repoManager.activeBranch.remoteState.url;
+				trackedRemoteBranchTextBox.Text = string.Empty;
+				remoteURLTextBox.Text = repoManager.activeBranch.remoteState.url;
+			}
+			else
+			{
+				trackedRemoteBranchTextBox.Text = string.Empty;
+				remoteURLTextBox.Text = string.Empty;
 			}
 
 			// update non-active branch list
@@ -55,6 +61,39 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				if (branch.isTracking) item.ToolTip = "Tracking: " + branch.tracking.fullname;
 				item.Content = string.Format("{0} [{1}]", branch.fullname, branch.isRemote ? "REMOTE" : "LOCAL");
 				nonActiveBranchesListBox.Items.Add(item);
+				item.ContextMenu = new ContextMenu();
+
+				// switch context menu
+				var switchFileMenu = new MenuItem();
+				switchFileMenu.Tag = branch;
+				switchFileMenu.Header = string.Format("Switch to '{0}'", branch.fullname);
+				switchFileMenu.Click += SwitchFileMenu_Click;
+				item.ContextMenu.Items.Add(switchFileMenu);
+
+				// merge context menu
+				var mergeFileMenu = new MenuItem();
+				mergeFileMenu.Tag = branch;
+				mergeFileMenu.Header = string.Format("Merge '{0}' into '{1}'", branch.fullname, repoManager.activeBranch.name);
+				mergeFileMenu.Click += MergeFileMenu_Click;
+				item.ContextMenu.Items.Add(mergeFileMenu);
+				item.ContextMenu.Items.Add(new Separator());
+
+				// rename context menu
+				if (!branch.isRemote)
+				{
+					var renameFileMenu = new MenuItem();
+					renameFileMenu.Tag = branch;
+					renameFileMenu.Header = string.Format("Rename '{0}'", branch.fullname);
+					renameFileMenu.Click += RenameFileMenu_Click;
+					item.ContextMenu.Items.Add(renameFileMenu);
+				}
+
+				// delete context menu
+				var deleteFileMenu = new MenuItem();
+				deleteFileMenu.Tag = branch;
+				deleteFileMenu.Header = string.Format("Delete '{0}'", branch.fullname);
+				deleteFileMenu.Click += DeleteFileMenu_Click;
+				item.ContextMenu.Items.Add(deleteFileMenu);
 			}
 		}
 
@@ -133,39 +172,21 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			});
 		}
 
-		private void switchBranchMenuItem_Click(object sender, RoutedEventArgs e)
+		private void SwitchFileMenu_Click(object sender, RoutedEventArgs e)
 		{
-			if (nonActiveBranchesListBox.SelectedIndex == -1)
-			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active branch");
-				return;
-			}
-
-			var branch = ((BranchState)((ListBoxItem)nonActiveBranchesListBox.SelectedItem).Tag);
+			var branch = (BranchState)((MenuItem)sender).Tag;
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (!RepoScreen.singleton.repoManager.Checkout(branch)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to checkout branch");
+				if (!RepoScreen.singleton.repoManager.Checkout(branch)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to switch branch");
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
 
-		private void mergeBranchMenuItem_Click(object sender, RoutedEventArgs e)
+		private void MergeFileMenu_Click(object sender, RoutedEventArgs e)
 		{
-			if (nonActiveBranchesListBox.SelectedIndex == -1)
-			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active branch");
-				return;
-			}
-
-			var branch = ((BranchState)((ListBoxItem)nonActiveBranchesListBox.SelectedItem).Tag);
-			if (!branch.isRemote)
-			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active 'REMOTE' branch");
-				return;
-			}
-
-			MainWindow.singleton.ShowMessageOverlay("Copy Tracking", string.Format("Are you sure you want to copy tracking from branch '{1}' into '{0}'", RepoScreen.singleton.repoManager.activeBranch.fullname, branch.fullname), MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+			var branch = (BranchState)((MenuItem)sender).Tag;
+			MainWindow.singleton.ShowMessageOverlay("Merge Branches", string.Format("Are you sure you want to merge branch '{0}' into '{1}'", RepoScreen.singleton.repoManager.activeBranch.fullname, branch.fullname), MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
 			{
 				if (result != MessageOverlayResults.Ok) return;
 				MainWindow.singleton.ShowProcessingOverlay();
@@ -173,22 +194,31 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				{
 					var mergeResult = RepoScreen.singleton.repoManager.MergeBranchIntoActive(branch);
 					if (mergeResult == MergeResults.Conflicts) ChangesTab.singleton.HandleConflics();
-					else if (mergeResult == MergeResults.Error) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to copy tracking");
+					else if (mergeResult == MergeResults.Error) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to merge branches");
 
 					MainWindow.singleton.HideProcessingOverlay();
 				});
 			});
 		}
 
-		private void deleteBranchMenuItem_Click(object sender, RoutedEventArgs e)
+		private void RenameFileMenu_Click(object sender, RoutedEventArgs e)
 		{
-			if (nonActiveBranchesListBox.SelectedIndex == -1)
+			var branch = (BranchState)((MenuItem)sender).Tag;
+			MainWindow.singleton.ShowNameEntryOverlay(branch.name, false, delegate(string name, string remoteName, bool succeeded)
 			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active branch");
-				return;
-			}
+				if (!succeeded) return;
+				MainWindow.singleton.ShowProcessingOverlay();
+				RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!RepoScreen.singleton.repoManager.RenameNonActiveBranch(branch, name)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to rename branch");
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			});
+		}
 
-			var branch = ((BranchState)((ListBoxItem)nonActiveBranchesListBox.SelectedItem).Tag);
+		private void DeleteFileMenu_Click(object sender, RoutedEventArgs e)
+		{
+			var branch = (BranchState)((MenuItem)sender).Tag;
 			if (branch.isRemote)
 			{
 				MainWindow.singleton.ShowMessageOverlay("Alert", "You must select a non-active 'LOCAL' branch\nOr run cleanup to remove invalid remotes.");

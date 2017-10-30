@@ -49,6 +49,8 @@ namespace GitItGUI.UI.Overlays
 					item.ToolTip = "URL: " + remote.url;
 					remoteComboBox.Items.Add(item);
 				}
+
+				remoteComboBox.SelectedIndex = 0;
 			}
 		}
 
