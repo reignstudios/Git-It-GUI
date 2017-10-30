@@ -347,12 +347,9 @@ namespace GitItGUI.Core
 					}
 
 					// add default ext to git lfs
-					if (addLFSDefaultExts)
+					if (addLFSDefaultExts && AppManager.defaultGitLFS_Exts != null && AppManager.defaultGitLFS_Exts.Count != 0)
 					{
-						foreach (string ext in AppManager.defaultGitLFS_Exts)
-						{
-							if (!repository.lfs.Track(ext)) throw new Exception(repository.lastError);
-						}
+						if (!repository.lfs.Track(AppManager.defaultGitLFS_Exts)) throw new Exception(repository.lastError);
 					}
 
 					// finish

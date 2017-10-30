@@ -67,6 +67,22 @@ namespace GitCommander
 				}
 			}
 
+			public bool Track(List<string> exts)
+			{
+				lock (repository)
+				{
+					if (exts.Count == 0) return true;
+
+					string args = string.Empty;
+					foreach (string ext in exts)
+					{
+						args += string.Format("\"*{0}\" ", ext);
+					}
+
+					return SimpleLFSInvoke("track " + args.TrimEnd(' '));
+				}
+			}
+
 			public bool Untrack(string ext)
 			{
 				lock (repository)
