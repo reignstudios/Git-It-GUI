@@ -669,7 +669,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 								CheckBlocks(false, 0);
 								blockMode = 0;
 								fBlockBrush = Brushes.Black;
-								bBlockBrush = Brushes.DarkGray;
+								bBlockBrush = Brushes.LightGreen;
 								inConflictDiffMode = true;
 								continue;
 							}
@@ -684,7 +684,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 								CheckBlocks(false, 0);
 								blockMode = 0;
 								fBlockBrush = Brushes.Black;
-								bBlockBrush = Brushes.DarkGray;
+								bBlockBrush = Brushes.LightBlue;
 								continue;
 							}
 							else if (ScanBlockPattern(ref line, 7, '>'))
@@ -697,7 +697,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 								inConflictDiffMode = false;
 								continue;
 							}
-							else
+							else if (inConflictDiffMode)
 							{
 								blockText += line + '\r';
 								continue;
@@ -728,7 +728,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 						}
 						else
 						{
-							CheckBlocks(false, 4);
+							CheckBlocks(false, 0);
 							blockMode = 0;
 							fBlockBrush = Brushes.Black;
 							blockText += line + '\r';
@@ -748,18 +748,26 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					var bitmap = new BitmapImage();
 					if (data == null) return bitmap;
 
-					using (var stream = new MemoryStream(data))
+					try
 					{
-						stream.Position = 0;
-						bitmap.BeginInit();
-						bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-						bitmap.CacheOption = BitmapCacheOption.OnLoad;
-						bitmap.UriSource = null;
-						bitmap.StreamSource = stream;
-						bitmap.EndInit();
+						using (var stream = new MemoryStream(data))
+						{
+							stream.Position = 0;
+							bitmap.BeginInit();
+							bitmap.CacheOption = BitmapCacheOption.OnLoad;
+							bitmap.UriSource = null;
+							bitmap.StreamSource = stream;
+							bitmap.EndInit();
+						}
+
+						bitmap.Freeze();
+					}
+					catch (Exception e)
+					{
+						DebugLog.LogError("Failed to load image: " + e.Message);
+						return new BitmapImage();
 					}
 
-					bitmap.Freeze();
 					return bitmap;
 				}
 				

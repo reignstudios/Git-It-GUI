@@ -66,7 +66,7 @@
 					</Button.ContextMenu>
 				</Button>
 
-				<ListBox Name="nonActiveBranchesListBox" SelectionMode="Extended" Margin="10,30,10,10"/>
+				<ListBox Name="nonActiveBranchesListBox" SelectionMode="Single" Margin="10,30,10,10"/>
 			</Grid>
 		</Border>
 	</Grid>

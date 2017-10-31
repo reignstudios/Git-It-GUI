@@ -37,7 +37,10 @@ namespace GitCommander
 		Changes,
 		DeletedByUs,
 		DeletedByThem,
-		DeletedByBoth
+		DeletedByBoth,
+		AddedByUs,
+		AddedByThem,
+		AddedByBoth
 	}
 
 	public class FileState
@@ -169,7 +172,7 @@ namespace GitCommander
 					if (match.Groups.Count == 2)
 					{
 						string filePath = match.Groups[1].Value;
-						if ((stateType & FileStates.Copied) != 0)
+						if ((stateType & FileStates.Copied) != 0 || (stateType & FileStates.RenamedInIndex) != 0 || (stateType & FileStates.RenamedInWorkdir) != 0)
 						{
 							match = Regex.Match(filePath, @"(.*)\s->\s(.*)");
 							if (match.Success) filePath = match.Groups[2].Value;
@@ -216,6 +219,7 @@ namespace GitCommander
 				pass = addState("\tnew file:", FileStates.NewInIndex);
 				if (!pass) pass = addState("\tmodified:", FileStates.ModifiedInIndex);
 				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromIndex);
+				if (!pass) pass = addState("\ttypechange:", FileStates.TypeChangeInIndex);
 				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInIndex);
 				if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInIndex);
 			}
@@ -223,6 +227,7 @@ namespace GitCommander
 			{
 				pass = addState("\tmodified:", FileStates.ModifiedInWorkdir);
 				if (!pass) pass = addState("\tdeleted:", FileStates.DeletedFromWorkdir);
+				if (!pass) pass = addState("\ttypechange:", FileStates.TypeChangeInWorkdir);
 				if (!pass) pass = addState("\trenamed:", FileStates.RenamedInWorkdir);
 				if (!pass) pass = addState("\tcopied:", FileStates.Copied | FileStates.NewInWorkdir);
 				if (!pass) pass = addState("\tnew file:", FileStates.NewInWorkdir);// call this just in case (should be done in untracked)
@@ -233,6 +238,9 @@ namespace GitCommander
 				if (!pass) pass = addState("\tdeleted by us:", FileStates.Conflicted, FileConflictTypes.DeletedByUs);
 				if (!pass) pass = addState("\tdeleted by them:", FileStates.Conflicted, FileConflictTypes.DeletedByThem);
 				if (!pass) pass = addState("\tboth deleted:", FileStates.Conflicted, FileConflictTypes.DeletedByBoth);
+				if (!pass) pass = addState("\tadded by us:", FileStates.Conflicted, FileConflictTypes.AddedByUs);
+				if (!pass) pass = addState("\tadded by them:", FileStates.Conflicted, FileConflictTypes.AddedByThem);
+				if (!pass) pass = addState("\tboth added:", FileStates.Conflicted, FileConflictTypes.AddedByBoth);
 			}
 			else if (mode == 3)
 			{
@@ -242,7 +250,11 @@ namespace GitCommander
 			if (!pass)
 			{
 				var match = Regex.Match(line, @"\t(.*):");
-				if (match.Success) return false;
+				if (match.Success)
+				{
+					RunExeDebugLineCallback?.Invoke("ERROR: Failed to parse status for state: " + line);
+					return false;
+				}
 			}
 
 			return true;

@@ -172,7 +172,7 @@ namespace GitItGUI.Core
 					if (Tools.IsBinaryFileData(fullPath)) 
 					{
 						// validate is supported image
-						if (!Tools.IsSupportedImageFile(fullPath)) return "<< Binary File >>";
+						if (!Tools.IsSupportedImageFile(fullPath) || fileState.HasState(FileStates.Conflicted)) return "<< Binary File >>";
 
 						// load new image data
 						var image = new PreviewImageData();

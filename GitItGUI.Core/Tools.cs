@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace GitItGUI.Core
@@ -69,6 +70,11 @@ namespace GitItGUI.Core
 			if (data.Length >= 1024) return false;
 			var match = Regex.Match(data, @"version https://git-lfs.github.com/spec/v1.*oid sha256:.*size\s\n*", RegexOptions.Singleline);
 			return match.Success;
+		}
+
+		internal static bool IsGitLFSPtr(byte[] data)
+		{
+			return IsGitLFSPtr(Encoding.Default.GetString(data));
 		}
 
 		internal static bool IsGitLFSPtr(StreamReader reader, out string ptr)

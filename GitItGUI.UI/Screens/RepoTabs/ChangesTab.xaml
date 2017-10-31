@@ -83,14 +83,14 @@
 						</Grid.RowDefinitions>
 
 						<Border Grid.Row="0" Margin="10,10,10,5" BorderThickness="1" BorderBrush="Gray" SnapsToDevicePixels="True">
-							<Grid>
+							<Grid Background="Black">
 								<Image Name="oldImage" Source="../../Images/AppIcon.png"/>
 								<Label Width="40" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" FontWeight="Bold" Foreground="Red">Old</Label>
 							</Grid>
 						</Border>
 
 						<Border Grid.Row="2" Margin="10,5,10,10" BorderThickness="1" BorderBrush="Gray" SnapsToDevicePixels="True">
-							<Grid>
+							<Grid Background="Black">
 								<Image Name="newImage" Source="../../Images/AppIcon.png"/>
 								<Label Width="40" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" FontWeight="Bold" Foreground="Green">New</Label>
 							</Grid>
