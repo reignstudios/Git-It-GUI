@@ -410,6 +410,19 @@ namespace GitCommander
 			}
 		}
 
+		public bool SaveConflictedFile(string filename, FileConflictSources source, Stream stream)
+		{
+			lock (this)
+			{
+				string sourceName = source == FileConflictSources.Ours ? "ORIG_HEAD" : "MERGE_HEAD";
+				var result = RunExe("git", string.Format("show {1}:\"{0}\"", filename, sourceName), stdOutToStream:stream);
+				lastResult = result.output;
+				lastError = result.errors;
+
+				return string.IsNullOrEmpty(lastError);
+			}
+		}
+
 		public bool CheckoutConflictedFile(string filename, FileConflictSources source)
 		{
 			lock (this)

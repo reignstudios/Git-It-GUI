@@ -743,22 +743,19 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				previewGrid.Visibility = Visibility.Visible;
 
 				var imageDelta = (PreviewImageData)delta;
-				BitmapImage LoadImage(byte[] data)
+				BitmapImage LoadImage(Stream stream)
 				{
 					var bitmap = new BitmapImage();
-					if (data == null) return bitmap;
+					if (stream == null) return bitmap;
 
 					try
 					{
-						using (var stream = new MemoryStream(data))
-						{
-							stream.Position = 0;
-							bitmap.BeginInit();
-							bitmap.CacheOption = BitmapCacheOption.OnLoad;
-							bitmap.UriSource = null;
-							bitmap.StreamSource = stream;
-							bitmap.EndInit();
-						}
+						stream.Position = 0;
+						bitmap.BeginInit();
+						bitmap.CacheOption = BitmapCacheOption.OnLoad;
+						bitmap.UriSource = null;
+						bitmap.StreamSource = stream;
+						bitmap.EndInit();
 
 						bitmap.Freeze();
 					}
@@ -770,9 +767,21 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 					return bitmap;
 				}
+
+				if (!imageDelta.isMergeDiff)
+				{
+					oldImageLabel.Content = "Old";
+					newImageLabel.Content = "New";
+				}
+				else
+				{
+					oldImageLabel.Content = "Theirs";
+					newImageLabel.Content = "Ours";
+				}
 				
 				newImage.Source = LoadImage(imageDelta.newImage);
 				oldImage.Source = LoadImage(imageDelta.oldImage);
+				imageDelta.Dispose();
 			}
 			else
 			{

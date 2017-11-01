@@ -32,9 +32,38 @@ namespace GitItGUI.Core
 		Error
 	}
 
-	public class PreviewImageData
+	public class PreviewImageData : IDisposable
 	{
-		public byte[] oldImage, newImage;
+		public bool isMergeDiff;
+		public Stream oldImage, newImage;
+		public StreamReader oldImageReader, newImageReader;
+
+		public void Dispose()
+		{
+			if (oldImageReader != null)
+			{
+				oldImageReader.Dispose();
+				oldImageReader = null;
+			}
+
+			if (oldImage != null)
+			{
+				oldImage.Dispose();
+				oldImage = null;
+			}
+
+			if (newImageReader != null)
+			{
+				newImageReader.Dispose();
+				newImageReader = null;
+			}
+
+			if (newImage != null)
+			{
+				newImage.Dispose();
+				newImage = null;
+			}
+		}
 	}
 
 	public partial class RepoManager
@@ -159,6 +188,8 @@ namespace GitItGUI.Core
 		{
 			lock (this)
 			{
+				PreviewImageData image = null;
+
 				try
 				{
 					// check if file still exists
@@ -172,25 +203,62 @@ namespace GitItGUI.Core
 					if (Tools.IsBinaryFileData(fullPath)) 
 					{
 						// validate is supported image
-						if (!Tools.IsSupportedImageFile(fullPath) || fileState.HasState(FileStates.Conflicted)) return "<< Binary File >>";
+						if (!Tools.IsSupportedImageFile(fullPath)) return "<< Binary File >>";
 
-						// load new image data
-						var image = new PreviewImageData();
-						image.newImage = File.ReadAllBytes(fullPath);
-
-						// load old image data
-						using (var stream = new MemoryStream())
-						using (var reader = new StreamReader(stream))
+						// load new/ours image data
+						image = new PreviewImageData();
+						if (fileState.HasState(FileStates.Conflicted))
 						{
-							if (!SaveOriginalFile(fileState.filename, reader)) return image;
-
-							// load old image data
-							stream.Position = 0;
-							image.oldImage = new byte[stream.Length];
-							stream.Read(image.oldImage, 0, image.oldImage.Length);
-						
-							return image;
+							image.isMergeDiff = true;
+							image.newImage = new MemoryStream();
+							if (repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, image.newImage))
+							{
+								image.newImage.Position = 0;
+							}
+							else
+							{
+								image.Dispose();
+								return null;
+							}
 						}
+						else
+						{
+							image.newImage = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.None);
+						}
+
+						// load old/theirs image data
+						if (fileState.HasState(FileStates.Conflicted))
+						{
+							image.oldImage = new MemoryStream();
+							if (repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, image.oldImage))
+							{
+								image.oldImage.Position = 0;
+							}
+							else
+							{
+								image.oldImage.Dispose();
+								image.oldImage = null;
+							}
+						}
+						else
+						{
+							var stream = new MemoryStream();
+							var reader = new StreamReader(stream);
+							if (SaveOriginalFile(fileState.filename, reader))
+							{
+								image.oldImage = stream;
+								image.oldImageReader = reader;
+								stream.Position = 0;
+							}
+							else
+							{
+								reader.Dispose();
+								stream.Dispose();
+								return image;
+							}
+						}
+						
+						return image;
 					}
 
 					// check for text types diffs
@@ -242,6 +310,7 @@ namespace GitItGUI.Core
 				{
 					pauseGitCommanderStdWrites = false;
 					DebugLog.LogError("Failed to refresh quick view: " + e.Message);
+					if (image != null) image.Dispose();
 					return null;
 				}
 			}
@@ -1038,32 +1107,45 @@ namespace GitItGUI.Core
 			lock (this)
 			{
 				string fullPath = Path.Combine(repository.repoPath, fileState.filename);
-				string fullPathOrig = null;
+				string fullPathOurs = null, fullPathTheirs = null, fullPathOrig = null;
 				void DeleteTempDiffFiles()
 				{
+					if (File.Exists(fullPathOurs)) File.Delete(fullPathOurs);
+					if (File.Exists(fullPathTheirs)) File.Delete(fullPathTheirs);
 					if (File.Exists(fullPathOrig)) File.Delete(fullPathOrig);
 				}
 
 				try
 				{
-					// get selected item
-					if (!fileState.HasState(FileStates.ModifiedInIndex) && !fileState.HasState(FileStates.ModifiedInWorkdir))
+					// validate state
+					if ((!fileState.HasState(FileStates.ModifiedInIndex) && !fileState.HasState(FileStates.ModifiedInWorkdir)) && !fileState.HasState(FileStates.Conflicted))
 					{
-						DebugLog.LogError("This file is not modified");
+						DebugLog.LogError("This file is not modified/conflicted");
 						return false;
 					}
 
 					// get info and save orig file
 					pauseGitCommanderStdWrites = true;
-					if (!SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(repository.lastError);
+					if (fileState.HasState(FileStates.Conflicted))
+					{
+						if (!repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs)) throw new Exception(repository.lastError);
+						if (!repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs)) throw new Exception(repository.lastError);
+						fullPathOurs = Path.Combine(repository.repoPath, fullPathOurs);
+						fullPathTheirs = Path.Combine(repository.repoPath, fullPathTheirs);
+					}
+					else
+					{
+						if (!SaveOriginalFile(fileState.filename, out fullPathOrig)) throw new Exception(repository.lastError);
+						fullPathOrig = Path.Combine(repository.repoPath, fullPathOrig);
+					}
 					pauseGitCommanderStdWrites = false;
-					fullPathOrig = Path.Combine(repository.repoPath, fullPathOrig);
 
 					// open diff tool
 					using (var process = new Process())
 					{
 						process.StartInfo.FileName = AppManager.mergeToolPath;
-						process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\"", fullPathOrig, fullPath);
+						if (fileState.HasState(FileStates.Conflicted)) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\"", fullPathTheirs, fullPathOurs);
+						else process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\"", fullPathOrig, fullPath);
 						process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
 						if (!process.Start())
 						{

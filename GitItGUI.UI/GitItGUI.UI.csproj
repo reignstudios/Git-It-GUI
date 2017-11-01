@@ -206,6 +206,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\CheckPattern.png" />
     <Resource Include="Images\Update.png" />
     <Resource Include="Images\UserTask.png" />
     <Resource Include="Images\unknown.png" />
