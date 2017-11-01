@@ -59,6 +59,8 @@ namespace GitItGUI.Core
 				case ".jpg":
 				case ".jpeg":
 				case ".bmp":
+				case ".gif":
+				case ".tif":
 					return true;
 			}
 
