@@ -123,12 +123,14 @@ namespace GitCommander
 
 				// start process
 				process.Start();
-				process.BeginErrorReadLine();
-				if (stdOutToFilePath == null && stdOutToStream == null && getStdOutputStreamCallback == null) process.BeginOutputReadLine();
 
 				// return streams
 				if (getStdInputStreamCallback != null) getStdInputStreamCallback(process.StandardInput);
 				if (getStdOutputStreamCallback != null) getStdOutputStreamCallback(process.StandardOutput);
+
+				// begin line reads
+				process.BeginErrorReadLine();
+				if (stdOutToFilePath == null && stdOutToStream == null && getStdOutputStreamCallback == null) process.BeginOutputReadLine();
 
 				// write input
 				if (stdInputStreamCallback != null)

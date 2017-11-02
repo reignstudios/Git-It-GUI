@@ -213,9 +213,29 @@ namespace GitCommander
 
 		public bool GarbageCollect()
 		{
+			StreamWriter stdInWriter = null;
+			void getStdInputStreamCallback(StreamWriter writer)
+			{
+				stdInWriter = writer;
+			}
+
+			bool failed = false;
+			void stdCallback(string line)
+			{
+				if (line.EndsWith("Should I try again? (y/n)"))
+				{
+					failed = true;
+					stdInWriter.WriteLine("n");
+				}
+			}
+
 			lock (this)
 			{
-				return SimpleGitInvoke("gc");
+				var result = RunExe("git", "gc", stdCallback:stdCallback, getStdInputStreamCallback:getStdInputStreamCallback);
+				lastResult = result.output;
+				lastError = result.errors;
+
+				return !failed && string.IsNullOrEmpty(lastError);
 			}
 		}
 
