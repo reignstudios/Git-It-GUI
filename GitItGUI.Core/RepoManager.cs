@@ -500,58 +500,52 @@ namespace GitItGUI.Core
 
 		public bool OpenFile(string filePath)
 		{
-			lock (this)
+			try
 			{
-				try
-				{
-					string path = PlatformInfo.ConvertPathToPlatform(string.Format("{0}\\{1}", repository.repoPath, filePath));
-					if (!File.Exists(path)) return false;
+				string path = PlatformInfo.ConvertPathToPlatform(string.Format("{0}\\{1}", repository.repoPath, filePath));
+				if (!File.Exists(path)) return false;
 
-					if (PlatformInfo.platform == Platforms.Windows)
-					{
-						Process.Start("explorer.exe", path);
-						return true;
-					}
-					else
-					{
-						throw new Exception("Unsuported platform: " + PlatformInfo.platform);
-					}
-				}
-				catch (Exception ex)
+				if (PlatformInfo.platform == Platforms.Windows)
 				{
-					DebugLog.LogError("Failed to open file: " + ex.Message);
+					Process.Start("explorer.exe", path);
+					return true;
 				}
-
-				return false;
+				else
+				{
+					throw new Exception("Unsuported platform: " + PlatformInfo.platform);
+				}
 			}
+			catch (Exception ex)
+			{
+				DebugLog.LogError("Failed to open file: " + ex.Message);
+			}
+
+			return false;
 		}
 
 		public bool OpenFileLocation(string filePath)
 		{
-			lock (this)
+			try
 			{
-				try
-				{
-					string path = PlatformInfo.ConvertPathToPlatform(string.Format("{0}\\{1}", repository.repoPath, filePath));
-					if (!File.Exists(path)) return false;
+				string path = PlatformInfo.ConvertPathToPlatform(string.Format("{0}\\{1}", repository.repoPath, filePath));
+				if (!File.Exists(path)) return false;
 
-					if (PlatformInfo.platform == Platforms.Windows)
-					{
-						Process.Start("explorer.exe", "/select, " + path);
-						return true;
-					}
-					else
-					{
-						throw new Exception("Unsuported platform: " + PlatformInfo.platform);
-					}
-				}
-				catch (Exception ex)
+				if (PlatformInfo.platform == Platforms.Windows)
 				{
-					DebugLog.LogError("Failed to open folder location: " + ex.Message);
+					Process.Start("explorer.exe", "/select, " + path);
+					return true;
 				}
-
-				return false;
+				else
+				{
+					throw new Exception("Unsuported platform: " + PlatformInfo.platform);
+				}
 			}
+			catch (Exception ex)
+			{
+				DebugLog.LogError("Failed to open folder location: " + ex.Message);
+			}
+
+			return false;
 		}
 	}
 }

@@ -155,20 +155,20 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			previewGrid.Visibility = Visibility.Hidden;
 		}
 
-		private bool RepoManager_AskUserToResolveConflictedFileCallback(FileState fileState, bool isBinaryFile, out MergeBinaryFileResults result)
+		private bool RepoManager_AskUserToResolveConflictedFileCallback(FileState fileState, bool isBinaryFile, out MergeFileResults result)
 		{
 			bool waiting = true, succeeded = true;
-			MergeBinaryFileResults binaryResult = MergeBinaryFileResults.Error;
-			MainWindow.singleton.ShowMergingOverlay(fileState.filename, delegate(MergeConflictOverlayResults mergeResult)
+			MergeFileResults binaryResult = MergeFileResults.Error;
+			MainWindow.singleton.ShowMergingOverlay(fileState.filename, isBinaryFile, delegate(MergeConflictOverlayResults mergeResult)
 			{
 				switch (mergeResult)
 				{
-					case MergeConflictOverlayResults.UseTheirs: binaryResult = MergeBinaryFileResults.UseTheirs; break;
-					case MergeConflictOverlayResults.UseOurs: binaryResult = MergeBinaryFileResults.KeepMine; break;
-					case MergeConflictOverlayResults.RunMergeTool: binaryResult = MergeBinaryFileResults.RunMergeTool; break;
+					case MergeConflictOverlayResults.UseTheirs: binaryResult = MergeFileResults.UseTheirs; break;
+					case MergeConflictOverlayResults.UseOurs: binaryResult = MergeFileResults.KeepMine; break;
+					case MergeConflictOverlayResults.RunMergeTool: binaryResult = MergeFileResults.RunMergeTool; break;
 
 					case MergeConflictOverlayResults.Cancel:
-						binaryResult = MergeBinaryFileResults.Cancel;
+						binaryResult = MergeFileResults.Cancel;
 						succeeded = false;
 						break;
 
@@ -190,7 +190,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		{
 			bool waiting = true, succeeded = false;
 			MergeFileAcceptedResults mergeResult = MergeFileAcceptedResults.No;
-			MainWindow.singleton.ShowMessageOverlay("Accept Changes?", "Do you want to stage the file: " + fileState.filename, MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgResult)
+			MainWindow.singleton.ShowMessageOverlay("Accept Changes?", "No changes detected.\nDo you want to stage the file as is: " + fileState.filename, MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgResult)
 			{
 				succeeded = msgResult == MessageOverlayResults.Ok;
 				mergeResult = (msgResult == MessageOverlayResults.Ok) ? MergeFileAcceptedResults.Yes : MergeFileAcceptedResults.No;
@@ -235,9 +235,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			}
 
 			// process
+			MainWindow.singleton.ShowMergingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
 				if (!RepoScreen.singleton.repoManager.ResolveConflict(fileState)) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve conflict");
+				MainWindow.singleton.HideMergingOverlay();
 			});
 		}
 
@@ -858,7 +860,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				if (msgBoxResult == MessageOverlayResults.Ok)
 				{
-					MainWindow.singleton.ShowMergingOverlay(null, null);
+					MainWindow.singleton.ShowMergingOverlay();
 					RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 					{
 						RepoScreen.singleton.repoManager.ResolveAllConflicts();
@@ -955,7 +957,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					{
 						if (msgBoxresult == MessageOverlayResults.Ok)
 						{
-							MainWindow.singleton.ShowMergingOverlay(null, null);
+							MainWindow.singleton.ShowMergingOverlay();
 							RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 							{
 								RepoScreen.singleton.repoManager.ResolveAllConflicts();

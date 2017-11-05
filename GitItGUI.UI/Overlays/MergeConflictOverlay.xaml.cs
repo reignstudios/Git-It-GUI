@@ -31,30 +31,28 @@ namespace GitItGUI.UI.Overlays
 	{
 		public delegate void DoneCallbackMethod(MergeConflictOverlayResults result);
 		private DoneCallbackMethod doneCallback;
+		private bool isBinaryMode;
 
 		public MergeConflictOverlay()
 		{
 			InitializeComponent();
 		}
 
-		public void Setup(string filePath, DoneCallbackMethod doneCallback)
+		public void Setup(string filePath, bool isBinaryMode, DoneCallbackMethod doneCallback)
 		{
 			this.doneCallback = doneCallback;
+			this.isBinaryMode = isBinaryMode;
+			WaitMode(filePath, string.IsNullOrEmpty(filePath));
+		}
 
-			if (string.IsNullOrEmpty(filePath))
-			{
-				filePathLabel.Text = string.Empty;
-				userTheirsButton.IsEnabled = false;
-				useOursButton.IsEnabled = false;
-				mergeToolButton.IsEnabled = false;
-				cancelButton.IsEnabled = false;
-			}
-
+		private void WaitMode(string filePath, bool isWaiting)
+		{
 			filePathLabel.Text = filePath;
-			userTheirsButton.IsEnabled = true;
-			useOursButton.IsEnabled = true;
-			mergeToolButton.IsEnabled = true;
-			cancelButton.IsEnabled = true;
+			userTheirsButton.IsEnabled = !isWaiting;
+			useOursButton.IsEnabled = !isWaiting;
+			mergeToolButton.IsEnabled = !isWaiting;
+			mergeToolButton.Visibility = isBinaryMode ? Visibility.Hidden : Visibility.Visible;
+			cancelButton.IsEnabled = !isWaiting;
 		}
 
 		private void openFileMenuItem_Click(object sender, RoutedEventArgs e)
@@ -67,24 +65,28 @@ namespace GitItGUI.UI.Overlays
 			RepoScreen.singleton.repoManager.OpenFileLocation(filePathLabel.Text);
 		}
 
-		private void userTheirsButton_Click(object sender, RoutedEventArgs e)
+		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (doneCallback != null) doneCallback(MergeConflictOverlayResults.UseTheirs);
-		}
-
-		private void useOursButton_Click(object sender, RoutedEventArgs e)
-		{
-			if (doneCallback != null) doneCallback(MergeConflictOverlayResults.UseOurs);
+			if (doneCallback != null) doneCallback(MergeConflictOverlayResults.Cancel);
+			Visibility = Visibility.Hidden;
 		}
 
 		private void mergeToolButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (doneCallback != null) doneCallback(MergeConflictOverlayResults.RunMergeTool);
+			WaitMode(filePathLabel.Text, true);
 		}
 
-		private void cancelButton_Click(object sender, RoutedEventArgs e)
+		private void userTheirsButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (doneCallback != null) doneCallback(MergeConflictOverlayResults.Cancel);
+			if (doneCallback != null) doneCallback(MergeConflictOverlayResults.UseTheirs);
+			WaitMode(filePathLabel.Text, true);
+		}
+
+		private void useOursButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (doneCallback != null) doneCallback(MergeConflictOverlayResults.UseOurs);
+			WaitMode(filePathLabel.Text, true);
 		}
 	}
 }

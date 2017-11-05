@@ -10,7 +10,7 @@ using System.Text;
 
 namespace GitItGUI.Core
 {
-	public enum MergeBinaryFileResults
+	public enum MergeFileResults
 	{
 		Error,
 		Cancel,
@@ -68,7 +68,7 @@ namespace GitItGUI.Core
 
 	public partial class RepoManager
 	{
-		public delegate bool AskUserToResolveConflictedFileCallbackMethod(FileState fileState, bool isBinaryFile, out MergeBinaryFileResults result);
+		public delegate bool AskUserToResolveConflictedFileCallbackMethod(FileState fileState, bool isBinaryFile, out MergeFileResults result);
 		public event AskUserToResolveConflictedFileCallbackMethod AskUserToResolveConflictedFileCallback;
 
 		public delegate bool AskUserIfTheyAcceptMergedFileCallbackMethod(FileState fileState, out MergeFileAcceptedResults result);
@@ -841,7 +841,7 @@ namespace GitItGUI.Core
 		{
 			lock (this)
 			{
-				bool success = true;
+				//bool success = true;
 				string fullPath = Path.Combine(repository.repoPath, fileState.filename);
 				string fullPathBase = fullPath+".base", fullPathOurs = null, fullPathTheirs = null;
 				void DeleteTempMergeFiles()
@@ -868,77 +868,76 @@ namespace GitItGUI.Core
 					{
 						DebugLog.Log("Auto resolving file that was deleted by both branches: " + fileState.filename);
 						if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
-						goto FINISH;
+						return true;
 					}
 					else
 					{
 						pauseGitCommanderStdWrites = true;
-						if (fileState.conflictType != FileConflictTypes.DeletedByUs)
+						if (fileState.conflictType != FileConflictTypes.DeletedByUs || fileState.conflictType == FileConflictTypes.AddedByUs || fileState.conflictType == FileConflictTypes.AddedByBoth)
 						{
-							bool fileCreated = repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
+							bool result = repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, out fullPathOurs);
 							fullPathOurs = Path.Combine(repository.repoPath, fullPathOurs);
-							if (!fileCreated) throw new Exception(repository.lastError);
+							if (!result) throw new Exception(repository.lastError);
 						}
 
-						if (fileState.conflictType != FileConflictTypes.DeletedByThem)
+						if (fileState.conflictType != FileConflictTypes.DeletedByThem || fileState.conflictType == FileConflictTypes.AddedByThem || fileState.conflictType == FileConflictTypes.AddedByBoth)
 						{
-							bool fileCreated = repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
+							bool result = repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, out fullPathTheirs);
 							fullPathTheirs = Path.Combine(repository.repoPath, fullPathTheirs);
-							if (!fileCreated) throw new Exception(repository.lastError);
+							if (!result) throw new Exception(repository.lastError);
 						}
 						pauseGitCommanderStdWrites = false;
 					}
 
+					// ======================================
+					// Handle Binary conflicts
+					// ======================================
+					#region Binary
 					// check if files are binary (if so open select binary file tool) [if file conflict is because of deletion this method is also used]
 					if (fileState.conflictType != FileConflictTypes.Changes || Tools.IsBinaryFileData(fullPathOurs) || Tools.IsBinaryFileData(fullPathTheirs))
 					{
 						// validate callback
-						if (AskUserToResolveConflictedFileCallback == null)
-						{
-							success = false;
-							goto FINISH;
-						}
+						if (AskUserToResolveConflictedFileCallback == null) return false;
 						
 						// process merge results
 						if (AskUserToResolveConflictedFileCallback(fileState, true, out var mergeBinaryResult))
 						{
 							switch (mergeBinaryResult)
 							{
-								case MergeBinaryFileResults.Error:
+								case MergeFileResults.Error:
 									throw new Exception("Error trying to resolve file: " + fileState.filename);
 
-								case MergeBinaryFileResults.Cancel:
-									success = false;
-									goto FINISH;
+								case MergeFileResults.Cancel:
+									return false;
 
-								case MergeBinaryFileResults.KeepMine:
+								case MergeFileResults.KeepMine:
 									if (fileState.conflictType == FileConflictTypes.Changes)
 									{
 										if (!repository.CheckoutConflictedFile(fileState.filename, FileConflictSources.Ours)) throw new Exception(repository.lastError);
 										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 									}
-									else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
+									else if (fileState.conflictType == FileConflictTypes.DeletedByThem || fileState.conflictType == FileConflictTypes.AddedByUs || fileState.conflictType == FileConflictTypes.AddedByBoth)
 									{
 										File.Copy(fullPathOurs, fullPath, true);
 										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 									}
-									else if (fileState.conflictType == FileConflictTypes.DeletedByUs)
+									else if (fileState.conflictType == FileConflictTypes.DeletedByUs || fileState.conflictType == FileConflictTypes.AddedByThem)
 									{
 										if (!repository.RemoveFile(fileState.filename)) throw new Exception(repository.lastError);
 									}
 									break;
 
-								case MergeBinaryFileResults.UseTheirs:
+								case MergeFileResults.UseTheirs:
 									if (fileState.conflictType == FileConflictTypes.Changes)
 									{
 										if (!repository.CheckoutConflictedFile(fileState.filename, FileConflictSources.Theirs)) throw new Exception(repository.lastError);
 										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
 									}
-									else if (fileState.conflictType == FileConflictTypes.DeletedByThem)
+									else if (fileState.conflictType == FileConflictTypes.DeletedByThem || fileState.conflictType == FileConflictTypes.AddedByUs)
 									{
 										if (!repository.RemoveFile(fileState.filename)) throw new Exception(repository.lastError);
 									}
-									else if (fileState.conflictType == FileConflictTypes.DeletedByUs)
+									else if (fileState.conflictType == FileConflictTypes.DeletedByUs || fileState.conflictType == FileConflictTypes.AddedByThem || fileState.conflictType == FileConflictTypes.AddedByBoth)
 									{
 										File.Copy(fullPathTheirs, fullPath, true);
 										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
@@ -952,153 +951,149 @@ namespace GitItGUI.Core
 						{
 							throw new Exception("Failed to resolve file: " + fileState.filename);
 						}
+					}
+					#endregion
 
-						// finish
-						goto FINISH;
-					}
-			
-					// copy base and parse
-					string baseFile = File.ReadAllText(fullPath);
-					var match = Regex.Match(baseFile, @"(<<<<<<<\s*\w*[\r\n]*).*(=======[\r\n]*).*(>>>>>>>\s*\w*[\r\n]*)", RegexOptions.Singleline);
-					if (match.Success && match.Groups.Count == 4)
-					{
-						baseFile = baseFile.Replace(match.Groups[1].Value, "").Replace(match.Groups[2].Value, "").Replace(match.Groups[3].Value, "");
-						File.WriteAllText(fullPathBase, baseFile);
-					}
+					// ======================================
+					// Handle Text conflicts
+					// ======================================
+					#region Text
 					else
 					{
-						File.Copy(fullPath, fullPathBase, true);
-					}
-
-					// hash base file
-					byte[] baseHash = null;
-					using (var md5 = MD5.Create())
-					{
-						using (var stream = File.OpenRead(fullPathBase))
+						// copy base and parse
+						string baseFile = File.ReadAllText(fullPath);
+						var match = Regex.Match(baseFile, @"(<<<<<<<\s*\w*[\r\n]*).*(=======[\r\n]*).*(>>>>>>>\s*\w*[\r\n]*)", RegexOptions.Singleline);
+						if (match.Success && match.Groups.Count == 4)
 						{
-							baseHash = md5.ComputeHash(stream);
+							baseFile = baseFile.Replace(match.Groups[1].Value, "").Replace(match.Groups[2].Value, "").Replace(match.Groups[3].Value, "");
+							File.WriteAllText(fullPathBase, baseFile);
 						}
-					}
-
-					// validate callback
-					if (AskUserToResolveConflictedFileCallback == null)
-					{
-						success = false;
-						goto FINISH;
-					}
-					
-					// process merge results
-					if (AskUserToResolveConflictedFileCallback(fileState, true, out var mergeFileResult))
-					{
-						switch (mergeFileResult)
+						else
 						{
-							case MergeBinaryFileResults.Error:
-								throw new Exception("Error trying to resolve file: " + fileState.filename);
-
-							case MergeBinaryFileResults.Cancel:
-								success = false;
-								goto FINISH;
-
-							case MergeBinaryFileResults.KeepMine:
-								File.Copy(fullPathOurs, fullPathBase, true);
-								break;
-
-							case MergeBinaryFileResults.UseTheirs:
-								File.Copy(fullPathTheirs, fullPathBase, true);
-								break;
-
-							case MergeBinaryFileResults.RunMergeTool:
-								using (var process = new Process())
-								{
-									process.StartInfo.FileName = AppManager.mergeToolPath;
-									if (AppManager.settings.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
-									else if (AppManager.settings.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
-									else if (AppManager.settings.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{1}\" \"{0}\" \"{2}\" \"{1}\"", fullPathOurs, fullPathBase, fullPathTheirs);
-									else if (AppManager.settings.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
-									process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
-									if (!process.Start())
-									{
-										throw new Exception("Failed to start Merge tool (is it installed?)");
-									}
-
-									process.WaitForExit();
-								}
-								break;
-
-							default: throw new Exception("Unsuported Response: " + mergeFileResult);
-						}
-					}
-					else
-					{
-						throw new Exception("Failed to resolve file: " + fileState.filename);
-					}
-
-					// get new base hash
-					byte[] baseHashChange = null;
-					using (var md5 = MD5.Create())
-					{
-						using (var stream = File.OpenRead(fullPathBase))
-						{
-							baseHashChange = md5.ComputeHash(stream);
-						}
-					}
-
-					// check if file was modified
-					bool wasModified = false;
-					if (!baseHashChange.SequenceEqual(baseHash))
-					{
-						wasModified = true;
-						File.Copy(fullPathBase, fullPath, true);
-						if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
-					}
-
-					// check if user accepts the current state of the merge
-					if (!wasModified)
-					{
-						// validate callback
-						if (AskUserIfTheyAcceptMergedFileCallback == null)
-						{
-							success = false;
-							goto FINISH;
+							File.Copy(fullPath, fullPathBase, true);
 						}
 
-						// process merge results
-						if (AskUserIfTheyAcceptMergedFileCallback(fileState, out var mergeAcceptedResult))
+						// hash base file
+						byte[] baseHash = null;
+						using (var md5 = MD5.Create())
 						{
-							switch (mergeAcceptedResult)
+							using (var stream = File.OpenRead(fullPathBase))
 							{
-								case MergeFileAcceptedResults.Yes:
-									File.Copy(fullPathBase, fullPath, true);
-									if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
-									wasModified = true;
+								baseHash = md5.ComputeHash(stream);
+							}
+						}
+
+						// validate callback
+						if (AskUserToResolveConflictedFileCallback == null) return false;
+					
+						// process merge results
+						if (AskUserToResolveConflictedFileCallback(fileState, false, out var mergeFileResult))
+						{
+							switch (mergeFileResult)
+							{
+								case MergeFileResults.Error:
+									throw new Exception("Error trying to resolve file: " + fileState.filename);
+
+								case MergeFileResults.Cancel:
+									return false;
+
+								case MergeFileResults.KeepMine:
+									File.Copy(fullPathOurs, fullPathBase, true);
 									break;
 
-								case MergeFileAcceptedResults.No:
-									success = false;
+								case MergeFileResults.UseTheirs:
+									File.Copy(fullPathTheirs, fullPathBase, true);
 									break;
 
-								default: throw new Exception("Unsuported Response: " + mergeAcceptedResult);
+								case MergeFileResults.RunMergeTool:
+									using (var process = new Process())
+									{
+										process.StartInfo.FileName = AppManager.mergeToolPath;
+										if (AppManager.settings.mergeDiffTool == MergeDiffTools.Meld) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
+										else if (AppManager.settings.mergeDiffTool == MergeDiffTools.kDiff3) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
+										else if (AppManager.settings.mergeDiffTool == MergeDiffTools.P4Merge) process.StartInfo.Arguments = string.Format("\"{1}\" \"{0}\" \"{2}\" \"{1}\"", fullPathOurs, fullPathBase, fullPathTheirs);
+										else if (AppManager.settings.mergeDiffTool == MergeDiffTools.DiffMerge) process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\" \"{2}\"", fullPathOurs, fullPathBase, fullPathTheirs);
+										process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+										if (!process.Start())
+										{
+											throw new Exception("Failed to start Merge tool (is it installed?)");
+										}
+
+										process.WaitForExit();
+									}
+									break;
+
+								default: throw new Exception("Unsuported Response: " + mergeFileResult);
 							}
 						}
 						else
 						{
-							throw new Exception("Failed to ask user if file was resolved: " + fileState.filename);
+							throw new Exception("Failed to resolve file: " + fileState.filename);
+						}
+
+						// get new base hash
+						byte[] baseHashChange = null;
+						using (var md5 = MD5.Create())
+						{
+							using (var stream = File.OpenRead(fullPathBase))
+							{
+								baseHashChange = md5.ComputeHash(stream);
+							}
+						}
+
+						// check if file was modified
+						bool wasModified = false;
+						if (!baseHashChange.SequenceEqual(baseHash))
+						{
+							wasModified = true;
+							File.Copy(fullPathBase, fullPath, true);
+							if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
+						}
+
+						// check if user accepts the current state of the merge
+						if (!wasModified)
+						{
+							// validate callback
+							if (AskUserIfTheyAcceptMergedFileCallback == null) return false;
+
+							// process merge results
+							if (AskUserIfTheyAcceptMergedFileCallback(fileState, out var mergeAcceptedResult))
+							{
+								switch (mergeAcceptedResult)
+								{
+									case MergeFileAcceptedResults.Yes:
+										File.Copy(fullPathBase, fullPath, true);
+										if (!repository.Stage(fileState.filename)) throw new Exception(repository.lastError);
+										wasModified = true;
+										break;
+
+									case MergeFileAcceptedResults.No:
+										return false;
+
+									default: throw new Exception("Unsuported Response: " + mergeAcceptedResult);
+								}
+							}
+							else
+							{
+								throw new Exception("Failed to ask user if file was resolved: " + fileState.filename);
+							}
 						}
 					}
+					#endregion
 				}
 				catch (Exception e)
 				{
-					pauseGitCommanderStdWrites = false;
 					DebugLog.LogError("Failed to resolve file: " + e.Message);
-					DeleteTempMergeFiles();
-					success = false;
+					return false;
 				}
-			
-				// finish
-				FINISH:;
-				DeleteTempMergeFiles();
-				if (refresh) Refresh();
-				return success;
+				finally
+				{
+					pauseGitCommanderStdWrites = false;
+					DeleteTempMergeFiles();
+					if (refresh) Refresh();
+				}
+
+				return true;
 			}
 		}
 		

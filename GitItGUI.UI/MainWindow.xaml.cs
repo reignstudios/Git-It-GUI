@@ -231,18 +231,18 @@ namespace GitItGUI.UI
 			}
 		}
 
-		public void ShowMergingOverlay(string filePath, MergeConflictOverlay.DoneCallbackMethod doneCallback)
+		public void ShowMergingOverlay(string filePath = null, bool isBinaryMode = false, MergeConflictOverlay.DoneCallbackMethod doneCallback = null)
 		{
 			if (Dispatcher.CheckAccess())
 			{
-				mergingOverlay.Setup(filePath, doneCallback);
+				mergingOverlay.Setup(filePath, isBinaryMode, doneCallback);
 				mergingOverlay.Visibility = Visibility.Visible;
 			}
 			else
 			{
 				Dispatcher.InvokeAsync(delegate ()
 				{
-					mergingOverlay.Setup(filePath, doneCallback);
+					mergingOverlay.Setup(filePath, isBinaryMode, doneCallback);
 					mergingOverlay.Visibility = Visibility.Visible;
 				});
 			}
