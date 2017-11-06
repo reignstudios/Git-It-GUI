@@ -58,6 +58,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			previewTextBox.Document.Blocks.Clear();
 			previewTextBox.Visibility = Visibility.Visible;
 			previewGrid.Visibility = Visibility.Hidden;
+			previewSingleGrid.Visibility = Visibility.Hidden;
 
 			// update changes
 			stagedChangesListBox.Items.Clear();
