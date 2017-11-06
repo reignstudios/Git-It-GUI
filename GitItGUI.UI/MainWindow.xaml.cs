@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using GitItGUI.UI.Overlays;
 using System.Diagnostics;
+using ImageMagick;
 
 namespace GitItGUI.UI
 {
@@ -35,6 +36,9 @@ namespace GitItGUI.UI
 			// init
 			singleton = this;
 			InitializeComponent();
+
+			// set pdf image processor location
+			MagickNET.SetGhostscriptDirectory(Environment.CurrentDirectory);
 			
 			// init app manager
 			if (!AppManager.Init())

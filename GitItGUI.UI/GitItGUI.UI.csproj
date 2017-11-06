@@ -38,8 +38,12 @@
     <ApplicationIcon>Images\AppIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Magick.NET-Q8-AnyCPU, Version=7.0.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
+      <HintPath>..\packages\Magick.NET-Q8-AnyCPU.7.0.7.900\lib\net40\Magick.NET-Q8-AnyCPU.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -197,6 +201,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -238,4 +243,10 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(SolutionDir)3rdParty\Ghostscript\gsdll32.dll" "$(TargetDir)gsdll32.dll"
+copy "$(SolutionDir)3rdParty\Ghostscript\gsdll64.dll" "$(TargetDir)gsdll64.dll"
+copy "$(SolutionDir)3rdParty\Ghostscript\gswin32c.exe" "$(TargetDir)gswin32c.exe"
+copy "$(SolutionDir)3rdParty\Ghostscript\gswin64c.exe" "$(TargetDir)gswin64c.exe"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

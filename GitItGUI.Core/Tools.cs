@@ -50,9 +50,11 @@ namespace GitItGUI.Core
 			}
 		}
 
-		internal static bool IsSupportedImageFile(string filename)
+		public static bool IsSupportedImageExt(string ext, bool allowUncommon)
 		{
-			string ext = Path.GetExtension(filename);
+			bool pass = false;
+
+			// common
 			switch (ext)
 			{
 				case ".png":
@@ -61,10 +63,30 @@ namespace GitItGUI.Core
 				case ".bmp":
 				case ".gif":
 				case ".tif":
-					return true;
+					pass = true;
+					break;
 			}
 
-			return false;
+			// uncommon
+			if (allowUncommon)
+			{
+				switch (ext)
+				{
+					case ".tga":
+					case ".psd":
+					case ".pdf":
+						pass = true;
+						break;
+				}
+			}
+
+			return pass;
+		}
+
+		public static bool IsSupportedImageFile(string filename, bool allowUncommon)
+		{
+			string ext = Path.GetExtension(filename).ToLower();
+			return IsSupportedImageExt(ext, allowUncommon);
 		}
 
 		internal static bool IsGitLFSPtr(string data)

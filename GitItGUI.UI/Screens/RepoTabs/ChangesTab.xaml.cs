@@ -2,6 +2,7 @@
 using GitItGUI.Core;
 using GitItGUI.UI.Images;
 using GitItGUI.UI.Overlays;
+using ImageMagick;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -590,7 +592,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void ProcessPreview(ListBoxItem item)
 		{
 			var fileState = (FileState)item.Tag;
-			var delta = RepoScreen.singleton.repoManager.GetQuickViewData(fileState);
+			var delta = RepoScreen.singleton.repoManager.GetQuickViewData(fileState, true);
 			if (delta == null)
 			{
 				previewTextBox.Visibility = Visibility.Visible;
@@ -752,29 +754,54 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				previewGrid.Visibility = Visibility.Visible;
 
 				var imageDelta = (PreviewImageData)delta;
-				BitmapImage LoadImage(Stream stream)
+				BitmapSource LoadImage(Stream stream, string ext)
 				{
-					var bitmap = new BitmapImage();
-					if (stream == null) return bitmap;
+					if (stream == null) return new BitmapImage();
 
 					try
 					{
 						stream.Position = 0;
-						bitmap.BeginInit();
-						bitmap.CacheOption = BitmapCacheOption.OnLoad;
-						bitmap.UriSource = null;
-						bitmap.StreamSource = stream;
-						bitmap.EndInit();
+						bool commonExt = Tools.IsSupportedImageExt(ext, false);
+						if (commonExt)
+						{
+							// load common image types
+							var bitmap = new BitmapImage();
+							bitmap.BeginInit();
+							bitmap.CacheOption = BitmapCacheOption.OnLoad;
+							bitmap.UriSource = null;
+							bitmap.StreamSource = stream;
+							bitmap.EndInit();
 
-						bitmap.Freeze();
+							bitmap.Freeze();
+							return bitmap;
+						}
+						else
+						{
+							// convert ext to enum
+							var format = MagickFormat.Unknown;
+							bool allowTransparency = true;
+							switch (ext)
+							{
+								case ".tga": format = MagickFormat.Tga; break;
+								case ".psd": format = MagickFormat.Psd; break;
+								case ".pdf": format = MagickFormat.Pdf; allowTransparency = false; break;
+							}
+
+							// load uncommon image types
+							var settings = new MagickReadSettings();
+							settings.Format = format;
+							using (var image = new MagickImage(stream, settings))
+							{
+								if (!allowTransparency) image.HasAlpha = false;
+								return image.ToBitmapSource();
+							}
+						}
 					}
 					catch (Exception e)
 					{
 						DebugLog.LogError("Failed to load image: " + e.Message);
 						return new BitmapImage();
 					}
-
-					return bitmap;
 				}
 
 				if (!imageDelta.isMergeDiff)
@@ -788,8 +815,16 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					newImageLabel.Content = "Ours";
 				}
 				
-				newImage.Source = LoadImage(imageDelta.newImage);
-				oldImage.Source = LoadImage(imageDelta.oldImage);
+				//if (imageDelta.oldImage == null)
+				{
+					
+				}
+				//else
+				{
+					newImage.Source = LoadImage(imageDelta.newImage, imageDelta.imageExt);
+					oldImage.Source = LoadImage(imageDelta.oldImage, imageDelta.imageExt);
+				}
+
 				imageDelta.Dispose();
 			}
 			else

@@ -35,6 +35,7 @@ namespace GitItGUI.Core
 	public class PreviewImageData : IDisposable
 	{
 		public bool isMergeDiff;
+		public string imageExt;
 		public Stream oldImage, newImage;
 		public StreamReader oldImageReader, newImageReader;
 
@@ -184,7 +185,7 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public object GetQuickViewData(FileState fileState)
+		public object GetQuickViewData(FileState fileState, bool allowUncommonImageTypes)
 		{
 			lock (this)
 			{
@@ -203,10 +204,11 @@ namespace GitItGUI.Core
 					if (Tools.IsBinaryFileData(fullPath)) 
 					{
 						// validate is supported image
-						if (!Tools.IsSupportedImageFile(fullPath)) return "<< Binary File >>";
+						if (!Tools.IsSupportedImageFile(fullPath, allowUncommonImageTypes)) return "<< Binary File >>";
 
 						// load new/ours image data
 						image = new PreviewImageData();
+						image.imageExt = Path.GetExtension(fileState.filename).ToLower();
 						if (fileState.HasState(FileStates.Conflicted))
 						{
 							image.isMergeDiff = true;
