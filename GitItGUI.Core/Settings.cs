@@ -24,6 +24,7 @@ namespace GitItGUI.Core
 		[XmlRoot("AppSettings")]
 		public class AppSettings
 		{
+			[XmlAttribute("WinMaximized")] public bool winMaximized = false;
 			[XmlAttribute("WinX")] public int winX = -1;
 			[XmlAttribute("WinY")] public int winY = -1;
 			[XmlAttribute("WinWidth")] public int winWidth = -1;

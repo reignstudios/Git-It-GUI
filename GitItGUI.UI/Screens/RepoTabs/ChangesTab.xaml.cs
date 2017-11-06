@@ -62,6 +62,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			unstagedChangesListBox.Items.Clear();
 			foreach (var fileState in RepoScreen.singleton.repoManager.GetFileStates())
 			{
+				if (fileState.isSubmodule) continue;
+
 				var item = new ListBoxItem();
 				item.Tag = fileState;
 
@@ -726,7 +728,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 							fBlockBrush = Brushes.Red;
 							blockText += line + '\r';
 						}
-						else if (line[0] == '#')
+						else if (ScanBlockPattern(ref line, 3, '#'))
 						{
 							CheckBlocks(false, 3);
 							blockMode = 3;

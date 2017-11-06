@@ -163,9 +163,10 @@ namespace GitItGUI.Core
 					// add repo to history
 					AppManager.AddRepoToHistory(repoPath);
 
-					// get signature
+					// non-refresh checks
 					if (!isRefreshMode)
 					{
+						// get signature
 						string sigName, sigEmail;
 						if (repository.GetSignature(SignatureLocations.Local, out sigName, out sigEmail))
 						{
@@ -174,11 +175,25 @@ namespace GitItGUI.Core
 							signatureIsLocal = true;
 							if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
 							{
-								repository.GetSignature(SignatureLocations.Any, out sigName, out sigEmail);
-								signatureName = sigName;
-								signatureEmail = sigEmail;
-								signatureIsLocal = false;
+								if (repository.GetSignature(SignatureLocations.Any, out sigName, out sigEmail))
+								{
+									signatureName = sigName;
+									signatureEmail = sigEmail;
+									signatureIsLocal = false;
+								}
+								else
+								{
+									signatureName = "<< ERROR >>";
+									signatureEmail = "<< ERROR >>";
+									signatureIsLocal = false;
+								}
 							}
+						}
+						else
+						{
+							signatureName = "<< ERROR >>";
+							signatureEmail = "<< ERROR >>";
+							signatureIsLocal = false;
 						}
 
 						if (checkForSettingErros)
@@ -186,6 +201,27 @@ namespace GitItGUI.Core
 							if (string.IsNullOrEmpty(sigName) || string.IsNullOrEmpty(sigEmail))
 							{
 								DebugLog.LogWarning("Credentials not set, please go to the settings tab!");
+							}
+						}
+
+						// submodules
+						if (repository.hasSubmodules)
+						{
+							if (repository.areSubmodulesInit)
+							{
+								if (!repository.PullSubmodules())
+								{
+									DebugLog.LogError("Failed to pull submodules: " + repository.lastError);
+									return false;
+								}
+							}
+							else
+							{
+								if (!repository.InitPullSubmodules())
+								{
+									DebugLog.LogError("Failed to init and pull submodules: " + repository.lastError);
+									return false;
+								}
 							}
 						}
 					}

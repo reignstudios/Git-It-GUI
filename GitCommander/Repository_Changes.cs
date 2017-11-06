@@ -49,6 +49,7 @@ namespace GitCommander
 		public FileStates state {get; internal set;}
 		public FileConflictTypes conflictType {get; internal set;}
 		public bool isLFS {get; internal set;}
+		public bool isSubmodule {get; internal set;}
 
 		public static bool IsAllStates(FileStates stateFlag, FileStates[] states)
 		{
@@ -169,14 +170,26 @@ namespace GitCommander
 				if (line.Contains(type))
 				{
 					var match = Regex.Match(line, type + @"\s*(.*)");
-					if (match.Groups.Count == 2)
+					if (match.Success)
 					{
+						// get common filename
 						string filePath = match.Groups[1].Value;
+
+						// parse submodule filename
+						bool isSubmodule = false;
+						match = Regex.Match(filePath, @"(.*)\s\((.*)\)");
+						if (match.Success)
+						{
+							filePath = match.Groups[1].Value;
+							isSubmodule = match.Groups[2].Value.Contains("content");
+						}
+
+						// parse extended filename
 						if ((stateType & FileStates.Copied) != 0 || (stateType & FileStates.RenamedInIndex) != 0 || (stateType & FileStates.RenamedInWorkdir) != 0)
 						{
 							match = Regex.Match(filePath, @"(.*)\s->\s(.*)");
 							if (match.Success) filePath = match.Groups[2].Value;
-							else throw new Exception("Failed to parse copied status type");
+							else throw new Exception("Failed to parse copied or renamed status type");
 						}
 						
 						if (states != null && states.Exists(x => x.filename == filePath))
@@ -192,6 +205,7 @@ namespace GitCommander
 								filename = filePath,
 								state = stateType,
 								conflictType = conflictType,
+								isSubmodule = isSubmodule,
 								isLFS = lfsExts.Contains(Path.GetExtension(filePath))
 							};
 							
@@ -456,6 +470,22 @@ namespace GitCommander
 			
 				yes = mergeCommitPending;
 				return string.IsNullOrEmpty(lastError);
+			}
+		}
+
+		public bool InitPullSubmodules()
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke("submodule update --init --recursive");
+			}
+		}
+
+		public bool PullSubmodules()
+		{
+			lock (this)
+			{
+				return SimpleGitInvoke("submodule update --recursive");
 			}
 		}
 

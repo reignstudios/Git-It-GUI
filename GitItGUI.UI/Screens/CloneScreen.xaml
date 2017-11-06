@@ -33,7 +33,7 @@
 			</Grid>
 		</Border>
 
-		<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="10,0,0,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="cancelButton_Click"/>
-		<Button Name="cloneButton" Content="Clone" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="cloneButton_Click"/>
+		<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="10,0,0,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Height="32" Background="LightPink" Click="cancelButton_Click"/>
+		<Button Name="cloneButton" Content="Clone" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Height="32" Background="LightGreen" Click="cloneButton_Click"/>
 	</Grid>
 </UserControl>

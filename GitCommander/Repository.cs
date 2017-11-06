@@ -13,6 +13,8 @@ namespace GitCommander
     public partial class Repository
     {
 		public bool isOpen {get; private set;}
+		public bool hasSubmodules {get; private set;}
+		public bool areSubmodulesInit {get; private set;}
 		public string lastResult {get; private set;}
 		public string lastError {get; private set;}
 
@@ -31,10 +33,14 @@ namespace GitCommander
 			lock (this)
 			{
 				isOpen = false;
+				hasSubmodules = false;
+				areSubmodulesInit = false;
 				lastResult = null;
 				lastError = null;
 				repoURL = null;
 				repoPath = null;
+
+				lfs.Close();
 			}
 		}
 
@@ -101,8 +107,28 @@ namespace GitCommander
 				{
 					repoURL = line;
 				}
+				
+				hasSubmodules = false;
+				areSubmodulesInit = false;
+				void stdCallback_Submodules(string line)
+				{
+					if (hasSubmodules) return;
+
+					var match = Regex.Match(line, @"(\s|\-)(\w*).*");
+					if (match.Success)
+					{
+						hasSubmodules = true;
+						areSubmodulesInit = match.Groups[1].Value == " ";
+					}
+				}
 			
 				var result = RunExe("git", "rev-parse --git-dir", workingDirectory:path);
+				lastResult = result.output;
+				lastError = result.errors;
+				if (!string.IsNullOrEmpty(lastError)) return false;
+
+				// check for submodules
+				result = RunExe("git", "submodule status", stdCallback:stdCallback_Submodules, workingDirectory:path);
 				lastResult = result.output;
 				lastError = result.errors;
 				if (!string.IsNullOrEmpty(lastError)) return false;

@@ -53,6 +53,7 @@ namespace GitItGUI.UI
 				Top = AppManager.settings.winY;
 				Width = AppManager.settings.winWidth;
 				Height = AppManager.settings.winHeight;
+				if (AppManager.settings.winMaximized) WindowState = WindowState.Maximized;
 			}
 
 			// version check
@@ -110,6 +111,7 @@ namespace GitItGUI.UI
 			AppManager.settings.winY = (int)Top;
 			AppManager.settings.winWidth = (int)Width;
 			AppManager.settings.winHeight = (int)Height;
+			AppManager.settings.winMaximized = WindowState == WindowState.Maximized;
 
 			// apply setting if UI open
 			if (settingsScreen.Visibility == Visibility.Visible) settingsScreen.Apply();

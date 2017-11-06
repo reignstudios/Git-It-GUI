@@ -15,6 +15,11 @@ namespace GitCommander
 			{
 				this.repository = repository;
 			}
+
+			internal void Close()
+			{
+				isEnabled = false;
+			}
 			
 			internal void Open()
 			{
