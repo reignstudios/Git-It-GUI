@@ -1,7 +1,0 @@
-﻿<Window xmlns="https://github.com/avaloniaui" MinWidth="500" MinHeight="150" MaxWidth="500" MaxHeight="150" Width="500" Height="150">
-	<Grid Name="grid">
-		<TextBlock Name="message" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,-20" TextWrapping="Wrap">This is some long message for testing length we can fit into this thing...</TextBlock>
-		<Button Name="okButton" Width="128" Height="32" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-10,-10,10,10">Ok</Button>
-		<Button Name="cancelButton" Width="128" Height="32" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,-10,-10,10">Cancel</Button>
-	</Grid>
-</Window>

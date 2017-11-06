@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System;
 
 namespace GitItGUI.UI.Screens
 {
@@ -33,7 +34,7 @@ namespace GitItGUI.UI.Screens
 			updateImage.Visibility = Visibility.Visible;
 		}
 
-		private void RefreshHistory()
+		internal void RefreshHistory()
 		{
 			historyListBox.Items.Clear();
 			foreach (var repo in AppManager.repositories)
@@ -44,12 +45,20 @@ namespace GitItGUI.UI.Screens
 
 				item.HorizontalContentAlignment = HorizontalAlignment.Center;
 				item.MouseDoubleClick += Item_MouseDoubleClick;
+				item.ContextMenu = new ContextMenu();
 
+				// open folder path
 				var menuItem = new MenuItem();
 				menuItem.Header = "Open folder path";
 				menuItem.ToolTip = repo;
-				menuItem.Click += MenuItem_Click;
-				item.ContextMenu = new ContextMenu();
+				menuItem.Click += OpenRepoMenuItem_Click;
+				item.ContextMenu.Items.Add(menuItem);
+
+				// remove repo from history
+				menuItem = new MenuItem();
+				menuItem.Header = "Remove from history";
+				menuItem.ToolTip = repo;
+				menuItem.Click += RemoveHistoryMenuItem_Click;
 				item.ContextMenu.Items.Add(menuItem);
 
 				historyListBox.Items.Add(item);
@@ -71,7 +80,7 @@ namespace GitItGUI.UI.Screens
 			}
 		}
 
-		private void MenuItem_Click(object sender, RoutedEventArgs e)
+		private void OpenRepoMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			var item = (MenuItem)sender;
 			string repo = (string)item.ToolTip;
@@ -80,6 +89,14 @@ namespace GitItGUI.UI.Screens
 				AppManager.RemoveRepoFromHistory(repo);
 				RefreshHistory();
 			}
+		}
+
+		private void RemoveHistoryMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			var item = (MenuItem)sender;
+			string repo = (string)item.ToolTip;
+			AppManager.RemoveRepoFromHistory(repo);
+			RefreshHistory();
 		}
 
 		private void Item_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

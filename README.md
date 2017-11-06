@@ -8,6 +8,10 @@ Download: https://github.com/reignstudios/Git-It-GUI/releases
 
 - Writen in C# / WPF (will support macOS and Linux/BSD in the future with Xamarin.Forms 3.0).
 
+- Image Diff preview.
+
+- Colorized text diff preview.
+
 - Auto check for .gitignore file.
 
 - Auto check for Git-LFS install.
@@ -20,9 +24,12 @@ Download: https://github.com/reignstudios/Git-It-GUI/releases
 
 - gitk for history (maybe something built in later).
 
+---
 LOGS: These will be stored in "C:\ProgramData\GitItGUI\logs.txt" on windows
 
+---
 ## NOTE: If you can use 'git / git lfs' in the terminal/cmd this tool wont work.
+### (git v2.11.0) and (git-lfs v1.5.5) or later are required!
  - Win32: https://git-scm.com/
 <!-- - macOS (recommend homebrew):
     - Install git via homebrew: "brew install git" and "brew install git-lfs"

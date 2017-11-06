@@ -36,6 +36,6 @@
 			</Grid>
 		</Border>
 
-		<Button Name="doneButton" Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="doneButton_Click"/>
+		<Button Name="doneButton" Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Height="32" Click="doneButton_Click"/>
 	</Grid>
 </UserControl>

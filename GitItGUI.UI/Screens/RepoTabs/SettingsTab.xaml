@@ -30,7 +30,7 @@
 				<ToggleButton Name="isLocalToggleButton" Grid.Row="4" Content="Is signature local" VerticalAlignment="Center" Margin="20,0" ToolTip="Is the signature local to this repository" Checked="isLocalToggleButton_Checked"/>
 			</Grid>
 		</Border>
-		<Button Name="applyButton" Content="Apply" Background="LightGreen" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="applyButton_Click"/>
-		<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,90,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="cancelButton_Click"/>
+		<Button Name="applyButton" Content="Apply" Background="LightGreen" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Height="32" Click="applyButton_Click"/>
+		<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,90,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Height="32" Click="cancelButton_Click"/>
 	</Grid>
 </UserControl>

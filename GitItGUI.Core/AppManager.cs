@@ -222,7 +222,7 @@ namespace GitItGUI.Core
 				// git and git-lfs versions
 				string gitVersion = null, gitlfsVersion = null;
 				string gitlfsRequiredGitVersion = "0.0.0.0";
-				const string minGitVersion = "2.13.0", minGitLFSVersion = "2.2.1";
+				const string minGitVersion = "2.11.0", minGitLFSVersion = "1.5.5";
 				
 				// get git version string
 				try

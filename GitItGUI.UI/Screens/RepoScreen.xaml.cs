@@ -128,7 +128,12 @@ namespace GitItGUI.UI.Screens
 				}
 				else
 				{
-					AppManager.RemoveRepoFromHistory(folderPath);
+					MainWindow.singleton.Dispatcher.InvokeAsync(delegate()
+					{
+						AppManager.RemoveRepoFromHistory(folderPath);
+						StartScreen.singleton.RefreshHistory();
+					});
+
 					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to open repo");
 				}
 				

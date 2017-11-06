@@ -1,6 +1,0 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui" Design.Width="400" Design.Height="400"  >
-	<Grid>
-		<TextBlock TextAlignment="Center" FontSize="24" Margin="10,10,10,0" VerticalAlignment="Top">Checking for Updates...</TextBlock>
-		<Image Source="resm:GitItGUI.Icons.AppIcon.png?assembly=GitItGUI" Margin="0,50,0,10" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="256" MaxHeight="256"/>
-	</Grid>
-</UserControl>
