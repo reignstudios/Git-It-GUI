@@ -28,6 +28,11 @@ namespace GitItGUI.UI
 
 		public MainWindow()
 		{
+			// UnhandledException
+			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+			Dispatcher.UnhandledException += Dispatcher_UnhandledException;
+
+			// init
 			singleton = this;
 			InitializeComponent();
 			
@@ -35,13 +40,16 @@ namespace GitItGUI.UI
 			if (!AppManager.Init())
 			{
 				MessageBox.Show(this, "Failed to start AppManager");
-				Environment.Exit(0);
+				Environment.Exit(1);
 				return;
 			}
 
 			// init screens
 			startScreen.Init();
 			repoScreen.Init();
+
+			// RepoManager Dispatcher UnhandledException
+			repoScreen.repoManager.dispatcher.UnhandledException += Dispatcher_UnhandledException;
 
 			// validate diff/merge tool exists
 			settingsScreen.ValidateDiffMergeTool();
@@ -59,6 +67,46 @@ namespace GitItGUI.UI
 			// version check
 			Title += " v" + VersionInfo.versionType;
 			AppManager.CheckForUpdates("http://reign-studios-services.com/GitItGUI/VersionInfo.xml", CheckForUpdatesCallback);
+		}
+
+		private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			var ex = e.ExceptionObject as Exception;
+			if (ex != null)
+			{
+				string error = "CRITICAL AppDomain: " + ex.Message;
+				MessageBox.Show(error);
+				DebugLog.LogError(error);
+				DebugLog.LogError("STACKTRACE: " + ex.StackTrace);
+			}
+			else
+			{
+				const string error = "CRITICAL AppDomain: Unknown error";
+				MessageBox.Show(error);
+				DebugLog.LogError(error);
+			}
+
+			Environment.Exit(2);
+		}
+
+		private void Dispatcher_UnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+		{
+			var ex = e.Exception;
+			if (ex != null)
+			{
+				string error = "CRITICAL Dispatcher: " + ex.Message;
+				MessageBox.Show(error);
+				DebugLog.LogError(error);
+				DebugLog.LogError("STACKTRACE: " + ex.StackTrace);
+			}
+			else
+			{
+				const string error = "CRITICAL Dispatcher: Unknown error";
+				MessageBox.Show(error);
+				DebugLog.LogError(error);
+			}
+
+			Environment.Exit(2);
 		}
 
 		private void CheckForUpdatesCallback(UpdateCheckResult result)
