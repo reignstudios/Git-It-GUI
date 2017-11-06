@@ -146,7 +146,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		public void ClosingRepo()
 		{
-			if (RepoScreen.singleton.repoManager.isOpen && RepoScreen.singleton.repoManager.ChangesExist())
+			if (RepoScreen.singleton.repoManager.isOpen)
 			{
 				RepoScreen.singleton.repoManager.SaveCommitMessage(commitMessageTextBox.Text);
 			}
