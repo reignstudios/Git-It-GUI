@@ -478,6 +478,16 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			});
 		}
 
+		private void ResolveAllConflicts()
+		{
+			MainWindow.singleton.ShowWaitingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (!RepoScreen.singleton.repoManager.ResolveAllConflicts()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve all conflicts");
+				MainWindow.singleton.HideWaitingOverlay();
+			});
+		}
+
 		private void resolveAllMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			// check conflicts
@@ -488,12 +498,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			}
 
 			// process
-			MainWindow.singleton.ShowWaitingOverlay();
-			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
-			{
-				if (!RepoScreen.singleton.repoManager.ResolveAllConflicts()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve all conflicts");
-				MainWindow.singleton.HideWaitingOverlay();
-			});
+			ResolveAllConflicts();
 		}
 
 		private void revertAllMenuItem_Click(object sender, RoutedEventArgs e)
@@ -858,15 +863,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		{
 			MainWindow.singleton.ShowMessageOverlay("Error", "Conflicts exist, resolve them now?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgBoxResult)
 			{
-				if (msgBoxResult == MessageOverlayResults.Ok)
-				{
-					MainWindow.singleton.ShowMergingOverlay();
-					RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
-					{
-						RepoScreen.singleton.repoManager.ResolveAllConflicts();
-						MainWindow.singleton.HideMergingOverlay();
-					});
-				}
+				if (msgBoxResult == MessageOverlayResults.Ok) ResolveAllConflicts();
 			});
 		}
 
@@ -955,15 +952,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				{
 					MainWindow.singleton.ShowMessageOverlay("Error", "Conflicts exist after pull, resolve them now?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults msgBoxresult)
 					{
-						if (msgBoxresult == MessageOverlayResults.Ok)
-						{
-							MainWindow.singleton.ShowMergingOverlay();
-							RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
-							{
-								RepoScreen.singleton.repoManager.ResolveAllConflicts();
-								MainWindow.singleton.HideMergingOverlay();
-							});
-						}
+						if (msgBoxresult == MessageOverlayResults.Ok) ResolveAllConflicts();
 					});
 				}
 				else if (result == SyncMergeResults.Error)

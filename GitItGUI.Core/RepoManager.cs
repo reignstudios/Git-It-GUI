@@ -475,7 +475,7 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Failed to optamize: " + e.Message);
+					DebugLog.LogError("Failed UnpackedObjectCount: " + e.Message);
 				}
 
 				size = null;
@@ -493,7 +493,42 @@ namespace GitItGUI.Core
 				}
 				catch (Exception e)
 				{
-					DebugLog.LogError("Failed to optamize: " + e.Message);
+					DebugLog.LogError("Failed to gc: " + e.Message);
+				}
+			}
+		}
+
+		public int UnusedLFSFiles(out string size)
+		{
+			lock (this)
+			{
+				try
+				{
+					int count;
+					if (!repository.lfs.PruneObjectCount(out count, out size)) throw new Exception(repository.lastError);
+					return count;
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed PruneObjectCount: " + e.Message);
+				}
+
+				size = null;
+				return -1;
+			}
+		}
+
+		public void PruneLFSFiles()
+		{
+			lock (this)
+			{
+				try
+				{
+					if (!repository.lfs.Prune()) throw new Exception(repository.lastError);
+				}
+				catch (Exception e)
+				{
+					DebugLog.LogError("Failed to prune lfs files: " + e.Message);
 				}
 			}
 		}

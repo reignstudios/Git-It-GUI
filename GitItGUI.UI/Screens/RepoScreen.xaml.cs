@@ -94,14 +94,30 @@ namespace GitItGUI.UI.Screens
 							int count = repoManager.UnpackedObjectCount(out string size);
 							if (count >= 1000)
 							{
-								MainWindow.singleton.ShowMessageOverlay("Optamize", string.Format("Your repo is fragmented, would you like to optamize?\nThere are '{0}' loose objects totalling '{1}' in size", count, size), MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
+								string msg = string.Format("Your repo is fragmented, would you like to optamize?\nThere are '{0}' loose objects totalling '{1}' in size.", count, size);
+
+								int lfsCount = -1;
+								string lfsSize = null, option = null;
+								if (repoManager.lfsEnabled)
+								{
+									lfsCount = repoManager.UnusedLFSFiles(out lfsSize);
+									if (lfsCount >= 1000)
+									{
+										option = "CleanUp LFS file";
+										msg += string.Format("\n\nYou also have '{0}' unused lfs files totalling '{1}' in size.", lfsCount, lfsSize);
+									}
+								}
+
+								MainWindow.singleton.ShowMessageOverlay("Optamize", msg, option, MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
 								{
 									if (result == MessageOverlayResults.Ok)
 									{
+										bool pruneLFS = MessageOverlay.optionChecked;
 										MainWindow.singleton.ShowProcessingOverlay();
 										repoManager.dispatcher.InvokeAsync(delegate()
 										{
 											repoManager.Optimize();
+											if (pruneLFS && repoManager.lfsEnabled) repoManager.PruneLFSFiles();
 											MainWindow.singleton.HideProcessingOverlay();
 										});
 									}

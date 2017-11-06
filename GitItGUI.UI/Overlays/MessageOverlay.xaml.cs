@@ -36,12 +36,14 @@ namespace GitItGUI.UI.Overlays
 		public delegate void DoneCallbackMethod(MessageOverlayResults result);
 		private DoneCallbackMethod doneCallback;
 
+		public static bool optionChecked;
+
 		public MessageOverlay()
 		{
 			InitializeComponent();
 		}
 
-		public void Setup(string title, string message, MessageOverlayTypes type, DoneCallbackMethod doneCallback)
+		public void Setup(string title, string message, string option, MessageOverlayTypes type, DoneCallbackMethod doneCallback)
 		{
 			// cancel pending message
 			if (this.doneCallback != null) doneCallback(MessageOverlayResults.Cancel);
@@ -50,6 +52,18 @@ namespace GitItGUI.UI.Overlays
 			// setup
 			titleTextBox.Text = title;
 			messageLabel.Text = message;
+			if (option != null)
+			{
+				optionCheckBox.IsChecked = true;
+				optionCheckBox.Content = option;
+				optionCheckBox.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				optionCheckBox.IsChecked = false;
+				optionCheckBox.Visibility = Visibility.Hidden;
+			}
+
 			if (type == MessageOverlayTypes.Ok)
 			{
 				okButton.Content = "Ok";
@@ -71,6 +85,8 @@ namespace GitItGUI.UI.Overlays
 
 		private void okButton_Click(object sender, RoutedEventArgs e)
 		{
+			optionChecked = optionCheckBox.IsChecked == true;
+
 			Visibility = Visibility.Hidden;
 			var callback = doneCallback;
 			doneCallback = null;

@@ -199,21 +199,31 @@ namespace GitItGUI.UI
 			}
 		}
 
-		public void ShowMessageOverlay(string title, string message, MessageOverlayTypes type = MessageOverlayTypes.Ok, MessageOverlay.DoneCallbackMethod doneCallback = null)
+		private void ShowMessageOverlayInternal(string title, string message, string option, MessageOverlayTypes type, MessageOverlay.DoneCallbackMethod doneCallback)
 		{
 			if (Dispatcher.CheckAccess())
 			{
-				messageOverlay.Setup(title, message, type, doneCallback);
+				messageOverlay.Setup(title, message, option, type, doneCallback);
 				messageOverlay.Visibility = Visibility.Visible;
 			}
 			else
 			{
 				Dispatcher.InvokeAsync(delegate ()
 				{
-					messageOverlay.Setup(title, message, type, doneCallback);
+					messageOverlay.Setup(title, message, option, type, doneCallback);
 					messageOverlay.Visibility = Visibility.Visible;
 				});
 			}
+		}
+
+		public void ShowMessageOverlay(string title, string message, MessageOverlayTypes type = MessageOverlayTypes.Ok, MessageOverlay.DoneCallbackMethod doneCallback = null)
+		{
+			ShowMessageOverlayInternal(title, message, null, type, doneCallback);
+		}
+
+		public void ShowMessageOverlay(string title, string message, string option, MessageOverlayTypes type = MessageOverlayTypes.Ok, MessageOverlay.DoneCallbackMethod doneCallback = null)
+		{
+			ShowMessageOverlayInternal(title, message, option, type, doneCallback);
 		}
 
 		public void HideMessageOverlay()

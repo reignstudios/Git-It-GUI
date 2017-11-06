@@ -170,6 +170,41 @@ namespace GitCommander
 					return string.IsNullOrEmpty(repository.lastError);
 				}
 			}
+
+			public bool PruneObjectCount(out int count, out string size)
+			{
+				bool resultFound = false;
+				int _count = -1;
+				string _size = "N/A";
+				void stdCallback(string line)
+				{
+					if (resultFound) return;
+
+					var match = Regex.Match(line, @"(\d*) files would be pruned \((.*)\)");
+					if (match.Success)
+					{
+						resultFound = true;
+						int.TryParse(match.Groups[1].Value, out _count);
+						_size = match.Groups[2].Value;
+					}
+				}
+
+				lock (repository)
+				{
+					bool result = SimpleLFSInvoke("prune --dry-run", stdCallback:stdCallback);
+					count = _count;
+					size = _size;
+					return result;
+				}
+			}
+
+			public bool Prune()
+			{
+				lock (repository)
+				{
+					return SimpleLFSInvoke("prune");
+				}
+			}
 		}
 	}
 }
