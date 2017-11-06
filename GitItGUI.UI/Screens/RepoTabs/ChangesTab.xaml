@@ -75,7 +75,9 @@
 							</ContextMenu>
 						</Button.ContextMenu>
 					</Button>
+
 					<RichTextBox Name="previewTextBox" Margin="10,41,10,10" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+
 					<Grid Name="previewGrid" Margin="10,41,10,10" Visibility="Visible" Background="White">
 						<Grid.RowDefinitions>
 							<RowDefinition Height="50*"/>
@@ -99,6 +101,17 @@
 								</Grid.Background>
 								<Image Name="newImage" Source="../../Images/AppIcon.png"/>
 								<Label Name="newImageLabel" Background="White" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="44" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" FontWeight="Bold" Foreground="Green">New</Label>
+							</Grid>
+						</Border>
+					</Grid>
+
+					<Grid Name="previewSingleGrid" Margin="10,41,10,10" Visibility="Hidden" Background="White">
+						<Border Margin="10,5,10,10" BorderThickness="1" BorderBrush="Gray" SnapsToDevicePixels="True">
+							<Grid>
+								<Grid.Background>
+									<ImageBrush ImageSource="../../Images/CheckPattern.png" TileMode="FlipXY" Stretch="Uniform" AlignmentY="Top" Viewport="0,0,2,2" ViewportUnits="Absolute" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+								</Grid.Background>
+								<Image Name="previewImage" Source="../../Images/AppIcon.png"/>
 							</Grid>
 						</Border>
 					</Grid>

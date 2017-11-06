@@ -597,6 +597,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				previewTextBox.Visibility = Visibility.Visible;
 				previewGrid.Visibility = Visibility.Hidden;
+				previewSingleGrid.Visibility = Visibility.Hidden;
 				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
 				range.Text = "<<< Invalide Preview Type >>>";
 			}
@@ -604,6 +605,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				previewTextBox.Visibility = Visibility.Visible;
 				previewGrid.Visibility = Visibility.Hidden;
+				previewSingleGrid.Visibility = Visibility.Hidden;
 				previewTextBox.Document.Blocks.Clear();
 
 				using (var stream = new MemoryStream())
@@ -751,7 +753,6 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			else if (delta is PreviewImageData)
 			{
 				previewTextBox.Visibility = Visibility.Hidden;
-				previewGrid.Visibility = Visibility.Visible;
 
 				var imageDelta = (PreviewImageData)delta;
 				BitmapSource LoadImage(Stream stream, string ext)
@@ -803,24 +804,28 @@ namespace GitItGUI.UI.Screens.RepoTabs
 						return new BitmapImage();
 					}
 				}
-
-				if (!imageDelta.isMergeDiff)
+				
+				if (fileState.HasState(FileStates.NewInIndex) || fileState.HasState(FileStates.NewInWorkdir))
 				{
-					oldImageLabel.Content = "Old";
-					newImageLabel.Content = "New";
+					previewSingleGrid.Visibility = Visibility.Visible;
+					previewGrid.Visibility = Visibility.Hidden;
+					previewImage.Source = LoadImage(imageDelta.newImage, imageDelta.imageExt);
 				}
 				else
 				{
-					oldImageLabel.Content = "Theirs";
-					newImageLabel.Content = "Ours";
-				}
-				
-				//if (imageDelta.oldImage == null)
-				{
-					
-				}
-				//else
-				{
+					if (!imageDelta.isMergeDiff)
+					{
+						oldImageLabel.Content = "Old";
+						newImageLabel.Content = "New";
+					}
+					else
+					{
+						oldImageLabel.Content = "Theirs";
+						newImageLabel.Content = "Ours";
+					}
+
+					previewSingleGrid.Visibility = Visibility.Hidden;
+					previewGrid.Visibility = Visibility.Visible;
 					newImage.Source = LoadImage(imageDelta.newImage, imageDelta.imageExt);
 					oldImage.Source = LoadImage(imageDelta.oldImage, imageDelta.imageExt);
 				}
@@ -831,6 +836,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			{
 				previewTextBox.Visibility = Visibility.Visible;
 				previewGrid.Visibility = Visibility.Hidden;
+				previewSingleGrid.Visibility = Visibility.Hidden;
 				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
 				range.Text = "<<< Unsuported Preview Type >>>";
 			}
