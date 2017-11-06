@@ -211,6 +211,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="VersionInfo.xml" />
     <Resource Include="Images\CheckPattern.png" />
     <Resource Include="Images\Update.png" />
     <Resource Include="Images\UserTask.png" />

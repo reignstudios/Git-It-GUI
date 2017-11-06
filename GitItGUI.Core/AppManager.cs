@@ -49,8 +49,8 @@ namespace GitItGUI.Core
 		public static int MaxRepoHistoryCount = 20;
 
 		private static WebClient client;
-		private static string platformName = "Unknown";
 
+		/*private static string platformName = "Unknown";
 		static AppManager()
 		{
 			switch (PlatformInfo.platform)
@@ -60,7 +60,7 @@ namespace GitItGUI.Core
 				case Platforms.Linux: platformName = "Linux"; break;
 				default: throw new Exception("Unsupported platform: " + PlatformInfo.platform);
 			}
-		}
+		}*/
 
 		/// <summary>
 		/// Must be called before using any other API feature
