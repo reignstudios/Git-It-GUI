@@ -162,16 +162,10 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		private bool SaveOriginalFile(string filename, StreamReader reader)
+		private bool SmudgeFile(string filename, StreamReader reader)
 		{
-			var stream = reader.BaseStream;
-
-			// save data to stream
-			if (!repository.SaveOriginalFile(filename, stream)) return false;
-			if (stream.Length == 0) return false;
-			stream.Position = 0;
-			
 			// smudge lfs ptr (aka convert ptr to data)
+			var stream = reader.BaseStream;
 			if (Tools.IsGitLFSPtr(reader, out string ptr))
 			{
 				stream.SetLength(0);
@@ -183,6 +177,30 @@ namespace GitItGUI.Core
 			}
 					
 			return true;
+		}
+
+		private bool SaveOriginalFile(string filename, StreamReader reader)
+		{
+			var stream = reader.BaseStream;
+
+			// save data to stream
+			if (!repository.SaveOriginalFile(filename, stream)) return false;
+			if (stream.Length == 0) return false;
+			stream.Position = 0;
+					
+			return SmudgeFile(filename, reader);
+		}
+
+		private bool SaveConflictedFile(string filename, FileConflictSources source, StreamReader reader)
+		{
+			var stream = reader.BaseStream;
+
+			// save data to stream
+			if (!repository.SaveConflictedFile(filename, source, stream)) return false;
+			if (stream.Length == 0) return false;
+			stream.Position = 0;
+				
+			return SmudgeFile(filename, reader);
 		}
 
 		public object GetQuickViewData(FileState fileState, bool allowUncommonImageTypes)
@@ -213,14 +231,17 @@ namespace GitItGUI.Core
 						{
 							image.isMergeDiff = true;
 							image.newImage = new MemoryStream();
-							if (repository.SaveConflictedFile(fileState.filename, FileConflictSources.Ours, image.newImage))
+							image.newImageReader = new StreamReader(image.newImage);
+							if (SaveConflictedFile(fileState.filename, FileConflictSources.Ours, image.newImageReader))
 							{
 								image.newImage.Position = 0;
 							}
 							else
 							{
-								image.Dispose();
-								return null;
+								image.newImageReader.Dispose();
+								image.newImage.Dispose();
+								image.newImage = null;
+								image.newImageReader = null;
 							}
 						}
 						else
@@ -232,31 +253,33 @@ namespace GitItGUI.Core
 						if (fileState.HasState(FileStates.Conflicted))
 						{
 							image.oldImage = new MemoryStream();
-							if (repository.SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, image.oldImage))
+							image.oldImageReader = new StreamReader(image.oldImage);
+							if (SaveConflictedFile(fileState.filename, FileConflictSources.Theirs, image.oldImageReader))
 							{
 								image.oldImage.Position = 0;
 							}
 							else
 							{
+								image.oldImageReader.Dispose();
 								image.oldImage.Dispose();
 								image.oldImage = null;
+								image.oldImageReader = null;
 							}
 						}
 						else
 						{
-							var stream = new MemoryStream();
-							var reader = new StreamReader(stream);
-							if (SaveOriginalFile(fileState.filename, reader))
+							image.oldImage = new MemoryStream();
+							image.oldImageReader = new StreamReader(image.oldImage);
+							if (SaveOriginalFile(fileState.filename, image.oldImageReader))
 							{
-								image.oldImage = stream;
-								image.oldImageReader = reader;
-								stream.Position = 0;
+								image.oldImage.Position = 0;
 							}
 							else
 							{
-								reader.Dispose();
-								stream.Dispose();
-								return image;
+								image.oldImageReader.Dispose();
+								image.oldImage.Dispose();
+								image.oldImage = null;
+								image.oldImageReader = null;
 							}
 						}
 						

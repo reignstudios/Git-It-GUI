@@ -835,13 +835,13 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				{
 					if (!imageDelta.isMergeDiff)
 					{
-						oldImageLabel.Content = "Old";
-						newImageLabel.Content = "New";
+						oldImageLabel.Content = imageDelta.oldImage != null ? "Old" : "N/A";
+						newImageLabel.Content = imageDelta.newImage != null ? "New" : "N/A";
 					}
 					else
 					{
-						oldImageLabel.Content = "Theirs";
-						newImageLabel.Content = "Ours";
+						oldImageLabel.Content = imageDelta.oldImage != null ? "Theirs" : "N/A";
+						newImageLabel.Content = imageDelta.newImage != null ? "Ours" : "N/A";
 					}
 
 					previewSingleGrid.Visibility = Visibility.Hidden;

@@ -63,6 +63,7 @@ namespace GitItGUI.Core
 				case ".bmp":
 				case ".gif":
 				case ".tif":
+				case ".ico":
 					pass = true;
 					break;
 			}
