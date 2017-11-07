@@ -6,31 +6,32 @@
              xmlns:local="clr-namespace:GitItGUI.UI.Screens.RepoTabs"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="40" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-		<Label Grid.Row="0" Content="Git Repo Settings" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-		<Border Grid.Row="1" Width="256" Height="148" VerticalAlignment="Top" BorderBrush="Gray" BorderThickness="2">
-			<Grid Background="#EEEEEE">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="30" />
-					<RowDefinition Height="25" />
-					<RowDefinition Height="30" />
-					<RowDefinition Height="25" />
-					<RowDefinition Height="*" />
-				</Grid.RowDefinitions>
+        <Label Grid.Row="0" Content="Git Repo Settings" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Border Grid.Row="1" Width="256" Height="148" VerticalAlignment="Top" BorderBrush="Gray" BorderThickness="2">
+            <Grid Background="#EEEEEE">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="25" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="25" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-				<Label Grid.Row="0" Content="Signature Name" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-				<TextBox Name="sigName" Grid.Row="1" Text="Full Name" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0" TextChanged="sigName_TextChanged"/>
-				<Label Grid.Row="2" Content="Signature Email" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-				<TextBox Name="sigEmail" Grid.Row="3" Text="account@email.com" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0" TextChanged="sigEmail_TextChanged"/>
-				<ToggleButton Name="isLocalToggleButton" Grid.Row="4" Content="Is signature local" VerticalAlignment="Center" Margin="20,0" ToolTip="Is the signature local to this repository" Checked="isLocalToggleButton_Checked"/>
-			</Grid>
-		</Border>
-		<Button Name="applyButton" Content="Apply" Background="LightGreen" HorizontalAlignment="Right" Margin="0,0,10,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Height="32" Click="applyButton_Click"/>
-		<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,90,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Height="32" Click="cancelButton_Click"/>
-	</Grid>
+                <Label Grid.Row="0" Content="Signature Name" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                <TextBox Name="sigName" Grid.Row="1" Text="Full Name" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0" TextChanged="sigName_TextChanged"/>
+                <Label Grid.Row="2" Content="Signature Email" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                <TextBox Name="sigEmail" Grid.Row="3" Text="account@email.com" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0" TextChanged="sigEmail_TextChanged"/>
+                <ToggleButton Name="isLocalToggleButton" Grid.Row="4" Content="Is signature local" VerticalAlignment="Center" Margin="20,0" ToolTip="Is the signature local to this repository" Checked="isLocalToggleButton_Checked"/>
+            </Grid>
+        </Border>
+
+        <Button Name="cancelButton" Content="Cancel" Background="LightPink" HorizontalAlignment="Center" Margin="172,153,353,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="32" Click="cancelButton_Click"/>
+		<Button Name="applyButton" Content="Apply" Background="LightGreen" HorizontalAlignment="Center" Margin="353,153,172,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="32" Click="applyButton_Click"/>
+    </Grid>
 </UserControl>
