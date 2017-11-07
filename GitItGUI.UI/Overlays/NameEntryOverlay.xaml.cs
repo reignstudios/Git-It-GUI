@@ -57,13 +57,14 @@ namespace GitItGUI.UI.Overlays
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
 			Visibility = Visibility.Hidden;
-			if (doneCallback != null) doneCallback(null, remoteComboBox.SelectedValue as string, false);
+			if (doneCallback != null) doneCallback(null, null, false);
 		}
 
 		private void okButton_Click(object sender, RoutedEventArgs e)
 		{
 			Visibility = Visibility.Hidden;
-			if (doneCallback != null) doneCallback(nameTextBox.Text, remoteComboBox.SelectedValue as string, true);
+			var item = (ComboBoxItem)remoteComboBox.SelectedItem;
+			if (doneCallback != null) doneCallback(nameTextBox.Text, item.Content as string, true);
 		}
 	}
 }
