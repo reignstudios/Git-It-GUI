@@ -29,6 +29,12 @@ namespace GitItGUI.Core
 			[XmlAttribute("WinY")] public int winY = -1;
 			[XmlAttribute("WinWidth")] public int winWidth = -1;
 			[XmlAttribute("WinHeight")] public int winHeight = -1;
+			[XmlElement("ChangesPanelHL")] public double changesPanelHL = -1;
+			[XmlElement("ChangesPanelHR")] public double changesPanelHR = -1;
+			[XmlElement("ChangesPanelStagingVU")] public double changesPanelStagingVU = -1;
+			[XmlElement("ChangesPanelStagingVD")] public double changesPanelStagingVD = -1;
+			[XmlElement("ChangesPanelCommitDiffVU")] public double changesPanelCommitDiffVU = -1;
+			[XmlElement("ChangesPanelCommitDiffVD")] public double changesPanelCommitDiffVD = -1;
 			[XmlElement("MergeDiffTool")] public MergeDiffTools mergeDiffTool = MergeDiffTools.P4Merge;
 			[XmlElement("AutoRefreshChanges")] public bool autoRefreshChanges = true;
 			[XmlElement("ShowLFSTag")] public bool showLFSTags = false;

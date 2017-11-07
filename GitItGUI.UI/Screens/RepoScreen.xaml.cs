@@ -48,6 +48,7 @@ namespace GitItGUI.UI.Screens
 		{
 			Dispatcher.InvokeAsync(delegate()
 			{
+				dispatcher.UnhandledException += MainWindow.singleton.Dispatcher_UnhandledException;
 				grid.Visibility = Visibility.Visible;
 			});
 		}

@@ -46,6 +46,14 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			// bind events
 			RepoScreen.singleton.repoManager.AskUserToResolveConflictedFileCallback += RepoManager_AskUserToResolveConflictedFileCallback;
 			RepoScreen.singleton.repoManager.AskUserIfTheyAcceptMergedFileCallback += RepoManager_AskUserIfTheyAcceptMergedFileCallback;
+
+			// apply grid offsets
+			if (AppManager.settings.changesPanelHL != -1) columDefHL.Width = new GridLength(AppManager.settings.changesPanelHL, columDefHL.Width.GridUnitType);
+			if (AppManager.settings.changesPanelHR != -1) columDefHR.Width = new GridLength(AppManager.settings.changesPanelHR, columDefHR.Width.GridUnitType);
+			if (AppManager.settings.changesPanelStagingVU != -1) rowStagingDefVU.Height = new GridLength(AppManager.settings.changesPanelStagingVU, rowStagingDefVU.Height.GridUnitType);
+			if (AppManager.settings.changesPanelStagingVD != -1) rowStagingDefVD.Height = new GridLength(AppManager.settings.changesPanelStagingVD, rowStagingDefVD.Height.GridUnitType);
+			if (AppManager.settings.changesPanelCommitDiffVU != -1) rowCommitDiffDefVU.Height = new GridLength(AppManager.settings.changesPanelCommitDiffVU, rowCommitDiffDefVU.Height.GridUnitType);
+			if (AppManager.settings.changesPanelCommitDiffVD != -1) rowCommitDiffDefVD.Height = new GridLength(AppManager.settings.changesPanelCommitDiffVD, rowCommitDiffDefVD.Height.GridUnitType);
 		}
 
 		public void Refresh()
@@ -146,11 +154,21 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		public void ClosingRepo()
 		{
+			// save commit message
 			if (RepoScreen.singleton.repoManager.isOpen)
 			{
 				RepoScreen.singleton.repoManager.SaveCommitMessage(commitMessageTextBox.Text);
 			}
 
+			// save grid offset
+			AppManager.settings.changesPanelHL = columDefHL.Width.Value;
+			AppManager.settings.changesPanelHR = columDefHR.Width.Value;
+			AppManager.settings.changesPanelStagingVU = rowStagingDefVU.Height.Value;
+			AppManager.settings.changesPanelStagingVD = rowStagingDefVD.Height.Value;
+			AppManager.settings.changesPanelCommitDiffVU = rowCommitDiffDefVU.Height.Value;
+			AppManager.settings.changesPanelCommitDiffVD = rowCommitDiffDefVD.Height.Value;
+
+			// clear states
 			stagedChangesListBox.Items.Clear();
 			unstagedChangesListBox.Items.Clear();
 			previewTextBox.Document.Blocks.Clear();
@@ -158,6 +176,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 			previewTextBox.Visibility = Visibility.Visible;
 			previewGrid.Visibility = Visibility.Hidden;
+			previewSingleGrid.Visibility = Visibility.Hidden;
 		}
 
 		private bool RepoManager_AskUserToResolveConflictedFileCallback(FileState fileState, bool isBinaryFile, out MergeFileResults result)

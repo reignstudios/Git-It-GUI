@@ -52,9 +52,6 @@ namespace GitItGUI.UI
 			startScreen.Init();
 			repoScreen.Init();
 
-			// RepoManager Dispatcher UnhandledException
-			repoScreen.repoManager.dispatcher.UnhandledException += Dispatcher_UnhandledException;
-
 			// validate diff/merge tool exists
 			settingsScreen.ValidateDiffMergeTool();
 
@@ -93,7 +90,7 @@ namespace GitItGUI.UI
 			Environment.Exit(2);
 		}
 
-		private void Dispatcher_UnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+		internal void Dispatcher_UnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
 		{
 			var ex = e.Exception;
 			if (ex != null)
