@@ -25,6 +25,8 @@ namespace GitItGUI.Core
 			catch (Exception e)
 			{
 				LogError("Failed to init debug log file: " + e.Message);
+				stream = new MemoryStream();
+				writer = new StreamWriter(stream);
 			}
 		}
 		
