@@ -15,7 +15,7 @@ namespace GitItGUI.Core
 	public partial class RepoManager : IDisposable
 	{
 		public delegate void ReadyCallbackMethod(Dispatcher dispatcher);
-		public delegate void RepoRefreshedCallbackMethod();
+		public delegate void RepoRefreshedCallbackMethod(bool isQuickRefresh);
 		public event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 		public bool disableRepoRefreshedCallback;
 		
@@ -245,7 +245,7 @@ namespace GitItGUI.Core
 			}
 
 			// finish
-			if (!disableRepoRefreshedCallback && RepoRefreshedCallback != null) RepoRefreshedCallback();
+			if (!disableRepoRefreshedCallback && RepoRefreshedCallback != null) RepoRefreshedCallback(false);
 			return true;
 		}
 
@@ -256,9 +256,16 @@ namespace GitItGUI.Core
 
 		public bool Refresh()
 		{
+			lock (this) return Open(repository.repoPath);
+		}
+
+		public bool QuickRefresh()
+		{
 			lock (this)
 			{
-				return Open(repository.repoPath);
+				bool result = RefreshChanges();
+				if (!disableRepoRefreshedCallback && RepoRefreshedCallback != null) RepoRefreshedCallback(true);
+				return result;
 			}
 		}
 

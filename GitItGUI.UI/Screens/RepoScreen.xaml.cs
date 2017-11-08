@@ -220,7 +220,7 @@ namespace GitItGUI.UI.Screens
 					}
 
 					repoManager.disableRepoRefreshedCallback = false;
-					if (lfsPassed) repoManager_RefreshedCallback();
+					if (lfsPassed) repoManager_RefreshedCallback(false);
 				}
 				else
 				{
@@ -232,13 +232,13 @@ namespace GitItGUI.UI.Screens
 			});
 		}
 		
-		private void repoManager_RefreshedCallback()
+		private void repoManager_RefreshedCallback(bool isQuickRefresh)
 		{
 			void RefreshInternal()
 			{
 				if (!repoManager.isOpen) return;
 
-				if (repoManager.isEmpty)
+				if (!isQuickRefresh && repoManager.isEmpty)
 				{
 					MainWindow.singleton.ShowMessageOverlay("Empty Repo", "Nothing has been commit to this repo, a first commit much be made to open it.", MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
 					{
@@ -266,9 +266,13 @@ namespace GitItGUI.UI.Screens
 				}
 
 				changesTab.Refresh();
-				branchesTab.Refresh();
-				settingsTab.Refresh();
-				terminalTab.Refresh();
+				if (!isQuickRefresh)
+				{
+					branchesTab.Refresh();
+					settingsTab.Refresh();
+					terminalTab.Refresh();
+				}
+
 				CheckSync();
 			}
 
@@ -295,6 +299,39 @@ namespace GitItGUI.UI.Screens
 					if (!repoManager.Refresh())
 					{
 						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to refresh repo");
+						MainWindow.singleton.Navigate(StartScreen.singleton);
+					}
+
+					MainWindow.singleton.HideProcessingOverlay();
+				});
+			}
+
+			if (repoManager != null && repoManager.isOpen)
+			{
+				if (repoManager.dispatcher.CheckAccess())
+				{
+					Invoke();
+				}
+				else
+				{
+					repoManager.dispatcher.InvokeAsync(delegate()
+					{
+						Invoke();
+					});
+				}
+			}
+		}
+
+		public void QuickRefresh()
+		{
+			void Invoke()
+			{
+				MainWindow.singleton.ShowProcessingOverlay();
+				repoManager.dispatcher.InvokeAsync(delegate()
+				{
+					if (!repoManager.QuickRefresh())
+					{
+						MainWindow.singleton.ShowMessageOverlay("Error", "Failed to quick refresh repo");
 						MainWindow.singleton.Navigate(StartScreen.singleton);
 					}
 

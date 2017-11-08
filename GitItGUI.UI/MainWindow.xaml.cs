@@ -176,7 +176,7 @@ namespace GitItGUI.UI
 		{
 			base.OnActivated(e);
 			
-			#if !DEBUG
+			//#if !DEBUG
 			if
 			(
 				repoScreen != null &&
@@ -187,9 +187,9 @@ namespace GitItGUI.UI
 				mergingOverlay.Visibility != Visibility.Visible
 			)
 			{
-				if (AppManager.settings.autoRefreshChanges) repoScreen.Refresh();
+				if (AppManager.settings.autoRefreshChanges) repoScreen.QuickRefresh();
 			}
-			#endif
+			//#endif
 		}
 
 		public void Navigate(UserControl screen)
