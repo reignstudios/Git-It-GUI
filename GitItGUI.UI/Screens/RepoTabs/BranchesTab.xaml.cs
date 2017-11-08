@@ -186,7 +186,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void MergeFileMenu_Click(object sender, RoutedEventArgs e)
 		{
 			var branch = (BranchState)((MenuItem)sender).Tag;
-			MainWindow.singleton.ShowMessageOverlay("Merge Branches", string.Format("Are you sure you want to merge branch '{0}' into '{1}'", RepoScreen.singleton.repoManager.activeBranch.fullname, branch.fullname), MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+			MainWindow.singleton.ShowMessageOverlay("Merge Branches", string.Format("Are you sure you want to merge branch '{1}' into '{0}'", RepoScreen.singleton.repoManager.activeBranch.fullname, branch.fullname), MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
 			{
 				if (result != MessageOverlayResults.Ok) return;
 				MainWindow.singleton.ShowProcessingOverlay();
