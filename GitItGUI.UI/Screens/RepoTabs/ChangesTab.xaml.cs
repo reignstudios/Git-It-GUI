@@ -953,12 +953,41 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
 					return;
 				}
+				else
+				{
+					Dispatcher.InvokeAsync(delegate()
+					{
+						commitMessageTextBox.Text = string.Empty;
+					});
+				}
 
 				var result = RepoScreen.singleton.repoManager.Sync();
 				if (result != SyncMergeResults.Succeeded)
 				{
 					if (result == SyncMergeResults.Conflicts) HandleConflics();
 					else if (result == SyncMergeResults.Error) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to sync changes");
+				}
+
+				MainWindow.singleton.HideProcessingOverlay();
+			});
+		}
+
+		private void commitAndPushButton_Click(object sender, RoutedEventArgs e)
+		{
+			// prep commit message
+			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
+			string msg = null;
+			if (changesExist && !PrepCommitMessage(out msg)) return;
+
+			// process
+			MainWindow.singleton.ShowProcessingOverlay();
+			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			{
+				if (changesExist && !RepoScreen.singleton.repoManager.CommitStagedChanges(msg, false))
+				{
+					RepoScreen.singleton.Refresh();
+					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
+					return;
 				}
 				else
 				{
@@ -968,6 +997,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					});
 				}
 
+				if (!RepoScreen.singleton.repoManager.Push()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to push changes");
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
