@@ -74,6 +74,7 @@ namespace GitItGUI.Core
 				switch (ext)
 				{
 					case ".tga":
+					case ".svg":
 					case ".psd":
 					case ".pdf":
 						pass = true;

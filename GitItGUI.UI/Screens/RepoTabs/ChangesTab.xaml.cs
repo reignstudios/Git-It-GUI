@@ -804,6 +804,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 							switch (ext)
 							{
 								case ".tga": format = MagickFormat.Tga; break;
+								case ".svg": format = MagickFormat.Svg; break;
 								case ".psd": format = MagickFormat.Psd; break;
 								case ".pdf": format = MagickFormat.Pdf; allowTransparency = false; break;
 							}
@@ -893,7 +894,6 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void simpleModeMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			AppManager.settings.simpleMode = true;
-			syncButton.Visibility = Visibility.Visible;
 			commitButton.Visibility = Visibility.Hidden;
 			pullButton.Visibility = Visibility.Hidden;
 			pushButton.Visibility = Visibility.Hidden;
@@ -902,7 +902,6 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void advancedModeMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			AppManager.settings.simpleMode = false;
-			syncButton.Visibility = Visibility.Hidden;
 			commitButton.Visibility = Visibility.Visible;
 			pullButton.Visibility = Visibility.Visible;
 			pushButton.Visibility = Visibility.Visible;

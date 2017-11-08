@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitItGUI.UI.Screens.RepoTabs"
              mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="600">
+             d:DesignHeight="600" d:DesignWidth="800">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*" Name="columDefHL" />
@@ -140,10 +140,10 @@
 						</Button.ContextMenu>
 					</Button>
 					<TextBox Name="commitMessageTextBox" Margin="10,41,10,35" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
-					<Button Name="syncButton" Content="Sync" Visibility="Hidden" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75" ToolTip="Sync changes with server" Click="syncButton_Click"/>
-					<Button Name="commitButton" Content="Commit" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75" ToolTip="Commit changes to local repo database" Click="commitButton_Click"/>
-					<Button Name="pullButton" Content="Pull" HorizontalAlignment="Left" Margin="90,0,0,10" VerticalAlignment="Bottom" Width="75" ToolTip="Pull changes from remote server" Click="pullButton_Click"/>
-					<Button Name="pushButton" Content="Push" HorizontalAlignment="Left" Margin="170,0,0,10" VerticalAlignment="Bottom" Width="75" ToolTip="Push changes to remote server" Click="pushButton_Click"/>
+					<Button Name="syncButton" Content="Sync" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75" ToolTip="Sync changes with server" Click="syncButton_Click"/>
+					<Button Name="commitButton" Content="Commit" HorizontalAlignment="Right" Margin="0,0,170,10" VerticalAlignment="Bottom" Width="75" ToolTip="Commit changes to local repo database" Click="commitButton_Click"/>
+					<Button Name="pullButton" Content="Pull" HorizontalAlignment="Right" Margin="0,0,90,10" VerticalAlignment="Bottom" Width="75" ToolTip="Pull changes from remote server" Click="pullButton_Click"/>
+					<Button Name="pushButton" Content="Push" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75" ToolTip="Push changes to remote server" Click="pushButton_Click"/>
 				</Grid>
 			</Border>
 		</Grid>
