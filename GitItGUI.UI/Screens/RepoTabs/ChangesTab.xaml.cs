@@ -894,6 +894,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void simpleModeMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			AppManager.settings.simpleMode = true;
+			commitAndPushButton.Visibility = Visibility.Hidden;
 			commitButton.Visibility = Visibility.Hidden;
 			pullButton.Visibility = Visibility.Hidden;
 			pushButton.Visibility = Visibility.Hidden;
@@ -902,6 +903,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void advancedModeMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			AppManager.settings.simpleMode = false;
+			commitAndPushButton.Visibility = Visibility.Visible;
 			commitButton.Visibility = Visibility.Visible;
 			pullButton.Visibility = Visibility.Visible;
 			pushButton.Visibility = Visibility.Visible;
