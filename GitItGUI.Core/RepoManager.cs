@@ -263,6 +263,8 @@ namespace GitItGUI.Core
 		{
 			lock (this)
 			{
+				if (!isOpen) throw new Exception("Repo not open!");
+
 				bool result = RefreshChanges();
 				if (!disableRepoRefreshedCallback && RepoRefreshedCallback != null) RepoRefreshedCallback(true);
 				return result;

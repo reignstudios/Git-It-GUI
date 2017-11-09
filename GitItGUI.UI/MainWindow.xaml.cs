@@ -187,7 +187,7 @@ namespace GitItGUI.UI
 				mergingOverlay.Visibility != Visibility.Visible
 			)
 			{
-				if (AppManager.settings.autoRefreshChanges) repoScreen.QuickRefresh();
+				if (AppManager.settings.autoRefreshChanges && repoScreen.repoManager != null && repoScreen.repoManager.isOpen) repoScreen.QuickRefresh();
 			}
 			//#endif
 		}
