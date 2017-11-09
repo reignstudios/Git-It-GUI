@@ -618,6 +618,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				previewTextBox.Visibility = Visibility.Visible;
 				previewGrid.Visibility = Visibility.Hidden;
 				previewSingleGrid.Visibility = Visibility.Hidden;
+				previewTextBox.Document.Blocks.Clear();
 				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
 				range.Text = "<<< Invalide Preview Type >>>";
 			}
@@ -1081,6 +1082,13 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 			var fileState = (stagedItem != null) ? (FileState)stagedItem.Tag : null;
 			if (fileState == null) fileState = (unstagedItem != null) ? (FileState)unstagedItem.Tag : null;
+
+			// validate isn't new file
+			if (fileState.HasState(FileStates.NewInIndex) || fileState.HasState(FileStates.NewInWorkdir))
+			{
+				MainWindow.singleton.ShowMessageOverlay("Note", "File has no history.");
+				return;
+			}
 
 			// process
 			MainWindow.singleton.ShowWaitingOverlay();
