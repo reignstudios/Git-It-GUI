@@ -28,7 +28,7 @@ Download: https://github.com/reignstudios/Git-It-GUI/releases
 LOGS: These will be stored in "C:\ProgramData\GitItGUI\logs.txt" on windows
 
 ---
-## Requirements: This tool requires git-core and .NET 4.7
+## Requirements: git-core and .NET 4.7
 ### (git v2.11.0) and (git-lfs v1.5.5) or later are required!
  - Win7-Win10: https://git-scm.com/
 <!-- - macOS (recommend homebrew):
