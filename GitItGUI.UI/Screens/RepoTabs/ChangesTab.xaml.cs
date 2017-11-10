@@ -942,14 +942,14 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			}
 
 			// validate changes exist
-			if (stagedChangesListBox.Items.Count == 0)
+			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
+			if (changesExist && stagedChangesListBox.Items.Count == 0)
 			{
 				MainWindow.singleton.ShowMessageOverlay("Error", "There are no staged files to commit");
 				return;
 			}
 
 			// prep commit message
-			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
 			string msg = null;
 			if (changesExist && !PrepCommitMessage(out msg)) return;
 
@@ -985,14 +985,14 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void commitAndPushButton_Click(object sender, RoutedEventArgs e)
 		{
 			// validate changes exist
-			if (stagedChangesListBox.Items.Count == 0)
+			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
+			if (changesExist && stagedChangesListBox.Items.Count == 0)
 			{
 				MainWindow.singleton.ShowMessageOverlay("Error", "There are no staged files to commit");
 				return;
 			}
 
 			// prep commit message
-			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
 			string msg = null;
 			if (changesExist && !PrepCommitMessage(out msg)) return;
 
@@ -1022,7 +1022,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 		private void commitButton_Click(object sender, RoutedEventArgs e)
 		{
 			// validate changes exist
-			if (stagedChangesListBox.Items.Count == 0)
+			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
+			if (changesExist && stagedChangesListBox.Items.Count == 0)
 			{
 				MainWindow.singleton.ShowMessageOverlay("Error", "There are no staged files to commit");
 				return;
