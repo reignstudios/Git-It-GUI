@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System;
+using System.Windows.Threading;
 
 namespace GitItGUI.UI.Screens
 {
@@ -14,6 +15,8 @@ namespace GitItGUI.UI.Screens
 	public partial class StartScreen : UserControl
 	{
 		public static StartScreen singleton;
+		private DispatcherTimer timer;
+		private bool outOfDate;
 
 		public StartScreen()
 		{
@@ -22,6 +25,15 @@ namespace GitItGUI.UI.Screens
 
 			updateImage.Visibility = Visibility.Hidden;
 			updateImage.MouseUp += UpdateImage_MouseUp;
+			timer = new DispatcherTimer(TimeSpan.FromSeconds(.25), DispatcherPriority.Background, DispatcherCallback, Dispatcher);
+		}
+
+		private void DispatcherCallback(object sender, EventArgs e)
+		{
+			if (outOfDate && Visibility == Visibility.Visible)
+			{
+				updateFlashImage.Visibility = updateFlashImage.Visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
+			}
 		}
 
 		public void Init()
@@ -32,6 +44,7 @@ namespace GitItGUI.UI.Screens
 		public void EnabledOutOfDate()
 		{
 			updateImage.Visibility = Visibility.Visible;
+			outOfDate = true;
 		}
 
 		internal void RefreshHistory()
