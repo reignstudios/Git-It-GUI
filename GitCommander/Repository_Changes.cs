@@ -371,6 +371,8 @@ namespace GitCommander
 			bool conflictExist = false;
 			void stdCallback(string line)
 			{
+				if (line.StartsWith("warning:")) return;
+				if (line.StartsWith("The file will have its original line endings in your working directory.")) return;
 				conflictExist = true;
 			}
 
