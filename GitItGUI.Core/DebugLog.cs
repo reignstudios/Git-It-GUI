@@ -19,7 +19,7 @@ namespace GitItGUI.Core
 				string logDir = Path.Combine(PlatformInfo.appDataPath, Settings.appSettingsFolderName);
 				if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
 				string logFileName = Path.Combine(logDir, "logs.txt");
-				stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+				stream = new FileStream(logFileName, FileMode.Create, FileAccess.Write, FileShare.Read);
 				writer = new StreamWriter(stream);
 			}
 			catch (Exception e)
@@ -58,7 +58,12 @@ namespace GitItGUI.Core
 				Console.WriteLine(value);
 				#endif
 
-				if (writer != null) writer.WriteLine(value);
+				if (writer != null)
+				{
+					writer.WriteLine(value);
+					writer.Flush();
+					stream.Flush();
+				}
 				if (WriteCallback != null) WriteCallback(value);
 			}
 		}

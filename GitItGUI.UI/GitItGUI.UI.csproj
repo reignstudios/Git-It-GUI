@@ -245,9 +245,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(SolutionDir)3rdParty\Ghostscript\gsdll32.dll" "$(TargetDir)gsdll32.dll"
-copy "$(SolutionDir)3rdParty\Ghostscript\gsdll64.dll" "$(TargetDir)gsdll64.dll"
-copy "$(SolutionDir)3rdParty\Ghostscript\gswin32c.exe" "$(TargetDir)gswin32c.exe"
-copy "$(SolutionDir)3rdParty\Ghostscript\gswin64c.exe" "$(TargetDir)gswin64c.exe"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

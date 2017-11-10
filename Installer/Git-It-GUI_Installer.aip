@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="13.5" version="14.4" Modules="simple" RootPath="." Language="en" Id="{C7F5B7C6-44E5-4AFF-8FCE-81E9836F6364}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="13.5" version="14.4.1" Modules="simple" RootPath="." Language="en" Id="{C7F5B7C6-44E5-4AFF-8FCE-81E9836F6364}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;MsiThemeComponent;BackgroundImagesComponent;UpdaterComponent;SerValComponent;DigCertStoreComponent;MsiInstExSeqComponent;DictionaryComponent;MsiAppSearchComponent;MsiAssemblyComponent;MsiClassComponent;MsiOdbcDataSrcComponent;MsiServInstComponent;MsiOrgComponent;MsiExtComponent;CPLAppletComponent;ActSyncAppComponent;PreReqComponent;WebApplicationsComponent;MsiJavaComponent;MsiDriverPackagesComponent;UserAccountsComponent;ScheduledTasksComponent;SqlConnectionComponent;AutorunComponent;FirewallExceptionComponent;GameUxComponent;MsiDirectEditorComponent;SharePointSlnComponent;SilverlightSlnComponent;MultipleInstancesComponent;SccmComponent;ActSyncAppComponent"/>
   </COMPONENT>
@@ -45,24 +45,16 @@
     <ROW Component="Magick.NETQ8AnyCPU.dll" ComponentId="{F4A4A10D-621E-49F5-A85C-4B9967F93802}" Directory_="APPDIR" Attributes="0" KeyPath="Magick.NETQ8AnyCPU.dll"/>
     <ROW Component="ProductInformation" ComponentId="{5578F502-08C2-4B0E-B8FE-8318417169C2}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{B62761F2-BB58-4F4E-A3A6-98EFD6186A5E}" Directory_="SHORTCUTDIR" Attributes="0"/>
-    <ROW Component="gsdll32.dll" ComponentId="{08190EA9-2723-4CC7-9F37-6546EA0D89EE}" Directory_="APPDIR" Attributes="0" KeyPath="gsdll32.dll"/>
-    <ROW Component="gsdll64.dll" ComponentId="{24594C63-00F1-4F61-AC94-F6A970968F16}" Directory_="APPDIR" Attributes="256" KeyPath="gsdll64.dll"/>
-    <ROW Component="gswin32c.exe" ComponentId="{7A75A868-221C-41C7-A95C-A7C2AA547192}" Directory_="APPDIR" Attributes="0" KeyPath="gswin32c.exe"/>
-    <ROW Component="gswin64c.exe" ComponentId="{DB05DC99-601E-48A0-A360-E9A7315B5343}" Directory_="APPDIR" Attributes="256" KeyPath="gswin64c.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="GitCommander.dll GitItGUI.Core.dll GitItGUI.UI.exe Magick.NETQ8AnyCPU.dll ProductInformation SHORTCUTDIR gsdll32.dll gsdll64.dll gswin32c.exe gswin64c.exe"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="GitCommander.dll GitItGUI.Core.dll GitItGUI.UI.exe Magick.NETQ8AnyCPU.dll ProductInformation SHORTCUTDIR"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="GitCommander.dll" Component_="GitCommander.dll" FileName="GITCOM~1.DLL|GitCommander.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\GitCommander.dll" SelfReg="false" NextFile="GitItGUI.Core.dll"/>
     <ROW File="GitItGUI.Core.dll" Component_="GitItGUI.Core.dll" FileName="GITITG~1.DLL|GitItGUI.Core.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\GitItGUI.Core.dll" SelfReg="false" NextFile="GitItGUI.UI.exe"/>
-    <ROW File="GitItGUI.UI.exe" Component_="GitItGUI.UI.exe" FileName="GITITG~1.EXE|GitItGUI.UI.exe" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\GitItGUI.UI.exe" SelfReg="false" NextFile="gsdll32.dll" DigSign="true"/>
+    <ROW File="GitItGUI.UI.exe" Component_="GitItGUI.UI.exe" FileName="GITITG~1.EXE|GitItGUI.UI.exe" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\GitItGUI.UI.exe" SelfReg="false" NextFile="Magick.NETQ8AnyCPU.dll" DigSign="true"/>
     <ROW File="Magick.NETQ8AnyCPU.dll" Component_="Magick.NETQ8AnyCPU.dll" FileName="MAGICK~1.DLL|Magick.NET-Q8-AnyCPU.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\Magick.NET-Q8-AnyCPU.dll" SelfReg="false"/>
-    <ROW File="gsdll32.dll" Component_="gsdll32.dll" FileName="gsdll32.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\gsdll32.dll" SelfReg="false" NextFile="gsdll64.dll"/>
-    <ROW File="gsdll64.dll" Component_="gsdll64.dll" FileName="gsdll64.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\gsdll64.dll" SelfReg="false" NextFile="gswin32c.exe"/>
-    <ROW File="gswin32c.exe" Component_="gswin32c.exe" FileName="gswin32c.exe" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\gswin32c.exe" SelfReg="false" NextFile="gswin64c.exe" DigSign="true"/>
-    <ROW File="gswin64c.exe" Component_="gswin64c.exe" FileName="gswin64c.exe" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\gswin64c.exe" SelfReg="false" NextFile="Magick.NETQ8AnyCPU.dll" DigSign="true"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
     <ROW BuildKey="x86_Release" BuildName="x86_Release" BuildOrder="1" BuildType="0" PackageFolder="Setup Files" Languages="en" InstallationType="4" UseLargeSchema="true"/>

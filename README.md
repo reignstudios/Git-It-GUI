@@ -36,3 +36,4 @@ LOGS: These will be stored in "C:\ProgramData\GitItGUI\logs.txt" on windows
     - Set "VS for Mac" Enviroment var in proj settings: "PATH" = "/usr/local/bin"
  - Linux:
      - Install git via terminal-->
+### To view single page PDFs download and install: https://www.ghostscript.com/download/gsdnld.html
