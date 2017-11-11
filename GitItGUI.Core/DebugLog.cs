@@ -36,6 +36,8 @@ namespace GitItGUI.Core
 			{
 				lock (stream)
 				{
+					writer.WriteLine("DebugLog disposed!");
+
 					writer.Flush();
 					stream.Flush();
 					writer.Close();

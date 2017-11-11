@@ -163,6 +163,8 @@ namespace GitItGUI.UI
 				return;
 			}
 
+			DebugLog.Log("Closing main window...");
+
 			// apply screen state
 			AppManager.settings.winX = (int)Left;
 			AppManager.settings.winY = (int)Top;
