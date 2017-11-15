@@ -93,7 +93,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 				// item label
 				var textBlock = new TextBlock();
-				textBlock.Margin = new Thickness(20, 0, 0, 0);
+				textBlock.Margin = new Thickness(24, 0, 0, 0);
 				textBlock.Text = fileState.filename + (fileState.isLFS ? " [LFS]" : string.Empty);
 				textBlock.ContextMenu = new ContextMenu();
 				var openFileMenu = new MenuItem();
