@@ -341,16 +341,14 @@ namespace GitCommander
 
 			lock (this)
 			{
-				var result = RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback: stdCallback_log);
+				var result = RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback:stdCallback_log);
 				lastResult = result.output;
 				lastError = result.errors;
-				bool remoteDoesntHaveBranch = lastError.Contains("unknown revision or path not in the working tree");
-				yes = isUpToDate && !remoteDoesntHaveBranch;
-				if (!isUpToDate && !remoteDoesntHaveBranch) return string.IsNullOrEmpty(lastError);
-				if (remoteDoesntHaveBranch) return true;
+				yes = isUpToDate;
+				if (!string.IsNullOrEmpty(lastError)) return false;
 
 				isUpToDate = true;
-				result = RunExe("git", string.Format("fetch {0} {1} --dry-run", remote, branch), stdCallback: stdCallback_fetch);
+				result = RunExe("git", string.Format("fetch {0} {1} --dry-run", remote, branch), stdCallback:stdCallback_fetch);
 				lastResult = result.output;
 				lastError = result.errors;
 				if (!isUpToDate) yes = false;

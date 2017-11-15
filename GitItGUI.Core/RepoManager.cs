@@ -67,6 +67,8 @@ namespace GitItGUI.Core
 		{
 			lock (this)
 			{
+				isOpen = false;
+
 				if (dispatcher != null)
 				{
 					dispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
