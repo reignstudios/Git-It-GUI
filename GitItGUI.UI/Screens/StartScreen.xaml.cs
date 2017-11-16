@@ -55,6 +55,7 @@ namespace GitItGUI.UI.Screens
 				var item = new ListBoxItem();
 				item.Content = Path.GetFileName(repo);
 				item.ToolTip = repo;
+				item.FontSize = 24;
 
 				item.HorizontalContentAlignment = HorizontalAlignment.Center;
 				item.MouseDoubleClick += Item_MouseDoubleClick;
