@@ -307,7 +307,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			// check conflicts
 			if (fileState.HasState(FileStates.Conflicted))
 			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "File not is in a conflicted state!\nAre you sure you want to accept as resolved and stage?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
+				MainWindow.singleton.ShowMessageOverlay("Alert", "File is in a conflicted state!\nAre you sure you want to accept as resolved and stage?", MessageOverlayTypes.YesNo, delegate(MessageOverlayResults result)
 				{
 					if (result == MessageOverlayResults.Ok) stageFile();
 				});
@@ -504,11 +504,11 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void ResolveAllConflicts()
 		{
-			MainWindow.singleton.ShowWaitingOverlay();
+			MainWindow.singleton.ShowMergingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
 				if (!RepoScreen.singleton.repoManager.ResolveAllConflicts()) MainWindow.singleton.ShowMessageOverlay("Error", "Failed to resolve all conflicts");
-				MainWindow.singleton.HideWaitingOverlay();
+				MainWindow.singleton.HideMergingOverlay();
 			});
 		}
 

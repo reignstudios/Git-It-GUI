@@ -68,7 +68,7 @@ namespace GitItGUI.UI.Overlays
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (doneCallback != null) doneCallback(MergeConflictOverlayResults.Cancel);
-			Visibility = Visibility.Hidden;
+			WaitMode(filePathLabel.Text, true);
 		}
 
 		private void mergeToolButton_Click(object sender, RoutedEventArgs e)
