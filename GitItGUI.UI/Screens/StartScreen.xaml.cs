@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System;
 using System.Windows.Threading;
+using System.Windows.Media.Imaging;
 
 namespace GitItGUI.UI.Screens
 {
@@ -16,12 +17,16 @@ namespace GitItGUI.UI.Screens
 	{
 		public static StartScreen singleton;
 		private DispatcherTimer timer;
-		private bool outOfDate;
+		private bool outOfDate, outOfDateFlash;
+		private BitmapImage outOfDateImage, outOfDateImageFlash;
 
 		public StartScreen()
 		{
 			singleton = this;
 			InitializeComponent();
+
+			outOfDateImage = new BitmapImage(new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/Update.png"));
+			outOfDateImageFlash = new BitmapImage(new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/UpdateFlash.png"));
 
 			updateImage.Visibility = Visibility.Hidden;
 			updateImage.MouseUp += UpdateImage_MouseUp;
@@ -32,7 +37,8 @@ namespace GitItGUI.UI.Screens
 		{
 			if (outOfDate && Visibility == Visibility.Visible)
 			{
-				updateFlashImage.Visibility = updateFlashImage.Visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
+				updateImage.Source = outOfDateFlash ? outOfDateImage : outOfDateImageFlash;
+				outOfDateFlash = !outOfDateFlash;
 			}
 		}
 

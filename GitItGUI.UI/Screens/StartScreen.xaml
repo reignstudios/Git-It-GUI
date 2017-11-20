@@ -42,6 +42,5 @@
 
 		<!-- Update Button -->
 		<Image Name="updateImage" Source="../Images/Update.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="64" Height="64" Margin="10" ToolTip="Update avaliable!"/>
-		<Image Name="updateFlashImage" Source="../Images/UpdateFlash.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="64" Height="64" Margin="10" ToolTip="Update avaliable!" Visibility="Hidden"/>
-    </Grid>
+	</Grid>
 </UserControl>
