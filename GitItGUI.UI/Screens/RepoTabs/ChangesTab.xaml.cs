@@ -300,6 +300,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 						});
 					}
 
+					RepoScreen.singleton.repoManager.QuickRefresh();
 					MainWindow.singleton.HideProcessingOverlay();
 				});
 			}
@@ -340,7 +341,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 						button.Click += UnstagedFileButton_Click;
 					});
 				}
-
+				
+				RepoScreen.singleton.repoManager.QuickRefresh();
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -372,7 +374,8 @@ namespace GitItGUI.UI.Screens.RepoTabs
 						unstagedChangesListBox.Items.Clear();
 					});
 				}
-
+				
+				RepoScreen.singleton.repoManager.QuickRefresh();
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -398,6 +401,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					});
 				}
 
+				RepoScreen.singleton.repoManager.QuickRefresh();
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -451,6 +455,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					});
 				}
 
+				RepoScreen.singleton.repoManager.QuickRefresh();
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -498,6 +503,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 					});
 				}
 
+				RepoScreen.singleton.repoManager.QuickRefresh();
 				MainWindow.singleton.HideProcessingOverlay();
 			});
 		}
@@ -942,22 +948,21 @@ namespace GitItGUI.UI.Screens.RepoTabs
 			}
 
 			// validate changes exist
-			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
-			if (changesExist && stagedChangesListBox.Items.Count == 0)
-			{
-				MainWindow.singleton.ShowMessageOverlay("Error", "There are no staged files to commit");
-				return;
-			}
-
-			// prep commit message
 			string msg = null;
-			if (changesExist && !PrepCommitMessage(out msg)) return;
+			bool needCommit = false;
+			bool changesExist = RepoScreen.singleton.repoManager.ChangesExist();
+			if (changesExist && stagedChangesListBox.Items.Count != 0)
+			{
+				// prep commit message
+				if (!PrepCommitMessage(out msg)) return;
+				needCommit = true;
+			}
 
 			// process
 			MainWindow.singleton.ShowProcessingOverlay();
 			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
 			{
-				if (changesExist && !RepoScreen.singleton.repoManager.CommitStagedChanges(msg, false))
+				if (needCommit && !RepoScreen.singleton.repoManager.CommitStagedChanges(msg, false))
 				{
 					RepoScreen.singleton.Refresh();
 					MainWindow.singleton.ShowMessageOverlay("Error", "Failed to commit changes");
