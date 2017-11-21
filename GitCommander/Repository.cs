@@ -131,7 +131,6 @@ namespace GitCommander
 				result = RunExe("git", "submodule status", stdCallback:stdCallback_Submodules, workingDirectory:path);
 				lastResult = result.output;
 				lastError = result.errors;
-				if (!string.IsNullOrEmpty(lastError)) return false;
 			
 				// get repo url
 				repoURL = "";
