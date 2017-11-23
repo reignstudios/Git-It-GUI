@@ -397,18 +397,14 @@ namespace GitItGUI.Core
 
 		private static void DownloadGit()
 		{
-			using (var process = Process.Start("https://git-scm.com/downloads"))
-			{
-				process.WaitForExit();
-			}
+			var process = Process.Start("https://git-scm.com/downloads");
+			process.Dispose();
 		}
 
 		private static void DownloadGitLFS()
 		{
-			using (var process = Process.Start("https://git-lfs.github.com/"))
-			{
-				process.WaitForExit();
-			}
+			var process = Process.Start("https://git-lfs.github.com/");
+			process.Dispose();
 		}
 
 		private static void Client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
@@ -445,7 +441,7 @@ namespace GitItGUI.Core
 							canCheckAppVersion = false;
 							if (!IsValidVersion(VersionInfo.version, xmlReader.ReadInnerXml()))
 							{
-								DebugLog.LogError("Your 'Git-It-GUI' version is out of date.");
+								DebugLog.LogWarning("Your 'Git-It-GUI' version is out of date.");
 								if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.AppVersionOutOfDate);
 							}
 						}

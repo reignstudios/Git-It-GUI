@@ -154,10 +154,8 @@ namespace GitItGUI.UI.Screens
 
 		private void UpdateImage_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
-			using (var process = Process.Start("https://github.com/reignstudios/Git-It-GUI/releases"))
-			{
-				process.WaitForExit();
-			}
+			var process = Process.Start("https://github.com/reignstudios/Git-It-GUI/releases");
+			process.Dispose();
 		}
 	}
 }
