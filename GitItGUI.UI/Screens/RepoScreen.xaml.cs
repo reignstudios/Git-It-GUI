@@ -240,7 +240,7 @@ namespace GitItGUI.UI.Screens
 
 				if (!isQuickRefresh && repoManager.isEmpty)
 				{
-					MainWindow.singleton.ShowMessageOverlay("Empty Repo", "Nothing has been commit to this repo, a first commit much be made to open it.", MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
+					MainWindow.singleton.ShowMessageOverlay("Empty Repo", "Nothing has been commit to this repo, a first commit must be made to open it.", MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
 					{
 						if (result == MessageOverlayResults.Ok)
 						{
