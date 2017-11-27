@@ -13,7 +13,7 @@ namespace GitItGUI.Core
 	{
 		internal static bool IsBinaryFileData(Stream stream, bool disposeStream = false)
 		{
-			const int maxByteRead = 1024 * 1024 * 8;
+			const long maxByteRead = 1024 * 1024 * 8;
 
 			// if the file is to large consider a data file (8mb)
 			if (stream.Length > maxByteRead)
