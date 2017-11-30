@@ -626,7 +626,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				previewSingleGrid.Visibility = Visibility.Hidden;
 				previewTextBox.Document.Blocks.Clear();
 				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
-				range.Text = "<<< Invalide Preview Type >>>";
+				range.Text = "<<< Invalid Preview Type >>>";
 			}
 			else if (delta is string)
 			{
