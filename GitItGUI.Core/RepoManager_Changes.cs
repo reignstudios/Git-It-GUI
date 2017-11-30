@@ -334,10 +334,9 @@ namespace GitItGUI.Core
 				catch (Exception e)
 				{
 					pauseGitCommanderStdWrites = false;
-					string error = "Failed to refresh quick view: " + e.Message;
-					DebugLog.LogError(error);
+					DebugLog.LogError("Failed to refresh quick view: " + e.Message);
 					if (image != null) image.Dispose();
-					return "ERROR: " + error;
+					return e;
 				}
 			}
 		}

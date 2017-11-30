@@ -628,6 +628,17 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
 				range.Text = "<<< Invalid Preview Type >>>";
 			}
+			else if (delta.GetType().IsSubclassOf(typeof(Exception)))
+			{
+				previewTextBox.Visibility = Visibility.Visible;
+				previewGrid.Visibility = Visibility.Hidden;
+				previewSingleGrid.Visibility = Visibility.Hidden;
+				previewTextBox.Document.Blocks.Clear();
+				var range = new TextRange(previewTextBox.Document.ContentEnd, previewTextBox.Document.ContentEnd);
+				var e = (Exception)delta;
+				range.Text = "ERROR: " + e.Message;
+				range.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Red);
+			}
 			else if (delta is string)
 			{
 				previewTextBox.Visibility = Visibility.Visible;
