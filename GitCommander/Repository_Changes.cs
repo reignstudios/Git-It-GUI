@@ -111,6 +111,24 @@ namespace GitCommander
 		{
 			return filename;
 		}
+
+		public string ToStateString()
+		{
+			string result = string.Empty;
+			var values = (FileStates[])Enum.GetValues(typeof(FileStates));
+			bool firstFound = false;
+			foreach (var value in values)
+			{
+				if (((int)state & (int)value) != 0)
+				{
+					if (firstFound) result += " : ";
+					result += string.Join(" ", Regex.Split(value.ToString(), @"(?=[A-Z](?![A-Z]|$))"));
+					firstFound = true;
+				}
+			}
+
+			return result;
+		}
 	}
 
 	public partial class Repository

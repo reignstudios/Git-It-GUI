@@ -90,6 +90,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				image.Source = ImagePool.GetImage(fileState.state);
 				button.Content = image;
 				button.Tag = fileState;
+				button.ToolTip = fileState.ToStateString();
 
 				// item label
 				var textBlock = new TextBlock();
