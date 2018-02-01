@@ -25,6 +25,7 @@
 
 				<Label Grid.Row="0" Content="Merge / Diff tool" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
 				<ComboBox Name="mergeDiffToolComboBox" Grid.Row="1" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0">
+					<ComboBoxItem>None</ComboBoxItem>
 					<ComboBoxItem>Meld</ComboBoxItem>
 					<ComboBoxItem>kDiff3</ComboBoxItem>
 					<ComboBoxItem>P4Merge</ComboBoxItem>

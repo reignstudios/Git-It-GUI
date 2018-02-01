@@ -106,11 +106,6 @@ namespace GitItGUI.Core
 			return true;
 		}
 
-		public static bool MergeDiffToolInstalled()
-		{
-			return File.Exists(mergeToolPath);
-		}
-
 		public static void SetMergeDiffTool(MergeDiffTools tool)
 		{
 			settings.mergeDiffTool = tool;
@@ -125,6 +120,7 @@ namespace GitItGUI.Core
 				PlatformInfo.GetWindowsProgramFilesPath(out programFilesx86, out programFilesx64);
 				switch (settings.mergeDiffTool)
 				{
+					case MergeDiffTools.None: mergeToolPath = null; break;
 					case MergeDiffTools.Meld: mergeToolPath = programFilesx86 + "\\Meld\\Meld.exe"; break;
 					case MergeDiffTools.kDiff3: mergeToolPath = programFilesx64 + "\\KDiff3\\kdiff3.exe"; break;
 					case MergeDiffTools.P4Merge: mergeToolPath = programFilesx64 + "\\Perforce\\p4merge.exe"; break;
@@ -133,19 +129,27 @@ namespace GitItGUI.Core
 			}
 			else if (PlatformInfo.platform == Platforms.Mac)
 			{
-				mergeToolPath = "";
+				mergeToolPath = null;
 			}
 			else if (PlatformInfo.platform == Platforms.Linux)
 			{
-				mergeToolPath = "";
+				mergeToolPath = null;
 			}
 			else
 			{
 				throw new Exception("Unsported platform: " + PlatformInfo.platform);
 			}
 
-			isMergeToolInstalled = File.Exists(mergeToolPath);
-			if (!isMergeToolInstalled) DebugLog.LogWarning("Diff/Merge tool not installed: " + mergeToolPath);
+			if (mergeToolPath != null)
+			{
+				isMergeToolInstalled = File.Exists(mergeToolPath);
+				if (!isMergeToolInstalled) DebugLog.LogWarning("Diff/Merge tool not installed: " + mergeToolPath);
+			}
+			else
+			{
+				isMergeToolInstalled = false;
+				DebugLog.LogWarning("Diff/Merge tool set to none. Some app functions will fail.");
+			}
 		}
 
 		public static void RemoveRepoFromHistory(string repoPath)

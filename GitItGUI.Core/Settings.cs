@@ -8,6 +8,7 @@ namespace GitItGUI.Core
 {
 	public enum MergeDiffTools
 	{
+		None,
 		Meld,
 		kDiff3,
 		P4Merge,

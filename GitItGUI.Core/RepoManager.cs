@@ -134,12 +134,6 @@ namespace GitItGUI.Core
 					return true;
 				}
 
-				if (!AppManager.MergeDiffToolInstalled())
-				{
-					DebugLog.LogError("Merge/Diff tool is not installed!\nGo to app settings and make sure your selected diff tool is installed.");
-					return false;
-				}
-
 				bool isRefreshMode = repoPath == repository.repoPath;
 			
 				try

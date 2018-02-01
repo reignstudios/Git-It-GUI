@@ -35,10 +35,11 @@ namespace GitItGUI.UI.Screens
 			showLSFTagsCheckBox.IsChecked = AppManager.settings.showLFSTags;
 			switch (AppManager.settings.mergeDiffTool)
 			{
-				case MergeDiffTools.Meld: mergeDiffToolComboBox.SelectedIndex = 0; break;
-				case MergeDiffTools.kDiff3: mergeDiffToolComboBox.SelectedIndex = 1; break;
-				case MergeDiffTools.P4Merge: mergeDiffToolComboBox.SelectedIndex = 2; break;
-				case MergeDiffTools.DiffMerge: mergeDiffToolComboBox.SelectedIndex = 3; break;
+				case MergeDiffTools.None: mergeDiffToolComboBox.SelectedIndex = 0; break;
+				case MergeDiffTools.Meld: mergeDiffToolComboBox.SelectedIndex = 1; break;
+				case MergeDiffTools.kDiff3: mergeDiffToolComboBox.SelectedIndex = 2; break;
+				case MergeDiffTools.P4Merge: mergeDiffToolComboBox.SelectedIndex = 3; break;
+				case MergeDiffTools.DiffMerge: mergeDiffToolComboBox.SelectedIndex = 4; break;
 			}
 		}
 
@@ -49,10 +50,11 @@ namespace GitItGUI.UI.Screens
 			var mergeTool = MergeDiffTools.kDiff3;
 			switch (mergeDiffToolComboBox.SelectedIndex)
 			{
-				case 0: mergeTool = MergeDiffTools.Meld; break;
-				case 1: mergeTool = MergeDiffTools.kDiff3; break;
-				case 2: mergeTool = MergeDiffTools.P4Merge; break;
-				case 3: mergeTool = MergeDiffTools.DiffMerge; break;
+				case 0: mergeTool = MergeDiffTools.None; break;
+				case 1: mergeTool = MergeDiffTools.Meld; break;
+				case 2: mergeTool = MergeDiffTools.kDiff3; break;
+				case 3: mergeTool = MergeDiffTools.P4Merge; break;
+				case 4: mergeTool = MergeDiffTools.DiffMerge; break;
 			}
 
 			AppManager.SetMergeDiffTool(mergeTool);
@@ -61,8 +63,8 @@ namespace GitItGUI.UI.Screens
 
 		public void ValidateDiffMergeTool()
 		{
-			if (AppManager.isMergeToolInstalled) return;
-			MainWindow.singleton.ShowMessageOverlay("Warning", "Diff/Merge tool not installed!\nSome app functions will fail.");
+			if (AppManager.isMergeToolInstalled || AppManager.settings.mergeDiffTool == MergeDiffTools.None) return;
+			MainWindow.singleton.ShowMessageOverlay("Warning", "Diff/Merge tool not installed!\nSome app functions will fail.\nGo to app settings.");
 		}
 
 		private void doneButton_Click(object sender, RoutedEventArgs e)

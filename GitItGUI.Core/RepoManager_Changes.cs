@@ -1031,6 +1031,14 @@ namespace GitItGUI.Core
 									break;
 
 								case MergeFileResults.RunMergeTool:
+									// validate diff/merge tool installed
+									if (string.IsNullOrEmpty(AppManager.mergeToolPath))
+									{
+										DebugLog.LogError("Diff/Merge tool not selected in app settings. ResolveConflict failed");
+										return false;
+									}
+
+									// run diff/merge tool
 									using (var process = new Process())
 									{
 										process.StartInfo.FileName = AppManager.mergeToolPath;
@@ -1124,6 +1132,13 @@ namespace GitItGUI.Core
 		
 		public bool OpenDiffTool(FileState fileState)
 		{
+			// validate diff/merge tool installed
+			if (string.IsNullOrEmpty(AppManager.mergeToolPath))
+			{
+				DebugLog.LogError("Diff/Merge tool not selected in app settings. OpenDiffTool failed");
+				return false;
+			}
+
 			lock (this)
 			{
 				string fullPath = Path.Combine(repository.repoPath, fileState.filename);
@@ -1160,7 +1175,7 @@ namespace GitItGUI.Core
 					}
 					pauseGitCommanderStdWrites = false;
 
-					// open diff tool
+					// run diff/merge tool
 					using (var process = new Process())
 					{
 						process.StartInfo.FileName = AppManager.mergeToolPath;
