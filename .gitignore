@@ -249,6 +249,3 @@ ModelManifest.xml
 # Installer
 Installer/Setup Files/
 Installer/Git-It-GUI_Installer-cache/
-
-*.gititgui
-*.gititgui-user
