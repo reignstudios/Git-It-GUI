@@ -95,7 +95,7 @@ namespace GitItGUI.UI.Screens
 							int count = repoManager.UnpackedObjectCount(out string size);
 							if (count >= 1000)
 							{
-								string msg = string.Format("Your repo is fragmented, would you like to optamize?\nThere are '{0}' loose objects totalling '{1}' in size.", count, size);
+								string msg = string.Format("Your repo is fragmented, would you like to optimize?\nThere are '{0}' loose objects totalling '{1}' in size.", count, size);
 
 								int lfsCount = -1;
 								string lfsSize = null, option = null;
@@ -109,7 +109,7 @@ namespace GitItGUI.UI.Screens
 									}
 								}
 
-								MainWindow.singleton.ShowMessageOverlay("Optamize", msg, option, MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
+								MainWindow.singleton.ShowMessageOverlay("Optimize", msg, option, MessageOverlayTypes.OkCancel, delegate(MessageOverlayResults result)
 								{
 									if (result == MessageOverlayResults.Ok)
 									{
