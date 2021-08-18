@@ -6,7 +6,7 @@ Download: https://github.com/reignstudios/Git-It-GUI/releases
 
 - Invokes git commands directly allowing any filters to work (including git-lfs).
 
-- Writen in C# / WPF (will support macOS and Linux/BSD in the future with Xamarin.Forms 3.0).
+- Writen in C# / WPF (will maybe support macOS & Linux/BSD in the future but UI change needed).
 
 - Image Diff preview.
 
