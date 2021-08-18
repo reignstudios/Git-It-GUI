@@ -23,9 +23,9 @@
 							<MenuItem Name="pushMenuItem" Header="Push" Click="pushMenuItem_Click"/>
 							<Separator/>
 							<MenuItem Name="renameMenuItem" Header="Rename" Click="renameMenuItem_Click"/>
-							<MenuItem Name="newBranchMenuItem" Header="Create new branch forked from active" Click="newBranchMenuItem_Click"/>
+							<MenuItem Name="newBranchMenuItem" Header="Create new branch forked from current" Click="newBranchMenuItem_Click"/>
 							<Separator/>
-							<MenuItem Name="copyTrackingMenuItem" Header="Copy tracking from non-active branch" Click="copyTrackingMenuItem_Click"/>
+							<MenuItem Name="copyTrackingMenuItem" Header="Copy tracking from non-current branch" Click="copyTrackingMenuItem_Click"/>
 							<MenuItem Name="removeTrackingMenuItem" Header="Remove tracking" Click="removeTrackingMenuItem_Click"/>
 						</ContextMenu>
 					</Button.ContextMenu>
