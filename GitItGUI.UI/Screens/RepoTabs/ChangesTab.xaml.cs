@@ -1130,5 +1130,10 @@ namespace GitItGUI.UI.Screens.RepoTabs
 				MainWindow.singleton.HideWaitingOverlay();
 			});
 		}
+
+		private void quickRefreshButton_Click(object sender, RoutedEventArgs e)
+		{
+			RepoScreen.singleton.QuickRefresh();
+		}
 	}
 }

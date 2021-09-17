@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="13.5" version="18.5" Modules="simple" RootPath="." Language="en" Id="{C7F5B7C6-44E5-4AFF-8FCE-81E9836F6364}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="13.5" version="18.6.1" Modules="simple" RootPath="." Language="en" Id="{C7F5B7C6-44E5-4AFF-8FCE-81E9836F6364}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="AI_CURRENT_YEAR" Value="2021" ValueLocId="-"/>
@@ -11,10 +11,10 @@
     <ROW Property="ARPURLUPDATEINFO" Value="https://github.com/reignstudios/Git-It-GUI/releases"/>
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Reign-Studios"/>
-    <ROW Property="ProductCode" Value="1033:{765A8DEA-5715-4419-A1FC-0A38DC7F5D71} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{222D0921-88FB-4F2F-9064-FD785E053394} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Git-It-GUI"/>
-    <ROW Property="ProductVersion" Value="1.0.6" Type="32"/>
+    <ROW Property="ProductVersion" Value="1.0.7" Type="32"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{FD4A5E78-F668-42CE-90BC-D1DDAA792189}"/>
@@ -41,6 +41,9 @@
     <ROW Component="GitCommander.dll" ComponentId="{E64735F7-C356-4FE2-986A-61AF79213D01}" Directory_="APPDIR" Attributes="0" KeyPath="GitCommander.dll"/>
     <ROW Component="GitItGUI.Core.dll" ComponentId="{59808791-268E-4180-BE51-885D5F50A5C0}" Directory_="APPDIR" Attributes="0" KeyPath="GitItGUI.Core.dll"/>
     <ROW Component="GitItGUI.UI.exe" ComponentId="{D71231D0-F14C-435F-BA1E-95B0F9AF1530}" Directory_="APPDIR" Attributes="0" KeyPath="GitItGUI.UI.exe"/>
+    <ROW Component="Magick.NET.Core.dll" ComponentId="{66E6E70A-6769-42B9-9419-AC5278121D42}" Directory_="APPDIR" Attributes="0" KeyPath="Magick.NET.Core.dll"/>
+    <ROW Component="Magick.NET.SystemWindowsMedia.dll" ComponentId="{AF55FBFE-E3B1-4F5D-A84B-78AD820DA962}" Directory_="APPDIR" Attributes="0" KeyPath="Magick.NET.SystemWindowsMedia.dll"/>
+    <ROW Component="Magick.NETQ16x64.dll" ComponentId="{FDD0F9B3-6867-4BC7-AF8A-12F93D5489C8}" Directory_="APPDIR" Attributes="256" KeyPath="Magick.NETQ16x64.dll"/>
     <ROW Component="Magick.NativeQ16x64.dll" ComponentId="{AF61DAA8-6508-48EB-AAD0-749587AC57A0}" Directory_="APPDIR" Attributes="256" KeyPath="Magick.NativeQ16x64.dll"/>
     <ROW Component="ProductInformation" ComponentId="{5578F502-08C2-4B0E-B8FE-8318417169C2}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{B62761F2-BB58-4F4E-A3A6-98EFD6186A5E}" Directory_="SHORTCUTDIR" Attributes="0"/>
@@ -56,6 +59,9 @@
     <ROW File="GitItGUI.UI.exe" Component_="GitItGUI.UI.exe" FileName="GITITG~1.EXE|GitItGUI.UI.exe" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\GitItGUI.UI.exe" SelfReg="false" DigSign="true"/>
     <ROW File="WPFFolderBrowser.dll" Component_="WPFFolderBrowser.dll" FileName="WPFFOL~1.DLL|WPFFolderBrowser.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\WPFFolderBrowser.dll" SelfReg="false"/>
     <ROW File="Magick.NativeQ16x64.dll" Component_="Magick.NativeQ16x64.dll" FileName="MAGICK~1.DLL|Magick.Native-Q16-x64.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\Magick.Native-Q16-x64.dll" SelfReg="false"/>
+    <ROW File="Magick.NET.Core.dll" Component_="Magick.NET.Core.dll" FileName="MAGICK~2.DLL|Magick.NET.Core.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\Magick.NET.Core.dll" SelfReg="false"/>
+    <ROW File="Magick.NET.SystemWindowsMedia.dll" Component_="Magick.NET.SystemWindowsMedia.dll" FileName="MAGICK~3.DLL|Magick.NET.SystemWindowsMedia.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\Magick.NET.SystemWindowsMedia.dll" SelfReg="false"/>
+    <ROW File="Magick.NETQ16x64.dll" Component_="Magick.NETQ16x64.dll" FileName="MAGICK~4.DLL|Magick.NET-Q16-x64.dll" Attributes="0" SourcePath="..\GitItGUI.UI\bin\Release\Magick.NET-Q16-x64.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
     <ROW BuildKey="x86_Release" BuildName="x86_Release" BuildOrder="1" BuildType="0" PackageFolder="Setup Files" Languages="en" InstallationType="4" UseLargeSchema="true"/>
@@ -133,6 +139,9 @@
     <ROW Feature_="MainFeature" Component_="WPFFolderBrowser.dll"/>
     <ROW Feature_="MainFeature" Component_="APPDIR"/>
     <ROW Feature_="MainFeature" Component_="Magick.NativeQ16x64.dll"/>
+    <ROW Feature_="MainFeature" Component_="Magick.NET.Core.dll"/>
+    <ROW Feature_="MainFeature" Component_="Magick.NET.SystemWindowsMedia.dll"/>
+    <ROW Feature_="MainFeature" Component_="Magick.NETQ16x64.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="AppIcon_1.exe" SourcePath="..\GitItGUI.UI\Images\AppIcon.ico" Index="0"/>
