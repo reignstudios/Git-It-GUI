@@ -141,6 +141,9 @@ namespace GitItGUI.Core
 					// load repo
 					if (isRefreshMode) repository.Close();
 					if (!repository.Open(repoPath)) throw new Exception(repository.lastError);
+
+					// validate unicode is disabled locally
+					if (!repository.EnsureUnicodeDisabledLocally()) return false;
 				
 					// check for git lfs
 					lfsEnabled = repository.lfs.isEnabled;

@@ -218,13 +218,14 @@ namespace GitCommander
 						}
 						else
 						{
+							var ext = Path.GetExtension(filePath);
 							var state = new FileState()
 							{
 								filename = filePath,
 								state = stateType,
 								conflictType = conflictType,
 								isSubmodule = isSubmodule,
-								isLFS = lfsExts.Contains(Path.GetExtension(filePath))
+								isLFS = lfsExts.Contains(ext)
 							};
 							
 							states.Add(state);

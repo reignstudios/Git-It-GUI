@@ -30,8 +30,10 @@ namespace GitItGUI.UI
 		public MainWindow()
 		{
 			// UnhandledException
+			#if !DEBUG
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 			Dispatcher.UnhandledException += Dispatcher_UnhandledException;
+			#endif
 
 			// init debug log
 			DebugLog.Log("Git-It-GUI v" + VersionInfo.version + Environment.NewLine);
@@ -68,9 +70,9 @@ namespace GitItGUI.UI
 				if (AppManager.settings.winMaximized) WindowState = WindowState.Maximized;
 			}
 
-			// version check
+			// validate system
 			Title += " v" + VersionInfo.versionType;
-			AppManager.CheckForUpdates("http://reign-studios-services.com/GitItGUI/VersionInfo.xml", CheckForUpdatesCallback);
+			AppManager.ValidateSystem("http://reign-studios-services.com/GitItGUI/VersionInfo.xml", CheckForUpdatesCallback);
 		}
 
 		private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -115,6 +117,11 @@ namespace GitItGUI.UI
 			Environment.Exit(2);
 		}
 
+		public void ShowSystemErrorMessageBox(string title, string message)
+		{
+			MessageBox.Show(this, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+		}
+
 		private void CheckForUpdatesCallback(UpdateCheckResult result)
 		{
 			Dispatcher.InvokeAsync(delegate()
@@ -122,14 +129,16 @@ namespace GitItGUI.UI
 				bool shouldExit = true;
 				switch (result)
 				{
-					case UpdateCheckResult.BadVersionError: ShowMessageOverlay("Error", "Git or (git-lfs) versions are incompatible with this app"); break;
-					case UpdateCheckResult.GitVersionToLowForLFS: ShowMessageOverlay("Error", "The git version installed is incompatible with the lfs version isntalled"); break;
+					case UpdateCheckResult.BadVersionError: ShowSystemErrorMessageBox("Error", "Git or (git-lfs) versions are incompatible with this app"); break;
+					case UpdateCheckResult.GitVersionToLowForLFS: ShowSystemErrorMessageBox("Error", "The git version installed is incompatible with the lfs version isntalled"); break;
 
-					case UpdateCheckResult.GitNotInstalledError: ShowMessageOverlay("Error", "Git is not installed or installed incorrectly.\nMake sure you're able to use it in cmd/term prompt"); break;
-					case UpdateCheckResult.GitLFSNotInstalledError: ShowMessageOverlay("Error", "Git-LFS is not installed or installed incorrectly.\nMake sure you're able to use it in cmd/term prompt"); break;
+					case UpdateCheckResult.GitNotInstalledError: ShowSystemErrorMessageBox("Error", "Git is not installed or installed incorrectly.\nMake sure you're able to use it in cmd/term prompt"); break;
+					case UpdateCheckResult.GitLFSNotInstalledError: ShowSystemErrorMessageBox("Error", "Git-LFS is not installed or installed incorrectly.\nMake sure you're able to use it in cmd/term prompt"); break;
 			
-					case UpdateCheckResult.GitVersionCheckError: ShowMessageOverlay("Error", "Git version parse failed.\nIts possible the git version you're using isn't supported"); break;
-					case UpdateCheckResult.GitLFSVersionCheckError: ShowMessageOverlay("Error", "Git-LFS version parse failed.\nIts possible the git-lfs version you're using isn't supported"); break;
+					case UpdateCheckResult.GitVersionCheckError: ShowSystemErrorMessageBox("Error", "Git version parse failed.\nIts possible the git version you're using isn't supported"); break;
+					case UpdateCheckResult.GitLFSVersionCheckError: ShowSystemErrorMessageBox("Error", "Git-LFS version parse failed.\nIts possible the git-lfs version you're using isn't supported"); break;
+
+					case UpdateCheckResult.UnicodeSettingsFailed: ShowSystemErrorMessageBox("Error", "Git unicode support is not enabled or failed to be enabled!"); break;
 
 					case UpdateCheckResult.AppVersionOutOfDate:
 						shouldExit = false;

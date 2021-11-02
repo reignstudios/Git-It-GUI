@@ -59,6 +59,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Magick.NET-Q16-x64, Version=8.2.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=AMD64">
       <HintPath>..\packages\Magick.NET-Q16-x64.8.2.1\lib\net20\Magick.NET-Q16-x64.dll</HintPath>
@@ -232,6 +235,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -243,7 +247,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\UpdateFlash.png" />
-    <None Include="VersionInfo.xml" />
     <Resource Include="Images\CheckPattern.png" />
     <Resource Include="Images\Update.png" />
     <Resource Include="Images\UserTask.png" />

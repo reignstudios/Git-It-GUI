@@ -29,7 +29,8 @@ namespace GitItGUI.Core
 		BadVersionError,
 		GitVersionCheckError,
 		GitLFSVersionCheckError,
-		GitVersionToLowForLFS
+		GitVersionToLowForLFS,
+		UnicodeSettingsFailed
 	}
 
 	public delegate void CheckForUpdatesCallbackMethod(UpdateCheckResult result);
@@ -216,7 +217,7 @@ namespace GitItGUI.Core
 			DebugLog.Dispose();
 		}
 
-		public static void CheckForUpdates(string url, CheckForUpdatesCallbackMethod checkForUpdatesCallback)
+		public static void ValidateSystem(string url, CheckForUpdatesCallbackMethod checkForUpdatesCallback)
 		{
 			try
 			{
@@ -236,7 +237,6 @@ namespace GitItGUI.Core
 				catch
 				{
 					DebugLog.LogError("git is not installed correctly. (Make sure git is usable in the cmd/terminal)");
-					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitNotInstalledError);
 					DownloadGit();
 					return;
@@ -250,30 +250,24 @@ namespace GitItGUI.Core
 				catch
 				{
 					DebugLog.LogError("git-lfs is not installed correctly. (Make sure git-lfs is usable in the cmd/terminal)");
-					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitLFSNotInstalledError);
 					DownloadGitLFS();
 					return;
 				}
 
 				// grab git version value
-				string appendix = "";
-				if (PlatformInfo.platform == Platforms.Windows) appendix = @"\.windows";
-				var match = Regex.Match(gitVersion, @"git version (.*)" + appendix);
+				var match = Regex.Match(gitVersion, @"git version (\d*\.\d*\.\d*)");
 				if (match.Success && match.Groups.Count == 2) gitVersion = match.Groups[1].Value;
 				else
 				{
 					DebugLog.LogError("Failed to grab git version!");
-					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitVersionCheckError);
 					DownloadGit();
 					return;
 				}
 				
 				// grab lfs and required git version value
-				if (PlatformInfo.platform == Platforms.Windows) appendix = @"; git .*\)";
-				else appendix = @"\)";
-				match = Regex.Match(gitlfsVersion, @"git-lfs/(.*) \(GitHub; (\w*) (\w*); go (.*)" + appendix);
+				match = Regex.Match(gitlfsVersion, @"git-lfs/(\d*\.\d*\.\d*) \(GitHub; (\w*) (\w*); go (\d*\.\d*\.\d*)");
 				if (match.Success && match.Groups.Count == 5)
 				{
 					gitlfsVersion = match.Groups[1].Value;
@@ -282,7 +276,6 @@ namespace GitItGUI.Core
 				else
 				{
 					DebugLog.LogError("Failed to grab git-lfs version!");
-					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitLFSVersionCheckError);
 					DownloadGitLFS();
 					return;
@@ -292,7 +285,6 @@ namespace GitItGUI.Core
 				if (!IsValidVersion(gitVersion, gitlfsRequiredGitVersion))
 				{
 					DebugLog.LogError(string.Format("'git-lfs' version is not compatible with 'git' version installed!"));
-					client.Dispose();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.GitVersionToLowForLFS);
 					DownloadGit();
 					DownloadGitLFS();
@@ -318,6 +310,14 @@ namespace GitItGUI.Core
 					if (!gitValid) DownloadGit();
 					if (!gitlfsValid) DownloadGitLFS();
 					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.BadVersionError);
+					return;
+				}
+
+				// make sure git prints unicode filenames
+				if (!repository.EnsureUnicodeEnabledGlobally())
+				{
+					DebugLog.LogError("Git unicode support is not enabled or failed to be enabled!");
+					if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.UnicodeSettingsFailed);
 					return;
 				}
 
@@ -419,6 +419,7 @@ namespace GitItGUI.Core
 			{
 				DebugLog.LogError("Failed to check for updates: " + e.Error.Message);
 				client.Dispose();
+				client = null;
 				if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.CommonError);
 				return;
 			}
@@ -427,6 +428,7 @@ namespace GitItGUI.Core
 			{
 				DebugLog.LogError("Update check canceled!");
 				client.Dispose();
+				client = null;
 				if (checkForUpdatesCallback != null) checkForUpdatesCallback(UpdateCheckResult.CommonError);
 				return;
 			}
@@ -461,6 +463,7 @@ namespace GitItGUI.Core
 			}
 			
 			client.Dispose();
+			client = null;
 		}
 	}
 }

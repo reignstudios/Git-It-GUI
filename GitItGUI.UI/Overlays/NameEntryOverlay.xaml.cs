@@ -64,7 +64,12 @@ namespace GitItGUI.UI.Overlays
 		{
 			Visibility = Visibility.Hidden;
 			var item = (ComboBoxItem)remoteComboBox.SelectedItem;
-			if (doneCallback != null) doneCallback(nameTextBox.Text, item.Content as string, true);
+			if (doneCallback != null)
+			{
+				string remoteName = null;
+				if (item != null) remoteName = item.Content as string;
+				doneCallback(nameTextBox.Text, remoteName, true);
+			}
 		}
 	}
 }

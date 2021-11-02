@@ -273,5 +273,45 @@ namespace GitCommander
 				return result;
 			}
 		}
+
+		public bool EnsureUnicodeDisabledLocally()
+		{
+			bool unicodeEntryExists = false;
+			void stdCallback(string line)
+			{
+				if (line != null) unicodeEntryExists = true;
+			}
+
+			lock (this)
+			{
+				if (!SimpleGitInvoke("config --local core.quotepath", stdCallback:stdCallback)) return false;
+				if (unicodeEntryExists)
+				{
+					if (!SimpleGitInvoke("config --local --unset core.quotepath")) return false;
+				}
+
+				return true;
+			}
+		}
+
+		public bool EnsureUnicodeEnabledGlobally()
+		{
+			bool unicodeEnabled = false;;
+			void stdCallback(string line)
+			{
+				if (line == "off") unicodeEnabled = true;
+			}
+
+			lock (this)
+			{
+				if (!SimpleGitInvoke("config --global core.quotepath", stdCallback:stdCallback)) return false;
+				if (!unicodeEnabled)
+				{
+					return SimpleGitInvoke("config --global core.quotepath off");
+				}
+
+				return true;
+			}
+		}
     }
 }
