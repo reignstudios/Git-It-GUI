@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace GitCommander
 {
@@ -84,7 +85,41 @@ namespace GitCommander
 		{
 			lock (this)
 			{
-				return SimpleGitInvoke("remote prune origin");
+				// run main prune command
+				if (!SimpleGitInvoke("remote prune origin")) return false;
+
+				// validate branch states
+				if (!GetBrancheStates(out var branchStates)) return false;
+
+				// check if HEAD needs to be reset
+				if (!branchStates.Any(x => x.isHead))
+				{
+					BranchState localBranchWithBrokenRemoteState = null;
+					foreach (var b in branchStates)
+					{
+						if (!b.isRemote && b.isTracking && b.tracking != null && b.tracking.remoteState != null)
+						{
+							foreach (var bOther in branchStates)
+							{
+								if (b == bOther) continue;
+								if (bOther.isRemote && b.tracking.fullname == bOther.fullname)
+								{
+									localBranchWithBrokenRemoteState = b;
+									break;
+								}
+							}
+						}
+
+						if (localBranchWithBrokenRemoteState != null) break;
+					}
+
+					if (localBranchWithBrokenRemoteState != null)
+					{
+						return SimpleGitInvoke($"symbolic-ref refs/remotes/origin/HEAD refs/remotes/{localBranchWithBrokenRemoteState.tracking.fullname}");
+					}
+				}
+
+				return true;
 			}
 		}
 
@@ -113,13 +148,14 @@ namespace GitCommander
 			}
 		}
 		
-		public bool GetBrancheStates(out BranchState[] brancheStates)
+		public bool GetBrancheStates(out BranchState[] branchStates)
 		{
 			var states = new List<BranchState>();
 			void stdCallback(string line)
 			{
 				line = line.TrimStart();
 				if (string.IsNullOrEmpty(line)) return;
+				if (line.StartsWith("warning:")) return;
 
 				// check if remote
 				bool isActive = false;
@@ -270,7 +306,7 @@ namespace GitCommander
 
 				if (!string.IsNullOrEmpty(lastError))
 				{
-					brancheStates = null;
+					branchStates = null;
 					return false;
 				}
 
@@ -283,7 +319,7 @@ namespace GitCommander
 					if (state.tracking != null && state.tracking.remoteState != null && GetRemoteURL(state.tracking.remoteState.name, out url)) state.tracking.remoteState.url = url;
 				}
 
-				brancheStates = states.ToArray();
+				branchStates = states.ToArray();
 				return true;
 			}
 		}
