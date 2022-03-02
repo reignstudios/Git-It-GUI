@@ -362,34 +362,61 @@ namespace GitCommander
 
 		public bool IsUpToDateWithRemote(string remote, string branch, out bool yes)
 		{
-			bool isUpToDate = true;
+			bool isCheckValid;
+
+			void stdCallback_branch(string line)
+			{
+				var values = line.Trim().Split('/');
+				if (values.Length == 2)
+				{
+					if (values[0] == remote && values[1] == branch) isCheckValid = true;
+				}
+			}
+
 			void stdCallback_log(string line)
 			{
 				var match = Regex.Match(line, @"commit (.*)");
-				if (match.Success) isUpToDate = false;
+				if (match.Success) isCheckValid = false;
 			}
 
 			void stdCallback_fetch(string line)
 			{
 				var match = Regex.Match(line, string.Format(@"\s*(.*)\.\.(.*)\s*{1}\s*->\s*{0}/{1}", remote, branch));
-				if (match.Success && match.Groups[1].Value != match.Groups[2].Value) isUpToDate = false;
+				if (match.Success && match.Groups[1].Value != match.Groups[2].Value) isCheckValid = false;
 			}
 
 			lock (this)
 			{
-				var result = RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback:stdCallback_log);
+				yes = true;
+
+				// check if remote branch exists
+				isCheckValid = false;
+				var result = RunExe("git", "branch -r", stdCallback: stdCallback_branch);
 				lastResult = result.output;
 				lastError = result.errors;
-				yes = isUpToDate;
+				if (!isCheckValid) yes = false;
 				if (!string.IsNullOrEmpty(lastError)) return false;
+				if (!isCheckValid) return true;
 
-				isUpToDate = true;
+				// check if un-pushed commits exist
+				isCheckValid = true;
+				result = RunExe("git", string.Format("log {0}/{1}..{1}", remote, branch), stdCallback:stdCallback_log);
+				lastResult = result.output;
+				lastError = result.errors;
+				if (!isCheckValid) yes = false;
+				if (!string.IsNullOrEmpty(lastError)) return false;
+				if (!isCheckValid) return true;
+
+				// check if remote changes exist
+				isCheckValid = true;
 				result = RunExe("git", string.Format("fetch {0} {1} --dry-run", remote, branch), stdCallback:stdCallback_fetch);
 				lastResult = result.output;
 				lastError = result.errors;
-				if (!isUpToDate) yes = false;
+				if (!isCheckValid) yes = false;
+				if (!string.IsNullOrEmpty(lastError)) return false;
+				if (!isCheckValid) return true;
 
-				return string.IsNullOrEmpty(lastError);
+				return true;
 			}
 		}
 	}
