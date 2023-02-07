@@ -1,1 +1,0 @@
-https://www.ghostscript.com/download/gsdnld.html

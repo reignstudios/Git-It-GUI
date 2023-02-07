@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="GitItGUI.UI.Overlays.ProcessingOverlay"
+			xmlns="https://github.com/avaloniaui"
+			xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			xmlns:local="clr-namespace:GitItGUI.UI.Overlays"
+			mc:Ignorable="d" 
+			d:DesignHeight="400" d:DesignWidth="600">
+	<Border BorderBrush="Orange" BorderThickness="4">
+		<Grid Background="#EE000000">
+			<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="White" FontSize="32" FontWeight="Bold" Width="256" Height="64" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-150,0,0">Processing...</Label>
+			<Image Name="spinnerImage" RenderTransformOrigin=".5,.5" Source="../Images/Processing.png" Width="128" Height="128" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0"/>
+			<TextBox Name="statusTextBox" Margin="60,280,60,0" TextWrapping="Wrap" IsReadOnly="True" Text="Terminal output..." Height="23" VerticalAlignment="Center"/>
+		</Grid>
+	</Border>
+</UserControl>

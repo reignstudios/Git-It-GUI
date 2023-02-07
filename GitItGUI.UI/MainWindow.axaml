@@ -1,0 +1,25 @@
+<Window x:Class="GitItGUI.UI.MainWindow"
+		xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		xmlns:screens="clr-namespace:GitItGUI.UI.Screens"
+		xmlns:overlays="clr-namespace:GitItGUI.UI.Overlays"
+		Title="Git-It-GUI" Width="800" Height="500" MinWidth="800" MinHeight="500">
+	<Grid>
+		<!-- Screens -->
+		<screens:StartScreen x:Name="startScreen" Visibility="Visible"/>
+		<screens:RepoScreen x:Name="repoScreen" Visibility="Hidden"/>
+		<screens:SettingsScreen x:Name="settingsScreen" Visibility="Hidden"/>
+		<screens:CloneScreen x:Name="cloneScreen" Visibility="Hidden"/>
+		<screens:CreateScreen x:Name="createScreen" Visibility="Hidden"/>
+
+		<!-- Overlays -->
+		<overlays:MergeConflictOverlay x:Name="mergingOverlay" Visibility="Hidden"/>
+		<overlays:NameEntryOverlay x:Name="nameEntryOverlay" Visibility="Hidden"/>
+		<overlays:ProcessingOverlay x:Name="processingOverlay" Visibility="Hidden"/>
+		<overlays:MessageOverlay x:Name="messageOverlay" Visibility="Hidden"/>
+		<overlays:WaitingOverlay x:Name="waitingOverlay" Visibility="Hidden"/>
+	</Grid>
+</Window>

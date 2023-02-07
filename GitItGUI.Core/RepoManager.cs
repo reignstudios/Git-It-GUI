@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Threading;
 
 namespace GitItGUI.Core
 {
@@ -14,7 +13,7 @@ namespace GitItGUI.Core
 	/// </summary>
 	public partial class RepoManager : IDisposable
 	{
-		public delegate void ReadyCallbackMethod(Dispatcher dispatcher);
+		public delegate void ReadyCallbackMethod(ThreadDispatcher dispatcher);
 		public delegate void RepoRefreshedCallbackMethod(bool isQuickRefresh);
 		public event RepoRefreshedCallbackMethod RepoRefreshedCallback;
 		public bool disableRepoRefreshedCallback;
@@ -31,7 +30,7 @@ namespace GitItGUI.Core
 		public Repository repository {get; private set;}
 		private bool pauseGitCommanderStdWrites;
 		private Thread thread;
-		public Dispatcher dispatcher { get; private set; }
+		public ThreadDispatcher dispatcher { get; private set; }
 
 		public RepoManager(ReadyCallbackMethod readyCallback)
 		{
@@ -58,9 +57,9 @@ namespace GitItGUI.Core
 
 		private void WorkerThread(object readyCallback)
 		{
-			dispatcher = Dispatcher.CurrentDispatcher;
-			if (readyCallback != null) ((ReadyCallbackMethod)readyCallback)(dispatcher);
-			Dispatcher.Run();
+			dispatcher = new ThreadDispatcher();
+			if (readyCallback is ReadyCallbackMethod callback) callback(dispatcher);
+			dispatcher.Run();
 		}
 
 		public void Dispose()
@@ -71,7 +70,7 @@ namespace GitItGUI.Core
 
 				if (dispatcher != null)
 				{
-					dispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
+					dispatcher.Stop();
 				}
 
 				if (thread != null)

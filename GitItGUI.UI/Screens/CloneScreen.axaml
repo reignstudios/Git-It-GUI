@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="GitItGUI.UI.Screens.CloneScreen"
+			xmlns="https://github.com/avaloniaui"
+			xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			xmlns:local="clr-namespace:GitItGUI.UI.Screens"
+			mc:Ignorable="d" 
+			d:DesignHeight="400" d:DesignWidth="600">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="40" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<Label Grid.Row="0" Content="Clone Settings" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+		<Border Grid.Row="1" Width="420" Height="145" VerticalAlignment="Top" BorderBrush="Gray" BorderThickness="2">
+			<Grid Background="#EEEEEE">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="30" />
+					<RowDefinition Height="25" />
+					<RowDefinition Height="30" />
+					<RowDefinition Height="25" />
+					<RowDefinition Height="25" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
+
+				<Label Grid.Row="0" Content="Repository URL" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+				<TextBox Name="repoUrlTextBox" Grid.Row="1" VerticalAlignment="Center" Margin="20,0"/>
+
+				<Label Grid.Row="2" Content="Clone Path" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+				<TextBox Name="clonePathTextBox" Grid.Row="3" VerticalAlignment="Center" Margin="20,0"/>
+				<Button Name="selectPathButton" Grid.Row="4" Width="100" Margin="20,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="selectPathButton_Click">Select Path</Button>
+			</Grid>
+		</Border>
+
+		<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Center" Margin="90,150,435,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="32" Background="LightPink" Click="cancelButton_Click"/>
+		<Button Name="cloneButton" Content="Clone" HorizontalAlignment="Center" Margin="435,150,90,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="32" Background="LightGreen" Click="cloneButton_Click"/>
+	</Grid>
+</UserControl>

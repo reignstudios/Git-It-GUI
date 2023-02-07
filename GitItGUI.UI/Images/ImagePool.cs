@@ -4,39 +4,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
+using Avalonia.Media.Imaging;
 
 namespace GitItGUI.UI.Images
 {
     static class ImagePool
     {
-		public static BitmapImage newImage, deletedImage, conflictedImage, modifiedImage, renamedImage, typeChangedImage, unknownImage;
+		public static Bitmap newImage, deletedImage, conflictedImage, modifiedImage, renamedImage, typeChangedImage, unknownImage;
 
 		static ImagePool()
 		{
-			var uriSource = new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/new.png");
-			newImage = new BitmapImage(uriSource);
+			newImage = new Bitmap("Images/new.png");
 
-			uriSource = new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/deleted.png");
-			deletedImage = new BitmapImage(uriSource);
-
-			uriSource = new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/conflicted.png");
-			conflictedImage = new BitmapImage(uriSource);
-
-			uriSource = new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/modified.png");
-			modifiedImage = new BitmapImage(uriSource);
-
-			uriSource = new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/renamed.png");
-			renamedImage = new BitmapImage(uriSource);
-
-			uriSource = new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/typeChanged.png");
-			typeChangedImage = new BitmapImage(uriSource);
-
-			uriSource = new Uri(@"pack://application:,,,/GitItGUI.UI;component/Images/unknown.png");
-			unknownImage = new BitmapImage(uriSource);
+			deletedImage = new Bitmap("Images/deleted.png");
+			conflictedImage = new Bitmap("Images/conflicted.png");
+			modifiedImage = new Bitmap("Images/modified.png");
+			renamedImage = new Bitmap("Images/renamed.png");
+			typeChangedImage = new Bitmap("Images/typeChanged.png");
+			unknownImage = new Bitmap("Images/unknown.png");
 		}
 
-		public static BitmapImage GetImage(FileStates state)
+		public static Bitmap GetImage(FileStates state)
 		{
 			if ((state & FileStates.Conflicted) != 0) return conflictedImage;
 			else if ((state & FileStates.NewInIndex) != 0 || (state & FileStates.NewInWorkdir) != 0) return newImage;
