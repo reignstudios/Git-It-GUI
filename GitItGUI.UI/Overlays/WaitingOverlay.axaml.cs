@@ -17,9 +17,9 @@ namespace GitItGUI.UI.Overlays
 	/// </summary>
 	public partial class WaitingOverlay : UserControl
 	{
-		public WaitingOverlay()
-		{
-			InitializeComponent();
-		}
+		//public WaitingOverlay()
+		//{
+		//	InitializeComponent();
+		//}
 	}
 }

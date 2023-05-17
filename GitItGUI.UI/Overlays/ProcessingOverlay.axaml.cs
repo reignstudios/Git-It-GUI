@@ -24,43 +24,43 @@ namespace GitItGUI.UI.Overlays
 		private double rot;
 		private Stopwatch stopwatch;
 
-		public ProcessingOverlay()
-		{
-			InitializeComponent();
-			DebugLog.WriteCallback += DebugLog_WriteCallback;
-			stopwatch = new Stopwatch();
-			CompositionTarget.Rendering += CompositionTarget_Rendering;
-		}
+		//public ProcessingOverlay()
+		//{
+		//	InitializeComponent();
+		//	DebugLog.WriteCallback += DebugLog_WriteCallback;
+		//	stopwatch = new Stopwatch();
+		//	CompositionTarget.Rendering += CompositionTarget_Rendering;
+		//}
 
-		private void DebugLog_WriteCallback(string value)
-		{
-			if (Dispatcher.UIThread.CheckAccess())
-			{
-				statusTextBox.Text = value;
-			}
-			else
-			{
-				Dispatcher.UIThread.InvokeAsync(delegate()
-				{
-					statusTextBox.Text = value;
-				});
-			}
-		}
+		//private void DebugLog_WriteCallback(string value)
+		//{
+		//	if (Dispatcher.UIThread.CheckAccess())
+		//	{
+		//		statusTextBox.Text = value;
+		//	}
+		//	else
+		//	{
+		//		Dispatcher.UIThread.InvokeAsync(delegate()
+		//		{
+		//			statusTextBox.Text = value;
+		//		});
+		//	}
+		//}
 
-		private void CompositionTarget_Rendering(object sender, EventArgs e)
-		{
-			if (IsVisible)
-			{
-				spinnerImage.RenderTransform = new RotateTransform(rot);
-				stopwatch.Stop();
-				rot += (stopwatch.ElapsedMilliseconds / 1000d) * 60;
-				stopwatch.Restart();
-			}
-		}
+		//private void CompositionTarget_Rendering(object sender, EventArgs e)
+		//{
+		//	if (IsVisible)
+		//	{
+		//		spinnerImage.RenderTransform = new RotateTransform(rot);
+		//		stopwatch.Stop();
+		//		rot += (stopwatch.ElapsedMilliseconds / 1000d) * 60;
+		//		stopwatch.Restart();
+		//	}
+		//}
 
-		public void SetStatusText(string text)
-		{
-			statusTextBox.Text = text;
-		}
+		//public void SetStatusText(string text)
+		//{
+		//	statusTextBox.Text = text;
+		//}
 	}
 }

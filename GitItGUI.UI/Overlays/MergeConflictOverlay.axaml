@@ -22,9 +22,9 @@
 						</TextBox.ContextMenu>
 					</TextBox>
 					<Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75" Click="cancelButton_Click"/>
-					<Button Name="mergeToolButton" Content="Merge Tool" HorizontalAlignment="Right" Margin="0,0,168,10" VerticalAlignment="Bottom" Width="75" Click="mergeToolButton_Click" ToolTip="Open the external merge tool"/>
-					<Button Name="userTheirsButton" Content="Use Theirs" HorizontalAlignment="Right" Margin="0,0,89,10" VerticalAlignment="Bottom" Width="74" Click="userTheirsButton_Click" ToolTip="Accept their changes only for this file (discard yours)"/>
-					<Button Name="useOursButton" Content="Use Yours" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="74" Click="useOursButton_Click" ToolTip="Accepts your changes only for this file (discard theirs)"/>
+					<Button Name="mergeToolButton" Content="Merge Tool" HorizontalAlignment="Right" Margin="0,0,168,10" VerticalAlignment="Bottom" Width="75" Click="mergeToolButton_Click"/> <!--ToolTip="Open the external merge tool"/>-->
+					<Button Name="userTheirsButton" Content="Use Theirs" HorizontalAlignment="Right" Margin="0,0,89,10" VerticalAlignment="Bottom" Width="74" Click="userTheirsButton_Click"/> <!--ToolTip="Accept their changes only for this file (discard yours)"/>-->
+					<Button Name="useOursButton" Content="Use Yours" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="74" Click="useOursButton_Click"/> <!--ToolTip="Accepts your changes only for this file (discard theirs)"/>-->
 				</Grid>
 			</Border>
 		</Grid>

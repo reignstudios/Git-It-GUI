@@ -32,13 +32,13 @@
 					<ComboBoxItem>DiffMerge</ComboBoxItem>
 				</ComboBox>
 
-				<ToggleButton Name="showLSFTagsCheckBox" Grid.Row="2" Content="Show LFS Tags" VerticalAlignment="Center" Margin="20,0" ToolTip="Show the '[LFS]' tag on lfs files in the changes tab"/>
-				<ToggleButton Name="autoRefreshCheckBox" Grid.Row="3" Content="Auto Refresh Changes" VerticalAlignment="Center" Margin="20,0" ToolTip="Refresh changes when app window comes into focus"/>
+				<ToggleButton Name="showLSFTagsCheckBox" Grid.Row="2" Content="Show LFS Tags" VerticalAlignment="Center" Margin="20,0"/><!--ToolTip="Show the '[LFS]' tag on lfs files in the changes tab"-->
+				<ToggleButton Name="autoRefreshCheckBox" Grid.Row="3" Content="Auto Refresh Changes" VerticalAlignment="Center" Margin="20,0"/><!--ToolTip="Refresh changes when app window comes into focus"-->
 			</Grid>
 		</Border>
 
 
-		<Button Name="doneButton" Grid.Row="0" ToolTip="Go back to start screen" Background="LightGreen" Width="32" Height="32" Margin="0,10,10,0" HorizontalAlignment="Right" VerticalAlignment="Top" Click="doneButton_Click">
+		<Button Name="doneButton" Grid.Row="0" Background="LightGreen" Width="32" Height="32" Margin="0,10,10,0" HorizontalAlignment="Right" VerticalAlignment="Top" Click="doneButton_Click"><!--ToolTip="Go back to start screen"-->
 			<TextBlock Text="⌂" FontWeight="Bold" FontSize="16" Margin="-1,-2,0,0"/>
 		</Button>
 	</Grid>

@@ -27,8 +27,8 @@
                 <TextBox Name="sigName" Grid.Row="1" Text="Full Name" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0" TextChanged="sigName_TextChanged"/>
                 <Label Grid.Row="2" Content="Signature Email" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
                 <TextBox Name="sigEmail" Grid.Row="3" Text="account@email.com" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="20,0" TextChanged="sigEmail_TextChanged"/>
-                <ToggleButton Name="isLocalToggleButton" Grid.Row="4" Content="Is signature local" VerticalAlignment="Center" Margin="20,0" ToolTip="Is the signature local to this repository" Checked="isLocalToggleButton_Checked"/>
-            </Grid>
+                <ToggleButton Name="isLocalToggleButton" Grid.Row="4" Content="Is signature local" VerticalAlignment="Center" Margin="20,0" Checked="isLocalToggleButton_Checked"/><!--ToolTip="Is the signature local to this repository"-->
+			</Grid>
         </Border>
 
         <Button Name="cancelButton" Content="Cancel" Background="LightPink" HorizontalAlignment="Center" Margin="172,153,353,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="32" Click="cancelButton_Click"/>

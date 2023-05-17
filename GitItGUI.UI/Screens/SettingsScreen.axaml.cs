@@ -62,13 +62,13 @@ namespace GitItGUI.UI.Screens
 		public void ValidateDiffMergeTool()
 		{
 			if (AppManager.isMergeToolInstalled || AppManager.settings.mergeDiffTool == MergeDiffTools.None) return;
-			MainWindow.singleton.ShowMessageOverlay("Warning", "Diff/Merge tool not installed!\nSome app functions will fail.\nGo to app settings.");
+			//MainWindow.singleton.ShowMessageOverlay("Warning", "Diff/Merge tool not installed!\nSome app functions will fail.\nGo to app settings.");
 		}
 
 		private void doneButton_Click(object sender, RoutedEventArgs e)
 		{
 			Apply();
-			MainWindow.singleton.Navigate(StartScreen.singleton);
+			//MainWindow.singleton.Navigate(StartScreen.singleton);
 		}
 	}
 }

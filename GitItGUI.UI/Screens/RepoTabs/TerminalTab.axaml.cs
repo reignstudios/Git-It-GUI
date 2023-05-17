@@ -31,7 +31,7 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		public void ScrollToEnd()
 		{
-			terminalTextBox.ScrollToEnd();
+			//terminalTextBox.ScrollToEnd();
 		}
 
 		public void CheckRefreshPending()

@@ -28,12 +28,12 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		public void OpenHistory(string filename)
 		{
-			MainWindow.singleton.ShowWaitingOverlay();
-			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
-			{
-				RepoScreen.singleton.repoManager.OpenGitk(filename);
-				MainWindow.singleton.HideWaitingOverlay();
-			});
+			//MainWindow.singleton.ShowWaitingOverlay();
+			//RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			//{
+			//	RepoScreen.singleton.repoManager.OpenGitk(filename);
+			//	MainWindow.singleton.HideWaitingOverlay();
+			//});
 		}
 
 		private void historyButton_Click(object sender, RoutedEventArgs e)

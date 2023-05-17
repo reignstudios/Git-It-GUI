@@ -35,20 +35,19 @@ namespace GitItGUI.UI.Overlays
 			remoteComboBox.IsVisible = showRemotesOption;
 			if (showRemotesOption)
 			{
-				var items = new List<ComboBoxItem>();
+				remoteComboBox.Items.Clear();
 				var item = new ComboBoxItem();
 				item.Content = "[Local Branch]";
 				//item.ToolTip = "This branch will only be tracked by your computer";
-				items.Add(item);
+				remoteComboBox.Items.Add(item);
 				foreach (var remote in RepoScreen.singleton.repoManager.remoteStates)
 				{
 					item = new ComboBoxItem();
 					item.Content = remote.name;
 					//item.ToolTip = "URL: " + remote.url;
-					items.Add(item);
+					remoteComboBox.Items.Add(item);
 				}
-
-				remoteComboBox.Items = items;
+				
 				remoteComboBox.SelectedIndex = 0;
 			}
 		}

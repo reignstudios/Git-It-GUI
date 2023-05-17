@@ -1,6 +1,6 @@
 ﻿//using System.Windows.Forms;
 //using System.Windows.Interop;
-using WPFFolderBrowser;
+//using WPFFolderBrowser;
 
 namespace GitItGUI.UI.Utils
 {
@@ -23,14 +23,14 @@ namespace GitItGUI.UI.Utils
 			folderPath = null;
 			return false;*/
 
-			using (var dlg = new WPFFolderBrowserDialog("Select Folder Test"))
+			/*using (var dlg = new WPFFolderBrowserDialog("Select Folder Test"))
 			{
 				if (dlg.ShowDialog(MainWindow.singleton) == true)
 				{
 					folderPath = dlg.FileName;
 					return true;
 				}
-			}
+			}*/
 
 			folderPath = null;
 			return false;

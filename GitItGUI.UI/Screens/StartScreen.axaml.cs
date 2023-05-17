@@ -31,8 +31,8 @@ namespace GitItGUI.UI.Screens
 			outOfDateImageFlash = new Bitmap("Images/UpdateFlash.png");
 
 			updateImage.IsVisible = false;
-			updateImage.MouseUp += UpdateImage_MouseUp;
-			timer = new DispatcherTimer(TimeSpan.FromSeconds(.25), DispatcherPriority.Background, DispatcherCallback, Dispatcher);
+			//updateImage.MouseUp += UpdateImage_MouseUp;
+			//timer = new DispatcherTimer(TimeSpan.FromSeconds(.25), DispatcherPriority.Background, DispatcherCallback, Dispatcher);
 		}
 
 		private void DispatcherCallback(object sender, EventArgs e)
@@ -57,7 +57,7 @@ namespace GitItGUI.UI.Screens
 
 		internal void RefreshHistory()
 		{
-			var items = new List<Control>();
+			historyListBox.Items.Clear();
 			foreach (var repo in AppManager.repositories)
 			{
 				var item = new ListBoxItem();
@@ -65,8 +65,8 @@ namespace GitItGUI.UI.Screens
 				//item.ToolTip = repo;
 				item.FontSize = 24;
 
-				item.HorizontalContentAlignment = HorizontalAlignment.Center;
-				item.MouseDoubleClick += Item_MouseDoubleClick;
+				//item.HorizontalContentAlignment = HorizontalAlignment.Center;
+				item.DoubleTapped += Item_MouseDoubleClick;
 				item.ContextMenu = new ContextMenu();
 
 				// open folder path
@@ -74,18 +74,17 @@ namespace GitItGUI.UI.Screens
 				menuItem.Header = "Open folder path";
 				//menuItem.ToolTip = repo;
 				menuItem.Click += OpenRepoMenuItem_Click;
-				items.Add(menuItem);
+				historyListBox.Items.Add(menuItem);
 
 				// remove repo from history
 				menuItem = new MenuItem();
 				menuItem.Header = "Remove from history";
 				//menuItem.ToolTip = repo;
 				menuItem.Click += RemoveHistoryMenuItem_Click;
-				items.Add(menuItem);
+				historyListBox.Items.Add(menuItem);
 
-				items.Add(item);
+				historyListBox.Items.Add(item);
 			}
-			historyListBox.Items = items;
 		}
 
 		public void Refresh()
@@ -105,28 +104,28 @@ namespace GitItGUI.UI.Screens
 
 		private void OpenRepoMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-			var item = (MenuItem)sender;
-			string repo = (string)item.ToolTip;
-			if (!Tools.OpenFolderLocation(repo))
-			{
-				AppManager.RemoveRepoFromHistory(repo);
-				RefreshHistory();
-			}
+			//var item = (MenuItem)sender;
+			//string repo = (string)item.ToolTip;
+			//if (!Tools.OpenFolderLocation(repo))
+			//{
+			//	AppManager.RemoveRepoFromHistory(repo);
+			//	RefreshHistory();
+			//}
 		}
 
 		private void RemoveHistoryMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-			var item = (MenuItem)sender;
-			string repo = (string)item.ToolTip;
-			AppManager.RemoveRepoFromHistory(repo);
-			RefreshHistory();
+			//var item = (MenuItem)sender;
+			//string repo = (string)item.ToolTip;
+			//AppManager.RemoveRepoFromHistory(repo);
+			//RefreshHistory();
 		}
 
-		private void Item_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		private void Item_MouseDoubleClick(object sender, Avalonia.Input.TappedEventArgs e)
 		{
-			var item = (ListBoxItem)sender;
-			string repo = (string)item.ToolTip;
-			RepoScreen.singleton.OpenRepo(repo);
+			//var item = (ListBoxItem)sender;
+			//string repo = (string)item.ToolTip;
+			//RepoScreen.singleton.OpenRepo(repo);
 		}
 
 		private void openButton_Click(object sender, RoutedEventArgs e)
@@ -140,22 +139,22 @@ namespace GitItGUI.UI.Screens
 		private void cloneButton_Click(object sender, RoutedEventArgs e)
 		{
 			CloneScreen.singleton.Setup();
-			MainWindow.singleton.Navigate(CloneScreen.singleton);
+			//MainWindow.singleton.Navigate(CloneScreen.singleton);
 		}
 
 		private void createButton_Click(object sender, RoutedEventArgs e)
 		{
 			CreateScreen.singleton.Setup();
-			MainWindow.singleton.Navigate(CreateScreen.singleton);
+			//MainWindow.singleton.Navigate(CreateScreen.singleton);
 		}
 
 		private void settingsButton_Click(object sender, RoutedEventArgs e)
 		{
 			SettingsScreen.singleton.Setup();
-			MainWindow.singleton.Navigate(SettingsScreen.singleton);
+			//MainWindow.singleton.Navigate(SettingsScreen.singleton);
 		}
 
-		private void UpdateImage_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		private void UpdateImage_MouseUp(object sender, Avalonia.Input.TappedEventArgs e)
 		{
 			using var process = Process.Start("https://github.com/reignstudios/Git-It-GUI/releases");
 		}

@@ -41,32 +41,32 @@ namespace GitItGUI.UI.Screens.RepoTabs
 
 		private void applyButton_Click(object sender, RoutedEventArgs e)
 		{
-			// validate name
-			if (sigName.Text.Length < 3)
-			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "Signature name to short");
-				return;
-			}
+			//// validate name
+			//if (sigName.Text.Length < 3)
+			//{
+			//	MainWindow.singleton.ShowMessageOverlay("Alert", "Signature name to short");
+			//	return;
+			//}
 
-			// validate email
-			var match = Regex.Match(sigEmail.Text, @"(.*)@(.*)\.(\w*)");
-			if (!match.Success)
-			{
-				MainWindow.singleton.ShowMessageOverlay("Alert", "Invalid signature email");
-				return;
-			}
+			//// validate email
+			//var match = Regex.Match(sigEmail.Text, @"(.*)@(.*)\.(\w*)");
+			//if (!match.Success)
+			//{
+			//	MainWindow.singleton.ShowMessageOverlay("Alert", "Invalid signature email");
+			//	return;
+			//}
 
-			// apply
-			applyButton.IsVisible = false;
-			cancelButton.IsVisible = false;
-			string name = sigName.Text, email = sigEmail.Text;
-			bool isLocal = isLocalToggleButton.IsChecked == true;
-			MainWindow.singleton.ShowProcessingOverlay();
-			RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
-			{
-				RepoScreen.singleton.repoManager.UpdateSignature(name, email, isLocal ? GitCommander.SignatureLocations.Local : GitCommander.SignatureLocations.Global);
-				MainWindow.singleton.HideProcessingOverlay();
-			});
+			//// apply
+			//applyButton.IsVisible = false;
+			//cancelButton.IsVisible = false;
+			//string name = sigName.Text, email = sigEmail.Text;
+			//bool isLocal = isLocalToggleButton.IsChecked == true;
+			//MainWindow.singleton.ShowProcessingOverlay();
+			//RepoScreen.singleton.repoManager.dispatcher.InvokeAsync(delegate()
+			//{
+			//	RepoScreen.singleton.repoManager.UpdateSignature(name, email, isLocal ? GitCommander.SignatureLocations.Local : GitCommander.SignatureLocations.Global);
+			//	MainWindow.singleton.HideProcessingOverlay();
+			//});
 		}
 
 		private void cancelButton_Click(object sender, RoutedEventArgs e)

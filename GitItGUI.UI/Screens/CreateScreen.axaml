@@ -27,8 +27,8 @@
 				<Button Name="selectPathButton" Grid.Row="2" Width="100" Margin="20,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="selectPathButton_Click">Select Path</Button>
 
 				<Separator Grid.Row="3" Margin="20,5" VerticalAlignment="Top"/>
-				<CheckBox Name="enableLFSCheckBox" Grid.Row="3" Margin="20,15" Width="100" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Init LFS support for this repo" Checked="enableLFSCheckBox_Checked" Unchecked="enableLFSCheckBox_Checked">Enable LFS</CheckBox>
-				<CheckBox Name="lfsDefaultsCheckBox" Grid.Row="3" Margin="125,15,0,0" Width="200" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Add Git-It-GUI default file '.ext' types to LFS" IsEnabled="False">Add default LFS binary types</CheckBox>
+				<CheckBox Name="enableLFSCheckBox" Grid.Row="3" Margin="20,15" Width="100" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="enableLFSCheckBox_Checked" Unchecked="enableLFSCheckBox_Checked">Enable LFS</CheckBox> <!--ToolTip="Init LFS support for this repo"-->
+				<CheckBox Name="lfsDefaultsCheckBox" Grid.Row="3" Margin="125,15,0,0" Width="200" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="False">Add default LFS binary types</CheckBox><!--ToolTip="Add Git-It-GUI default file '.ext' types to LFS"-->
 			</Grid>
 		</Border>
 

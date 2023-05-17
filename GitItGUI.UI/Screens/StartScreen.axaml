@@ -10,7 +10,7 @@
         <Image Source="../Images/AppIcon.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="230" Height="230" Margin="-50,-50,0,0" Opacity=".25"/>
         <Label Content="Git-It-GUI" FontWeight="Bold" Margin="0,10,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="32"/>
         <Label Content="Select a repo below from the history list or open/clone/create one" Margin="0,60,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="12"/>
-        <Button Name="settingsButton" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32" ToolTip="Settings" Click="settingsButton_Click">
+        <Button Name="settingsButton" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="32" Height="32" Click="settingsButton_Click"><!--ToolTip="Settings"-->
             <Image Source="../Images/Settings.png"/>
         </Button>
         <Border Margin="10,91,10,10" BorderBrush="Gray" BorderThickness="2">
@@ -21,13 +21,13 @@
 				</Grid.RowDefinitions>
 
 				<Grid Grid.Row="0" Background="#EEEEEE" Margin="0">
-					<Button Name="openButton" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Open an existing repo" Click="openButton_Click">
+					<Button Name="openButton" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Height="32" Click="openButton_Click"><!--ToolTip="Open an existing repo"-->
 						<Image Source="../Images/Open.png"/>
 					</Button>
-					<Button Name="cloneButton" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Clone an existing repo" Click="cloneButton_Click">
+					<Button Name="cloneButton" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="32" Click="cloneButton_Click"><!--ToolTip="Clone an existing repo"-->
 						<Image Source="../Images/Clone.png" Margin="2"/>
 					</Button>
-					<Button Name="createButton" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Height="32" ToolTip="Create a new repo" Click="createButton_Click">
+					<Button Name="createButton" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Height="32" Click="createButton_Click"><!--ToolTip="Create a new repo"-->
 						<Image Source="../Images/Create.png" Margin="2"/>
 					</Button>
 					<Separator VerticalAlignment="Top" Margin="0,51,0,0"/>
@@ -41,6 +41,6 @@
         </Border>
 
 		<!-- Update Button -->
-		<Image Name="updateImage" Source="../Images/Update.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="64" Height="64" Margin="10" ToolTip="Update avaliable!"/>
+		<Image Name="updateImage" Source="../Images/Update.png" HorizontalAlignment="Left" VerticalAlignment="Top" Width="64" Height="64" Margin="10"/><!--ToolTip="Update avaliable!"-->
 	</Grid>
 </UserControl>

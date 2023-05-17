@@ -53,12 +53,12 @@ namespace GitItGUI.UI.Screens
 				return;
 			}
 
-			RepoScreen.singleton.CloneRepo(clonePathTextBox.Text, repoUrlTextBox.Text);
+			//RepoScreen.singleton.CloneRepo(clonePathTextBox.Text, repoUrlTextBox.Text);
 		}
 
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
-			MainWindow.singleton.Navigate(StartScreen.singleton);
+			//MainWindow.singleton.Navigate(StartScreen.singleton);
 		}
 	}
 }

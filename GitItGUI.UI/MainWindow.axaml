@@ -9,17 +9,17 @@
 		Title="Git-It-GUI" Width="800" Height="500" MinWidth="800" MinHeight="500">
 	<Grid>
 		<!-- Screens -->
-		<screens:StartScreen x:Name="startScreen" Visibility="Visible"/>
-		<screens:RepoScreen x:Name="repoScreen" Visibility="Hidden"/>
-		<screens:SettingsScreen x:Name="settingsScreen" Visibility="Hidden"/>
-		<screens:CloneScreen x:Name="cloneScreen" Visibility="Hidden"/>
-		<screens:CreateScreen x:Name="createScreen" Visibility="Hidden"/>
+		<screens:StartScreen x:Name="startScreen" IsVisible="True"/>
+		<screens:RepoScreen x:Name="repoScreen" IsVisible="False"/>
+		<screens:SettingsScreen x:Name="settingsScreen" IsVisible="False"/>
+		<screens:CloneScreen x:Name="cloneScreen" IsVisible="False"/>
+		<screens:CreateScreen x:Name="createScreen" IsVisible="False"/>
 
 		<!-- Overlays -->
-		<overlays:MergeConflictOverlay x:Name="mergingOverlay" Visibility="Hidden"/>
-		<overlays:NameEntryOverlay x:Name="nameEntryOverlay" Visibility="Hidden"/>
-		<overlays:ProcessingOverlay x:Name="processingOverlay" Visibility="Hidden"/>
-		<overlays:MessageOverlay x:Name="messageOverlay" Visibility="Hidden"/>
-		<overlays:WaitingOverlay x:Name="waitingOverlay" Visibility="Hidden"/>
+		<overlays:MergeConflictOverlay x:Name="mergingOverlay" IsVisible="False"/>
+		<overlays:NameEntryOverlay x:Name="nameEntryOverlay" IsVisible="False"/>
+		<overlays:ProcessingOverlay x:Name="processingOverlay" IsVisible="False"/>
+		<overlays:MessageOverlay x:Name="messageOverlay" IsVisible="False"/>
+		<overlays:WaitingOverlay x:Name="waitingOverlay" IsVisible="False"/>
 	</Grid>
 </Window>

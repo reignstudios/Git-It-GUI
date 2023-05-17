@@ -48,12 +48,12 @@ namespace GitItGUI.UI.Screens
 				return;
 			}
 
-			RepoScreen.singleton.CreateRepo(repoPathTextBox.Text, enableLFSCheckBox.IsChecked == true, lfsDefaultsCheckBox.IsChecked == true);
+			//RepoScreen.singleton.CreateRepo(repoPathTextBox.Text, enableLFSCheckBox.IsChecked == true, lfsDefaultsCheckBox.IsChecked == true);
 		}
 
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
-			MainWindow.singleton.Navigate(StartScreen.singleton);
+			//MainWindow.singleton.Navigate(StartScreen.singleton);
 		}
 
 		private void enableLFSCheckBox_Checked(object sender, RoutedEventArgs e)
