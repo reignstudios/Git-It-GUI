@@ -205,7 +205,7 @@ namespace GitCommander
 					}
 					else
 					{
-						match = Regex.Match(line, @"(\S*).*\[(.*)\]");
+						match = Regex.Match(line, @"(\S*).*?\[(\S*)?\]");
 						if (match.Success)
 						{
 							isTracking = true;
